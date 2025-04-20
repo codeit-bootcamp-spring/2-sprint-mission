@@ -35,7 +35,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContentResult getById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findByBinaryContentId(id)
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID를 가진 컨텐츠가 없습니다."));
 
         return BinaryContentResult.fromEntity(binaryContent);
@@ -50,6 +50,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void delete(UUID id) {
-        binaryContentRepository.delete(id);
+        binaryContentRepository.deleteById(id);
     }
 }

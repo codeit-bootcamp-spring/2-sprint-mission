@@ -59,7 +59,7 @@
 
 #### 4. 레포지토리와 서비스에 JPA 도입하기
 
-- [ ] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
+- [x] 기존의 Repository 인터페이스를 JPARepository로 정의하고 쿼리메소드로 대체하세요.
     - FileRepository와 JCFRepository 구현체는 삭제합니다.
 - [ ] 영속성 컨텍스트의 특징에 맞추어 서비스 레이어를 수정해보세요.
     - 힌트: 트랜잭션, 영속성 전이, 변경 감지, 지연로딩

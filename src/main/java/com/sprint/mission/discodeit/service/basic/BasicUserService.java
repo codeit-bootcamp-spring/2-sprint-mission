@@ -59,10 +59,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResult getById(UUID userId) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
@@ -73,7 +73,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByName(name)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
@@ -84,7 +84,7 @@ public class BasicUserService implements UserService {
         return userRepository.findAll()
                 .stream()
                 .map(user -> {
-                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                    UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                             .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
                     return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
@@ -98,7 +98,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(
                         () -> new IllegalArgumentException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent()));
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
@@ -106,7 +106,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
-        User user = userRepository.findByUserId(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         BinaryContent savedBinaryContent = null;
@@ -117,13 +117,13 @@ public class BasicUserService implements UserService {
                     binaryContentRequest.bytes());
 
             savedBinaryContent = binaryContentRepository.save(binaryContent);
-            binaryContentRepository.delete(user.getBinaryContent().getId());
+            binaryContentRepository.deleteById(user.getBinaryContent().getId());
         }
 
         user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), savedBinaryContent);
         User savedUser = userRepository.save(user);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(savedUser.getId())
+        UserStatus userStatus = userStatusRepository.findByUser_Id(savedUser.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(savedUser, userStatus.isOnline(Instant.now()));
@@ -131,12 +131,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        userStatusRepository.delete(userStatus.getId());
+        userStatusRepository.deleteById(userStatus.getId());
     }
 
     private void validateDuplicateUserName(String name) {

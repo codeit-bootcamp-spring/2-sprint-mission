@@ -25,9 +25,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResult create(ReadStatusCreateRequest readStatusCreateRequest) {
-        Channel channel = channelRepository.findByChannelId(readStatusCreateRequest.channelId())
+        Channel channel = channelRepository.findById(readStatusCreateRequest.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("readStaus에 해당하는 채널이 없습니다."));
-        User user = userRepository.findByUserId(readStatusCreateRequest.userId())
+        User user = userRepository.findById(readStatusCreateRequest.userId())
                 .orElseThrow(() -> new IllegalArgumentException("readStatus에 해당하는 유저가 없습니다."));
 
         readStatusRepository.findByChannelIdAndUserId(readStatusCreateRequest.channelId(),
@@ -44,13 +44,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public List<ReadStatusResult> getAllByUserId(UUID userId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findByUserId(userId);
+        List<ReadStatus> readStatuses = readStatusRepository.findByUser_Id(userId);
         return ReadStatusResult.fromEntity(readStatuses);
     }
 
     @Override
     public ReadStatusResult updateLastReadTime(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.findByReadStatusId(readStatusId)
+        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 Id의 객체가 없습니다."));
 
         readStatus.updateLastReadTime();
@@ -61,6 +61,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID readStatusId) {
-        readStatusRepository.delete(readStatusId);
+        readStatusRepository.deleteById(readStatusId);
     }
 }

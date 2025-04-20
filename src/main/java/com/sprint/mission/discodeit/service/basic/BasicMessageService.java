@@ -35,7 +35,7 @@ public class BasicMessageService implements MessageService {
     public MessageResult create(MessageCreateRequest messageCreateRequest,
                                 List<BinaryContentRequest> files) {
 
-        Channel channel = channelRepository.findByChannelId(messageCreateRequest.channelId())
+        Channel channel = channelRepository.findById(messageCreateRequest.channelId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 채널이 존재하지 않습니다."));
 
         List<BinaryContent> attachments;
@@ -54,7 +54,7 @@ public class BasicMessageService implements MessageService {
             attachments = List.of();
         }
 
-        User user = userRepository.findByUserId(messageCreateRequest.authorId())
+        User user = userRepository.findById(messageCreateRequest.authorId())
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
         Message message = messageRepository.save(
@@ -65,7 +65,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResult getById(UUID id) {
-        Message message = messageRepository.findByMessageId(id)
+        Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         return MessageResult.fromEntity(message);
@@ -83,7 +83,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResult updateContext(UUID id, String context) {
-        Message message = messageRepository.findByMessageId(id)
+        Message message = messageRepository.findById(id)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID id) {
-        Message message = messageRepository.findByMessageId(id)
+        Message message = messageRepository.findById(id)
                 .orElseThrow(
                         () -> new IllegalArgumentException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
@@ -106,9 +106,9 @@ public class BasicMessageService implements MessageService {
                 .toList();
 
         for (UUID attachmentId : attachmentIds) {
-            binaryContentRepository.delete(attachmentId);
+            binaryContentRepository.deleteById(attachmentId);
         }
 
-        messageRepository.delete(id);
+        messageRepository.deleteById(id);
     }
 }

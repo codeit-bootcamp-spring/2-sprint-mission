@@ -22,7 +22,7 @@ public class BasicAuthService implements AuthService {
     @Override
     public UserResult login(LoginRequest loginRequestUser) {
         User user = findUserByNameAndValidatePassword(loginRequestUser);
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저의 상태가 존재하지 않습니다."));
 
         Instant now = Instant.now();
