@@ -36,26 +36,23 @@ public class BasicUserService implements UserService {
         validateDuplicateEmail(userRequest.email());
         validateDuplicateUserName(userRequest.username());
 
-        UUID binaryContentId = null;
+        BinaryContent savedBinaryContent = null;
         if (binaryContentRequest != null) {
             BinaryContent binaryContent = new BinaryContent(
                     binaryContentRequest.fileName(),
                     binaryContentRequest.contentType(),
                     binaryContentRequest.bytes());
-            BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-
-            binaryContentId = savedBinaryContent.getId();
+            savedBinaryContent = binaryContentRepository.save(binaryContent);
         }
 
         User savedUser = userRepository.save(new User(
-                        userRequest.username(),
-                        userRequest.email(),
-                        userRequest.password(),
-                        binaryContentId
-                )
-        );
+                userRequest.username(),
+                userRequest.email(),
+                userRequest.password(),
+                savedBinaryContent
+        ));
         Instant now = Instant.now();
-        UserStatus userStatus = userStatusRepository.save(new UserStatus(savedUser.getId(), now));
+        UserStatus userStatus = userStatusRepository.save(new UserStatus(savedUser, now));
 
         return UserResult.fromEntity(savedUser, userStatus.isOnline(now));
     }
@@ -112,19 +109,18 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        UUID profileImageId = null;
+        BinaryContent savedBinaryContent = null;
         if (binaryContentRequest != null) {
             BinaryContent binaryContent = new BinaryContent(
                     binaryContentRequest.fileName(),
                     binaryContentRequest.contentType(),
                     binaryContentRequest.bytes());
 
-            BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-            binaryContentRepository.delete(user.getProfileId());
-            profileImageId = savedBinaryContent.getId();
+            savedBinaryContent = binaryContentRepository.save(binaryContent);
+            binaryContentRepository.delete(user.getBinaryContent().getId());
         }
 
-        user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), profileImageId);
+        user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), savedBinaryContent);
         User savedUser = userRepository.save(user);
 
         UserStatus userStatus = userStatusRepository.findByUserId(savedUser.getId())

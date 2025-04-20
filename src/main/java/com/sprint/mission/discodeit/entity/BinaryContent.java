@@ -9,8 +9,8 @@ import java.io.Serializable;
 public class BinaryContent extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private final String fileName;
-    private final String contentType;
+    private String fileName;
+    private String contentType;
     private final byte[] bytes;
 
     public BinaryContent(String filename, String contentType, byte[] bytes) {

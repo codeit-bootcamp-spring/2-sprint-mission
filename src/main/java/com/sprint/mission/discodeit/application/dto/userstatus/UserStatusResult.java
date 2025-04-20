@@ -11,7 +11,7 @@ public record UserStatusResult(UUID id, Instant createdAt, Instant updatedAt, UU
         return new UserStatusResult(userStatus.getId(),
                 userStatus.getCreatedAt(),
                 userStatus.getUpdatedAt(),
-                userStatus.getUserId(),
+                userStatus.getUser().getId(),
                 userStatus.getLastActiveAt(),
                 online);
     }

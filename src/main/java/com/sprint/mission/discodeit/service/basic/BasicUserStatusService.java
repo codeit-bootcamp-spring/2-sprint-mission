@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
 import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -23,7 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResult create(UserStatusCreateRequest request) {
-        userRepository.findByUserId(request.userId())
+        User user = userRepository.findByUserId(request.userId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
 
         userStatusRepository.findByUserId(request.userId())
@@ -31,7 +32,8 @@ public class BasicUserStatusService implements UserStatusService {
                     throw new IllegalArgumentException("해당 유저의 상태가 이미 존재합니다.");
                 });
 
-        UserStatus userStatus = userStatusRepository.save(new UserStatus(request.userId(), request.lastActiveAt()));
+        UserStatus userStatus = userStatusRepository.save(
+                new UserStatus(user, request.lastActiveAt()));
 
         return UserStatusResult.fromEntity(userStatus,
                 userStatus.isOnline(ZonedDateTime.now().toInstant()));

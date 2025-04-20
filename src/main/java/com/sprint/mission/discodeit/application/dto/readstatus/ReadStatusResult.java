@@ -9,7 +9,13 @@ import java.util.UUID;
 public record ReadStatusResult(UUID id, Instant createdAt, Instant updatedAt, UUID userId, UUID channelId,
                                Instant lastReadAt) {
     public static ReadStatusResult fromEntity(ReadStatus readStatus) {
-        return new ReadStatusResult(readStatus.getId(), readStatus.getCreatedAt(), readStatus.getUpdatedAt(), readStatus.getUserId(), readStatus.getChannelId(), readStatus.getLastReadTime());
+        return new ReadStatusResult(
+                readStatus.getId(),
+                readStatus.getCreatedAt(),
+                readStatus.getUpdatedAt(),
+                readStatus.getUser().getId(),
+                readStatus.getChannel().getId(),
+                readStatus.getLastReadTime());
     }
 
 

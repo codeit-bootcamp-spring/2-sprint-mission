@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 @Getter
 public class User extends BaseUpdatableEntity implements Serializable {
@@ -12,16 +11,16 @@ public class User extends BaseUpdatableEntity implements Serializable {
     private String name;
     private String email;
     private String password;
-    private UUID profileId;
+    private BinaryContent binaryContent;
 
-    public User(String name, String email, String password, UUID profileId) {
+    public User(String name, String email, String password, BinaryContent binaryContent) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
+        this.binaryContent = binaryContent;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+    public void update(String newUsername, String newEmail, String newPassword, BinaryContent binaryContent) {
         if (newUsername != null && !newUsername.equals(this.name)) {
             this.name = newUsername;
         }
@@ -31,8 +30,8 @@ public class User extends BaseUpdatableEntity implements Serializable {
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
         }
-        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-            this.profileId = newProfileId;
+        if (binaryContent.getId() != null && !binaryContent.getId().equals(this.binaryContent.getId())) {
+            this.binaryContent = binaryContent;
         }
     }
 

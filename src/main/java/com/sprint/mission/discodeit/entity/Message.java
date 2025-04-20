@@ -5,21 +5,20 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
 public class Message extends BaseUpdatableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID channelId;
-    private final UUID userId;
+    private Channel channel;
+    private User user;
     private String context;
-    private List<UUID> attachmentIds;
+    private List<BinaryContent> attachments;
 
-    public Message(String context, UUID channelId, UUID userId, List<UUID> attachmentIds) {
-        this.userId = userId;
-        this.channelId = channelId;
+    public Message(Channel channel, User user, String context, List<BinaryContent> attachments) {
+        this.channel = channel;
+        this.user = user;
         this.context = context;
-        this.attachmentIds = attachmentIds;
+        this.attachments = attachments;
     }
 
     public void updateContext(String context) {

@@ -9,7 +9,12 @@ public record UserResult(UUID id, Instant createdAt, Instant updatedAt, String u
                          boolean online) {
 
     public static UserResult fromEntity(User user, boolean isOnline) {
-        return new UserResult(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), user.getProfileId(),
+        return new UserResult(user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getName(),
+                user.getEmail(),
+                user.getBinaryContent().getId(),
                 isOnline);
     }
 }

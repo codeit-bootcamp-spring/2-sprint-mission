@@ -6,19 +6,18 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 @Getter
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private final UUID userId;
-    private final UUID channelId;
+    private User user;
+    private Channel channel;
     private Instant lastReadTime;
 
-    public ReadStatus(UUID userId, UUID channelId) {
-        this.userId = userId;
-        this.channelId = channelId;
+    public ReadStatus(User user, Channel channel) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadTime = ZonedDateTime.now().toInstant();
     }
 

@@ -6,18 +6,17 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final int DEFAULT_DURATION = 5 * 60 * 1000;
-    private final UUID userId;
+    private User user;
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.userId = userId;
+    public UserStatus(User user, Instant lastActiveAt) {
+        this.user = user;
         this.lastActiveAt = lastActiveAt;
     }
 

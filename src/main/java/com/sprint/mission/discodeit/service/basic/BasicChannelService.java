@@ -4,13 +4,11 @@ import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
 import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.application.dto.channel.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +28,7 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ChannelResult createPublic(PublicChannelCreateRequest channelRegisterRequest) {
@@ -44,12 +44,16 @@ public class BasicChannelService implements ChannelService {
         Channel savedChannel = channelRepository.save(channel);
 
         for (UUID memberId : privateChannelCreateRequest.participantIds()) {
-            readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
+            User member = userRepository.findByUserId(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+            readStatusRepository.save(new ReadStatus(member, savedChannel));
         }
 
         List<UUID> channelMemberIds = readStatusRepository.findByChannelId(channel.getId())
                 .stream()
-                .map(ReadStatus::getUserId)
+                .map(ReadStatus::getUser)
+                .map(User::getId)
                 .toList();
 
         return ChannelResult.fromPrivate(savedChannel, null, channelMemberIds);
@@ -68,7 +72,8 @@ public class BasicChannelService implements ChannelService {
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId())
                     .stream()
-                    .map(ReadStatus::getUserId)
+                    .map(ReadStatus::getUser)
+                    .map(User::getId)
                     .toList();
 
             return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userIds);
@@ -86,9 +91,8 @@ public class BasicChannelService implements ChannelService {
 
         List<Channel> privateChannels = readStatusRepository.findByUserId(userId)
                 .stream()
-                .map(readStatus -> channelRepository.findByChannelId(readStatus.getChannelId())
-                        .orElseThrow(
-                                () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent())))
+                .map(readStatus -> channelRepository.findByChannelId(readStatus.getChannel().getId())
+                        .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent())))
                 .toList();
 
         List<ChannelResult> publicChannelResults = publicChannels.stream()
@@ -153,13 +157,17 @@ public class BasicChannelService implements ChannelService {
                 .ifPresent(readStatus -> {
                     throw new IllegalArgumentException("해당 Private 채널의 유저가 이미 존재합니다.");
                 });
-        readStatusRepository.save(new ReadStatus(friendId, channel.getId()));
+
+        User friend = userRepository.findByUserId(friendId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+        readStatusRepository.save(new ReadStatus(friend, channel));
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())
                 .orElse(null);
 
         List<UUID> userId = readStatusRepository.findByChannelId(channel.getId()).stream().toList()
                 .stream()
-                .map(ReadStatus::getUserId)
+                .map(ReadStatus::getUser)
+                .map(User::getId)
                 .toList();
 
         return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userId);
