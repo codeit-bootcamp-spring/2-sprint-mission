@@ -29,8 +29,8 @@ public class BasicAuthService implements AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        UserStatus status = userStatusRepository.findById(user.getId())
-            .orElseThrow(() -> new IllegalArgumentException("사용자 상태 정보를 찾을 수 없습니다."));
+        userStatusRepository.findByUserId(user.getId())
+            .orElseGet(() -> userStatusRepository.save(new UserStatus(user)));
 
         return userMapper.toDto(user);
     }

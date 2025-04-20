@@ -111,7 +111,11 @@ public class BasicChannelService implements ChannelService {
 
     private Instant getLatestMessageTime(UUID channelId) {
         return messageRepository.findAll().stream()
-            .filter(message -> message.getChannel().getId().equals(channelId))
+            .filter(message -> message != null
+                && message.getChannel() != null
+                && message.getChannel().getId() != null
+                && message.getCreatedAt() != null
+                && message.getChannel().getId().equals(channelId))
             .map(Message::getCreatedAt)
             .max(Instant::compareTo)
             .orElse(null);

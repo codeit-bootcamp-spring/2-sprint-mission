@@ -41,6 +41,7 @@ public class ChannelMapper {
 
         Instant lastMessageAt = messageRepository.findAllByChannel(channel).stream()
             .map(Message::getUpdatedAt)
+            .filter(updatedAt -> updatedAt != null)
             .max(Comparator.naturalOrder())
             .orElse(null);
 

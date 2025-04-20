@@ -33,7 +33,6 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = new BinaryContent(filename, (long) bytes.length, contentType);
         BinaryContent saved = binaryContentRepository.save(binaryContent);
         UUID id = saved.getId();
-
         binaryContentStorage.put(id, bytes);
         return binaryContentMapper.toDto(saved);
     }

@@ -84,10 +84,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     @Transactional
-    public void update(UpdateReadStatusRequest request) {
-        UUID readStatusId = request.readStatusId();
-        Instant newLastReadAt = request.newLastReadAt();
-
+    public void update(UUID readStatusId, Instant newLastReadAt) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(
                 () -> new IllegalArgumentException(

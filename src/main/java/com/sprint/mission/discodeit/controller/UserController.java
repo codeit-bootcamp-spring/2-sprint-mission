@@ -55,10 +55,8 @@ public class UserController {
                 }
             });
 
-        UUID userId = userService.createUser(request, profileOpt).getId();
-        return userService.getUserById(userId)
-            .map(user -> ResponseEntity.status(HttpStatus.CREATED).body(user))
-            .orElse(ResponseEntity.badRequest().build());
+        UserDto user = userService.createUser(request, profileOpt); // 변경됨
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @Operation(
@@ -131,10 +129,12 @@ public class UserController {
         @PathVariable UUID userId,
         @RequestBody UpdateUserStatusRequest request
     ) {
-        if (!userId.equals(request.userId())) {
-            return ResponseEntity.badRequest().build();
-        }
-        userStatusService.updateByUserId(userId);
+        UpdateUserStatusRequest fixedRequest = new UpdateUserStatusRequest(
+            userId,
+            request.newLastActiveAt()
+        );
+
+        userStatusService.update(fixedRequest);
         return ResponseEntity.ok().build();
     }
 }

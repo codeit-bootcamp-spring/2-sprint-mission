@@ -56,21 +56,26 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     @Transactional
     public void update(UpdateUserStatusRequest request) {
-        UserStatus userStatus = userStatusRepository.findById(request.userId())
-            .orElseThrow(
-                () -> new UserStatusNotFoundException(request.userId()));
+        UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
+            .orElseGet(() -> {
+                User user = userRepository.findById(request.userId())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                return userStatusRepository.save(new UserStatus(user));
+            });
+
         userStatus.updateLastActiveAt(request.newLastActiveAt());
-//        userStatusRepository.save(userStatus);
     }
 
     @Override
     @Transactional
     public void updateByUserId(UUID userId) {
         UserStatus userStatus = userStatusRepository.findById(userId)
-            .orElseThrow(() -> new UserStatusNotFoundException(userId));
-
+            .orElseGet(() -> {
+                User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                return userStatusRepository.save(new UserStatus(user));
+            });
         userStatus.updateLastActiveAt(Instant.now());
-//        userStatusRepository.save(userStatus);
     }
 
     @Override

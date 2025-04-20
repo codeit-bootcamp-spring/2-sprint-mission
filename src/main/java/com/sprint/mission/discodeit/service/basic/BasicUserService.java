@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.file.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
@@ -12,6 +13,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,11 +30,12 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentService binaryContentService;
     private final UserMapper userMapper;
 
     @Override
     @Transactional
-    public User createUser(CreateUserRequest request,
+    public UserDto createUser(CreateUserRequest request,
         Optional<CreateBinaryContentRequest> profileOpt) {
         if (userRepository.findAll().stream().anyMatch(
             user -> user.getUsername().equals(request.username()) || user.getEmail()
@@ -42,12 +45,9 @@ public class BasicUserService implements UserService {
         }
 
         BinaryContent profile = profileOpt.map(p -> {
-            BinaryContent binaryContent = new BinaryContent(
-                p.fileName(),
-                (long) p.bytes().length,
-                p.contentType()
-            );
-            return binaryContentRepository.save(binaryContent);
+            BinaryContentDto dto = binaryContentService.create(p);
+            return binaryContentRepository.findById(dto.id())
+                .orElseThrow(() -> new IllegalStateException("프로필 저장 후 조회 실패"));
         }).orElse(null);
 
         User user = new User(
@@ -58,8 +58,9 @@ public class BasicUserService implements UserService {
         );
         userRepository.save(user);
         userStatusRepository.save(new UserStatus(user));
+        userStatusRepository.flush();
 
-        return user;
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -93,12 +94,10 @@ public class BasicUserService implements UserService {
         userRepository.findById(request.userId()).ifPresent(user -> {
             BinaryContent newProfile = profileOpt.map(profile -> {
                 Optional.ofNullable(user.getProfile()).ifPresent(binaryContentRepository::delete);
-                BinaryContent binaryContent = new BinaryContent(
-                    profile.fileName(),
-                    (long) profile.bytes().length,
-                    profile.contentType()
-                );
-                return binaryContentRepository.save(binaryContent);
+
+                BinaryContentDto dto = binaryContentService.create(profile);
+                return binaryContentRepository.findById(dto.id())
+                    .orElseThrow(() -> new IllegalStateException("프로필 저장 후 조회 실패"));
             }).orElse(user.getProfile());
 
             user.update(

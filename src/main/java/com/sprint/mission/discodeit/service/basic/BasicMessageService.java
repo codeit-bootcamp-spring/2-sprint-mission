@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.file.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
@@ -16,6 +18,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +41,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageResponseMapper;
+    private final BinaryContentService binaryContentService;
 
 
     @Override
@@ -62,12 +66,15 @@ public class BasicMessageService implements MessageService {
         if (attachments != null && !attachments.isEmpty()) {
             for (MultipartFile file : attachments) {
                 try {
-                    BinaryContent content = new BinaryContent(
+                    CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(
                         file.getOriginalFilename(),
-                        file.getSize(),
-                        file.getContentType()
+                        file.getContentType(),
+                        file.getBytes()
                     );
-                    binaryContentRepository.save(content);
+
+                    BinaryContentDto dto = binaryContentService.create(binaryRequest);
+                    BinaryContent content = binaryContentRepository.findById(dto.id())
+                        .orElseThrow(() -> new IllegalStateException("저장된 파일을 다시 찾을 수 없습니다."));
                     attachmentIds.add(content);
                 } catch (Exception e) {
                     throw new RuntimeException("첨부 파일 저장 실패", e);

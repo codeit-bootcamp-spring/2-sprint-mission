@@ -68,14 +68,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ);
             InputStreamResource resource = new InputStreamResource(inputStream);
 
+            String contentType =
+                dto.contentType() != null ? dto.contentType() : "application/octet-stream";
+
             return ResponseEntity.ok()
                 .contentLength(dto.size())
-                .contentType(MediaType.parseMediaType(dto.contentType()))
+                .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=\"" + dto.fileName() + "\"")
+                    "attachment; filename=\"" + (dto.fileName() != null ? dto.fileName() : "file")
+                        + "\"")
                 .body(resource);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("파일 다운로드 실패: " + path, e);
         }
     }
