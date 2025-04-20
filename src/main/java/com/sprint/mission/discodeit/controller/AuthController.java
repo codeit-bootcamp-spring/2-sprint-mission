@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.WrongPasswordException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,12 +22,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class AuthController {
 
   private final AuthService authService;
+  private final UserMapper userMapper;
 
   @PostMapping(path = "/login")
   public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
     try {
       User user = authService.login(loginRequest);
-      UserDto userDto = UserDto.from(user);
+      UserDto userDto = userMapper.toDto(user);
       return ResponseEntity.ok(userDto);
     } catch (UserNotFoundException e) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND)

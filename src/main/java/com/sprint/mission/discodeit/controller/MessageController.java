@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class MessageController {
 
   private final MessageService messageService;
+  private final MessageMapper messageMapper;
 
   @PostMapping(
       path = "/channels/{channelId}/messages",
@@ -53,7 +55,7 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
     Message created = messageService.create(request, attachmentRequests);
-    return ResponseEntity.status(HttpStatus.CREATED).body(MessageDto.from(created));
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageMapper.toDto(created));
   }
 
   @PatchMapping("messages/{messageId}")
@@ -62,7 +64,7 @@ public class MessageController {
       @RequestBody MessageUpdateRequest request
   ) {
     Message updatedMessage = messageService.update(messageId, request);
-    return ResponseEntity.ok(MessageDto.from(updatedMessage));
+    return ResponseEntity.ok(messageMapper.toDto(updatedMessage));
   }
 
   @DeleteMapping("messages/{messageId}")
@@ -76,7 +78,7 @@ public class MessageController {
       @RequestParam("channelId") UUID channelId
   ) {
     List<MessageDto> messages = messageService.findAllByChannelId(channelId).stream()
-        .map(MessageDto::from)
+        .map(messageMapper::toDto)
         .toList();
     return ResponseEntity.ok(messages);
   }
