@@ -7,8 +7,8 @@ import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameAlr
 import static com.sprint.mission.discodeit.exception.user.UserErrors.userNameNotFoundError;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.core.content.usecase.CreateBinaryContentUseCase;
+import com.sprint.mission.discodeit.core.content.usecase.DeleteBinaryContentUseCase;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
@@ -40,8 +40,8 @@ public class BasicUserService implements UserService {
   private final UserRepositoryPort userRepository;
 
   private final UserStatusService userStatusService;
-  private final BinaryContentStoragePort binaryContentStorage;
-  private final BinaryContentMetaRepositoryPort binaryContentMetaRepository;
+  private final CreateBinaryContentUseCase createBinaryContentUseCase;
+  private final DeleteBinaryContentUseCase deleteBinaryContentUseCase;
 
   /**
    * <h2>유저 생성 메서드</h2>
@@ -63,7 +63,7 @@ public class BasicUserService implements UserService {
     //이미지 DTO값이 존재하는 지 확인
     if (binaryContentDTO.isPresent()) {
       //이미지 DTO가 존재하면 BinaryContent를 만드는 메서드 실행
-      profile = makeBinaryContent(binaryContentDTO);
+      profile = createBinaryContentUseCase.create(binaryContentDTO.orElse(null));
     }
 
     //유저 생성 및 저장, 로그 출력
@@ -81,47 +81,6 @@ public class BasicUserService implements UserService {
 
     //결과물을 DTO로 감싸서 호출
     return UserResult.create(user, user.getUserStatus().isOnline());
-  }
-
-  //동일 내용이 있는지 확인하는 메서드
-  private void validateUser(String name, String email) {
-    if (userRepository.findByName(name).isPresent()) {
-      userNameAlreadyExistsError(name);
-    }
-
-    if (userRepository.findByEmail(email).isPresent()) {
-      userEmailAlreadyExistsError(email);
-    }
-  }
-
-  /**
-   * <h2>이미지 생성 메서드</h2>
-   * 유저 생성, 유저 업데이트 메서드가 사용될 때 작동함 <br> 이미지 DTO 내 값이 존재하면 작동하는 메서드 <br> DTO 내 변수를 풀어해친 뒤, 메타 데이터는
-   * DB에다가, bytes는 로컬에다가 저장 <br>
-   *
-   * @param binaryContentDTO 파일 이름, 파일 타입, 바이트
-   * @return 유저 메타 데이터
-   */
-  private BinaryContent makeBinaryContent(Optional<CreateBinaryContentCommand> binaryContentDTO) {
-    return binaryContentDTO.map(contentDTO -> {
-      String fileName = contentDTO.fileName();
-      String contentType = contentDTO.contentType();
-      byte[] bytes = contentDTO.bytes();
-      Long size = (long) bytes.length;
-
-      //BinaryContent를 생성
-      BinaryContent content = BinaryContent.create(fileName, size, contentType);
-
-      //메타 데이터는 DB에 저장
-      binaryContentMetaRepository.save(content);
-      //메타 데이터의 id와 bytes는 로컬 storage에 저장
-      binaryContentStorage.put(content.getId(), bytes);
-
-      logger.info("Binary Content Created: {}", content.getId());
-
-      return content;
-      // 어느 하나라도 오류가 발생하면 null 반환
-    }).orElse(null);
   }
 
   /**
@@ -154,13 +113,29 @@ public class BasicUserService implements UserService {
   }
 
   /**
+   * <h2>동일 이름, 이메일 확인 메서드</h2>
+   * 동일한 이름과 이메일이 있으면 오류를 발생
+   *
+   * @param name  확인할 이름
+   * @param email 확인할 이메일
+   */
+  private void validateUser(String name, String email) {
+    if (userRepository.findByName(name).isPresent()) {
+      userNameAlreadyExistsError(name);
+    }
+
+    if (userRepository.findByEmail(email).isPresent()) {
+      userEmailAlreadyExistsError(email);
+    }
+  }
+
+  /**
    * <h2>유저 찾기 메서드</h2>
    * id를 통해서 유저를 찾음
    *
    * @param userId
    * @return 아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부
    */
-  //ID로 유저를 조회
   @Override
   @Transactional(readOnly = true)
   public UserResult findById(UUID userId) {
@@ -175,7 +150,6 @@ public class BasicUserService implements UserService {
    *
    * @return List [아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부]
    */
-  //유저 전체 조회
   @Override
   @Transactional(readOnly = true)
   public List<UserResult> findAll() {
@@ -210,9 +184,9 @@ public class BasicUserService implements UserService {
     //프로필이 있으면 새로 만들어야하기에 기존 이미지를 삭제 진행함
     //업데이트할 이미지가 없는데 기존 프로필이 존재하면 기존 프로필 이미지를 유지함
     if (profile != null && binaryContentDTO.isPresent()) {
-      binaryContentMetaRepository.delete(profile.getId());
+      deleteBinaryContentUseCase.delete(profile.getId());
     }
-    BinaryContent newProfile = makeBinaryContent(binaryContentDTO);
+    BinaryContent newProfile = createBinaryContentUseCase.create(binaryContentDTO.orElse(null));
 
     //유저 엔티티 내부의 업데이트 메서드를 진행함
     user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
@@ -237,7 +211,7 @@ public class BasicUserService implements UserService {
     //유저 이미지가 존재하면 삭제를 진행함
     //Update와 동일한 방식이나, 업데이트에서는 binaryContent 값이 존재할 경우에만 삭제를 진행함
     Optional.ofNullable(user.getProfile().getId())
-        .ifPresent(binaryContentMetaRepository::delete);
+        .ifPresent(deleteBinaryContentUseCase::delete);
 
     //유저 상태와 유저를 DB에서 제거
     userStatusService.delete(user.getId());

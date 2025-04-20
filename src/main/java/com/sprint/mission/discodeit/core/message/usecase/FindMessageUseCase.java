@@ -12,6 +12,6 @@ public interface FindMessageUseCase {
 
 //  Slice<MessageResult> findMessagesByChannelId(UUID channelId, Pageable pageable);
 
-  Slice<MessageResult> findMessagesByChannelId(UUID channelId, Instant cursor, Pageable pageable);
+  Slice<MessageResult> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
 
 }

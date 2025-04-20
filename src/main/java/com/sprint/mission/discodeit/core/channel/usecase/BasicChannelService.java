@@ -192,6 +192,13 @@ public class BasicChannelService implements ChannelService {
     return ChannelResult.create(channel, userIdList, lastMessageAt);
   }
 
+  /**
+   * <h2>최근 메시지 시각 추출 메서드</h2>
+   * 매개변수로 받은 채널에서 메시지를 목록을 얻는다. <br> 메시지 목록 중에서 최근에 생성된 메시지의 생성 시각을 추출한 뒤 반환한다.
+   *
+   * @param channel 찾을 채널
+   * @return 최신 메시지 시각
+   */
   private Instant findLastMessageAt(Channel channel) {
     //메시지 레포지토리에서 채널 아이디를 검색함
     return messageRepository.findAllByChannelId(channel.getId())

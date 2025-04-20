@@ -77,7 +77,7 @@ public class MessageController {
       @PageableDefault(
           size = 50, sort = "createdAt", direction = Direction.DESC
       ) Pageable pageable) {
-    Slice<MessageResult> results = messageService.findMessagesByChannelId(channelId, cursor,
+    Slice<MessageResult> results = messageService.findAllByChannelId(channelId, cursor,
         pageable);
     PageResponse<MessageResult> pageResponse = PageResponseMapper.fromSlice(results,
         MessageResult::createdAt);
