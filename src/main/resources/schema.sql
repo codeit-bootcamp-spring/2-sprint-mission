@@ -1,0 +1,190 @@
+-- 1
+-- psql에서 이미 'discodeit' DB에 접속된 상태이므로 DB 생성
+-- USE는 생략
+
+-- 2
+-- 사용자 생성
+--CREATE USER discodeit_user WITH PASSWORD 'discodeit1234';
+--GRANT ALL PRIVILEGES ON DATABASE discodeit TO discodeit_user;
+
+-- uuid_genertate_v 같은 함수를 사용할 수 있게 해줌
+--CREATE EXTENSION IF NOT EXISTS "uuid-oosp";
+
+-- 3
+-- 테이블 생성
+-- users
+-- CREATE TABLE users
+-- (
+--     -- generate는 값을 자동생성해주고, 충돌위험을 줄여주는 postgreSQL용 함수
+--     id         UUID PRIMARY KEY      DEFAULT uuid_generate_v4(),
+--     username   VARCHAR(50)  NOT NULL UNIQUE,
+--     password   VARCHAR(60)  NOT NULL,
+--     email      VARCHAR(100) NOT NULL UNIQUE,
+--     created_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
+--     updated_at TIMESTAMPTZ  NOT NULL DEFAULT now(),
+--     profile_id UUID,
+--     -- 제약조건
+--     CONSTRAINT fk_users_profile
+--         FOREIGN KEY (profile_id)
+--             REFERENCES binary_contents (id)
+--             ON DELETE SET NULL
+-- );
+--
+-- -- binary_contents
+-- CREATE TABLE binary_contents
+-- (
+--     id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     created_at   TIMESTAMPTZ  NOT NULL,
+--     file_name    VARCHAR(255) NOT NULL,
+--     size         BIGINT       NOT NULL,
+--     content_type VARCHAR(100) NOT NULL,
+--     -- BYTEA = byte array
+--     -- image, file, PDF, audio
+--     bytes        BYTEA
+-- );
+--
+-- -- user_statuses
+-- CREATE TABLE user_statuses
+-- (
+--     id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     user_id        UUID        NOT NULL UNIQUE,
+--     created_at     TIMESTAMPTZ NOT NULL,
+--     updated_at     TIMESTAMPTZ NOT NULL,
+--     last_active_at TIMESTAMPTZ NOT NULL,
+--     CONSTRAINT fk_user_status_user
+--         FOREIGN KEY (user_id)
+--             REFERENCES users (id)
+--             ON DELETE CASCADE
+-- );
+--
+-- -- channels
+-- CREATE TABLE channels
+-- (
+--     id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     name        VARCHAR(100),
+--     description VARCHAR(500),
+--     -- postgreSQL에서 ENUM을 사용하면, 변경할 때 어려움이 생긴다..
+--     -- 그래서 check를 사용하여 타입변경이 쉽도록 한다.
+--     type        VARCHAR(10) NOT NULL CHECK ( type IN ('PUBLIC', 'PRIVATE') ),
+--     created_at  TIMESTAMPTZ NOT NULL,
+--     updated_at  TIMESTAMPTZ NOT NULL
+-- );
+--
+-- -- messages
+-- CREATE TABLE messages
+-- (
+--     id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     author_id  UUID,
+--     channel_id UUID        NOT NULL,
+--     content    TEXT,
+--     created_at TIMESTAMPTZ NOT NULL,
+--     updated_at TIMESTAMPTZ NOT NULL,
+--     CONSTRAINT fk_messages_channel
+--         FOREIGN KEY (channel_id)
+--             REFERENCES channels (id)
+--             ON DELETE CASCADE,
+--     CONSTRAINT fk_messages_author
+--         FOREIGN KEY (author_id)
+--             REFERENCES users (id)
+--             ON DELETE SET NULL
+-- );
+--
+-- CREATE TABLE message_attachments
+-- (
+--     message_id    UUID NOT NULL,
+--     attachment_id UUID NOT NULL,
+--     PRIMARY KEY (message_id, attachment_id),
+--     FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
+--     FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+-- );
+--
+-- CREATE TABLE read_statuses
+-- (
+--     id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+--     user_id      UUID        NOT NULL,
+--     channel_id   UUID        NOT NULL,
+--     created_at   TIMESTAMPTZ NOT NULL,
+--     updated_at   TIMESTAMPTZ NOT NULL,
+--     last_read_at TIMESTAMPTZ NOT NULL,
+--     CONSTRAINT fk_read_user
+--         FOREIGN KEY (user_id)
+--             REFERENCES users (id)
+--             ON DELETE CASCADE,
+--     CONSTRAINT fk_read_channel
+--         FOREIGN KEY (channel_id)
+--             REFERENCES channels (id)
+--             ON DELETE CASCADE,
+--     -- 사용자는 하나의 채널당 한 번만 읽음 상태를 기록할 수 있게 하기 위해서 UNIQUE
+--     -- UK
+--     CONSTRAINT uq_read_status UNIQUE (user_id, channel_id)
+-- );
+--
+--
+-- -- (1) 바이너리 파일 (프로필 이미지 등)
+-- INSERT INTO binary_contents (id, created_at, file_name, size, content_type, bytes)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         'profile1.png',
+--         204800,
+--         'image/png',
+--         decode('89504E470D0A1A0A', 'hex') -- dummy 바이너리
+--        );
+--
+-- -- (2) 사용자
+-- INSERT INTO users (id, created_at, updated_at, username, email, password, profile_id)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         now(),
+--         'alice',
+--         'alice@example.com',
+--         'encrypted-password-123',
+--         NULL -- profile_id는 위 binary_contents UUID와 연결 가능
+--        );
+--
+-- -- (3) 사용자 상태
+-- INSERT INTO user_statuses (id, created_at, updated_at, user_id, last_active_at)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         now(),
+--         (SELECT id FROM users WHERE username = 'alice'),
+--         now());
+--
+-- -- (4) 채널
+-- INSERT INTO channels (id, created_at, updated_at, name, description, type)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         now(),
+--         'general',
+--         'General discussion',
+--         'PUBLIC');
+--
+-- -- (5) 메시지
+-- INSERT INTO messages (id, created_at, updated_at, content, channel_id, author_id)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         now(),
+--         'Hello, world!',
+--         (SELECT id FROM channels WHERE name = 'general'),
+--         (SELECT id FROM users WHERE username = 'alice'));
+--
+-- -- (6) 읽음 상태
+-- INSERT INTO read_statuses (id, created_at, updated_at, user_id, channel_id, last_read_at)
+-- VALUES (gen_random_uuid(),
+--         now(),
+--         now(),
+--         (SELECT id FROM users WHERE username = 'alice'),
+--         (SELECT id FROM channels WHERE name = 'general'),
+--         now());
+--
+-- -- (7) 메시지 첨부파일
+-- -- 가정: 위 messages와 binary_contents가 각각 하나 존재한다고 가정
+-- INSERT INTO message_attachments (message_id, attachment_id)
+-- VALUES ((SELECT id FROM messages WHERE content = 'Hello, world!'),
+--         (SELECT id FROM binary_contents WHERE file_name = 'profile1.png'));
+
+-- userRepository.findALL()이 호출된다고 볼 수 있다.
+SELECT *
+FROM users;
+SELECT email
+FROM users
+WHERE username = 'alice';
