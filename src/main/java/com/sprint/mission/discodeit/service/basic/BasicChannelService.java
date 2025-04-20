@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
@@ -28,7 +27,6 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ReadStatusService readStatusService;
-    private final MessageRepository messageRepository;
     private final ChannelMapper channelMapper;
 
     @Transactional

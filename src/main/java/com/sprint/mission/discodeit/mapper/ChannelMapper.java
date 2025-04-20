@@ -4,12 +4,10 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,10 +20,7 @@ public class ChannelMapper {
     private final UserMapper userMapper;
 
     public ChannelDto toDto(Channel channel) {
-        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
-                .max(Comparator.comparing(Message::getCreatedAt))
-                .map(Message::getCreatedAt)
-                .orElse(null);
+        Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId());
 
         boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
         List<UserDto> participants = isPrivate ?
