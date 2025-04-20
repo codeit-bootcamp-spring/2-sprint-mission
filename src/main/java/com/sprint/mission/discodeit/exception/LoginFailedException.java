@@ -8,7 +8,7 @@ public class LoginFailedException extends NormalException {
   public LoginFailedException(ErrorCode errorCode, Object... args) {
     super(errorCode.getMessage());
     this.errorCode = errorCode;
-    this.args = args;
+    this.args = args != null ? args : new Object[0];
   }
 
   public ErrorCode getErrorCode() {

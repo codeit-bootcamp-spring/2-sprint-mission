@@ -34,16 +34,19 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional
   public BinaryContent create(CreateBinaryContentCommand command) {
-    //바이너키 컨텐트 메타 데이터를 생성
-    //파일명, 파일 사이즈, 파일 타입
-    BinaryContent binaryContent = BinaryContent.create(command.fileName(),
-        (long) command.bytes().length, command.contentType());
-    //메타 데이터를 DB에 저장시킴
-    binaryContentMetaRepository.save(binaryContent);
-    //byte를 로컬 storage에 저장시킴
-    binaryContentStorage.put(binaryContent.getId(), command.bytes());
-    logger.info("Binary Content Created: {}", binaryContent.getId());
-    return binaryContent;
+    if (command != null) {
+      //바이너키 컨텐트 메타 데이터를 생성
+      //파일명, 파일 사이즈, 파일 타입
+      BinaryContent binaryContent = BinaryContent.create(command.fileName(),
+          (long) command.bytes().length, command.contentType());
+      //메타 데이터를 DB에 저장시킴
+      binaryContentMetaRepository.save(binaryContent);
+      //byte를 로컬 storage에 저장시킴
+      binaryContentStorage.put(binaryContent.getId(), command.bytes());
+      logger.info("Binary Content Created: {}", binaryContent.getId());
+      return binaryContent;
+    }
+    return null;
   }
 
   /**

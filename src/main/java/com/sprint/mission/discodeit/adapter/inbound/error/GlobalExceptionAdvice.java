@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
 import com.sprint.mission.discodeit.exception.AlreadyExistsException;
+import com.sprint.mission.discodeit.exception.CriticalException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.LoginFailedException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -66,5 +67,10 @@ public class GlobalExceptionAdvice {
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
-
+  @ExceptionHandler(CriticalException.class)
+  public ResponseEntity<ErrorResponse> handleCriticalException(CriticalException ex) {
+    ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+    ErrorResponse response = ErrorResponse.of(errorCode, ex.getMessage());
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+  }
 }

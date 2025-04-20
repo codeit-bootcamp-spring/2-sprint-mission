@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -69,7 +70,7 @@ public class UserController {
     //Why? 서비스단에서 컨트롤러 단 영향을 적게 주기위해서
     UserResult result = userService.create(command, binaryContentRequest);
 
-    return ResponseEntity.ok(UserDtoMapper.toCreateResponse(result));
+    return ResponseEntity.status(HttpStatus.CREATED).body(UserDtoMapper.toCreateResponse(result));
   }
 
   //파일이 존재하면 DTO로 만든 뒤, Optional로 감싸서 반환

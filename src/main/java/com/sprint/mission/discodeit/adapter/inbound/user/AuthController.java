@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,6 @@ public class AuthController {
   public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest requestBody) {
     LoginUserCommand command = toLoginUserCommand(requestBody);
     UserResult result = loginUseCase.login(command);
-    return ResponseEntity.ok((UserDtoMapper.toCreateResponse(result)));
+    return ResponseEntity.status(HttpStatus.OK).body(UserDtoMapper.toCreateResponse(result));
   }
 }

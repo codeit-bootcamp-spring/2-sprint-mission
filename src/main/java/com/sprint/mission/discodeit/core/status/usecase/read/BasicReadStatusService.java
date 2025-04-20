@@ -15,12 +15,17 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
+
+  private final Logger logger = LoggerFactory.getLogger(BasicReadStatusService.class);
+
 
   private final UserRepositoryPort userRepository;
   private final ReadStatusRepositoryPort readStatusRepository;
@@ -56,6 +61,8 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus status = ReadStatus.create(user, channel,
         command.lastReadAt());
     readStatusRepository.save(status);
+    logger.info("ReadStatus Created: id: {}, user id: {}, channel id: {}, last Read At : {} ",
+        status.getId(), user.getId(), channel.getId(), status.getLastReadAt());
 
     //직접 컨트롤러단과 연결하기에 result로 감싸서 반환
     return ReadStatusResult.create(status);
@@ -119,6 +126,9 @@ public class BasicReadStatusService implements ReadStatusService {
         () -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, command.readStatusId())
     );
     status.update(command.newLastReadAt());
+
+    logger.info("Read Status update : id {}, last Read At {}", status.getId(),
+        status.getLastReadAt());
     return ReadStatusResult.create(status);
   }
 
@@ -135,6 +145,7 @@ public class BasicReadStatusService implements ReadStatusService {
     if (!readStatusRepository.existsId(readStatusId)) {
       throw new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId);
     }
+    logger.info("Read Status delete : id {}", readStatusId);
     readStatusRepository.delete(readStatusId);
   }
 

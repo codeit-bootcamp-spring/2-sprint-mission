@@ -12,30 +12,30 @@ spring:
       idle-timeout: 60000
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     defer-datasource-initialization: true
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: true
+    open-in-view: false
   sql:
     init:
       mode: always
-      continue-on-error: true
+      continue-on-error: false
 
 logging:
   level:
     org:
       hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE
+        SQL: info
+        orm.jdbc.bind: info
       springframework:
-        data: DEBUG
+        data: info
     com:
       example:
-        myapp: DEBUG
+        myapp: info
 
 discodeit:
   storage:
@@ -47,3 +47,31 @@ discodeit:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
+
+
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    defer-datasource-initialization: true
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+#    open-in-view: true
+#  sql:
+#    init:
+#      mode: always
+#      continue-on-error: true
+#
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: DEBUG
+#        orm.jdbc.bind: TRACE
+#      springframework:
+#        data: DEBUG
+#    com:
+#      example:
+#        myapp: DEBUG

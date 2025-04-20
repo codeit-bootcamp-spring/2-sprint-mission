@@ -108,7 +108,6 @@ public class BasicMessageService implements MessageService {
       messageSlice = messageRepository.findAllByChannelId(channelId, cursor, pageable);
     }
     //메시지를 반환 dto로 변환하는 작업 진행
-    //TODO. 반환 dto 내에서 로직 순회를 해야하는 지, 아니면 없애야하는 지 생각해보기
     return messageSlice.map(message -> MessageResult.create(message, message.getAuthor()));
   }
 

@@ -5,13 +5,14 @@ import com.sprint.mission.discodeit.core.status.port.UserStatusRepositoryPort;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.AlreadyExistsException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NormalException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserRepositoryPort userRepository;
+  private final Logger logger = LoggerFactory.getLogger(BasicUserStatusService.class);
+
   private final UserStatusRepositoryPort userStatusRepository;
 
   /**
@@ -42,6 +44,9 @@ public class BasicUserStatusService implements UserStatusService {
     //유저 상태가 존재하지 않으면 진행
     UserStatus userStatus = UserStatus.create(user, command.lastActiveAt());
     userStatusRepository.save(userStatus);
+    logger.info("User Status created : id {}, user id {}, last Active At {}", userStatus.getId(),
+        user.getId(), userStatus.getLastActiveAt());
+
     return userStatus;
   }
 
@@ -94,6 +99,8 @@ public class BasicUserStatusService implements UserStatusService {
     }
     //업데이트 진행
     userStatus.update(command.newLastActiveAt());
+    logger.info("User Status update : id {}, last Active At {}", userStatus.getId(),
+        userStatus.getLastActiveAt());
     return userStatus;
   }
 
@@ -124,7 +131,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
         () -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, userId)
     );
-
+    logger.info("User Status delete : id {}", userStatus.getId());
     userStatusRepository.delete(userStatus.getId());
   }
 

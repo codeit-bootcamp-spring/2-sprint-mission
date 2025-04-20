@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryConte
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.exception.CriticalException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import java.io.FileInputStream;
@@ -52,8 +53,7 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
       try {
         Files.createDirectories(storagePath);
       } catch (IOException e) {
-        //TODO. 예외처리 구현해야함
-        throw new RuntimeException();
+        throw new CriticalException("파일 폴더를 생성할 수 없습니다.");
       }
     }
   }

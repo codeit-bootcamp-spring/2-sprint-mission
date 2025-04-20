@@ -10,7 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface JpaChannelRepository extends JpaRepository<Channel, UUID> {
 
-  List<Channel> findAllByType(ChannelType type);
+  @Query("SELECT c FROM Channel c WHERE c.type = :type")
+  List<Channel> findAllByType(@Param("type") ChannelType type);
 
   @Query("""
         SELECT c FROM Channel c
