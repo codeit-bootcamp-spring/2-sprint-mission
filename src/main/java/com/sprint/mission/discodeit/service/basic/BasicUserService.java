@@ -61,10 +61,10 @@ public class BasicUserService implements UserService {
     String password = userCreateRequest.password();
 
     User user = new User(username, email, password, nullableProfile);
-    User createdUser = userRepository.save(user);
+    UserStatus userStatus = new UserStatus(user, Instant.now());
+    // userStatus를 더이상 사용하지 않아서 그냥 new UserStatus() 만 작성해도 괜찮나요?
 
-    UserStatus userStatus = new UserStatus(createdUser, Instant.now());
-    userStatusRepository.save(userStatus);
+    User createdUser = userRepository.save(user);
 
     return userMapper.toDto(createdUser);
   }
