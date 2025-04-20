@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Transactional
     @Override
@@ -43,8 +45,9 @@ public class BasicUserService implements UserService {
         if (binaryContentRequest != null) {
             BinaryContent binaryContent = new BinaryContent(
                     binaryContentRequest.fileName(),
-                    binaryContentRequest.contentType(),
-                    binaryContentRequest.bytes());
+                    binaryContentRequest.contentType());
+
+            binaryContentStorage.put(binaryContent.getId(), binaryContentRequest.bytes());
             savedBinaryContent = binaryContentRepository.save(binaryContent);
         }
 
@@ -121,10 +124,11 @@ public class BasicUserService implements UserService {
         if (binaryContentRequest != null) {
             BinaryContent binaryContent = new BinaryContent(
                     binaryContentRequest.fileName(),
-                    binaryContentRequest.contentType(),
-                    binaryContentRequest.bytes());
+                    binaryContentRequest.contentType());
 
             savedBinaryContent = binaryContentRepository.save(binaryContent);
+            binaryContentStorage.put(binaryContent.getId(), binaryContentRequest.bytes());
+
             binaryContentRepository.deleteById(user.getBinaryContent().getId());
         }
 

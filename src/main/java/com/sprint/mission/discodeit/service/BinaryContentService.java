@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface BinaryContentService {
 
-    BinaryContentResult createProfileImage(BinaryContentRequest binaryContentRequest);
+    BinaryContentResult create(BinaryContentRequest binaryContentRequest);
 
     BinaryContentResult getById(UUID id);
 

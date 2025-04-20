@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentR
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,19 +19,20 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Transactional
     @Override
-    public BinaryContentResult createProfileImage(BinaryContentRequest binaryContentRequest) {
+    public BinaryContentResult create(BinaryContentRequest binaryContentRequest) {
         if (binaryContentRequest == null) {
             return null;
         }
 
         BinaryContent binaryContent = new BinaryContent(
                 binaryContentRequest.fileName(),
-                binaryContentRequest.contentType(),
-                binaryContentRequest.bytes());
+                binaryContentRequest.contentType());
 
+        binaryContentStorage.put(binaryContent.getId(), binaryContentRequest.bytes());
         BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
         return BinaryContentResult.fromEntity(savedBinaryContent);

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.application.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Transactional
     @Override
@@ -44,8 +46,9 @@ public class BasicMessageService implements MessageService {
                     .map(binaryContentRequest -> {
                         BinaryContent binaryContent = new BinaryContent(
                                 binaryContentRequest.fileName(),
-                                binaryContentRequest.contentType(),
-                                binaryContentRequest.bytes());
+                                binaryContentRequest.contentType());
+
+                        binaryContentStorage.put(binaryContent.getId(), binaryContentRequest.bytes());
 
                         return binaryContentRepository.save(binaryContent);
                     })

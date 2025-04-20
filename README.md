@@ -82,8 +82,8 @@
 - 데이터베이스에 이미지와 같은 파일을 저장하면 성능 상 불리한 점이 많습니다.
 - 따라서 실제 바이너리 데이터는 별도의 공간에 저장하고, 데이터베이스에는 바이너리 데이터에 대한 메타 정보(파일명, 크기, 유형 등)만 저장하는 것이 좋습니다.
 
-- [ ]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
-- [ ]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
+- [x]  BinaryContent 엔티티는 파일의 메타 정보(fileName, size, contentType)만 표현하도록 bytes 속성을 제거하세요.
+- [x]  BinaryContent의 byte[] 데이터 저장을 담당하는 인터페이스를 설계하세요.
 
 - 저장 매체의 확장성(로컬 저장소, 원격 저장소)을 고려해 인터페이스부터 설계합니다.
 - 패키지명: com.sprint.mission.discodeit.storage
@@ -99,18 +99,18 @@
     - ResponseEntity<?> download(BinaryContentDto)
         - HTTP API로 다운로드 기능을 제공합니다.
         - BinaryContentDto 정보를 바탕으로 파일을 다운로드할 수 있는 응답을 반환합니다.
-- [ ]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
+- [x]  서비스 레이어에서 기존에 BinaryContent를 저장하던 로직을 BinaryContentStorage를 활용하도록 리팩토링하세요.
 
-- [ ]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
+- [x]  BinaryContentController에 파일을 다운로드하는 API를 추가하고, BinaryContentStorage에 로직을 위임하세요.
 - 엔드포인트: GET /api/binaryContents/{binaryContentId}/download
 - 요청
     - 값: BinaryContentId
     - 방식: Query Parameter
 - 응답: ResponseEntity<?>
 - 클래스 다이어그램
-    - [ ]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
+    - [x]  로컬 디스크 저장 방식으로 BinaryContentStorage 구현체를 구현하세요.
 
-- [ ]  discodeit.storage.type 값이 local 인 경우에만 Bean으로 등록되어야 합니다.
+- [x]  discodeit.storage.type 값이 local 인 경우에만 Bean으로 등록되어야 합니다.
 - Path root
     - 로컬 디스크의 루트 경로입니다.
     - discodeit.storage.local.root-path 설정값을 정의하고, 이 값을 통해 주입합니다.
