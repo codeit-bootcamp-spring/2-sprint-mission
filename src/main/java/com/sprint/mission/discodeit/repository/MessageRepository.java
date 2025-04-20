@@ -5,13 +5,16 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
+    @EntityGraph(attributePaths = {"attachments"})
     Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
 
     List<Message> findAllByChannelId(UUID channelId);
 
+    @EntityGraph(attributePaths = {"attachments"})
     Slice<Message> findAllByAuthorId(UUID authorId, Pageable pageable);
 
     List<Message> findAllByAuthorId(UUID authorId);
