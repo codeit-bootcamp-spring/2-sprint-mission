@@ -2,31 +2,35 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.auth.LoginResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
   @Override
-  public LoginResponse login(LoginRequest loginRequest) {
-    User user = userRepository.findUserByUsername(loginRequest.username())
+  @Transactional(readOnly = true)
+  public UserDto login(LoginRequest loginRequest) {
+    User user = userRepository.findByUsername(loginRequest.username())
         .orElseThrow(() -> new NoSuchElementException(
             String.format("User with username %s not found", loginRequest.username())));
 
     if (!user.getPassword().equals(loginRequest.password())) {
       throw new IllegalArgumentException("Wrong password");
     }
-    return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(),
-        user.getCreatedAt(), user.getUpdatedAt(), user.getProfileId());
+
+    return userMapper.toDto(user);
   }
 }

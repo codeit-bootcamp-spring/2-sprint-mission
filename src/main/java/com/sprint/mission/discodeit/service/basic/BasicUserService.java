@@ -1,25 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.user.UserUpdateResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -27,129 +23,102 @@ import org.springframework.web.multipart.MultipartFile;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
-  private final BinaryContentRepository binaryContentRepository;
+  private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public UserCreateResponse save(UserCreateRequest userCreateRequest, MultipartFile profile)
+  @Transactional
+  public UserDto save(UserCreateRequest userCreateRequest, MultipartFile profile)
       throws IOException {
-    UUID profileId = null;
-    if (userRepository.findUserByUsername(userCreateRequest.username()).isPresent()) {
+    if (userRepository.findByUsername(userCreateRequest.username()).isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with username %s already exists", userCreateRequest.username()));
     }
 
-    if (userRepository.findUserByEmail(userCreateRequest.email()).isPresent()) {
+    if (userRepository.findByEmail(userCreateRequest.email()).isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with email %s already exists", userCreateRequest.email()));
     }
 
-    if (profile != null) {
-      BinaryContent binaryContent = BinaryContent.builder()
+    BinaryContent binaryContent = null;
+    if (profile != null && !profile.isEmpty()) {
+      binaryContent = BinaryContent.builder()
           .fileName(profile.getOriginalFilename())
           .contentType(profile.getContentType())
-          .bytes(profile.getBytes())
           .size((long) profile.getBytes().length)
           .build();
-      binaryContentRepository.save(binaryContent);
-      profileId = binaryContent.getId();
     }
 
     User user = new User(
-        userCreateRequest.username(), userCreateRequest.password(),
-        userCreateRequest.email(), profileId);
+        userCreateRequest.username(),
+        userCreateRequest.password(),
+        userCreateRequest.email(),
+        binaryContent);
+
     userRepository.save(user);
-    UserStatus userStatus = UserStatus.builder()
-        .userId(user.getId())
-        .build();
-    userStatusRepository.save(userStatus);
-    return new UserCreateResponse(user.getId(), user.getUsername(), user.getEmail(),
-        user.getProfileId(), user.getCreatedAt());
+
+    if (binaryContent != null) {
+      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+    }
+    return userMapper.toDto(user);
   }
 
   @Override
-  public FindUserDto findByUser(UUID userId) {
-    User user = userRepository.findUserById(userId)
-        .orElseThrow(
-            () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new NoSuchElementException(
-            String.format("User with userId %s not found", userId)));
-
-    FindUserDto findUserDto = new FindUserDto(
-        user.getId(), user.getUsername(), user.getEmail(),
-        user.getProfileId(), user.getCreatedAt(),
-        user.getUpdatedAt(), userStatus.getLastActiveAt(),
-        userStatus.isLastStatus());
-
-    return findUserDto;
+  @Transactional(readOnly = true)
+  public List<UserDto> findAllUser() {
+    return userRepository.findAllWithProfileAndStatus().stream()
+        .map(userMapper::toDto)
+        .toList();
   }
 
   @Override
-  public List<FindUserDto> findAllUser() {
-    List<User> userList = userRepository.findAllUser();
-
-    return userList.stream()
-        .map(user -> findByUser(user.getId()))
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public UserUpdateResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
+  @Transactional
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       MultipartFile profile) throws IOException {
-
-    UUID profileId = null;
-
-    User user = userRepository.findUserById(userId).
+    User user = userRepository.findById(userId).
         orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    if (userRepository.findUserByUsername(userUpdateRequest.newUsername())
+    if (userRepository.findByUsername(userUpdateRequest.newUsername())
         .filter(otherUser -> !otherUser.getId().equals(user.getId()))
         .isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with username %s already exists", userUpdateRequest.newUsername()));
     }
 
-    if (userRepository.findUserByEmail(userUpdateRequest.newEmail())
+    if (userRepository.findByEmail(userUpdateRequest.newEmail())
         .filter(otherUser -> !otherUser.getId().equals(user.getId()))
         .isPresent()) {
       throw new IllegalArgumentException(
           String.format("User with email %s already exists", userUpdateRequest.newEmail()));
     }
 
-    if (profile != null) {
-      BinaryContent binaryContent = BinaryContent.builder()
+    BinaryContent binaryContent = null;
+    if (profile != null && !profile.isEmpty()) {
+      binaryContent = BinaryContent.builder()
           .fileName(profile.getOriginalFilename())
           .contentType(profile.getContentType())
-          .bytes(profile.getBytes())
           .size((long) profile.getBytes().length)
           .build();
-      binaryContentRepository.save(binaryContent);
-      profileId = binaryContent.getId();
+
+      binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
     }
 
     user.updateUsername(userUpdateRequest.newUsername());
     user.updatePassword(userUpdateRequest.newPassword());
     user.updateEmail(userUpdateRequest.newEmail());
-    user.updateProfile(profileId);
-    userRepository.save(user);
-    return new UserUpdateResponse(user.getId(), user.getUsername(), user.getEmail(),
-        user.getProfileId(), user.getCreatedAt(), user.getUpdatedAt());
+    user.updateProfile(binaryContent);
+
+    return userMapper.toDto(user);
   }
 
   @Override
+  @Transactional
   public void delete(UUID userId) {
-    User user = userRepository.findUserById(userId)
+    User user = userRepository.findById(userId)
         .orElseThrow(
             () -> new NoSuchElementException(String.format("User with id %s not found", userId)));
 
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(
-            () -> new NoSuchElementException(
-                String.format("UserStatus with userId %s not found", userId)));
-
-    userStatusRepository.delete(userStatus.getId());
-    userRepository.delete(user.getId());
+    userRepository.delete(user);
   }
 }

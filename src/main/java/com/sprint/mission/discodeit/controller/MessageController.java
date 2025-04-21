@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,10 +19,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +57,7 @@ public class MessageController {
           responseCode = "201",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageDto.class)
           )
       ),
       @ApiResponse(
@@ -62,12 +69,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<Message> send(
+  public ResponseEntity<MessageDto> send(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    Message message = messageService.sendMessage(messageCreateRequest, attachments);
-    return ResponseEntity.status(HttpStatus.CREATED).body(message);
+    MessageDto messageDto = messageService.sendMessage(messageCreateRequest, attachments);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
   }
 
   @PatchMapping("/{messageId}")
@@ -94,7 +101,7 @@ public class MessageController {
           description = "메세지가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Message.class)
+              schema = @Schema(implementation = MessageDto.class)
           )
       ),
       @ApiResponse(
@@ -106,12 +113,12 @@ public class MessageController {
           )
       )
   })
-  public ResponseEntity<Message> update(
+  public ResponseEntity<MessageDto> update(
       @PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest
   ) {
-    Message message = messageService.updateMessage(messageId, messageUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(message);
+    MessageDto messageDto = messageService.updateMessage(messageId, messageUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(messageDto);
   }
 
   @DeleteMapping("/{messageId}")
@@ -163,16 +170,20 @@ public class MessageController {
           description = "Message목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = Message.class))
+              schema = @Schema(implementation = PageResponse.class)
           )
       )
   })
-  public ResponseEntity<List<Message>> FindChannelMessage(
-      @RequestParam("channelId") UUID channelId
+  public ResponseEntity<PageResponse<MessageDto>> FindChannelMessage(
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant cursor,
+      @PageableDefault(size = 50, sort = "createdAt", direction = Direction.DESC)
+      @Parameter(hidden = true) Pageable pageable
   ) {
-    List<Message> message = messageService.findMessageByChannelId(
-        channelId);
+    PageResponse<MessageDto> page = messageService.findMessageByChannelId(channelId, pageable,
+        cursor);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(message);
+        .body(page);
   }
 }

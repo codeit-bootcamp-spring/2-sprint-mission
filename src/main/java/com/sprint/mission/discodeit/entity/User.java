@@ -1,38 +1,62 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.UUID;
-
+@Table(name = "users")
+@Entity
 @Getter
 @AllArgsConstructor
-public class User extends BaseEntity implements Serializable {
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @Column(unique = true, nullable = false)
   private String username;
+
+  @Column(nullable = false)
   private String password;
+
+  @Column(unique = true, nullable = false)
   private String email;
-  private UUID profileId;
+
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST,
+      CascadeType.REMOVE}, orphanRemoval = true, optional = false)
+  private UserStatus status;
 
   public void updateUsername(String username) {
-    super.updateTime();
     this.username = username;
   }
 
   public void updatePassword(String password) {
-    super.updateTime();
     this.password = password;
   }
 
   public void updateEmail(String email) {
-    super.updateTime();
     this.email = email;
   }
 
-  public void updateProfile(UUID profile) {
-    super.updateTime();
-    this.profileId = profile;
+  public void updateProfile(BinaryContent profile) {
+    this.profile = profile;
+  }
+
+  public User(String username, String password, String email, BinaryContent profile) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.profile = profile;
+    this.status = new UserStatus(this);
   }
 }

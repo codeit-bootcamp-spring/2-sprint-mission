@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -52,7 +53,7 @@ public class ReadStatusController {
           description = "Message 읽음 상태가 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ReadStatus.class)
+              schema = @Schema(implementation = ReadStatusDto.class)
           )
       ),
       @ApiResponse(
@@ -72,11 +73,11 @@ public class ReadStatusController {
           )
       )
   })
-  public ResponseEntity<ReadStatus> save(
+  public ResponseEntity<ReadStatusDto> save(
       @RequestBody ReadStatusRequest readStatusRequest
   ) {
-    ReadStatus readStatus = readStatusService.save(readStatusRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
+    ReadStatusDto readStatusDto = readStatusService.save(readStatusRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(readStatusDto);
   }
 
   @PatchMapping("/{readStatusId}")
@@ -103,7 +104,7 @@ public class ReadStatusController {
           description = "Message 읽음 상태가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = ReadStatus.class)
+              schema = @Schema(implementation = ReadStatusDto.class)
           )
       ),
       @ApiResponse(
@@ -115,11 +116,11 @@ public class ReadStatusController {
           )
       )
   })
-  public ResponseEntity<ReadStatus> update(
+  public ResponseEntity<ReadStatusDto> update(
       @PathVariable("readStatusId") UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
-    ReadStatus readStatus = readStatusService.update(readStatusId, readStatusUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(readStatus);
+    ReadStatusDto readStatusDto = readStatusService.update(readStatusId, readStatusUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(readStatusDto);
   }
 
   @GetMapping("")
@@ -139,15 +140,15 @@ public class ReadStatusController {
           description = "Message 읽음 상태 목록 조회 성공",
           content = @Content(
               mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))
+              array = @ArraySchema(schema = @Schema(implementation = ReadStatusDto.class))
           )
       )
   })
-  public ResponseEntity<List<ReadStatus>> findByUserId(
+  public ResponseEntity<List<ReadStatusDto>> findByUserId(
       @RequestParam("userId") UUID readStatusId
   ) {
-    List<ReadStatus> readStatusList = readStatusService.findAllByUserId(
+    List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(
         readStatusId);
-    return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
+    return ResponseEntity.status(HttpStatus.OK).body(readStatusDtoList);
   }
 }

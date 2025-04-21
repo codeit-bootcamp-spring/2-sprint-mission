@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   @GetMapping("/{binaryContentId}")
   @Operation(summary = "첨부 파일 조회", operationId = "find")
@@ -61,12 +65,11 @@ public class BinaryContentController {
           )
       )
   })
-  public ResponseEntity<BinaryContent> find(
+  public ResponseEntity<BinaryContentDto> find(
       @PathVariable("binaryContentId") UUID binaryContentId
   ) {
-    binaryContentService.findById(binaryContentId);
-    return ResponseEntity.status(HttpStatus.OK).body(
-        binaryContentService.findById(binaryContentId));
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDto);
   }
 
   @GetMapping("")
@@ -90,10 +93,30 @@ public class BinaryContentController {
           )
       )
   })
-  public ResponseEntity<List<BinaryContent>> findByIdIn(
+  public ResponseEntity<List<BinaryContentDto>> findByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIdList
   ) {
-    List<BinaryContent> result = binaryContentService.findByIdIn(binaryContentIdList);
-    return ResponseEntity.status(HttpStatus.OK).body(result);
+    List<BinaryContentDto> binaryContentDtoList = binaryContentService.findByIdIn(
+        binaryContentIdList);
+    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDtoList);
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  @Operation(summary = "파일 다운로드", operationId = "download")
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200",
+          description = "파일 다운로드 성공",
+          content = @Content(
+              mediaType = "*/*",
+              schema = @Schema(type = "string", format = "binary")
+          )
+      )
+  })
+  public ResponseEntity<Resource> binaryContentDownload(
+      @PathVariable("binaryContentId") UUID binaryContentId
+  ) {
+    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+    return binaryContentStorage.download(binaryContentDto);
   }
 }

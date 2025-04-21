@@ -55,17 +55,17 @@ public class ChannelController {
           description = "Public Channel이 성공적으로 생성됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelDto.class)
           )
       )
   })
-  public ResponseEntity<Channel> createPublic(
+  public ResponseEntity<ChannelDto> createPublic(
       @RequestBody PublicChannelCreateRequest publicChannelCreateRequest
   ) {
-    Channel channel = channelService.createPublicChannel(
+    ChannelDto channelDto = channelService.createPublicChannel(
         publicChannelCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(channel);
+        .body(channelDto);
   }
 
   @PostMapping("/private")
@@ -82,17 +82,17 @@ public class ChannelController {
           responseCode = "201",
           description = "Private Channel이 성공적으로 생성됨",
           content = @Content(
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelDto.class)
           )
       )
   })
-  public ResponseEntity<Channel> createPrivate(
+  public ResponseEntity<ChannelDto> createPrivate(
       @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest
   ) {
-    Channel channel = channelService.createPrivateChannel(
+    ChannelDto channelDto = channelService.createPrivateChannel(
         privateChannelCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(channel);
+        .body(channelDto);
   }
 
   @PatchMapping("/{channelId}")
@@ -118,7 +118,7 @@ public class ChannelController {
           description = "Channel 정보가 성공적으로 수정됨",
           content = @Content(
               mediaType = "*/*",
-              schema = @Schema(implementation = Channel.class)
+              schema = @Schema(implementation = ChannelDto.class)
           )
       ),
       @ApiResponse(
@@ -138,12 +138,12 @@ public class ChannelController {
           )
       )
   })
-  public ResponseEntity<Channel> update(
+  public ResponseEntity<ChannelDto> update(
       @PathVariable(name = "channelId") UUID channelId,
       @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest
   ) {
-    Channel channel = channelService.updateChannel(channelId, publicChannelUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(channel);
+    ChannelDto channelDto = channelService.updateChannel(channelId, publicChannelUpdateRequest);
+    return ResponseEntity.status(HttpStatus.OK).body(channelDto);
   }
 
   @DeleteMapping("/{channelId}")
