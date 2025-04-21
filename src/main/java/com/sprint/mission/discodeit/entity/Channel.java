@@ -1,125 +1,127 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.ChannelType;
+
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 @Getter
-public class Channel implements Serializable {
+@Table(name = "channels")
+@Entity
+public class Channel extends BaseEntity { // 부모 클래스 상속 가정
 
-  @Serial
-  private static final long serialVersionUID = 102L;
-  private final UUID channelId; // 채널 ID
-  private final ZonedDateTime createdAt; // 생성시간
-  private ZonedDateTime updatedAt; // 업데이트 된 시간
-  private final UUID ownerId; // 채널 생성자의 아이디
-  private final Set<UUID> userList = new HashSet<>(); // 가입한 유저 리스트
-  private String channelName; //채널이름
-  private final String channelType; // 채널 타입 (PUBLIC/PRIVATE)
-  private String description; // 채널 설명 (PUBLIC)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false) // 타입은 필수
+    private ChannelType type;
 
-  // PUBLIC
-  public Channel(String channelName, UUID ownerId) {
-    this.createdAt = ZonedDateTime.now();
-    this.channelId = UUID.randomUUID();
-    this.channelName = channelName;
-    this.ownerId = ownerId;
-    this.channelType = ChannelType.PUBLIC;
-    userList.add(ownerId); // 생성자를 채널에 자동 추가
-  }
+    @Column(unique = true, nullable = false)
+    private String name;
 
-  // PUBLIC
-  public Channel(String channelName, UUID ownerId, String description) {
-    this(channelName, ownerId);
-    this.description = description;
-  }
+    @Column(nullable = true)
+    private String description;
 
-  // PRIVATE 채널 생성자
-  public Channel(UUID ownerId, Set<UUID> participants) {
-    this.createdAt = ZonedDateTime.now();
-    this.channelId = UUID.randomUUID();
-    this.ownerId = ownerId;
-    this.channelType = ChannelType.PRIVATE;
+    @OneToMany(
+        mappedBy = "channel",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    private final Set<UserChannel> participants = new HashSet<>();
 
-    // 참여자 추가
-    userList.add(ownerId);
-    if (participants != null) {
-      userList.addAll(participants);
+    protected Channel() {
+        super();
     }
-  }
 
-  // PRIVATE 채널 생성자 (이름 포함)
-  public Channel(String channelName, UUID ownerId, Set<UUID> participants) {
-    this(ownerId, participants);
-    this.channelName = channelName;
-  }
 
-  // 채널 참여
-  public void joinChannel(UUID userId) {
-    this.getUserList().add(userId);
-  }
-
-  // 채널 탈퇴
-  public void leaveChannel(UUID userId) {
-    this.getUserList().remove(userId);
-  }
-
-  // 채널명 변경
-  public void setChannelName(String newChannelName) {
-    this.channelName = newChannelName;
-    setUpdatedAt();
-  }
-
-  // 설명 변경 (PUBLIC)
-  public void setDescription(String description) {
-    if (isPublic()) {
-      this.description = description;
-      setUpdatedAt();
+    public Channel(ChannelType type, String name, String description) {
+        super();
+        if (type == null) {
+            throw new IllegalArgumentException("Channel type cannot be null.");
+        }
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Channel name cannot be empty.");
+        }
+        this.type = type;
+        this.name = name.trim();
+        this.description =
+            (description == null || description.isBlank()) ? null : description.trim();
     }
-  }
 
-  // 업데이트 시간 설정
-  public void setUpdatedAt() {
-    updatedAt = ZonedDateTime.now();
-  }
-
-  //    // 채널 타입 확인 메서드
-  public boolean isPrivate() {
-    return ChannelType.PRIVATE.equals(this.channelType);
-  }
-
-  public boolean isPublic() {
-    return ChannelType.PUBLIC.equals(this.channelType);
-  }
-
-
-  public UUID getId() {
-    return this.channelId;
-  }
-
-  public String getName() {
-    return this.channelName;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    public static Channel createPublicChannel(String name, String description) {
+        return new Channel(ChannelType.PUBLIC, name, description);
     }
-    Channel channel = (Channel) o;
-    return Objects.equals(ownerId, channel.ownerId);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(ownerId);
-  }
+    public static Channel createPublicChannel(String name) {
+        return new Channel(ChannelType.PUBLIC, name, null);
+    }
+
+
+    public static Channel createPrivateChannel(String name, String description) {
+        return new Channel(ChannelType.PRIVATE, name, description);
+    }
+
+    public static Channel createPrivateChannel(String name) {
+        return new Channel(ChannelType.PRIVATE, name, null);
+    }
+
+
+    public boolean update(String newName, String newDescription) {
+        boolean updated = false;
+        String trimmedNewName = (newName == null) ? null : newName.trim();
+        String trimmedNewDescription = (newDescription == null) ? null : newDescription.trim();
+
+        if (trimmedNewName != null && trimmedNewName.isEmpty()) {
+            throw new IllegalArgumentException("Channel name cannot be empty.");
+        }
+
+        if (trimmedNewName != null && !trimmedNewName.equals(this.name)) {
+            this.name = trimmedNewName;
+            updated = true;
+        }
+
+        if (!Objects.equals(this.description, trimmedNewDescription)) {
+            this.description = trimmedNewDescription;
+            updated = true;
+        }
+        return updated;
+    }
+
+    public boolean isPublic() {
+        return this.type == ChannelType.PUBLIC;
+    }
+
+    public boolean isPrivate() {
+        return this.type == ChannelType.PRIVATE;
+    }
+
+    public void addParticipant(User user) {
+        if (user == null) {
+            return;
+        }
+        boolean alreadyExists = this.participants.stream()
+            .anyMatch(uc -> uc != null && uc.getUser() != null && uc.getUser().equals(user));
+        if (!alreadyExists) {
+            UserChannel userChannel = new UserChannel(user, this);
+            this.participants.add(userChannel);
+        }
+    }
+
+    public void leaveChannel(User user) {
+        if (user == null) {
+            return;
+        }
+        this.participants.removeIf(
+            uc -> uc != null && uc.getUser() != null && uc.getUser().equals(user));
+    }
+
 }
-

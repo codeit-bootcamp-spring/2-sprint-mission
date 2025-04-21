@@ -1,31 +1,27 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.UserDto.Response;
-import com.sprint.mission.discodeit.dto.UserDto.Update;
-import com.sprint.mission.discodeit.dto.common.ListSummary;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UserDto.Summary;
-import java.util.List;
-import org.springframework.stereotype.Component;
+import com.sprint.mission.discodeit.dto.data.PageResponse;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Component//유저 CRUD
 public interface UserService {
 
-  Summary findByUserId(UUID id);
+    UserDto create(UserCreateRequest userCreateRequest,
+        Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-  ListSummary<Summary> findByAllUsersId();
+    UserDto find(UUID userId);
+    
 
-  void deleteUser(UUID id);
+    UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+        Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-  UserDto.Response createdUser(UserDto.Create createUserDto);
+    void delete(UUID userId);
 
-  //업데이트 권한에 대한 것은?
-  Response updateUser(UUID userId, Update updateUserDto);
-
-  boolean existsById(UUID userId);
-
-  void leaveChannel(List<UUID> ChannelInUsers, UUID channelId);
-
+    List<UserDto> findAll();
 }

@@ -1,22 +1,27 @@
+# src/main/resources/application.yml
+
 spring:
   application:
     name: discodeit
-  jpa:
-    open-in-view: false
 
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
 
+  data:
+    web:
+      pageable:
+        default-page-size: 50
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit1234
+    username: discodeit
+    password: decodeit_user
+    driver-class-name: org.postgresql.Driver
 
 discodeit:
   storage:
-    data-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/data
-    # 이미지 파일
-    image-dir: C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission/images
-# 로깅 설정
-logging:
-  level:
-    root: INFO
-    com.sprint.mission.discodeit: DEBUG
-    org.springframework.web: INFO
-
-jwt:
-  secret: your-very-strong-and-long-secret-key-please-change-this
+    type: local
+    local:
+      root-path: ./discodeit-storaget

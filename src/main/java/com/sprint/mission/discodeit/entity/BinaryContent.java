@@ -1,39 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent implements Serializable {
+@Setter
+@Entity
+@NoArgsConstructor
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity {
+    // 조인 테이블 생성 시 부모가 관리
 
-  @Serial
-  private static final long serialVersionUID = 1L; // Serializable 클래스에 권장
-
-  private final UUID id;
-  private final String contentType;     //파일이ㅡ 타입 jpg 등
-  private final String fileName;
-  private final long size;
-  private final UUID ownerId;
-  private final String ownerType;
-  private final String filePath;
-  private final ZonedDateTime createdAt; // 생성 시간
+    private String fileName;
+    private Long size;
+    private String contentType;
 
 
-  public BinaryContent(String contentType, String fileName, long size, UUID ownerId,
-      String ownerType, String filePath) {
-    this.id = UUID.randomUUID();// ID는 외부에서 생성하여 주입
-    this.contentType = contentType;
-    this.fileName = fileName;
-    this.size = size; // 파일 크기 저장
-    this.ownerId = ownerId;
-    this.ownerType = ownerType;
-    this.filePath = filePath;
-    this.createdAt = ZonedDateTime.now();
-  }
+    public BinaryContent(String contentType, String fileName, long size
+    ) {
+        super();
+        this.contentType = contentType;
+        this.fileName = fileName;
+        this.size = size;
+    }
+
 }

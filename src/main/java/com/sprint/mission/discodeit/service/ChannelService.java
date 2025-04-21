@@ -1,27 +1,31 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.ChannelDto.Response;
-import com.sprint.mission.discodeit.dto.common.ListSummary;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ChannelService {
 
-  ChannelDto.Response createPrivateChannel(ChannelDto.CreatePrivate dto);
+    @Transactional
+    ChannelDto create(PublicChannelCreateRequest request);
 
-  ChannelDto.Response createPublicChannel(ChannelDto.CreatePublic dto);
+    @Transactional
+    ChannelDto create(PrivateChannelCreateRequest request);
 
-  ChannelDto.Response getChannelDetails(UUID channelId);
+    @Transactional(readOnly = true)
+    ChannelDto find(UUID channelId);
 
-  List<ChannelDto.Response> findAllByUserId(UUID userId);
-  
-  ListSummary<Response> findPublicChannels();
 
-  ChannelDto.Response updateChannel(ChannelDto.Update dto, UUID ownerId);
+    @Transactional
+    ChannelDto update(UUID channelId, PublicChannelUpdateRequest request);
 
-  void deleteChannel(UUID channelId, UUID ownerId);
+    @Transactional
+    void delete(UUID channelId);
 
-  List<ChannelDto.Response> getAccessibleChannels(UUID userId);
+    @Transactional(readOnly = true)
+    List<ChannelDto> findAllByUserId(UUID userId);
 }
-

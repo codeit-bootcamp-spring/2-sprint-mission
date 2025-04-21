@@ -1,45 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
-
 @Getter
-public class ReadStatus implements Serializable {
+@Setter
+@Entity
+@NoArgsConstructor
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+    // 1대 다 자식에서 관리(단방향) 유저는 @ 추가 필요 x
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 
-  private final UUID id;
-  private final UUID channelId; // 채널
-  private final UUID userId; // 유저
-  private UUID lastReadMessageId; // 마지막으로 메시지
-  private ZonedDateTime lastReadAt; // 마지막으로 메시지를 읽은 시간
-  private final ZonedDateTime createdAt;
-  private ZonedDateTime updatedAt;
+    // 채널도 같음
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", referencedColumnName = "id", nullable = false)
+    private Channel channel;
 
-  public ReadStatus(UUID channelId, UUID userId, UUID lastReadMessageId) {
-    this.id = UUID.randomUUID();
-    this.channelId = channelId;
-    this.userId = userId;
-    this.lastReadMessageId = lastReadMessageId;
-    this.lastReadAt = ZonedDateTime.now();
-    this.createdAt = ZonedDateTime.now();
-    this.updatedAt = ZonedDateTime.now(); //
-  }
+    @Column(nullable = false)
+    private Instant lastReadAt;
 
-  public void updateLastReadMessage(UUID messageId) {
-    this.lastReadMessageId = messageId;
-    this.lastReadAt = ZonedDateTime.now(); // 메시지 읽은 시간 업데이트
-    setUpdatedAt();
-  }
+    public ReadStatus(User user, Channel channel) {
+        super();
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = Instant.now();
+    }
 
-  private void setUpdatedAt() {
-    this.updatedAt = ZonedDateTime.now();
-  }
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        super();
+        this.user = user;
+        this.channel = channel;
+        this.lastReadAt = lastReadAt;
+    }
+
+    public boolean update(Instant newLastReadAt) {
+        boolean anyValueUpdated = false;
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+            anyValueUpdated = true;
+        }
+
+        return anyValueUpdated;
+    }
 }

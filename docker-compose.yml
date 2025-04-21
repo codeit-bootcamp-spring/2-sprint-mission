@@ -1,12 +1,12 @@
 version: '3'
 services:
   postgres-db:
-    image: postgres:15
+    image: postgres:17
     container_name: local_postgres
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: discodeit
+      POSTGRES_PASSWORD: decodeit_user
+      POSTGRES_DB: discodeit1234
     ports:
       - "5432:5432"
     volumes:

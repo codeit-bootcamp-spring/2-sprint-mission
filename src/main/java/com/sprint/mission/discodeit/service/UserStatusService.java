@@ -1,15 +1,24 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.StatusDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
+import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusService {
-    boolean createUserStatus(UUID statusDto);
-    StatusDto.StatusResponse updateUserStatus(UUID userId, StatusDto.StatusRequest statusDto);
-    List<StatusDto.Summary> findAllUsers();
-    StatusDto.Summary findById(UUID userId);
-    boolean deleteUserStatus(UUID userId);
-    void setUserOnline(UUID userId);
+
+    UserStatusDto create(UserStatusCreateRequest request);
+
+    UserStatusDto find(UUID userStatusId);
+
+    List<UserStatus> findAll();
+
+    UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest request);
+
+    UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request);
+
+    void delete(UUID userStatusId);
 }

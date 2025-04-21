@@ -1,111 +1,72 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.jwt.RequiresAuth;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.sprint.mission.discodeit.service.BinaryContentStorage;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
 
+import java.util.List;
+import java.util.UUID;
 
-@RestController
-@RequestMapping("/binary-contents")
 @RequiredArgsConstructor
-public class BinaryContentController {
+@RestController
+@RequestMapping("/api/binaryContents")
+public class BinaryContentController implements BinaryContentApi {
 
-  private final BinaryContentService binaryContentService;
+    private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
 
-  @RequiresAuth
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<BinaryContentDto.Summary> uploadBinaryContent(
-      @RequestParam("ownerId") UUID ownerId, @RequestParam("ownerType") String ownerType,
-      @RequestPart("file") MultipartFile file) throws IOException {
+    @GetMapping(path = "{binaryContentId}")
+    public ResponseEntity<BinaryContent> find(
+        @PathVariable("binaryContentId") UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(binaryContent);
+    }
 
-    BinaryContentDto.Upload uploadDto = BinaryContentDto.Upload.builder().ownerId(ownerId)
-        .ownerType(ownerType).file(file).build();
+    @GetMapping
+    public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+        @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(binaryContents);
+    }
 
-    BinaryContentDto.Summary summary = binaryContentService.createBinaryContent(uploadDto);
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<?> download(
+        @PathVariable("binaryContentId") UUID binaryContentId) {
 
-    return ResponseEntity.ok(summary);
-  }
+        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+        BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
+        return binaryContentStorage.download(dto);
+    }
 
-  @RequiresAuth
-  @GetMapping("/{contentId}")
-  public ResponseEntity<Resource> downloadBinaryContent(@PathVariable UUID contentId)
-      throws IOException {
+    @PostMapping("/upload")
+    public ResponseEntity<BinaryContentDto> upload(
+        @RequestParam("file") MultipartFile file) throws IOException {
 
-    BinaryContent metadata = binaryContentService.getBinaryContentEntity(contentId);
-    Optional<InputStream> streamOpt = binaryContentService.getContentStream(contentId);
-    InputStreamResource resource = new InputStreamResource(streamOpt.get());
-    String encodedFileName = UriUtils.encode(metadata.getFileName(), StandardCharsets.UTF_8);
-    String contentDisposition = "attachment; filename*=UTF-8''" + encodedFileName;
-    return ResponseEntity.ok().contentType(MediaType.parseMediaType(metadata.getContentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-        .contentLength(metadata.getSize()).body(resource);
-  }
-
-  @RequiresAuth
-  @GetMapping("/download-archive")
-  public void downloadFilesAsZip(@RequestParam List<UUID> ids, HttpServletResponse response)
-      throws IOException {
-
-    String zipFileName = "download_" + System.currentTimeMillis() + ".zip";
-    String encodedZipFileName = UriUtils.encode(zipFileName, StandardCharsets.UTF_8);
-    String contentDisposition = "attachment; filename*=UTF-8''" + encodedZipFileName;
-
-    response.setContentType("application/zip");
-    response.setHeader(HttpHeaders.CONTENT_DISPOSITION, contentDisposition);
-
-    binaryContentService.writeFilesAsZip(ids, response.getOutputStream());
-  }
-
-
-  @GetMapping("/summaries")
-  public ResponseEntity<List<BinaryContentDto.Summary>> downloadBinaryContents(
-      @RequestParam List<UUID> ids) {
-
-    List<BinaryContentDto.Summary> summaries;
-    summaries = binaryContentService.findBinaryContentSummariesByIds(ids);
-
-    return ResponseEntity.ok(summaries);
-  }
-
-
-  @RequiresAuth
-  @DeleteMapping()
-  public ResponseEntity<List<BinaryContentDto.DeleteResponse>> deleteBinaryContentsByIds(
-      @RequestParam List<UUID> ids) {
-
-    List<BinaryContentDto.DeleteResponse> results = binaryContentService.deleteBinaryContentsByIds(
-        ids);
-    return ResponseEntity.ok(results);
-  }
-
-  @RequiresAuth
-  @DeleteMapping("/delete/{ownerId}")
-  public ResponseEntity<Void> deleteBinaryContentsByOwner(@PathVariable UUID ownerId) {
-    binaryContentService.deleteBinaryContentByOwner(ownerId);
-    return ResponseEntity.noContent().build();
-  }
+        if (file != null && !file.isEmpty()) {
+            BinaryContentCreateRequest createRequest = new BinaryContentCreateRequest(
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getBytes()
+            );
+            BinaryContentDto binaryContentDto = binaryContentService.create(createRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(binaryContentDto);
+        }
+        return ResponseEntity.badRequest().build();
+    }
 }

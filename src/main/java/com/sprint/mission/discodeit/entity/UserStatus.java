@@ -1,58 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.StatusOperation;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
-
 @Getter
-public class UserStatus implements Serializable {
+@Setter
+@Entity
+@NoArgsConstructor
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 105L;
-  private static final long ONLINE_MINUTES = 5;
-  private final UUID id; // 클래스 아이디
-  private final UUID userId; // 사용자
-  private ZonedDateTime lastSeenAt; // 마지막 접속 시간
-  private final ZonedDateTime createdAt; // 클래스 생성 시간
-  private ZonedDateTime updatedAt; // 업데이트 시간
-  private StatusOperation status;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonIgnore
+    private User user;                // 주인 필드(외래키 소유)
 
-  public UserStatus(UUID userId) {
-    this.id = UUID.randomUUID();
-    this.userId = userId;
-    this.lastSeenAt = null;
-    this.createdAt = ZonedDateTime.now();
-    this.updatedAt = null;
-    this.setStatus(StatusOperation.OFFLINE);
-  }
+    @Column(nullable = false)
+    private Instant lastActiveAt = Instant.now();
 
-  public void updateLastTime() {
-    this.updatedAt = ZonedDateTime.now();
-  }
+    //1대1로 매핑
+    public UserStatus(User user) {
+        setUser(user);
+    }
 
-  public void setLastSeenAt(ZonedDateTime lastSeenAt) {
-    this.lastSeenAt = lastSeenAt;
-    this.updatedAt = ZonedDateTime.now();
+    public void setUser(User user) {
+        this.user = user;
+        if (user != null && user.getUserStatus() != this) {
+            user.setUserStatus(this);
+        }
+    }
 
-  }
-
-  public void setStatus(StatusOperation statusOperation) {
-    this.status = statusOperation;
-    updateLastTime();
-  }
-
-  public boolean isOnline() {
-    ZonedDateTime now = ZonedDateTime.now();
-    Duration duration = Duration.between(lastSeenAt, now);
-    return duration.toMinutes() < ONLINE_MINUTES;
-  }
-
-
+    @Transient
+    public boolean isOnline() {
+        return lastActiveAt != null &&
+            lastActiveAt.isAfter(Instant.now().minus(Duration.ofMinutes(5)));
+    }
 }
+

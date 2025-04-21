@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3b3e1724-c9dd-42c9-8f3f-a6d5572ecd20" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/BinaryContentMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/BinaryContentMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ChannelMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ChannelMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/MessageMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/MessageMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/PageResponseMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/PageResponseMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ReadStatusMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ReadStatusMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserStatusMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserStatusMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/basic/repositoryimpl/BasicChannelRepositoryImplement.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/basic/serviceimpl/BasicAuthService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/DataStorageException.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="discodeit" type="f1a62948:ProjectNode" />
+              </path>
+            </expand>
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Record" />
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="part2" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2v7245MsJP0SJucV6hDgAjFYYe2" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.discodeit: Compose 배포.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml.postgres-db: Compose 배포.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.docker-compose.yml: Compose 배포.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission [dependencies].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.2-sprint-mission 빌드.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Gradle 종속성 빌드 중.executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.DiscodeitApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;part2-양찬혁-sprint6&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ych61/IdeaProjects/codeit_sprint/2-sprint-mission&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.sprint.mission.discodeit.service" />
+      <recent name="com.sprint.mission.discodeit.mapper" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\ych61\IdeaProjects\codeit_sprint\2-sprint-mission\.idea" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ych61\IdeaProjects\codeit_sprint\2-sprint-mission\src\main\resources\static\asset" />
+      <recent name="C:\Users\ych61\IdeaProjects\codeit_sprint\2-sprint-mission\src\main\resources\static" />
+      <recent name="C:\Users\ych61\IdeaProjects\codeit_sprint\2-sprint-mission" />
+      <recent name="C:\Users\ych61\IdeaProjects\codeit_sprint\2-sprint-mission\src\main" />
+      <recent name="C:\Users\ych61\IdeaProjects\codeit_sprint\2-sprint-mission\src\main\java\com\sprint\mission\discodeit" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.DiscodeitApplication">
+    <configuration name="2-sprint-mission [dependencies]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="dependencies" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="DiscodeitApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="discodeit.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.sprint.mission.discodeit.DiscodeitApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="discodeit: Compose 배포" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="src/main/java/com/sprint/mission/discodeit/docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml: Compose 배포" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.postgres-db: Compose 배포" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="postgres-db" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.2-sprint-mission [dependencies]" />
+        <item itemvalue="Docker.docker-compose.yml.postgres-db: Compose 배포" />
+        <item itemvalue="Docker.docker-compose.yml: Compose 배포" />
+        <item itemvalue="Docker.discodeit: Compose 배포" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-a94e463ab2e7-intellij.indexing.shared.core-IU-243.26053.27" />
+        <option value="bundled-js-predefined-d6986cc7102b-1632447f56bf-JavaScript-IU-243.26053.27" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="애플리케이션 수준" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="3b3e1724-c9dd-42c9-8f3f-a6d5572ecd20" name="변경" comment="" />
+      <created>1743481598945</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1743481598945</updated>
+      <workItem from="1743481602018" duration="19572000" />
+      <workItem from="1743508238839" duration="294000" />
+      <workItem from="1743569591847" duration="94000" />
+      <workItem from="1743569805714" duration="16896000" />
+      <workItem from="1743638744358" duration="9144000" />
+      <workItem from="1743652885717" duration="6765000" />
+      <workItem from="1743684432654" duration="17556000" />
+      <workItem from="1743739455876" duration="15511000" />
+      <workItem from="1743846822349" duration="7156000" />
+      <workItem from="1743876832069" duration="868000" />
+      <workItem from="1743877728967" duration="65000" />
+      <workItem from="1743877817188" duration="336000" />
+      <workItem from="1743878183219" duration="360000" />
+      <workItem from="1743878557007" duration="2740000" />
+      <workItem from="1743920571857" duration="939000" />
+      <workItem from="1743952102667" duration="581000" />
+      <workItem from="1743985566905" duration="1374000" />
+      <workItem from="1744091632192" duration="392000" />
+      <workItem from="1744092202838" duration="713000" />
+      <workItem from="1744093066022" duration="2274000" />
+      <workItem from="1744095624780" duration="2606000" />
+      <workItem from="1744098283364" duration="4604000" />
+      <workItem from="1744111982152" duration="719000" />
+      <workItem from="1744162633960" duration="94000" />
+      <workItem from="1744537896306" duration="576000" />
+      <workItem from="1744538490502" duration="255000" />
+      <workItem from="1744538755203" duration="80000" />
+      <workItem from="1744538844642" duration="21000" />
+      <workItem from="1744538908001" duration="56000" />
+      <workItem from="1744538972222" duration="569000" />
+      <workItem from="1744539555063" duration="27000" />
+      <workItem from="1744539594966" duration="169000" />
+      <workItem from="1744619600763" duration="5556000" />
+      <workItem from="1744675970140" duration="9189000" />
+      <workItem from="1744689619868" duration="17913000" />
+      <workItem from="1744735514366" duration="26000" />
+      <workItem from="1744779015594" duration="18147000" />
+      <workItem from="1744848837759" duration="1415000" />
+      <workItem from="1744856168198" duration="1797000" />
+      <workItem from="1744867233420" duration="1125000" />
+      <workItem from="1744940187729" duration="749000" />
+      <workItem from="1744944329182" duration="775000" />
+      <workItem from="1744950418721" duration="1156000" />
+      <workItem from="1744951607731" duration="6751000" />
+      <workItem from="1744959884352" duration="195000" />
+      <workItem from="1744960104029" duration="31000" />
+      <workItem from="1744960157832" duration="4406000" />
+      <workItem from="1744964634858" duration="32000" />
+      <workItem from="1744964717177" duration="1451000" />
+      <workItem from="1745054343537" duration="2860000" />
+      <workItem from="1745057338726" duration="2784000" />
+      <workItem from="1745060169243" duration="2351000" />
+      <workItem from="1745062558367" duration="1036000" />
+      <workItem from="1745063616145" duration="30000" />
+      <workItem from="1745063667887" duration="683000" />
+      <workItem from="1745133935937" duration="3867000" />
+      <workItem from="1745138552371" duration="608000" />
+      <workItem from="1745139176508" duration="1939000" />
+      <workItem from="1745141149845" duration="2176000" />
+      <workItem from="1745143354417" duration="2475000" />
+      <workItem from="1745146067231" duration="332000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="part2-양찬혁-sprint6" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
