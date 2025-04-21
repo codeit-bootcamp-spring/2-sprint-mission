@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -34,6 +34,7 @@ public class BasicAuthService implements AuthService {
         return UserResult.fromEntity(user, userStatus.isOnline(now));
     }
 
+    // 메서드 몇칸 띌건지
     private User findUserByNameAndValidatePassword(LoginRequest loginRequestUser) {
         User user = validateUserName(loginRequestUser);
         validatePassword(user, loginRequestUser.password());

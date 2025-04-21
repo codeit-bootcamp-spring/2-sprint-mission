@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusResult;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -39,8 +39,7 @@ public class BasicReadStatusService implements ReadStatusService {
                     throw new IllegalArgumentException("해당 채널과 유저에 대한 읽기 상태가 이미 존재합니다.");
                 });
 
-        ReadStatus readStatus = readStatusRepository.save(
-                new ReadStatus(user, channel));
+        ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel));
 
         return ReadStatusResult.fromEntity(readStatus);
     }

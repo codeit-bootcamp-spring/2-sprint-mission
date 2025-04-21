@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusResult;
-import com.sprint.mission.discodeit.application.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusResult;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;

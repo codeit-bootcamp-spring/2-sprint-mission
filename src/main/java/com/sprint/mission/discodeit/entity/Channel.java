@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "channels")
 public class Channel extends BaseUpdatableEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Column(name = "name")

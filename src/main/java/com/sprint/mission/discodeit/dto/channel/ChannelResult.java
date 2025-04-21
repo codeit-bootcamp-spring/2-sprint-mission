@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.application.dto.channel;
+package com.sprint.mission.discodeit.dto.channel;
 
-import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 

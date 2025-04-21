@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Column(name = "file_name")

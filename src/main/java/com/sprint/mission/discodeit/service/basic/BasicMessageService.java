@@ -1,20 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.application.dto.message.MessageResult;
-import com.sprint.mission.discodeit.application.dto.user.UserResult;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResult;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.dto.user.UserResult;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,6 +79,7 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         User user = message.getUser();
+
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
@@ -84,19 +88,19 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<MessageResult> getAllByChannelId(UUID channelId) {
-        return messageRepository.findAll()
-                .stream()
-                .filter(message -> message.getChannel().getId().equals(channelId))
-                .sorted(Comparator.comparing(Message::getCreatedAt))
-                .map(message -> {
-                    User user = message.getUser();
-                    UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                            .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+    public PageResponse<MessageResult> getAllByChannelId(UUID channelId, Pageable pageable) {
+        Slice<Message> slices = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+        slices.getContent();
 
-                    return MessageResult.fromEntity(message, UserResult.fromEntity(user, userStatus.isOnline(Instant.now())));
-                })
-                .toList();
+        return PageResponseMapper.fromSlice(slices, message -> {
+            UserStatus userStatus = userStatusRepository.findByUser_Id(message.getUser().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+            return MessageResult.fromEntity(
+                    message,
+                    UserResult.fromEntity(message.getUser(), userStatus.isOnline(Instant.now()))
+            );
+        });
     }
 
     @Transactional
