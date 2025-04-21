@@ -5,24 +5,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-  void save();
+  @EntityGraph(attributePaths = {"status", "profile"})
+  @Query("select u from User u where u.id = :id")
+  Optional<User> findWithDetailsById(UUID id);
 
-  void addUser(User user);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  @Query("select u from User u")
+  List<User> findAllWithDetails();
 
-  Optional<User> findUserById(UUID userId);
+  Optional<User> findByUsername(String username);
 
-  List<User> findUsersByIds(Set<UUID> userIds);
-
-  List<User> findUserAll();
-
-  Optional<User> findUserByName(String username);
-
-  void deleteUserById(UUID userId);
-
-  boolean existsById(UUID userId);
+  @EntityGraph(attributePaths = {"status", "profile"})
+  List<User> findByIdIn(Set<UUID> userIds);
 
   boolean existsByUsername(String username);
 

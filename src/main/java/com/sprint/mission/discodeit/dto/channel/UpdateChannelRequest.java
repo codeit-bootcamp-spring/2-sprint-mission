@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import lombok.Data;
+public record UpdateChannelRequest(
+    String newName,
+    String newDescription
+) {
 
-@Data
-public class UpdateChannelRequest {
-
-  String newName;
-  String newDescription;
 }

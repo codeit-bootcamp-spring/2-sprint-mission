@@ -1,27 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 
 @Getter
-public class Message extends BaseEntity implements Serializable {
+@Builder
+@AllArgsConstructor
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private final UUID authorId;  // User의 UUID 저장
-  private final UUID channelId; // Channel의 UUID 저장
-  private String content;
-  private List<UUID> attachmentIds = new ArrayList<>();
 
-  public Message(UUID authorId, UUID channelId, String content) {
+  @Column(columnDefinition = "TEXT")
+  private String content;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id")
+  private User author;
+
+  @Builder.Default
+  @ManyToMany
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments = new ArrayList<>();
+
+  public Message(User author, Channel channel, String content) {
     super();
-    this.authorId = authorId;
-    this.channelId = channelId;
+    this.author = author;
+    this.channel = channel;
     this.content = content;
-    this.attachmentIds = new ArrayList<>();
+  }
+
+  protected Message() {
   }
 
   public void updateContent(String content) {
@@ -29,16 +61,16 @@ public class Message extends BaseEntity implements Serializable {
     updateTimestamp();
   }
 
-  public void addAttachment(UUID attachmentId) {
-    this.attachmentIds.add(attachmentId);
+  public void addAttachment(BinaryContent attachment) {
+    this.attachments.add(attachment);
   }
 
   @Override
   public String toString() {
     return "Message{" +
-        "senderId= " + authorId + '\'' +
+        "author= " + author + '\'' +
         ", sendTime= " + getCreatedAt() + '\'' +
-        ", channelId= " + channelId + '\'' +
+        ", channel= " + channel + '\'' +
         ", content= '" + content + '\'' +
         '}';
   }

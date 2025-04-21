@@ -1,14 +1,11 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import java.util.UUID;
-import lombok.Builder;
-import lombok.Data;
 
-@Data
-@Builder
-public class RegisterResponse {
+public record RegisterResponse(
+    UUID userId,
+    boolean success,
+    String message
+) {
 
-  private UUID userId;
-  private boolean success;
-  private String message;
 }

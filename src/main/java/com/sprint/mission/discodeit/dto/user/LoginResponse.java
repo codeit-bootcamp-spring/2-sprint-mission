@@ -1,13 +1,9 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import lombok.Builder;
-import lombok.Data;
+public record LoginResponse(
+    boolean success,
+    String message,
+    String token
+) {
 
-@Data
-@Builder
-public class LoginResponse {
-
-  private boolean success;
-  private String message;
-  private String token;
 }
