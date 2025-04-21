@@ -45,7 +45,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public Channel create(PrivateChannelCreateRequest request) {
-    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    Channel channel = new Channel(ChannelType.PRIVATE, request.name(), request.description());
     Channel createdChannel = channelRepository.save(channel);
 
     request.participantIds().forEach(userId -> {
