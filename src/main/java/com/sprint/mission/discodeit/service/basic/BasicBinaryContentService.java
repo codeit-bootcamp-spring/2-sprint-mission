@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,9 +20,13 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
+
+    @Transactional
     @Override
-    public BinaryContent create(BinaryContentCreateRequest dto) {
+    public BinaryContentDto create(BinaryContentCreateRequest dto) {
         String fileName = dto.fileName();
         byte[] bytes = dto.bytes();
         String contentType = dto.contentType();
@@ -26,29 +34,35 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = new BinaryContent(
                 fileName,
                 (long) bytes.length,
-                contentType,
-                bytes
+                contentType
         );
-        return binaryContentRepository.save(binaryContent);
+        binaryContentRepository.save(binaryContent);
+        binaryContentStorage.put(binaryContent.getId(), bytes);
+
+        return binaryContentMapper.toDto(binaryContent);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId)
+    public BinaryContentDto find(UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
+        return binaryContentMapper.toDto(binaryContent);
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
         return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+                .map(binaryContentMapper::toDto)
                 .toList();
     }
 
+    @Transactional
     @Override
     public void delete(UUID binaryContentId) {
-        if (!binaryContentRepository.existsById(binaryContentId)) {
-            throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
-        }
-        binaryContentRepository.deleteById(binaryContentId);
+        BinaryContent content = binaryContentRepository.findById(binaryContentId).orElseThrow(() ->
+                new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
+        binaryContentRepository.delete(content);
     }
 }
