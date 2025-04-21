@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UpdateReadStatusRequest(
-    UUID readStatusId,
     Instant newLastReadAt
 ) {
 

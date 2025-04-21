@@ -1,43 +1,61 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.service.TimeFormatter;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
-import java.io.Serializable;
-import java.time.Instant;
 
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel extends BaseEntity implements Serializable {
+public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+    @Column(length = 100)
+    private String name;
 
-  private String name;
-  private String description;
-  private String type;
+    @Column(length = 500)
+    private String description;
 
-  public Channel(String name, String description, String type) {
-    super();
-    this.name = name;
-    this.description = description;
-    this.type = type;
-  }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private ChannelType type;
 
-  public void update(String name, String description, Instant updatedAt) {
-    this.name = name;
-    this.description = description;
-    this.updatedAt = updatedAt;
-  }
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReadStatus> readStatuses = new ArrayList<>();
 
-  public boolean isPrivate() {
-    return "PRIVATE CHANNEL".equals(this.name);
-  }
+    protected Channel() {
+    }
 
-  @Override
-  public String toString() {
-    return "Channel{" +
-        "name='" + name + '\'' +
-        ", id=" + id +
-        ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
-        ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
-        '}';
-  }
+    public Channel(String name, String description, ChannelType type) {
+        this.name = name;
+        this.description = description;
+        this.type = type;
+    }
+
+    public void update(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public boolean isPrivate() {
+        return this.type == ChannelType.PRIVATE;
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+            "name='" + name + '\'' +
+            ", id=" + id +
+            ", createdAt=" + TimeFormatter.formatTimestamp(createdAt) +
+            ", updatedAt=" + TimeFormatter.formatTimestamp(updatedAt) +
+            '}';
+    }
 }
