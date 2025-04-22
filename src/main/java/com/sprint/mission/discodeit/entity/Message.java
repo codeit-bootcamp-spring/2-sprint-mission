@@ -1,51 +1,68 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
-
+@Entity
+@Table(name = "messages")
 @Getter
-public class Message implements Serializable, Identifiable {
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private List<UUID> attachmentIds;
-    private Instant updatedAt;
-    private String content;
-    private final UUID channelId;
-    private final UUID authorId;
+@NoArgsConstructor
+public class Message extends BaseUpdatableEntity implements Serializable, Identifiable {
 
-    @Builder
-    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.attachmentIds = attachmentIds != null ? new ArrayList<>(attachmentIds) : new ArrayList<>();
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
-        this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
-    }
+  private static final long serialVersionUID = 1L;
 
-    public void updateMessageInfo(String newContent) {
-        boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
-            this.content = newContent;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
-    }
 
-    public void updateMessageAttachment(List<UUID> attachmentIds) {
-            this.attachmentIds = new ArrayList<>(attachmentIds);
-            this.updatedAt = Instant.now();
+  @OneToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachments;
+
+  @Lob
+  private String content;
+
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;
+
+  @Builder
+  public Message(String content, Channel channel, User author,
+      List<BinaryContent> attachments) {
+    this.attachments = attachments != null ? new ArrayList<>(attachments) : new ArrayList<>();
+    this.content = content;
+    this.channel = channel;
+    this.author = author;
+  }
+
+  public void updateMessageInfo(String newContent) {
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
     }
+  }
+
+  public void updateBinaryContent(List<BinaryContent> attachments) {
+    this.attachments = new ArrayList<>(attachments);
+  }
 
 }

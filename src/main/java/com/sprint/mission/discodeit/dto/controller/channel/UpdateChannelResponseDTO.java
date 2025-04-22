@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.controller.channel;
 
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.time.Instant;
@@ -11,7 +12,7 @@ public record UpdateChannelResponseDTO(
     ChannelType type,
     String name,
     String description,
-    List<UUID> participantIds,
+    List<FindUserResult> participants,
     Instant lastMessageAt
 ) {
 

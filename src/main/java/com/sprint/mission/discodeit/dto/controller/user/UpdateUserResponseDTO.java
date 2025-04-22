@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.dto.controller.user;
 
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
-
-import java.time.Instant;
+import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import java.util.UUID;
 
 public record UpdateUserResponseDTO(
     UUID id,
-    UUID profileId,
-    Instant createdAt,
-    Instant updatedAt,
+    FindBinaryContentResult profile,
     String username,
     String email,
     Boolean online

@@ -1,24 +1,24 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam;
-import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
-import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusDTO;
-import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusParam;
-
+import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusResult;
+import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
+import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusResult;
 import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
 
-  ReadStatusDTO create(CreateReadStatusParam createReadStatusParam);
+  CreateReadStatusResult create(CreateReadStatusCommand createReadStatusCommand);
 
-  ReadStatusDTO find(UUID id);
+  FindReadStatusResult find(UUID id);
 
-  List<ReadStatusDTO> findAllByUserId(UUID userId);
+  List<FindReadStatusResult> findAllByUserId(UUID userId);
 
-  List<ReadStatusDTO> findAllByChannelId(UUID channelId);
+  List<FindReadStatusResult> findAllByChannelId(UUID channelId);
 
-  UpdateReadStatusDTO update(UUID id, UpdateReadStatusParam updateReadStatusParam);
+  UpdateReadStatusResult update(UUID id, UpdateReadStatusCommand updateReadStatusCommand);
 
   void delete(UUID id);
 

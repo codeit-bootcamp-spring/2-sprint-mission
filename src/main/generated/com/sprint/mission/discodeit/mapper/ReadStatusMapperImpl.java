@@ -2,11 +2,17 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.controller.readstatus.CreateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.readstatus.CreateReadStatusResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.readstatus.FindReadStatusResponseDTO;
+import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusResponseDTO;
-import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusParam;
-import com.sprint.mission.discodeit.dto.service.readStatus.ReadStatusDTO;
-import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusDTO;
+import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusResult;
+import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
+import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusResult;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -14,14 +20,14 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-04T10:27:12+0900",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (Amazon.com Inc.)"
+    date = "2025-04-17T11:36:05+0900",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (Oracle Corporation)"
 )
 @Component
 public class ReadStatusMapperImpl implements ReadStatusMapper {
 
     @Override
-    public CreateReadStatusParam toReadStatusParam(CreateReadStatusRequestDTO createReadStatusRequestDTO) {
+    public CreateReadStatusCommand toCreateReadStatusCommand(CreateReadStatusRequestDTO createReadStatusRequestDTO) {
         if ( createReadStatusRequestDTO == null ) {
             return null;
         }
@@ -34,14 +40,14 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         channelId = createReadStatusRequestDTO.channelId();
         lastReadAt = createReadStatusRequestDTO.lastReadAt();
 
-        CreateReadStatusParam createReadStatusParam = new CreateReadStatusParam( userId, channelId, lastReadAt );
+        CreateReadStatusCommand createReadStatusCommand = new CreateReadStatusCommand( userId, channelId, lastReadAt );
 
-        return createReadStatusParam;
+        return createReadStatusCommand;
     }
 
     @Override
-    public CreateReadStatusResponseDTO toReadStatusResponseDTO(ReadStatusDTO readStatusDTO) {
-        if ( readStatusDTO == null ) {
+    public CreateReadStatusResponseDTO toReadStatusResponseDTO(CreateReadStatusResult createReadStatusResult) {
+        if ( createReadStatusResult == null ) {
             return null;
         }
 
@@ -50,10 +56,10 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID channelId = null;
         Instant lastReadAt = null;
 
-        id = readStatusDTO.id();
-        userId = readStatusDTO.userId();
-        channelId = readStatusDTO.channelId();
-        lastReadAt = readStatusDTO.lastReadAt();
+        id = createReadStatusResult.id();
+        userId = createReadStatusResult.userId();
+        channelId = createReadStatusResult.channelId();
+        lastReadAt = createReadStatusResult.lastReadAt();
 
         CreateReadStatusResponseDTO createReadStatusResponseDTO = new CreateReadStatusResponseDTO( id, userId, channelId, lastReadAt );
 
@@ -61,16 +67,16 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
     }
 
     @Override
-    public UpdateReadStatusResponseDTO toUpdateReadStatusResponseDTO(UpdateReadStatusDTO updateReadStatusDTO) {
-        if ( updateReadStatusDTO == null ) {
+    public UpdateReadStatusResponseDTO toUpdateReadStatusResponseDTO(UpdateReadStatusResult updateReadStatusResult) {
+        if ( updateReadStatusResult == null ) {
             return null;
         }
 
         UUID id = null;
         Instant lastReadAt = null;
 
-        id = updateReadStatusDTO.id();
-        lastReadAt = updateReadStatusDTO.lastReadAt();
+        id = updateReadStatusResult.id();
+        lastReadAt = updateReadStatusResult.lastReadAt();
 
         UpdateReadStatusResponseDTO updateReadStatusResponseDTO = new UpdateReadStatusResponseDTO( id, lastReadAt );
 
@@ -78,23 +84,29 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
     }
 
     @Override
-    public ReadStatus toEntity(CreateReadStatusParam createReadStatusParam) {
-        if ( createReadStatusParam == null ) {
+    public FindReadStatusResult toFindReadStatusResult(ReadStatus readStatus) {
+        if ( readStatus == null ) {
             return null;
         }
 
-        ReadStatus.ReadStatusBuilder readStatus = ReadStatus.builder();
+        UUID userId = null;
+        UUID channelId = null;
+        UUID id = null;
+        Instant lastReadAt = null;
 
-        readStatus.userId( createReadStatusParam.userId() );
-        readStatus.channelId( createReadStatusParam.channelId() );
-        readStatus.lastReadAt( createReadStatusParam.lastReadAt() );
+        userId = readStatusUserId( readStatus );
+        channelId = readStatusChannelId( readStatus );
+        id = readStatus.getId();
+        lastReadAt = readStatus.getLastReadAt();
 
-        return readStatus.build();
+        FindReadStatusResult findReadStatusResult = new FindReadStatusResult( id, userId, channelId, lastReadAt );
+
+        return findReadStatusResult;
     }
 
     @Override
-    public ReadStatusDTO toReadStatusDTO(ReadStatus readStatus) {
-        if ( readStatus == null ) {
+    public FindReadStatusResponseDTO toFindReadStatusResponseDTO(FindReadStatusResult findReadStatusResult) {
+        if ( findReadStatusResult == null ) {
             return null;
         }
 
@@ -103,13 +115,100 @@ public class ReadStatusMapperImpl implements ReadStatusMapper {
         UUID channelId = null;
         Instant lastReadAt = null;
 
+        id = findReadStatusResult.id();
+        userId = findReadStatusResult.userId();
+        channelId = findReadStatusResult.channelId();
+        lastReadAt = findReadStatusResult.lastReadAt();
+
+        FindReadStatusResponseDTO findReadStatusResponseDTO = new FindReadStatusResponseDTO( id, userId, channelId, lastReadAt );
+
+        return findReadStatusResponseDTO;
+    }
+
+    @Override
+    public CreateReadStatusResult toCreateReadStatusResult(ReadStatus readStatus) {
+        if ( readStatus == null ) {
+            return null;
+        }
+
+        UUID userId = null;
+        UUID channelId = null;
+        UUID id = null;
+        Instant lastReadAt = null;
+
+        userId = readStatusUserId( readStatus );
+        channelId = readStatusChannelId( readStatus );
         id = readStatus.getId();
-        userId = readStatus.getUserId();
-        channelId = readStatus.getChannelId();
         lastReadAt = readStatus.getLastReadAt();
 
-        ReadStatusDTO readStatusDTO = new ReadStatusDTO( id, userId, channelId, lastReadAt );
+        CreateReadStatusResult createReadStatusResult = new CreateReadStatusResult( id, userId, channelId, lastReadAt );
 
-        return readStatusDTO;
+        return createReadStatusResult;
+    }
+
+    @Override
+    public UpdateReadStatusResult toUpdateReadStatusResult(ReadStatus readStatus) {
+        if ( readStatus == null ) {
+            return null;
+        }
+
+        UUID userId = null;
+        UUID channelId = null;
+        UUID id = null;
+        Instant lastReadAt = null;
+
+        userId = readStatusUserId( readStatus );
+        channelId = readStatusChannelId( readStatus );
+        id = readStatus.getId();
+        lastReadAt = readStatus.getLastReadAt();
+
+        UpdateReadStatusResult updateReadStatusResult = new UpdateReadStatusResult( id, userId, channelId, lastReadAt );
+
+        return updateReadStatusResult;
+    }
+
+    @Override
+    public UpdateReadStatusCommand toUpdateReadStatusCommand(UpdateReadStatusRequestDTO updateReadStatusRequestDTO) {
+        if ( updateReadStatusRequestDTO == null ) {
+            return null;
+        }
+
+        Instant newLastReadAt = null;
+
+        newLastReadAt = updateReadStatusRequestDTO.newLastReadAt();
+
+        UpdateReadStatusCommand updateReadStatusCommand = new UpdateReadStatusCommand( newLastReadAt );
+
+        return updateReadStatusCommand;
+    }
+
+    private UUID readStatusUserId(ReadStatus readStatus) {
+        if ( readStatus == null ) {
+            return null;
+        }
+        User user = readStatus.getUser();
+        if ( user == null ) {
+            return null;
+        }
+        UUID id = user.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
+    }
+
+    private UUID readStatusChannelId(ReadStatus readStatus) {
+        if ( readStatus == null ) {
+            return null;
+        }
+        Channel channel = readStatus.getChannel();
+        if ( channel == null ) {
+            return null;
+        }
+        UUID id = channel.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
     }
 }

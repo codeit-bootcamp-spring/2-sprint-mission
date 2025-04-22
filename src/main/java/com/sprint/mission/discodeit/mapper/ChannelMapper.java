@@ -2,8 +2,9 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.controller.channel.*;
 import com.sprint.mission.discodeit.dto.service.channel.*;
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -17,46 +18,31 @@ public interface ChannelMapper {
 
   ChannelMapper INSTANCE = Mappers.getMapper(ChannelMapper.class);
 
-  CreateChannelParam toChannelParam(CreatePublicChannelRequestDTO createChannelRequestDTO);
+  CreatePublicChannelCommand toCreatePublicChannelCommand(
+      CreatePublicChannelRequestDTO createPublicChannelRequestDTO);
 
-  CreatePublicChannelResponseDTO toChannelResponseDTO(ChannelDTO channelDTO);
+  CreatePublicChannelResponseDTO toCreatePublicChannelResponseDTO(
+      CreatePublicChannelResult createPublicChannelResult);
 
-  CreatePrivateChannelParam toPrivateChannelParam(
+  CreatePrivateChannelCommand toCreatePrivateChannelCommand(
       CreatePrivateChannelRequestDTO createPrivateChannelRequestDTO);
 
-  CreatePrivateChannelResponseDTO toPrivateChannelResponseDTO(PrivateChannelDTO privateChannelDTO);
+  CreatePrivateChannelResponseDTO toCreatePrivateChannelResponseDTO(
+      CreatePrivateChannelResult createPrivateChannelResult);
 
-  UpdateChannelParam toUpdateChannelParam(UpdateChannelRequestDTO updateChannelRequestDTO);
+  UpdateChannelCommand toUpdateChannelCommand(UpdateChannelRequestDTO updateChannelRequestDTO);
 
-  UpdateChannelResponseDTO toUpdateChannelResponseDTO(UpdateChannelDTO updateChannelDTO);
+  UpdateChannelResponseDTO toUpdateChannelResponseDTO(UpdateChannelResult updateChannelResult);
 
-  ChannelDTO toChannelDTO(Channel channel);
+  UpdateChannelResult toUpdateChannelResult(Channel channel, Instant lastMessageAt);
 
-  default PrivateChannelDTO toPrivateChannelDTO(List<UUID> userIds, Channel channel,
-      Instant lastMessageAt) {
-    return new PrivateChannelDTO(
-        channel.getId(),
-        channel.getType(),
-        channel.getName(),
-        channel.getDescription(),
-        userIds,
-        lastMessageAt
+  FindChannelResponseDTO toFindChannelResponseDTO(FindChannelResult findChannelResult);
 
-    );
-  }
+  FindChannelResult toFindChannelResult(Channel channel, Instant lastMessageAt,
+      List<FindUserResult> participants);
 
-  UpdateChannelDTO toUpdateChannelDTO(Channel channel, Instant lastMessageAt);
+  CreatePrivateChannelResult toCreatePrivateChannelResult(Channel channel, Instant lastMessageAt,
+      List<FindUserResult> participants);
 
-  default FindChannelDTO toFindChannelDTO(Channel channel, Instant latestMessageTime,
-      List<UUID> userIds) {
-    return new FindChannelDTO(
-        channel.getId(),
-        channel.getType(),
-        channel.getName(),
-        channel.getDescription(),
-        userIds,
-        latestMessageTime
-
-    );
-  }
+  CreatePublicChannelResult toCreatePublicChannelResult(Channel channel);
 }

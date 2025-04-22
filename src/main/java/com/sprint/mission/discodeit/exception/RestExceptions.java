@@ -42,5 +42,18 @@ public class RestExceptions {
 
   // File
   public static final RestException FILE_READ_ERROR = new RestException(ResultCode.FILE_READ_ERROR);
+  public static final RestException FILE_WRITE_ERROR = new RestException(
+      ResultCode.FILE_WRITE_ERROR);
+  public static final RestException FILE_DELETE_ERROR = new RestException(
+      ResultCode.FILE_DELETE_ERROR);
+  public static final RestException INIT_DIRECTORY_ERROR = new RestException(
+      ResultCode.INIT_DIRECTORY_ERROR
+  );
+  public static final RestException FILE_DOWNLOAD_ERROR = new RestException(
+      ResultCode.FILE_DOWNLOAD_ERROR
+  );
+  public static final RestException UNSUPPORTED_MEDIA_TYPE = new RestException(
+      ResultCode.UNSUPPORTED_MEDIA_TYPE
+  );
 
 }

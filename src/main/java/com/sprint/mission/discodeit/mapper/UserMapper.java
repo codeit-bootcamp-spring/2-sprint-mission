@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.controller.user.*;
-import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserDTO;
-import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
-import com.sprint.mission.discodeit.dto.service.user.UserDTO;
+import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -19,24 +18,25 @@ public interface UserMapper {
 
   UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-  CreateUserParam toCreateUserParam(CreateUserRequestDTO createUserRequestDTO);
+  CreateUserCommand toCreateUserCommand(CreateUserRequestDTO createUserRequestDTO);
 
-  CreateUserResponseDTO toCreateUserResponseDTO(UserDTO userDTO);
+  CreateUserResponseDTO toCreateUserResponseDTO(CreateUserResult createUserResult);
 
-  UpdateUserParam toUpdateUserParam(UpdateUserRequestDTO updateUserRequestDTO);
+  UpdateUserCommand toUpdateUserCommand(UpdateUserRequestDTO updateUserRequestDTO);
 
-  UpdateUserResponseDTO toUpdateUserResponseDTO(UpdateUserDTO updateUserDTO);
+  UpdateUserResponseDTO toUpdateUserResponseDTO(UpdateUserResult updateUserResult);
 
-  UserResponseDTO toUserResponseDTO(UserDTO userDTO);
+  FindUserResponseDTO toFindUserResponseDTO(FindUserResult findUserResult);
+  
+  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
+  FindUserResult toFindUserResult(User user);
 
-  @Mapping(source = "user.id", target = "id")
-  @Mapping(source = "user.createdAt", target = "createdAt")
-  @Mapping(source = "user.updatedAt", target = "updatedAt")
-  @Mapping(expression = "java(userStatus.isLoginUser())", target = "online")
-  UserDTO toUserDTO(User user, UserStatus userStatus);
+  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
+  CreateUserResult toCreateUserResult(User user);
 
-  @Mapping(source = "user.id", target = "id")
-  @Mapping(source = "user.createdAt", target = "createdAt")
-  @Mapping(source = "user.updatedAt", target = "updatedAt")
-  UpdateUserDTO toUpdateUserDTO(User user, boolean online, BinaryContentDTO binaryContentDTO);
+  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
+  UpdateUserResult toUpdateUserResult(User user);
+
+  FindBinaryContentResult toFindBinaryContentResult(BinaryContent binaryContent);
+
 }

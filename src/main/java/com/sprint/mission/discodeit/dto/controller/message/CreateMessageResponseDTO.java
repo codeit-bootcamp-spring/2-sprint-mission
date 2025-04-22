@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.dto.controller.message;
 
-import com.sprint.mission.discodeit.dto.controller.user.UserResponseDTO;
 
+import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -9,10 +10,11 @@ import java.util.UUID;
 public record CreateMessageResponseDTO(
     UUID id,
     Instant createdAt,
-    List<UUID> attachmentIds,
+    Instant updatedAt,
+    List<FindBinaryContentResult> attachments,
     String content,
     UUID channelId,
-    UUID authorId
+    FindUserResult author
 ) {
 
 }

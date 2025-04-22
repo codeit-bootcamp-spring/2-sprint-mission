@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 
+@EnableJpaAuditing
+@EnableCaching
 @SpringBootApplication
 public class DiscodeitApplication {
-    public static void main(String[] args) {
-        ApplicationContext context =  SpringApplication.run(DiscodeitApplication.class, args);
-    }
+
+  public static void main(String[] args) {
+    ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+  }
 }
