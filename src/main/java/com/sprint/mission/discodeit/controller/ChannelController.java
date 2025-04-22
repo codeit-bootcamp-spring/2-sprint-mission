@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelFindResponse;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,31 +21,31 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @GetMapping
-  public ResponseEntity<List<ChannelFindResponse>> findAllChannelByUser(
+  public ResponseEntity<List<ChannelDto>> findAllChannelByUser(
       @RequestParam UUID userId) {
-    List<ChannelFindResponse> response = channelService.findAllByUserId(userId);
+    List<ChannelDto> response = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(response);
   }
 
   @PostMapping("/public")
-  public ResponseEntity<Channel> createPublicChannel(
+  public ResponseEntity<ChannelDto> createPublicChannel(
       @RequestBody PublicChannelCreateRequest request) {
-    Channel response = channelService.createPublicChannel(request);
+    ChannelDto response = channelService.createPublicChannel(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PostMapping("/private")
-  public ResponseEntity<Channel> createPrivateChannel(
+  public ResponseEntity<ChannelDto> createPrivateChannel(
       @RequestBody PrivateChannelCreateRequest request) {
-    Channel response = channelService.createPrivateChannel(request);
+    ChannelDto response = channelService.createPrivateChannel(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @PatchMapping("/{channelId}")
-  public ResponseEntity<Channel> update(
+  public ResponseEntity<ChannelDto> update(
       @PathVariable("channelId") UUID channelId,
-      @RequestBody ChannelUpdateRequest channelUpdateRequest) {
-    Channel response = channelService.update(channelId, channelUpdateRequest);
+      @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+    ChannelDto response = channelService.update(channelId, publicChannelUpdateRequest);
     return ResponseEntity.ok(response);
   }
 

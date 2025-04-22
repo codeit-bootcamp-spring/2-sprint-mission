@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.transaction.Transactional;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,47 +21,50 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BasicReadStatusService implements ReadStatusService {
 
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
+  private final ReadStatusMapper readStatusMapper;
 
   @Override
-  public ReadStatus create(ReadStatusCreateRequest request) {
-    User user = userRepository.findById(request.userId())
-        .orElseThrow(() -> new ResourceNotFoundException("해당 유저 없음"));
-    Channel channel = channelRepository.findById(request.channelId())
-        .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
+  public ReadStatusDto create(ReadStatusCreateRequest request) {
+    User user = userRepository.getReferenceById(request.userId());
+    Channel channel = channelRepository.getReferenceById(request.channelId());
 
-    if (readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
+    if (readStatusRepository.findByUserAndChannel(user, channel)
         .isPresent()) {
       throw new IllegalArgumentException("해당 유저의 해당 채널 ReadStatus 이미 존재");
     }
 
-    ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(),
-        request.lastReadAt());
-    return readStatusRepository.save(readStatus);
+    ReadStatus readStatus = new ReadStatus(user, channel, request.lastReadAt());
+    readStatusRepository.save(readStatus);
+    return readStatusMapper.toResponse(readStatus);
   }
 
   @Override
-  public ReadStatus find(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 ReadStatus 없음"));
+  public ReadStatusDto find(UUID readStatusId) {
+    return readStatusMapper.toResponse(readStatusRepository.findById(readStatusId)
+        .orElseThrow(() -> new ResourceNotFoundException("해당 ReadStatus 없음")));
   }
 
   @Override
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUser_Id(userId).stream()
+        .map(readStatusMapper::toResponse)
+        .toList();
   }
 
   @Override
-  public ReadStatus update(UUID readStatusId, Instant newLastReadAt) {
+  public ReadStatusDto update(UUID readStatusId, Instant newLastReadAt) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 ReadStatus 없음"));
 
     readStatus.updateLastReadAt(newLastReadAt);
-    return readStatusRepository.save(readStatus);
+    readStatusRepository.save(readStatus);
+    return readStatusMapper.toResponse(readStatus);
   }
 
   @Override

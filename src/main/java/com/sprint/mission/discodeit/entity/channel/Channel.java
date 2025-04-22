@@ -1,21 +1,28 @@
 package com.sprint.mission.discodeit.entity.channel;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.annotation.Nullable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.time.Instant;
-
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel extends BaseEntity {
+public class Channel extends BaseUpdatableEntity {
 
-  private final ChannelType type;
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  private ChannelType type;
 
-  @Nullable
   private String name; //PUBLIC 전용
-  @Nullable
   private String description; //PUBLIC 전용
 
+  protected Channel() {
+  }
 
   //Private Channel 만들때 호출
   public Channel(ChannelType type) {
@@ -35,23 +42,9 @@ public class Channel extends BaseEntity {
   public void update(String newName, String newDescription) {
     if (newName != null && !newName.equals(this.name)) {
       this.name = newName;
-      this.updatedAt = Instant.now();
     }
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
-      this.updatedAt = Instant.now();
     }
-  }
-
-  @Override
-  public String toString() {
-    return "Channel{" +
-        "type=" + type +
-        ", name='" + name + '\'' +
-        ", newDescription='" + description + '\'' +
-        ", updatedAt=" + updatedAt +
-        ", id=" + id +
-        ", createdAt=" + createdAt +
-        '}';
   }
 }

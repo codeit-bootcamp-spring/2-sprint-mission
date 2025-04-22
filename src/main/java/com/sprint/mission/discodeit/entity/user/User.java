@@ -1,71 +1,81 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.common.BinaryContent;
+import com.sprint.mission.discodeit.exception.DuplicateResourceException;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "users")
 @Getter
-public class User extends BaseEntity {
+@Setter
+public class User extends BaseUpdatableEntity {
 
   private String username;
   private String email;
   private String password;
   //
-  private UUID profileId;
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
+
+  protected User() {
+  }
 
   public User(String username, String email, String password) {
     this(username, email, password, null);
   }
 
-  public User(String username, String email, String password, UUID profileId) {
+  public User(String username, String email, String password, BinaryContent profile) {
     super();
 
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
-  public void update(String newUsername, String newEmail, String newPassword, UUID profileId) {
-    boolean anyValueUpdated = false;
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent profile) {
     if (newUsername != null && !newUsername.equals(this.username)) {
       this.username = newUsername;
-      anyValueUpdated = true;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
-      anyValueUpdated = true;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
       this.password = newPassword;
-      anyValueUpdated = true;
     }
-    if (profileId != null && !profileId.equals(this.profileId)) {
-      this.profileId = profileId;
-      anyValueUpdated = true;
+    if (profile != null && !profile.equals(this.profile)) {
+      this.profile = profile;
+    }
+  }
+
+  public void validateNotDuplicateWith(User other) {
+    if (other == null) {
+      return;
     }
 
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+    if (this.username.equals(other.username)) {
+      throw new DuplicateResourceException("이미 존재하는 username입니다.");
+    }
+
+    if (this.email.equals(other.email)) {
+      throw new DuplicateResourceException("이미 존재하는 email입니다.");
     }
   }
 
   public boolean hasProfile() {
-    return this.profileId != null;
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-        "newUsername='" + username + '\'' +
-        ", newEmail='" + email + '\'' +
-        ", newPassword='" + password + '\'' +
-        ", profileId=" + profileId +
-        ", updatedAt=" + updatedAt +
-        ", id=" + id +
-        ", createdAt=" + createdAt +
-        '}';
+    return this.profile != null;
   }
 }

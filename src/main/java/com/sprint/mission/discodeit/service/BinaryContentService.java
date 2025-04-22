@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.common.BinaryContent;
 
 import java.util.UUID;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 
 public interface BinaryContentService {
 
@@ -12,7 +13,9 @@ public interface BinaryContentService {
 
   BinaryContent find(UUID binaryContentId);
 
+  ResponseEntity<?> download(UUID binaryContentId);
+
   List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
 
-  void delete(UUID binaryContentId);
+  void delete(BinaryContent binaryContent);
 }
