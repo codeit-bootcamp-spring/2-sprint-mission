@@ -5,8 +5,27 @@ spring:
     multipart:
           max-file-size: 10MB
           max-request-size: 10MB
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    jpa:
+      hibernate:
+        ddl-auto: none
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+    sql:
+      init:
+        mode: always
 
 discodeit:
   repository:
     type: file   # jcf | file
     file-directory: .discodeit
+
+  storage:
+    type: local
+    local:
+      root-path: ./binary-files
