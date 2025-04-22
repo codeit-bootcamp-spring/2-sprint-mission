@@ -1,37 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.UUID;
-import lombok.Getter;
 
 @Getter
-public class ReadStatus implements Serializable {
+@Entity
+@Table(name = "read_statues")
+public class ReadStatus extends BaseUpdatableEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-  private static final long serialVersionUID = 1L;
-  private final UUID id;
-  private final UUID userId;
-  private final UUID channelId;
-  private final Instant createdAt;
-  private Instant updatedAt;
-  private Instant lastReadTime;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-  public ReadStatus(UUID userId, UUID channelId) {
-    this.id = UUID.randomUUID();
-    this.userId = userId;
-    this.channelId = channelId;
-    this.createdAt = ZonedDateTime.now().toInstant();
-    this.updatedAt = createdAt;
-    this.lastReadTime = createdAt;
-  }
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
 
-  public void updateLastReadTime() {
-    this.lastReadTime = ZonedDateTime.now().toInstant();
-    updateLastModified();
-  }
+    @Column(name = "last_read_at")
+    private Instant lastReadTime;
 
-  private void updateLastModified() {
-    this.updatedAt = ZonedDateTime.now().toInstant();
-  }
+    protected ReadStatus() {
+    }
+
+    public ReadStatus(User user, Channel channel) {
+        this.user = user;
+        this.channel = channel;
+        this.lastReadTime = ZonedDateTime.now().toInstant();
+    }
+
+    public void updateLastReadTime() {
+        this.lastReadTime = ZonedDateTime.now().toInstant();
+    }
 }

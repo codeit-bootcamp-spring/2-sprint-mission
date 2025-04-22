@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentResult;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Operation(
             summary = "바이너리 컨텐츠 생성"
@@ -38,7 +40,7 @@ public class BinaryContentController {
             @RequestPart MultipartFile multipartFile) {
 
         BinaryContentRequest binaryContentRequest = BinaryContentRequest.fromMultipartFile(multipartFile);
-        BinaryContentResult binaryContentResult = binaryContentService.createProfileImage(binaryContentRequest);
+        BinaryContentResult binaryContentResult = binaryContentService.create(binaryContentRequest);
 
         return ResponseEntity.ok(binaryContentResult);
     }
@@ -77,6 +79,12 @@ public class BinaryContentController {
 
         return ResponseEntity.ok()
                 .body(binaryContentResult);
+    }
+
+
+    @GetMapping("{binaryContentId}/download")
+    public ResponseEntity<?> download(BinaryContentResult binaryContentResult) {
+        return binaryContentStorage.download(binaryContentResult);
     }
 
     @Operation(

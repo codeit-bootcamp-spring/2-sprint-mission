@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.application.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.application.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.application.dto.message.MessageResult;
-import com.sprint.mission.discodeit.application.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResult;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,11 +67,15 @@ public class MessageController {
             @ApiResponse(responseCode = "400", description = "파라미터 오류")
     })
     @GetMapping
-    public ResponseEntity<List<MessageResult>> getAllByChannelId(
+    public ResponseEntity<PageResponse<MessageResult>> getAllByChannelId(
             @Parameter(description = "채널 ID", required = true)
-            @RequestParam UUID channelId) {
-
-        return ResponseEntity.ok(messageService.getAllByChannelId(channelId));
+            @RequestParam UUID channelId,
+            @PageableDefault(
+                    size = 50,
+                    sort = "createdDate",
+                    direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(messageService.getAllByChannelId(channelId, pageable));
     }
 
     @Operation(

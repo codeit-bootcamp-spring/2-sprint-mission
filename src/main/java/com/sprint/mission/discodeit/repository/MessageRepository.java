@@ -1,22 +1,23 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MessageRepository {
+public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  Message save(Message message);
+    List<Message> findByChannel_Id(UUID channelId);
 
-  Optional<Message> findByMessageId(UUID id);
+    Slice<Message> findByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
 
-  List<Message> findAll();
-
-  List<Message> findByChannelId(UUID channelId);
-
-  void delete(UUID id);
-
-  Optional<Instant> findLastMessageCreatedAtByChannelId(UUID channelId);
+    @Query("SELECT m.createdAt FROM Message m WHERE m.channel.id = :channelId ORDER BY m.createdAt DESC")
+    Optional<Instant> findLastMessageCreatedAtByChannelId(@Param("channelId") UUID channelId);
 }

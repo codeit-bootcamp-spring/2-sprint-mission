@@ -1,19 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.application.dto.channel.ChannelResult;
-import com.sprint.mission.discodeit.application.dto.channel.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.application.dto.channel.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.dto.channel.ChannelResult;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserResult;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -21,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,10 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
+    @Transactional
     @Override
     public ChannelResult createPublic(PublicChannelCreateRequest channelRegisterRequest) {
         Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.name(), channelRegisterRequest.description());
@@ -38,45 +40,65 @@ public class BasicChannelService implements ChannelService {
         return ChannelResult.fromPublic(savedChannel, null);
     }
 
+    @Transactional
     @Override
     public ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel savedChannel = channelRepository.save(channel);
 
         for (UUID memberId : privateChannelCreateRequest.participantIds()) {
-            readStatusRepository.save(new ReadStatus(memberId, savedChannel.getId()));
+            User member = userRepository.findById(memberId)
+                    .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
+
+            readStatusRepository.save(new ReadStatus(member, savedChannel));
         }
 
-        List<UUID> channelMemberIds = readStatusRepository.findByChannelId(channel.getId())
+        Instant now = Instant.now();
+        List<UserResult> participants = readStatusRepository.findByChannel_Id(channel.getId())
                 .stream()
-                .map(ReadStatus::getUserId)
+                .map(ReadStatus::getUser)
+                .map(user -> {
+                    UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                            .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+                    return UserResult.fromEntity(user, userStatus.isOnline(now));
+                })
                 .toList();
 
-        return ChannelResult.fromPrivate(savedChannel, null, channelMemberIds);
+
+        return ChannelResult.fromPrivate(savedChannel, null, participants);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ChannelResult getById(UUID id) {
-        Channel channel = channelRepository.findByChannelId(id)
-                .orElseThrow(
-                        () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
                         channel.getId())
                 .orElse(null);
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            List<UUID> userIds = readStatusRepository.findByChannelId(channel.getId())
+            Instant now = Instant.now();
+            List<UserResult> participants = readStatusRepository.findByChannel_Id(channel.getId())
                     .stream()
-                    .map(ReadStatus::getUserId)
+                    .map(ReadStatus::getUser)
+                    .map(user -> {
+                        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+                        return UserResult.fromEntity(user, userStatus.isOnline(now));
+                    })
                     .toList();
 
-            return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userIds);
+            return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, participants);
         }
 
         return ChannelResult.fromPublic(channel, lastMessageCreatedAt);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ChannelResult> getAllByUserId(UUID userId) {
         List<Channel> publicChannels = channelRepository.findAll()
@@ -84,11 +106,10 @@ public class BasicChannelService implements ChannelService {
                 .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
                 .toList();
 
-        List<Channel> privateChannels = readStatusRepository.findByUserId(userId)
+        List<Channel> privateChannels = readStatusRepository.findByUser_Id(userId)
                 .stream()
-                .map(readStatus -> channelRepository.findByChannelId(readStatus.getChannelId())
-                        .orElseThrow(
-                                () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent())))
+                .map(readStatus -> channelRepository.findById(readStatus.getChannel().getId())
+                        .orElseThrow(() -> new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent())))
                 .toList();
 
         List<ChannelResult> publicChannelResults = publicChannels.stream()
@@ -104,64 +125,75 @@ public class BasicChannelService implements ChannelService {
         return totalChannels;
     }
 
+    @Transactional
     @Override
     public ChannelResult updatePublic(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest) {
-        Channel channel = channelRepository.findByChannelId(id)
+        Channel channel = channelRepository.findById(id)
                 .orElseThrow(
-                        () -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+                        () -> new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         channel.update(publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
         Channel updatedChannel = channelRepository.save(channel);
 
-        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
-                        channel.getId())
+        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())
                 .orElse(null);
 
         return ChannelResult.fromPublic(updatedChannel, lastMessageCreatedAt);
     }
 
+    @Transactional
     @Override
     public void delete(UUID channelId) {
-        channelRepository.delete(channelId);
+        channelRepository.deleteById(channelId);
 
-        List<UUID> readStatusIds = readStatusRepository.findByChannelId(channelId)
+        List<UUID> readStatusIds = readStatusRepository.findByChannel_Id(channelId)
                 .stream()
                 .map(ReadStatus::getId)
                 .toList();
 
         for (UUID readStatusId : readStatusIds) {
-            readStatusRepository.delete(readStatusId);
+            readStatusRepository.deleteById(readStatusId);
         }
 
-        List<UUID> messageIds = messageRepository.findByChannelId(channelId)
+        List<UUID> messageIds = messageRepository.findByChannel_Id(channelId)
                 .stream()
                 .map(Message::getId)
                 .toList();
 
         for (UUID messageId : messageIds) {
-            messageRepository.delete(messageId);
+            messageRepository.deleteById(messageId);
         }
     }
 
-
+    @Transactional
     @Override
     public ChannelResult addPrivateMember(UUID channelId, UUID friendId) {
-        Channel channel = channelRepository.findByChannelId(channelId)
-                .orElseThrow(() -> new IllegalArgumentException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         readStatusRepository.findByChannelIdAndUserId(channelId, friendId)
                 .ifPresent(readStatus -> {
                     throw new IllegalArgumentException("해당 Private 채널의 유저가 이미 존재합니다.");
                 });
-        readStatusRepository.save(new ReadStatus(friendId, channel.getId()));
+
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_USER_NOT_FOUND.getMessageContent()));
+        readStatusRepository.save(new ReadStatus(friend, channel));
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())
                 .orElse(null);
 
-        List<UUID> userId = readStatusRepository.findByChannelId(channel.getId()).stream().toList()
+        Instant now = Instant.now();
+        List<UserResult> participants = readStatusRepository.findByChannel_Id(channel.getId())
                 .stream()
-                .map(ReadStatus::getUserId)
+                .map(ReadStatus::getUser)
+                .map(user -> {
+                    UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
+                            .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+
+                    return UserResult.fromEntity(user, userStatus.isOnline(now));
+                })
                 .toList();
 
-        return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, userId);
+        return ChannelResult.fromPrivate(channel, lastMessageCreatedAt, participants);
     }
 }

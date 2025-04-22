@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.util.mock.user;
 
-import com.sprint.mission.discodeit.application.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 
 public final class MockUser {
 

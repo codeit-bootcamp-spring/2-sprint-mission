@@ -1,40 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private final UUID channelId;
-    private final UUID userId;
-    private String context;
-    private List<UUID> attachmentIds;
 
-    public Message(String context, UUID channelId, UUID userId, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = ZonedDateTime.now().toInstant();
-        this.updatedAt = createdAt;
-        this.userId = userId;
-        this.channelId = channelId;
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User user;
+
+    @Column(name = "content")
+    private String context;
+
+    @ManyToMany
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
+    private List<BinaryContent> attachments;
+
+    protected Message() {
+    }
+
+    public Message(Channel channel, User user, String context, List<BinaryContent> attachments) {
+        this.channel = channel;
+        this.user = user;
         this.context = context;
-        this.attachmentIds = attachmentIds;
+        this.attachments = attachments;
     }
 
     public void updateContext(String context) {
         this.context = context;
-        updateLastModified();
-    }
-
-    private void updateLastModified() {
-        this.updatedAt = ZonedDateTime.now().toInstant();
     }
 }
