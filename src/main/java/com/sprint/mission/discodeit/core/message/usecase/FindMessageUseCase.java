@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.core.message.usecase;
 
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
+import java.time.Instant;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface FindMessageUseCase {
 
-  MessageResult findMessageByMessageId(UUID messageId);
+//  MessageResult find(UUID messageId, Pageable pageable);
 
-  MessageListResult findMessagesByChannelId(UUID channelId);
+//  Slice<MessageResult> findMessagesByChannelId(UUID channelId, Pageable pageable);
+
+  Slice<MessageResult> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
 
 }

@@ -18,9 +18,9 @@ public record ChannelUpdateResponse(
     Instant updatedAt,
     @Schema(description = "Channel Type", example = "PUBLIC")
     ChannelType type,
-    @Schema(description = "Channel name", example = "string")
+    @Schema(description = "Channel username", example = "string")
     String name,
-    @Schema(description = "Channel description", example = "string")
+    @Schema(description = "Channel newDescription", example = "string")
     String description
 ) {
 

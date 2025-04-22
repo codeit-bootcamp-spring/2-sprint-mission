@@ -54,8 +54,8 @@ public class ServerServiceTest {
 
   }
 //
-//  static User createMockUser(UUID userId) {
-//    return new User(userId, null, Instant.now(), null, null, null);
+//  static User createMockUser(UUID authorId) {
+//    return new User(authorId, null, Instant.now(), null, null, null);
 //  }
 
 }

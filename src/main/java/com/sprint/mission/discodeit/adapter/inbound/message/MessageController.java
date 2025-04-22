@@ -1,28 +1,27 @@
 package com.sprint.mission.discodeit.adapter.inbound.message;
 
-import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toCreateMessageCommand;
-import static com.sprint.mission.discodeit.adapter.inbound.message.MessageDtoMapper.toUpdateMessageCommand;
-
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.adapter.inbound.message.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageCreateResponse;
 import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageDeleteResponse;
-import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageUpdateResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.MessageResponse;
+import com.sprint.mission.discodeit.adapter.inbound.message.response.PageResponse;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageResult;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageListResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageResult;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +46,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageCreateResponse> create(
+  public ResponseEntity<MessageResponse> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest requestBody,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
       throws IOException {
@@ -64,28 +63,34 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
 
-    CreateMessageCommand command = toCreateMessageCommand(requestBody);
+    CreateMessageCommand command = MessageDtoMapper.toCreateMessageCommand(requestBody);
 
-    CreateMessageResult result = messageService.create(command, attachmentRequests);
+    MessageResult result = messageService.create(command, attachmentRequests);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(MessageCreateResponse.create(result.message()));
+        .body(MessageDtoMapper.toCreateResponse(result));
   }
 
   @GetMapping
-  public ResponseEntity<List<MessageResult>> findAll(@RequestParam UUID channelId) {
-    MessageListResult result = messageService.findMessagesByChannelId(channelId);
-
-    return ResponseEntity.ok(result.messageList());
+  public ResponseEntity<PageResponse<MessageResult>> findAll(@RequestParam UUID channelId,
+      @RequestParam(required = false) Instant cursor,
+      @PageableDefault(
+          size = 50, sort = "createdAt", direction = Direction.DESC
+      ) Pageable pageable) {
+    Slice<MessageResult> results = messageService.findAllByChannelId(channelId, cursor,
+        pageable);
+    PageResponse<MessageResult> pageResponse = PageResponseMapper.fromSlice(results,
+        MessageResult::createdAt);
+    return ResponseEntity.ok(pageResponse);
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageUpdateResponse> updateMessage(
+  public ResponseEntity<MessageResponse> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
-    UpdateMessageCommand command = toUpdateMessageCommand(messageId, requestBody);
-    UpdateMessageResult result = messageService.update(command);
-    return ResponseEntity.ok(MessageUpdateResponse.create(result.message()));
+    UpdateMessageCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
+    MessageResult result = messageService.update(command);
+    return ResponseEntity.ok(MessageDtoMapper.toCreateResponse(result));
   }
 
   @DeleteMapping("/{messageId}")

@@ -1,71 +1,68 @@
 package com.sprint.mission.discodeit.core.message.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.channel.entity.Channel;
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.user.entity.User;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.List;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-public class Message implements Serializable {
+@NoArgsConstructor
+@Table(name = "messages")
+@Entity
+public class Message extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;
 
-  private final UUID id;
-  private final UUID userId;
-  private final UUID channelId;
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-  private final Instant createdAt;
-  private Instant updatedAt;
-
+  @Column(columnDefinition = "text")
   private String content;
 
-  private List<UUID> attachmentIds;
+  @OneToMany(cascade = CascadeType.ALL)
+  @JoinTable(
+      name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id")
+  )
+  private List<BinaryContent> attachment;
 
-  private Message(UUID userId, UUID channelId, String content, List<UUID> attachmentIds) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
+  private Message(User author, Channel channel, String content, List<BinaryContent> attachment) {
+    super();
 
-    this.userId = userId;
-    this.channelId = channelId;
+    this.author = author;
+    this.channel = channel;
 
     this.content = content;
-    this.attachmentIds = attachmentIds;
+    this.attachment = attachment;
   }
 
-  public static Message create(UUID userId, UUID channelId, String text, List<UUID> attachmentIds) {
-    return new Message(userId, channelId, text, attachmentIds);
+  public static Message create(User user, Channel channel, String text,
+      List<BinaryContent> attachmentIds) {
+    return new Message(user, channel, text, attachmentIds);
   }
 
   public void update(String newText) {
-    boolean anyValueUpdated = false;
     if (newText != null && !newText.equals(content)) {
       this.content = newText;
-      anyValueUpdated = true;
-    }
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
     }
   }
-
-//  public void update(String newText, List<UUID> newAttachmentIds) {
-//    boolean anyValueUpdated = false;
-//    if (newText != null && !newText.equals(content)) {
-//      this.content = newText;
-//      anyValueUpdated = true;
-//    }
-//    if (newAttachmentIds != null) {
-//      this.attachmentIds = newAttachmentIds;
-//      anyValueUpdated = true;
-//    }
-//    if (anyValueUpdated) {
-//      this.updatedAt = Instant.now();
-//    }
-//  }
 
   //TODO. Message Validator 구현해야함
   public static class Validator {

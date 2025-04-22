@@ -1,33 +1,36 @@
 package com.sprint.mission.discodeit.core.channel.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @ToString
 @Getter
-public class Channel implements Serializable {
+@NoArgsConstructor
+@Table(name = "channels")
+@Entity
+public class Channel extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-
-  private final UUID id;
-
+  @Column(name = "name", length = 100)
   private String name;
+  @Column(name = "description", length = 500)
   private String description;
 
+  @Enumerated(EnumType.STRING)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Column(name = "type", columnDefinition = "channel_type")
   private ChannelType type;
 
-  private final Instant createdAt;
-  private Instant updatedAt;
-
   private Channel(String name, String description, ChannelType type) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-
+    super();
     this.name = name;
     this.description = description;
     this.type = type;
@@ -38,18 +41,11 @@ public class Channel implements Serializable {
   }
 
   public void update(String newName, String newDescription) {
-    boolean anyValueUpdated = false;
     if (newName != null && !newName.equals(this.name)) {
       this.name = newName;
-      anyValueUpdated = true;
     }
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
     }
   }
 

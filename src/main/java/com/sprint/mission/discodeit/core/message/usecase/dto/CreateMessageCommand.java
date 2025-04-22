@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.core.message.usecase.dto;
 import java.util.UUID;
 
 public record CreateMessageCommand(
-    UUID userId,
+    UUID authorId,
     UUID channelId,
-    String text
+    String content
 ) {
 
 }

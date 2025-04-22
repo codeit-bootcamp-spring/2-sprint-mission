@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "User Login Request")
 public record UserLoginRequest(
-    @Schema(description = "User name", example = "string")
+    @Schema(description = "User username", example = "string")
     @NotBlank String username,
 
     @Schema(description = "User password", example = "string")

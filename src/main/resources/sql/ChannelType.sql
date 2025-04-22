@@ -1,0 +1,1 @@
+create type channel_type as enum ('PUBLIC','PRIVATE');

@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.core.status.usecase.user.dto;
 
+import com.sprint.mission.discodeit.core.user.entity.User;
 import java.time.Instant;
-import java.util.UUID;
 
 public record CreateUserStatusCommand(
-    UUID userId,
+//    UUID userId,
+    User user,
     Instant lastActiveAt
 ) {
 

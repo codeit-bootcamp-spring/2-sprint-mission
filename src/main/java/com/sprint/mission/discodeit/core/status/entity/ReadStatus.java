@@ -1,51 +1,52 @@
 package com.sprint.mission.discodeit.core.status.entity;
 
-import lombok.Getter;
-import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.channel.entity.Channel;
+import com.sprint.mission.discodeit.core.user.entity.User;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @ToString
 @Getter
-public class ReadStatus implements Serializable {
+@NoArgsConstructor
+@Table(name = "read_statuses")
+@Entity
+public class ReadStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  private final UUID readStatusId;
-  private final UUID userId;
-  private final UUID channelId;
+  @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
 
-  private final Instant createdAt;
-  private Instant updatedAt;
+  @Column(name = "last_read_At")
   private Instant lastReadAt;
 
-  private ReadStatus(UUID readStatusId, UUID userId, UUID channelId, Instant lastReadAt,
-      Instant createdAt) {
-    this.readStatusId = readStatusId;
-    this.userId = userId;
-    this.channelId = channelId;
-    this.createdAt = createdAt;
-    this.updatedAt = createdAt;
+  private ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    super();
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 
-  public static ReadStatus create(UUID userId, UUID channelId, Instant lastReadAt) {
-    return new ReadStatus(UUID.randomUUID(), userId, channelId, lastReadAt, Instant.now());
+  public static ReadStatus create(User user, Channel channel, Instant lastReadAt) {
+    return new ReadStatus(user, channel, lastReadAt);
   }
 
   public void update(Instant newLastReadAt) {
-    boolean anyValueUpdated = false;
     if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = newLastReadAt;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
     }
   }
 }
+

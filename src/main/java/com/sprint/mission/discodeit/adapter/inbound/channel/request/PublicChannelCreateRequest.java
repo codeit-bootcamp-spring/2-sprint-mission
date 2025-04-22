@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Public Channel Create")
 public record PublicChannelCreateRequest(
-    @Schema(description = "Channel name", example = "string")
+    @Schema(description = "Channel username", example = "string")
     @NotBlank String name,
-    @Schema(description = "Channel description", example = "string")
+    @Schema(description = "Channel newDescription", example = "string")
     String description
 ) {
 

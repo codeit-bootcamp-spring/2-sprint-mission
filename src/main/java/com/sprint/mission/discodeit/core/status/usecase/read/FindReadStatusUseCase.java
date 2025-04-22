@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.core.status.usecase.read;
 
-import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
 import java.util.List;
 import java.util.UUID;
 
 public interface FindReadStatusUseCase {
 
-  ReadStatus find(UUID readStatusId);
+  ReadStatusResult findByReadStatusId(UUID readStatusId);
 
-  ReadStatus findReadStatusByUserId(UUID userId);
+  ReadStatusResult findByUserId(UUID userId);
 
-  List<ReadStatus> findAllByUserId(UUID userId);
+  List<ReadStatusResult> findAllByUserId(UUID userId);
 
 
 }

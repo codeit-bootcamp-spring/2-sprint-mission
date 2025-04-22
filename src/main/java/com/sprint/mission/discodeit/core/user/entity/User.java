@@ -1,65 +1,66 @@
 package com.sprint.mission.discodeit.core.user.entity;
 
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @ToString
 @Getter
-public class User implements Serializable {
+@NoArgsConstructor
+@Table(name = "users")
+@Entity
+public class User extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-
-  private UUID id;
-  private UUID profileId;
-
+  @Column(name = "username", length = 50, unique = true, nullable = false)
   private String name;
+  @Column(name = "email", length = 100, unique = true, nullable = false)
   private String email;
+  @Column(name = "password", length = 60, nullable = false)
   private String password;
 
-  private final Instant createdAt;
-  private Instant updatedAt;
+  @Setter
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private UserStatus userStatus;
 
-  private User(UUID id, UUID profileId, Instant createdAt, String name, String email,
-      String password) {
-    this.id = id;
-    this.profileId = profileId;
-    this.createdAt = createdAt;
-    this.updatedAt = createdAt;
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  private User(String name, String email, String password, BinaryContent profile) {
+    super();
+    this.profile = profile;
     this.name = name;
     this.email = email;
     this.password = password;
   }
 
-  public static User create(String name, String email, String password, UUID profileId) {
-    return new User(UUID.randomUUID(), profileId, Instant.now(), name, email, password);
+  public static User create(String name, String email, String password, BinaryContent profile) {
+    return new User(name, email, password, profile);
   }
 
-  public void update(String newUserName, String newEmail, String newPassword, UUID newProfileId) {
-    boolean anyValueUpdated = false;
+  public void update(String newUserName, String newEmail, String newPassword,
+      BinaryContent newProfile) {
     if (newUserName != null && !newUserName.equals(this.name)) {
       this.name = newUserName;
-      anyValueUpdated = true;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
       this.email = newEmail;
-      anyValueUpdated = true;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
       this.password = newPassword;
-      anyValueUpdated = true;
     }
-    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-      this.profileId = newProfileId;
-      anyValueUpdated = true;
-    }
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+    if (newProfile != null && !newProfile.equals(this.profile)) {
+      this.profile = newProfile;
     }
   }
 

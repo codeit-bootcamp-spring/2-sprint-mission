@@ -1,56 +1,57 @@
 package com.sprint.mission.discodeit.core.status.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
+import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.user.entity.User;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import jdk.jfr.Timestamp;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Getter
-public class UserStatus implements Serializable {
+@NoArgsConstructor
+@Table(name = "user_statuses")
+@Entity
+public class UserStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @OneToOne
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
 
-  private final UUID userStatusId;
-
-  public final Instant createdAt;
-  public Instant updatedAt;
-
-  private final UUID userId;
+  @Timestamp
+  @Column(name = "last_active_at")
   private Instant lastActiveAt;
 
-  private UserStatus(UUID userStatusId, UUID userId, Instant createdAt, Instant lastActiveAt) {
-    this.userStatusId = userStatusId;
-    this.userId = userId;
-    this.createdAt = createdAt;
-    this.updatedAt = createdAt;
+  private UserStatus(User user, Instant lastActiveAt) {
+    super();
+    this.user = user;
     this.lastActiveAt = lastActiveAt;
   }
 
-  public static UserStatus create(UUID userId, Instant lastActiveAt) {
-    return new UserStatus(UUID.randomUUID(), userId, Instant.now(), lastActiveAt);
+  public static UserStatus create(User user, Instant lastActiveAt) {
+    return new UserStatus(user, lastActiveAt);
   }
 
   public void update(Instant lastActiveAt) {
-    boolean anyValueUpdated = false;
     if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
     }
   }
-
+  
+  @Transactional
   public void setOffline() {
-    this.updatedAt = Instant.now().minus(Duration.ofMinutes(6));
+    updateTime(Instant.now().minus(Duration.ofMinutes(6)));
   }
 
   public boolean isOnline() {
-    return Duration.between(updatedAt, Instant.now()).getSeconds() <= 300;
+    return Duration.between(getUpdatedAt(), Instant.now()).getSeconds() <= 300;
   }
 
 }
+

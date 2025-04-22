@@ -1,44 +1,44 @@
 package com.sprint.mission.discodeit.core.content.entity;
 
+import com.sprint.mission.discodeit.core.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @ToString
 @Getter
-public class BinaryContent implements Serializable {
+@NoArgsConstructor
+@Table(name = "binary_contents")
+@Entity
+public class BinaryContent extends BaseEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-
-  private final UUID id;
-  public final Instant uploadAt;
-
+  @Column(name = "file_name", nullable = false)
   private String fileName;
+
+  @Column(name = "content_type", length = 100, nullable = false)
   private String contentType;
-  private String extension;
+
+  @Column(name = "size", nullable = false)
   private Long size;
-  private byte[] bytes;
 
-  private BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
-    this.id = UUID.randomUUID();
-    this.uploadAt = Instant.now();
+  @Column(name = "extension", nullable = false)
+  private String extension;
 
+  private BinaryContent(String fileName, Long size, String contentType) {
+    super();
     this.fileName = fileName;
     this.contentType = contentType;
     this.extension = extractExtension(fileName);
 
     this.size = size;
-    this.bytes = bytes;
+//    this.bytes = bytes;
   }
 
-  public static BinaryContent create(String fileName, Long size, String contentType,
-      byte[] bytes) {
-    return new BinaryContent(fileName, size, contentType, bytes);
+  public static BinaryContent create(String fileName, Long size, String contentType) {
+    return new BinaryContent(fileName, size, contentType);
   }
 
   private static String extractExtension(String fileName) {

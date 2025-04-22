@@ -5,7 +5,7 @@ import java.util.UUID;
 public record UpdateChannelCommand(
     UUID channelId,
     String newName,
-    String description
+    String newDescription
 //    ChannelType newType
 ) {
 
