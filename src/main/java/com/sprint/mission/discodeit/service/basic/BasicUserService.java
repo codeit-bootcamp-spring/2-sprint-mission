@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,20 +30,21 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
+  @Transactional
   public User create(UserCreateRequest request,
       Optional<BinaryContentCreateRequest> optionalBinaryContentCreateRequest) {
     // username과 email은 다른 유저와 같으면 안됩니다.
     validationUserCreateRequest(request);
 
-    UUID nullableProfileId = optionalBinaryContentCreateRequest
+    BinaryContent nullableProfile = optionalBinaryContentCreateRequest
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+              contentType);
           binaryContentRepository.save(binaryContent);
-          return binaryContent.getId();
+          return binaryContent;
         })
         .orElse(null);
 
@@ -49,11 +52,12 @@ public class BasicUserService implements UserService {
         request.username(),
         request.email(),
         request.password(),
-        nullableProfileId
+        nullableProfile
     );
 
     // UserStatus 를 같이 생성합니다.
-    UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+    UserStatus userStatus = new UserStatus(user, Instant.now());
+    user.setStatus(userStatus);
     userStatusRepository.save(userStatus);
 
     return userRepository.save(user);
@@ -92,16 +96,15 @@ public class BasicUserService implements UserService {
     );
 
     // 업데이트 할 바이너리 컨텐츠가 있으면 교체
-    optionalBinaryContentRequest.ifPresent(binaryContentRequest -> {
+    BinaryContent nullableProfile = optionalBinaryContentRequest.ifPresent(binaryContentRequest -> {
       BinaryContent binaryContent = new BinaryContent(
           binaryContentRequest.fileName(),
           (long) binaryContentRequest.bytes().length,
-          binaryContentRequest.contentType(),
-          binaryContentRequest.bytes()
+          binaryContentRequest.contentType()
       );
       binaryContentRepository.save(binaryContent);
-      user.setProfileId(binaryContent.getId());
-    });
+      return binaryContent;
+    }).orElse(null);
 
     return userRepository.save(user);
   }
@@ -116,8 +119,8 @@ public class BasicUserService implements UserService {
     // BinaryContent(프로필), UserStatus
     userRepository.findById(userId)
         .ifPresent(user -> {
-          if (user.getProfileId() != null) {
-            binaryContentRepository.delete(user.getProfileId());
+          if (user.getProfile() != null) {
+            binaryContentRepository.delete(user.getProfile().getId());
           }
         });
     userStatusRepository.findByUserId(userId)
@@ -154,7 +157,7 @@ public class BasicUserService implements UserService {
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
+        user.getProfile(),
         online
     );
   }

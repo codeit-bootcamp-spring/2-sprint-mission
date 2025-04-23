@@ -30,7 +30,7 @@ public class UserStatusService {
       throw new IllegalArgumentException("User with id " + request.userId() + " already exists");
     }
 
-    UserStatus userStatus = new UserStatus(user.getId(), request.lastOnlineAt());
+    UserStatus userStatus = new UserStatus(user, request.lastOnlineAt());
     userStatusRepository.save(userStatus);
 
     return userStatus;

@@ -1,28 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
-import java.io.Serializable;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class UserStatus implements Serializable {
+@Table(name = "user_statuses")
+@Entity
+@NoArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  private final UUID id;
-  private final UUID userId;
-  private final Instant craetedAt;
-  private Instant updatedAt;
+  @Column(nullable = false)
   private Instant lastActiveAt;
   private boolean online;
 
-  public UserStatus(UUID userId, Instant lastActiveAt) {
-    this.id = UUID.randomUUID();
-    this.userId = userId;
-    this.craetedAt = Instant.now();
-    this.updatedAt = Instant.now();
+  public UserStatus(User user, Instant lastActiveAt) {
+    this.user = user;
     this.lastActiveAt = lastActiveAt;
     this.online = isOnline();
   }
@@ -36,7 +40,7 @@ public class UserStatus implements Serializable {
     this.online = isOnline();
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      setUpdatedAt(Instant.now());
     }
   }
 
@@ -45,5 +49,4 @@ public class UserStatus implements Serializable {
 
     return lastActiveAt.isAfter(fiveMinuteAgo);
   }
-
 }
