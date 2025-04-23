@@ -1,12 +1,8 @@
 package com.sprint.mission.discodeit.dto.login;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+public record LoginForm(
+    String username,
+    String password
+) {
 
-@Getter
-@AllArgsConstructor
-public class LoginForm {
-
-    private String username;
-    private String password;
 }

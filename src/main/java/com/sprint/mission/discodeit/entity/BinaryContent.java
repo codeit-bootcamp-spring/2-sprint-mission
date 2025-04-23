@@ -1,29 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-import java.time.Instant;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.domain.Persistable;
 
+@Entity
+@Table(name = "binary_contents")
 @Getter
-public class BinaryContent implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
+@Setter
+public class BinaryContent extends BaseEntity implements Persistable<UUID> {
 
     private String fileName;
+
     private Long size;
-    private String contentType;
-    private byte[] bytes;
 
-    public BinaryContent(String fileName, long size, String contentType, byte[] bytes) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    private String ContentType;
 
-        this.fileName = fileName;
-        this.size = size;
-        this.contentType = contentType;
-        this.bytes = bytes;
+    @Transient
+    private boolean isNew = true;
+
+    protected BinaryContent() {
+    }
+
+    public static BinaryContent createBinaryContent(String fileName, Long size,
+        String contentType) {
+
+        BinaryContent binaryContent = new BinaryContent();
+        binaryContent.setFileName(fileName);
+        binaryContent.setSize(size);
+        binaryContent.setContentType(contentType);
+
+        return binaryContent;
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PrePersist
+    public void martNotNew() {
+        this.isNew = false;
     }
 }

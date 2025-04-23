@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class UpdateChannelRequest {
+public record UpdateChannelRequest(
+    String newName,
+    String newDescription
+) {
 
-    private String newName;
-    private String newDescription;
 }

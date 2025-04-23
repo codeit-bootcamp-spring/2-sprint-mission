@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,28 +31,29 @@ public class MessageController {
     private final MessageService messageService;
 
     @GetMapping("/api/messages")
-    public ResponseEntity<List<MessageResponseDto>> findAllByChannelId(
-        @RequestParam UUID channelId
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+        @RequestParam("channelId") UUID channelId,
+        @RequestParam(value = "cursor", required = false) Instant cursor,
+        @RequestParam(value = "size", defaultValue = "50") int size
     ) {
-        List<MessageResponseDto> messageList = messageService.findByChannelId(channelId);
+        // TODO size 일단 10으로 하고 test
+        PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId,
+            cursor, 10);
 
-        return ResponseEntity.ok(messageList);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/api/messages")
-    public ResponseEntity<MessageResponseDto> create(
+    public ResponseEntity<MessageDto> create(
         @RequestPart("messageCreateRequest") CreateMessageRequest request,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
-
-        UUID messageId;
+        MessageDto response = null;
         if (files == null || files.isEmpty()) {
-            messageId = messageService.create(request);
+            response = messageService.create(request);
         } else {
             List<CreateBinaryContentRequest> binaryContentRequests = convertFiles(files);
-            messageId = messageService.create(request, binaryContentRequests);
+            response = messageService.create(request, binaryContentRequests);
         }
-
-        MessageResponseDto response = messageService.findById(messageId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -73,12 +76,12 @@ public class MessageController {
     }
 
     @PatchMapping("/api/messages/{messageId}")
-    public ResponseEntity<MessageResponseDto> updateMessage(
+    public ResponseEntity<MessageDto> updateMessage(
         @PathVariable UUID messageId,
         @RequestBody UpdateMessageRequest request) {
 
         messageService.update(messageId, request);
-        MessageResponseDto response = messageService.findById(messageId);
+        MessageDto response = messageService.findById(messageId);
 
         return ResponseEntity.ok(response);
     }

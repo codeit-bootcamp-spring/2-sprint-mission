@@ -1,59 +1,71 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import com.sprint.mission.discodeit.entity.common.BaseUpdatableEntity;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.UUID;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
+import org.springframework.data.domain.Persistable;
 
+@Entity
+@Table(name = "channels")
 @Getter
-@ToString
-public class Channel implements Serializable {
+@Setter
+public class Channel extends BaseUpdatableEntity implements Persistable<UUID> {
 
-    private static final long serialVersionUID = 1L;
+    @Enumerated(EnumType.STRING)
+    private ChannelType channelType;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final List<UUID> userIds;
-
-    private Instant updatedAt;
     private String name;
+
     private String description;
-    private ChannelType type;
 
-    public Channel(String name, String description, ChannelType type) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.name = name;
-        this.description = description;
-        this.type = type;
+    @Transient
+    private boolean isNew = true;
 
-        this.userIds = new ArrayList<>();
+    protected Channel() {
     }
 
-    public void updateName(String name) {
-        this.name = name;
-        this.updatedAt = Instant.now();
+    public static Channel createPublicChannel(String name, String description) {
+        Channel channel = new Channel();
+        channel.setName(name);
+        channel.setDescription(description);
+        channel.setChannelType(ChannelType.PUBLIC);
+
+        return channel;
     }
 
-    public void updateDescription(String description) {
-        this.description = description;
-        this.updatedAt = Instant.now();
+    public static Channel createPrivateChannel() {
+        Channel channel = new Channel();
+        channel.setChannelType(ChannelType.PRIVATE);
+
+        return channel;
     }
 
-    public void updateChannelType(ChannelType type) {
-        this.type = type;
-        this.updatedAt = Instant.now();
+    public void update(String newName, String newDescription) {
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+        }
+
+        if (newDescription != null && newDescription.equals((this.description))) {
+            this.description = newDescription;
+        }
     }
 
-    public void addMember(UUID userId) {
-        userIds.add(userId);
+    @Override
+    public boolean isNew() {
+        return isNew;
     }
 
-    public void removeMember(UUID userId) {
-        userIds.remove(userId);
+    @PostLoad
+    @PrePersist
+    public void markNotNew() {
+        this.isNew = false;
     }
 }

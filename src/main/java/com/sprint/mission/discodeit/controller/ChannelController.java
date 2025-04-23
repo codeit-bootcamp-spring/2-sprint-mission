@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.AddChannelMemberRequest;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
@@ -27,43 +26,37 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("/api/channels/public")
-    public ResponseEntity<ChannelResponseDto> createPublicChannel(
+    public ResponseEntity<ChannelDto> createPublicChannel(
         @RequestBody CreatePublicChannelRequest request
     ) {
-
-        UUID channelId = channelService.createPublicChannel(request);
-        ChannelResponseDto response = channelService.findByChannelId(channelId);
+        ChannelDto response = channelService.createPublicChannel(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/api/channels/private")
-    public ResponseEntity<ChannelResponseDto> createPrivateChannel(
+    public ResponseEntity<ChannelDto> createPrivateChannel(
         @RequestBody CreatePrivateChannelRequest request
     ) {
-
-        UUID channelId = channelService.createPrivateChannel(request);
-        ChannelResponseDto response = channelService.findByChannelId(channelId);
+        ChannelDto response = channelService.createPrivateChannel(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/api/channels")
-    public ResponseEntity<List<ChannelResponseDto>> getChannelByUserId(
+    public ResponseEntity<List<ChannelDto>> getChannelByUserId(
         @RequestParam UUID userId
     ) {
-        List<ChannelResponseDto> response = channelService.findAllByUserId(userId);
+        List<ChannelDto> response = channelService.findAllByUserId(userId);
 
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/api/channels/{channelId}")
-    public ResponseEntity<ChannelResponseDto> updateChannel(
+    public ResponseEntity<ChannelDto> updateChannel(
         @PathVariable UUID channelId,
         @RequestBody UpdateChannelRequest request) {
-
-        channelService.update(channelId, request);
-        ChannelResponseDto response = channelService.findByChannelId(channelId);
+        ChannelDto response = channelService.update(channelId, request);
 
         return ResponseEntity.ok(response);
     }
@@ -73,29 +66,6 @@ public class ChannelController {
         @PathVariable UUID channelId
     ) {
         channelService.remove(channelId);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    // 채널 멤버 관리
-    @PostMapping("/api/channels/{channelId}/members")
-    public ResponseEntity<Void> addChannelMember(
-        @PathVariable UUID channeld,
-        @RequestBody AddChannelMemberRequest request) {
-        UUID channelId = request.getChannelId();
-        UUID userId = request.getUserId();
-
-        channelService.addMember(channelId, userId);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/api/channels/{channelId}/members/{userId}")
-    public ResponseEntity<Void> removeChannelMember(
-        @PathVariable UUID channelId,
-        @PathVariable UUID userId) {
-
-        channelService.removeMember(channelId, userId);
 
         return ResponseEntity.noContent().build();
     }

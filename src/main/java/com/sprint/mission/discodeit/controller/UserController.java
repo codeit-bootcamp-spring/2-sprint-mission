@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequest;
+import com.sprint.mission.discodeit.dto.binarycontent.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
 import java.util.List;
@@ -26,64 +26,61 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/api/users")
-    public ResponseEntity<List<UserResponseDto>> findAll() {
-        List<UserResponseDto> userList = userService.findAll();
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> userList = userService.findAll();
 
         return ResponseEntity.ok(userList);
     }
 
     @GetMapping("/api/users/{userId}")
-    public ResponseEntity<UserResponseDto> getUser(@PathVariable UUID userId) {
-        UserResponseDto user = userService.findByUserId(userId);
+    public ResponseEntity<UserDto> getUser(@PathVariable UUID userId) {
+        UserDto user = userService.findByUserId(userId);
 
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/api/users")
-    public ResponseEntity<UserResponseDto> createUser(
+    public ResponseEntity<UserDto> createUser(
         @RequestPart(value = "userCreateRequest") CreateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile file)
         throws Exception {
 
-        UUID userId;
+        UserDto response = null;
         if (file == null || file.isEmpty()) {
-            userId = userService.create(request);
+            response = userService.create(request);
         } else {
             CreateBinaryContentRequest binaryContentRequest =
                 convertFileToRequest(file);
 
-            userId = userService.create(request, binaryContentRequest);
+            response = userService.create(request, binaryContentRequest);
         }
-        UserResponseDto response = userService.findByUserId(userId);
 
         return ResponseEntity.ok(response);
     }
 
     private CreateBinaryContentRequest convertFileToRequest(MultipartFile file)
         throws IOException {
-        CreateBinaryContentRequest binaryContentRequest =
-            new CreateBinaryContentRequest(file.getOriginalFilename(),
-                file.getContentType(),
-                file.getBytes());
-        return binaryContentRequest;
+        return new CreateBinaryContentRequest(file.getOriginalFilename(),
+            file.getContentType(),
+            file.getBytes());
     }
 
     @PatchMapping("/api/users/{userId}")
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID userId,
+    public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
         @RequestPart(value = "userUpdateRequest") UpdateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile file)
         throws IOException {
 
+        UserDto response = null;
         if (file == null || file.isEmpty()) {
-            userService.update(userId, request);
+            response = userService.update(userId, request);
 
         } else {
             CreateBinaryContentRequest binaryContentRequest =
                 convertFileToRequest(file);
 
-            userService.update(userId, request, binaryContentRequest);
+            response = userService.update(userId, request, binaryContentRequest);
         }
-        UserResponseDto response = userService.findByUserId(userId);
 
         return ResponseEntity.ok(response);
     }

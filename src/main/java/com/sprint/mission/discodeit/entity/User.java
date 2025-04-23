@@ -1,63 +1,86 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import com.sprint.mission.discodeit.entity.common.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.UUID;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
+import org.springframework.data.domain.Persistable;
 
+@Entity
+@Table(name = "users")
 @Getter
-@ToString
-public class User implements Serializable, Comparable<User> {
+@Setter
+public class User extends BaseUpdatableEntity implements Persistable<UUID> {
 
-    private static final long serialVersionUID = 1L;
+    private String username;
 
-    private UUID id;
-    private Instant createdAt;
-    private List<Message> messageList = new ArrayList<>();
-    private Instant updatedAt;
-    private String name;
     private String email;
+
     private String password;
-    private UUID profileImageId;
-    private Instant lastLoginAt;
 
-    public User(String name, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.lastLoginAt = createdAt;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus status;
+
+    @Transient
+    private boolean isNew = true;
+
+    protected User() {
     }
 
-    public void updateName(String name) {
-        this.name = name;
-        this.updatedAt = Instant.now();
+    public static User createUser(String username, String email, String password) {
+        User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(password); // TODO 암호화 처리
+
+        return user;
     }
 
-    public void updateEmail(String email) {
-        this.email = email;
-        this.updatedAt = Instant.now();
+    public void setStatus(UserStatus status) {
+        this.status = status;
+        status.setUser(this);
     }
 
-    public void updateProfileImageId(UUID profileImageId) {
-        this.profileImageId = profileImageId;
+    public BinaryContent updateProfile(BinaryContent newProfile) {
+
+        BinaryContent oldProfile = this.profile;
+        this.profile = newProfile;
+
+        return oldProfile;
     }
 
-    public void updatePassword(String password) {
-        this.password = password;
-    }
-
-    public void updateLastLoginAt(Instant lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
+    public void update(String newUsername, String newEmail, String newPassword) {
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+        }
     }
 
     @Override
-    public int compareTo(User other) {
-        return this.name.compareTo(other.name);
+    public boolean isNew() {
+        return isNew;
+    }
+
+    @PostLoad
+    @PrePersist
+    void markNotNew() {
+        this.isNew = false;
     }
 }

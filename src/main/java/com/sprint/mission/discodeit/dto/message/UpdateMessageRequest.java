@@ -1,14 +1,7 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import java.util.List;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+public record UpdateMessageRequest(
+    String newContent
+) {
 
-@Data
-@AllArgsConstructor
-public class UpdateMessageRequest {
-
-    private String content;
-    private List<UUID> binaryContentIds;
 }

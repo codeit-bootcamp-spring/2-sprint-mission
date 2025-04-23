@@ -2,13 +2,9 @@ package com.sprint.mission.discodeit.dto.channel;
 
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
+public record CreatePrivateChannelRequest(
+    List<UUID> participantIds
+) {
 
-@Getter
-@AllArgsConstructor
-public class CreatePrivateChannelRequest {
-
-    private List<UUID> participantIds;
 }
