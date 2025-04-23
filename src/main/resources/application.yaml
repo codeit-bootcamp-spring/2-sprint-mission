@@ -2,15 +2,48 @@ spring:
   application:
     name: discodeit
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 60000
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 discodeit:
-  repository:
-    type: jcf   # jcf | file
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage
 
 logging:
   level:
-    org.springframework: INFO
-    com.sprint.mission.discodeit: INFO
+    org.springframework: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    com.sprint.mission.discodeit: DEBUG
+    org.hibernate:
+      SQL: INFO
+      orm.jdbc.bind: INFO
+    springframework.data: INFO
+    com.example.myapp: INFO
 
 Spring:
   web:
@@ -20,9 +53,8 @@ Spring:
           /api/**:
             allowed-origins: "http://localhost:63342"
             allowed-methods: GET, POST, PUT, DELETE
-            allowed-headers:
+            allowed-headers: "*"
             allow-credentials: true
-
 
 server:
   port: 8080
