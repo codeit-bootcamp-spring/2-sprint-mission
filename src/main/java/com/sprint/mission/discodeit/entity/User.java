@@ -1,57 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "users")
 @Getter
-public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
+    @Setter
+    @Column(name = "username", nullable = false, length = 50, unique = true)
     private String username;
-    private String email;
-    private String password;
-    private UUID profileId;     // BinaryContent
 
-    public User(String username, String email, String password, UUID profileId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
+    @Setter
+    @Column(name = "email", nullable = false, length = 100, unique = true)
+    private String email;
+
+    @Setter
+    @Column(name = "password", nullable = false, length = 60)
+    private String password;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_profile"))
+    private BinaryContent profile;
+
+    @Setter
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus status;
+
+    @Builder
+    public User(String username, String email, String password, BinaryContent profile) {
+        super();
         this.username = username;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
+        this.profile = profile;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
-        boolean anyValueUpdated = false;
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
-            anyValueUpdated = true;
-        }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-            anyValueUpdated = true;
-        }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-            anyValueUpdated = true;
-        }
-        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-            this.profileId = newProfileId;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+    public void updateProfile(BinaryContent profile) {
+        this.profile = profile;
     }
 }

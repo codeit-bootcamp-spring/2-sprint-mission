@@ -1,47 +1,37 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.Duration;
+import lombok.NoArgsConstructor;
 import java.time.Instant;
-import java.util.UUID;
 
+
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    //
-    private UUID userId;
+@NoArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_user_status_user"))
+    private User user;
+
+    @Column(name = "last_active_at", nullable = false)
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        //
-        this.userId = userId;
+    @Builder
+    public UserStatus(User user, Instant lastActiveAt) {
+        super();
+        this.user = user;
         this.lastActiveAt = lastActiveAt;
-    }
-
-    public void update(Instant lastActiveAt) {
-        boolean anyValueUpdated = false;
-        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
-            this.lastActiveAt = lastActiveAt;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
+        if (user != null) {
+            user.setStatus(this);
         }
     }
 
-    public Boolean isOnline() {
-        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
-
-        return lastActiveAt.isAfter(instantFiveMinutesAgo);
+    public void updateLastActiveAt(Instant lastActiveAt) {
+        this.lastActiveAt = lastActiveAt;
     }
 }
