@@ -1,45 +1,40 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.custom.auth.InvalidPasswordException;
-import com.sprint.mission.discodeit.exception.custom.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.LogicException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
-    private final UserStatusService userStatusService;
+    private final UserMapper userMapper;
 
+    @Transactional
     @Override
-    public User login(AuthLoginDto authLoginDto) {
+    public UserDto login(AuthLoginDto authLoginDto) {
         String username = authLoginDto.username();
         String password = authLoginDto.password();
 
-        User foundUser = userRepository.findAll().stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst()
-                .orElse(null);
-
-        if (foundUser == null) {
-            throw new UserNotFoundException("로그인 실패: 유저를 찾을 수 없습니다.");
-        }
+        User foundUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
 
         if (!foundUser.getPassword().equals(password)) {
-            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+            throw new LogicException(ErrorCode.INVALID_PASSWORD);
         }
 
-        UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto = new UserStatusUpdateByUserIdDto(Instant.now());
-        userStatusService.updateByUserId(foundUser.getId(), userStatusUpdateByUserIdDto);
+        foundUser.getStatus().update(Instant.now());
 
-        return foundUser;
+        return userMapper.toDto(foundUser);
     }
 }

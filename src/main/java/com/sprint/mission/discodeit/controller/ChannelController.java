@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -30,31 +30,37 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
+    @Operation(summary = "Public Channel 생성")
     @PostMapping("/public")
-    public ResponseEntity<Channel> createUser(@RequestBody ChannelCreatePublicDto channelCreatePublicDto) {
-        Channel channel = channelService.createPublic(channelCreatePublicDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+    public ResponseEntity<ChannelDto> createPublic(@RequestBody ChannelCreatePublicDto channelCreatePublicDto) {
+        ChannelDto channelDto = channelService.createPublic(channelCreatePublicDto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
     }
 
+    @Operation(summary = "Private Channel 생성")
     @PostMapping("/private")
-    public ResponseEntity<Channel> createUser(@RequestBody ChannelCreatePrivateDto channelCreatePrivateDto) {
-        Channel channel = channelService.createPrivate(channelCreatePrivateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+    public ResponseEntity<ChannelDto> createPrivate(@RequestBody ChannelCreatePrivateDto channelCreatePrivateDto) {
+        ChannelDto channelDto = channelService.createPrivate(channelCreatePrivateDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
     }
 
+    @Operation(summary = "Channel 정보 수정")
     @PatchMapping("/{channelId}")
-    public ResponseEntity<Channel> updateChannel(@PathVariable UUID channelId,
-                                                 @RequestBody ChannelUpdateDto channelUpdateDto) {
-        Channel channel = channelService.update(channelId, channelUpdateDto);
-        return ResponseEntity.ok(channel);
+    public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
+                                                    @RequestBody ChannelUpdateDto channelUpdateDto) {
+        ChannelDto channelDto = channelService.update(channelId, channelUpdateDto);
+        return ResponseEntity.ok(channelDto);
     }
 
+    @Operation(summary = "Channel 삭제")
     @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @GetMapping
     public ResponseEntity<List<ChannelDto>> getChannelsByUserId(@RequestParam("userId") UUID userId) {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));

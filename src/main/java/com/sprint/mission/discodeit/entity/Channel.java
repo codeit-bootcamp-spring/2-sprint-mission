@@ -1,14 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-@Getter
-public class Channel extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@NoArgsConstructor
+@Entity
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     private ChannelType type;
+
+    @Column(length = 100)
     private String name;
+
+    @Column(length = 500)
     private String description;
+
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
+
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReadStatus> readStatuses;
 
     public Channel(ChannelType type, String name, String description) {
         super();
@@ -39,17 +67,5 @@ public class Channel extends BaseEntity implements Serializable {
         if (anyValueUpdated) {
             updateUpdatedAt();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id=" + id + '\'' +
-                ", type=" + type + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", createdAt=" + createdAt + '\'' +
-                ", updatedAt=" + updatedAt +
-                '}';
     }
 }

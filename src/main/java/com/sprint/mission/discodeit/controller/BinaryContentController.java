@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -20,14 +23,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
 
+    @Operation(summary = "여러 첨부 파일 조회")
     @GetMapping
-    public ResponseEntity<List<BinaryContent>> getBinaryContents(@RequestParam List<UUID> binaryContentIds) {
-        return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
+    public ResponseEntity<List<BinaryContentDto>> getBinaryContents(@RequestParam List<UUID> binaryContentIds) {
+        List<BinaryContentDto> binaryContentDtos = binaryContentService.findAllByIdIn(binaryContentIds).stream()
+                .toList();
+
+        return ResponseEntity.ok(binaryContentDtos);
     }
 
+    @Operation(summary = "첨부 파일 조회")
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<BinaryContent> getBinaryContentById(@PathVariable UUID binaryContentId) {
-        return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
+    public ResponseEntity<BinaryContentDto> getBinaryContentById(@PathVariable UUID binaryContentId) {
+        BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+
+        return ResponseEntity.ok(binaryContentDto);
+    }
+
+    @Operation(summary = "파일 다운로드")
+    @GetMapping("/{binaryContentId}/download")
+    public ResponseEntity<?> downloadBinaryContent(@PathVariable UUID binaryContentId) {
+        BinaryContentDto binaryContent = binaryContentService.findById(binaryContentId);
+
+        return binaryContentStorage.download(binaryContent);
     }
 }
