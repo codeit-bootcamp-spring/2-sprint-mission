@@ -1,21 +1,13 @@
 package com.sprint.mission.discodeit.util;
 
-import com.sprint.mission.discodeit.config.FileConfig;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class FileUtil {
-
-  private static final String EXTENSION = ".ser";
 
   public static void init(Path directory) {
     if (!Files.exists(directory)) {
@@ -28,61 +20,34 @@ public class FileUtil {
   }
 
   public static Path resolvePath(Path directory, UUID id) {
-    return directory.resolve(id.toString() + EXTENSION);
+    return directory.resolve(id.toString());
   }
 
-  public static <T> T save(Path directory, T object, UUID id) {
-    Path filePath = resolvePath(directory, id);
-    try (
-        FileOutputStream fos = new FileOutputStream(filePath.toFile());
-        ObjectOutputStream oos = new ObjectOutputStream(fos)
-    ) {
-      oos.writeObject(object);
-    } catch (IOException e) {
-      throw new RuntimeException("파일 저장 중 오류 발생");
+  public static UUID save(Path root, UUID id, byte[] data) {
+    Path filePath = resolvePath(root, id);
+    if (Files.exists(filePath)) {
+      throw new RuntimeException("이미 존재하는 파일");
     }
-    return object;
+    try (OutputStream fos = Files.newOutputStream(filePath)) {
+      fos.write(data);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return id;
   }
 
-  public static <T> Optional<T> findById(Path directory, UUID id, Class<T> clazz) {
-    Path filePath = resolvePath(directory, id);
+  public static InputStream get(Path root, UUID id) {
+    Path filePath = resolvePath(root, id);
     if (!Files.exists(filePath)) {
-      return Optional.empty();
+      throw new RuntimeException("존재하지 않는 파일");
     }
-    try (
-        FileInputStream fis = new FileInputStream(filePath.toFile());
-        ObjectInputStream ois = new ObjectInputStream(fis)
-    ) {
-      Object object = ois.readObject();
-      if (clazz.isInstance(object)) {
-        return Optional.of(clazz.cast(object));
-      }
-      return Optional.empty();
-    } catch (IOException | ClassNotFoundException e) {
-      throw new RuntimeException("파일 조회 중 오류 발생");
-    }
-  }
-
-  public static <T> List<T> findAll(Path directory, Class<T> clazz) {
-    List<T> objectList = new ArrayList<>();
     try {
-      Files.list(directory)
-          .filter(path -> path.toString().endsWith(EXTENSION))
-          .forEach(path -> {
-            UUID id = UUID.fromString(path.getFileName().toString().replace(EXTENSION, ""));
-            Optional<T> objectNullable = findById(directory, id, clazz);
-            objectNullable.ifPresent(objectList::add);
-          });
+      return Files.newInputStream(filePath);
     } catch (IOException e) {
-      throw new RuntimeException("모든 파일 조회 중 오류 발생");
+      throw new RuntimeException("파일 읽기 중 실패: " + e);
     }
-    return objectList;
   }
 
-  public static boolean existsById(Path directory, UUID id) {
-    Path filePath = resolvePath(directory, id);
-    return Files.exists(filePath);
-  }
 
   public static void delete(Path directory, UUID id) {
     Path filePath = resolvePath(directory, id);
@@ -99,8 +64,6 @@ public class FileUtil {
       return false;  // 확장자가 없다면 false
     }
     String ext = originalFilename.substring(dotIndex).toLowerCase();
-    return FileConfig.ALLOWED_EXTENSIONS.contains(ext);
+    return FileExtensionUtil.ALLOWED_EXTENSIONS.contains(ext);
   }
-
-
 }
