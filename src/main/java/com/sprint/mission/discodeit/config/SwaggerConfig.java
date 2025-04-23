@@ -19,6 +19,7 @@ public class SwaggerConfig {
         converter.setSupportedMediaTypes(supportedMediaTypes);
     }
 
+    // URL: http://localhost:8080/swagger-ui/index.html
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()

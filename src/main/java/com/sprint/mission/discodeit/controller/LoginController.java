@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.dto.authdto.AuthServiceLoginRequest;
+import com.sprint.mission.discodeit.service.dto.request.authdto.AuthServiceLoginDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -30,9 +30,9 @@ public class LoginController {
     @ApiResponse(responseCode = "401", description = "사용자를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "User not found")))
     @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않음", content = @Content(examples = @ExampleObject(value = "Password does not match")))
     public ResponseEntity<User> postLogin(
-            @RequestBody AuthServiceLoginRequest authServiceLoginRequest
+            @RequestBody AuthServiceLoginDto authServiceLoginDto
     ) {
-        User loginResponse = authService.login(authServiceLoginRequest);
+        User loginResponse = authService.login(authServiceLoginDto);
         return ResponseEntity.ok(loginResponse);
     }
 }

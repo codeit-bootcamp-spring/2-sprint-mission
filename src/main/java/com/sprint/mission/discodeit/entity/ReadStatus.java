@@ -1,41 +1,66 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BaseEntity {
+@NoArgsConstructor
+@Entity
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private UUID userId;
-    private UUID channelId;
+    @JoinColumn(name = "user_id")
+    @ManyToOne
+    private User user;
+
+    @JoinColumn(name = "channel_id")
+    @ManyToOne
+    private Channel channel;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant lastReadAt;
 
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.userId = userId;
-        this.channelId = channelId;
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadAt = lastReadAt;
     }
 
     public void readStatusUpdate(Instant newLastReadAt) {
-        boolean anyValueUpdated = false;
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
         }
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(user.getId(), channel.getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ReadStatus readStatus)) return false;
+        return user != null && channel != null &&
+                user.getId().equals(readStatus.user.getId()) &&
+                channel.getId().equals(readStatus.channel.getId());
+    }
 
     @Override
     public String toString() {
         return "\nID: " + getId() +
-                "\nUser ID: " + userId +
-                "\nChannel ID: " + channelId+
+                "\nUser ID: " + user +
+                "\nChannel ID: " + channel +
                 "\nLast Read Time: " + getLastReadAt();
     }
 

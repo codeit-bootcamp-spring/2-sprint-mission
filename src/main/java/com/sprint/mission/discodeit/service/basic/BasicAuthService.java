@@ -2,30 +2,27 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.AuthException;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.dto.authdto.AuthServiceLoginRequest;
+import com.sprint.mission.discodeit.service.dto.request.authdto.AuthServiceLoginDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
+    private final UserJPARepository userJpaRepository;
 
     @Override
-    public User login(AuthServiceLoginRequest authServiceLoginRequest) {
-        List<User> UserList = userRepository.load();
-        User matchingUserUser = UserList.stream().filter(m -> m.getName().equals(authServiceLoginRequest.username())).findAny()
+    @Transactional(readOnly = true)
+    public User login(AuthServiceLoginDto authServiceLoginDto) {
+        User matchingUserUser = userJpaRepository.findByUsername(authServiceLoginDto.username())
                 .orElseThrow(() -> new AuthException("User not found"));
-
-        if (!matchingUserUser.getPassword().equals(authServiceLoginRequest.password())) {
+        if (!matchingUserUser.getPassword().equals(authServiceLoginDto.password())) {
             throw new AuthException("Password does not match");
         }
-
         return matchingUserUser;
     }
 }

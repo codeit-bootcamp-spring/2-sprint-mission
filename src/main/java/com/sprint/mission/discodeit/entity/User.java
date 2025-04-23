@@ -1,33 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
-public class User extends BaseEntity {
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
 
-    private String name;
+    @Column(length = 50, unique = true, nullable = false)
+    private String username;
+
+    @Column(length = 100, unique = true, nullable = false)
     private String email;
-    private String password;
-    private UUID profileId;
 
-    public User(String name, String email, String password, UUID profileId) {
-        super();
-        this.name = name;
+    @Column(length = 60, nullable = false)
+    private String password;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private UserStatus status;
+
+    public User(String username, String email, String password, BinaryContent profile) {
+        this.username = username;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
+        this.profile = profile;
     }
 
 
-    public void update(String name, String email, String password, UUID profileId) {
-        this.name = name;
+    public void update(String name, String email, String password, BinaryContent profile) {
+        this.username = name;
         this.email = email;
         this.password = password;
-        this.profileId = profileId;
-        super.update();
+        this.profile = profile;
     }
 
     @Override
@@ -45,9 +63,9 @@ public class User extends BaseEntity {
 
     @Override
     public String toString() {
-        return "\nName: " + name + "\nMail: " + email + "\nPassword: " + password +
+        return "\nName: " + username + "\nMail: " + email + "\nPassword: " + password +
                 "\nUser ID: " + this.getId() +
-                "\nProfile ID: " + profileId +
+                "\nProfile ID: " + profile +
                 "\nCreatedAt: " + this.getCreatedAt() +
                 "\nUpdatedAt: " + this.getUpdatedAt();
 

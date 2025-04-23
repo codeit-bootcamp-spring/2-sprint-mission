@@ -5,17 +5,21 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exceptions.InvalidInputException;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
+import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
+import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.userdto.*;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.userdto.UserCreateDto;
+import com.sprint.mission.discodeit.service.dto.request.userdto.UserUpdateDto;
+import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,119 +28,94 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentService binaryContentService;
-    private final BinaryContentRepository binaryContentRepository;
+    private final UserJPARepository userJpaRepository;
+    private final BinaryContentJPARepository binaryContentJpaRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final ResponseMapStruct responseMapStruct;
 
     @Override
-    public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        List<User> userList = userRepository.load();
-        Optional<User> validateName = userList.stream()
-                .filter(u -> u.getName().equals(userCreateDto.username()))
-                .findAny();
-        Optional<User> validateEmail = userList.stream()
-                .filter(u -> u.getEmail().equals(userCreateDto.email()))
-                .findAny();
-        if (validateName.isPresent()) {
-            throw new InvalidInputException("User already exists.");
-        }
-        if (validateEmail.isPresent()) {
-            throw new InvalidInputException("Email already exists.");
+    @Transactional
+    public UserResponseDto create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
+        if (userJpaRepository.existsByUsernameOrEmail(userCreateDto.username(), userCreateDto.email())) {
+            throw new InvalidInputException("Username or email already exists");
         }
 
-        UUID nullableProfileId = optionalBinaryContentCreateDto
+        BinaryContent nullableProfile = optionalBinaryContentCreateDto
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
+                    BinaryContent createBinaryContent = binaryContentJpaRepository.save(binaryContent);
+                    binaryContentStorage.put(createBinaryContent.getId(), bytes);
+                    return binaryContent;
                 })
                 .orElse(null);
 
-        // profile ID 추가 후 user 생성
-        User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfileId);
-        User createdUser = userRepository.save(user);
-        System.out.println(createdUser);
-
-        // user status 생성
-        Instant currentTime = Instant.now();
-        UserStatus userStatus = new UserStatus(createdUser.getId(), currentTime);
-        userStatusRepository.save(userStatus);
-
-        return createdUser;
+        User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfile);
+        new UserStatus(user, Instant.now());
+        User createdUser = userJpaRepository.save(user);
+        return responseMapStruct.toUserDto(createdUser);
     }
 
 
     @Override
-    public UserFindResponseDto find(UserFindRequestDto userFindRequestDto) {
-        // userRepository 에서 User Id로 조회
-        User matchingUser = userRepository.loadToId(userFindRequestDto.userId())
+    @Transactional(readOnly = true)
+    public UserResponseDto find(UUID userId) {
+        User matchingUser = userJpaRepository.findByIdWithProfile(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-
-        // userStatusRepository 에서 User Id로 조회
-        UserStatus matchingUserStatus = userStatusRepository.loadToId(userFindRequestDto.userId())
-                .orElseThrow(() -> new NotFoundException("User Status does not exist."));
-
-        return UserFindResponseDto.UserFindResponse(matchingUser, matchingUserStatus);
+        return responseMapStruct.toUserDto(matchingUser);
     }
 
 
     @Override
-    public List<UserFindAllResponseDto> findAllUser() {
-        List<User> userList = userRepository.load().stream().toList();
-        if (userList.isEmpty()) {
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> findAllUser() {
+        List<UserResponseDto> userAllList = new ArrayList<>();
+        userJpaRepository.findAllUsers().stream()
+                .map(responseMapStruct::toUserDto)
+                .forEach(userAllList::add);
+        if (userAllList.isEmpty()) {
             throw new NotFoundException("User list is empty.");
         }
-        List<UserStatus> userStatusList = userStatusRepository.load().stream().toList();
-        if (userStatusList.isEmpty()) {
-            throw new NotFoundException("User Status list is empty.");
-        }
-        return UserFindAllResponseDto.UserFindAllResponse(userList, userStatusList);
+        return userAllList;
     }
 
 
     @Override
-    public User update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        User matchingUser = userRepository.loadToId(userId)
+    @Transactional
+    public UserResponseDto update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
+        User matchingUser = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
 
-        UUID nullableProfileId = optionalBinaryContentCreateDto
+        BinaryContent nullableProfile = optionalBinaryContentCreateDto
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
+                    BinaryContent updateBinaryContent = binaryContentJpaRepository.save(binaryContent);
+                    binaryContentStorage.put(updateBinaryContent.getId(), bytes);
+                    return updateBinaryContent;
+
                 })
                 .orElse(null);
 
-        binaryContentService.delete(matchingUser.getProfileId());
-
         if (userUpdateDto.newPassword() == null) {
-            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfileId);
+            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfile);
         } else {
-            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfileId);
+            matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfile);
         }
-        userRepository.save(matchingUser);
-
-        return matchingUser;
+        userJpaRepository.save(matchingUser);
+        return responseMapStruct.toUserDto(matchingUser);
     }
 
 
     @Override
+    @Transactional
     public void delete(UUID userId) {
-        User matchingUser = userRepository.loadToId(userId)
+        User matchingUser = userJpaRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User does not exist."));
-
-        UserStatus matchingUserStatus = userStatusRepository.load().stream()
-                .filter(us -> us.getUserId().equals(matchingUser.getId()))
-                .findAny()
-                .orElseThrow(() -> new NotFoundException("User Status does not exist."));
-
-        binaryContentService.delete(matchingUser.getProfileId());
-        userStatusRepository.remove(matchingUserStatus);
-        userRepository.remove(matchingUser);
+        userJpaRepository.delete(matchingUser);
     }
 }

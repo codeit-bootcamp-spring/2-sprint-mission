@@ -2,13 +2,20 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exceptions.NotFoundException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
+import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.service.dto.binarycontentdto.BinaryContentUpdateDto;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.service.dto.response.BinaryContentResponseDto;
+import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentUpdateDto;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,63 +24,79 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentJPARepository binaryContentJPARepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
+    private final ResponseMapStruct responseMapStruct;
 
 
     @Override
-    public BinaryContent create(BinaryContentCreateDto request) {
+    @Transactional
+    public BinaryContentResponseDto create(BinaryContentCreateDto request) {
         String fileName = request.fileName();
         String contentType = request.contentType();
         byte[] bytes = request.bytes();
         BinaryContent binaryContent = new BinaryContent(
                 fileName,
                 (long) bytes.length,
-                contentType,
-                bytes
+                contentType
         );
-        return binaryContentRepository.save(binaryContent);
+
+        BinaryContent createBinaryContent = binaryContentJPARepository.save(binaryContent);
+        binaryContentStorage.put(createBinaryContent.getId(), bytes);
+        return responseMapStruct.toBinaryContentDto(createBinaryContent);
     }
 
 
     @Override
-    public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.loadToId(binaryContentId)
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> download(UUID binaryContentId) {
+        BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
                 .orElseThrow(() -> new NotFoundException("Profile not found"));
+        BinaryContentResponseDto response = responseMapStruct.toBinaryContentDto(findBinaryContent);
+        return binaryContentStorage.download(response);
     }
 
 
     @Override
-    public List<BinaryContent> findAll(List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContentList = binaryContentRepository.load();
-        if (binaryContentList.isEmpty()) {
-            throw new NotFoundException("Profile not found.");
-        }
-        return binaryContentList.stream()
-                .filter(m -> binaryContentIds.contains(m.getId()))
-                .toList();
+    @Transactional(readOnly = true)
+    public BinaryContentResponseDto find(UUID binaryContentId) {
+        BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
+                .orElseThrow(() -> new NotFoundException("Profile not found"));
+        return responseMapStruct.toBinaryContentDto(findBinaryContent);
     }
 
 
     @Override
-    public BinaryContent updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto) {
-        BinaryContent matchingBinaryContent = binaryContentRepository.loadToId(binaryContentUpdateDto.Id())
+    @Transactional(readOnly = true)
+    public List<BinaryContentResponseDto> findAll(List<UUID> binaryContentIds) {
+        List<BinaryContentResponseDto> binaryContentList = new ArrayList<>();
+        binaryContentJPARepository.findAllById(binaryContentIds).stream()
+                .map(responseMapStruct::toBinaryContentDto)
+                .forEach(binaryContentList::add);
+        return binaryContentList;
+    }
+
+
+    @Override
+    @Transactional
+    public BinaryContentResponseDto updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto) {
+        BinaryContent matchingBinaryContent = binaryContentJPARepository.findById(binaryContentUpdateDto.Id())
                 .orElseThrow(() -> new NotFoundException("Profile not found."));
 
         String fileName = binaryContentUpdateDto.newFileName();
-        String contentType = binaryContentUpdateDto.newContentType();
         byte[] bytes = binaryContentUpdateDto.newBytes();
+        String contentType = binaryContentUpdateDto.newContentType();
 
-        matchingBinaryContent.updateBinaryContent(fileName, (long) bytes.length, contentType, bytes);
-        return binaryContentRepository.save(matchingBinaryContent);
+        matchingBinaryContent.updateBinaryContent(fileName, (long) bytes.length, contentType);
+        return responseMapStruct.toBinaryContentDto(matchingBinaryContent);
     }
 
 
-
     @Override
+    @Transactional
     public void delete(UUID binaryContentId) {
-        BinaryContent matchingBinaryContent = binaryContentRepository.loadToId(binaryContentId)
-                .orElse(null);
-
-        binaryContentRepository.remove(matchingBinaryContent);
+        binaryContentJPARepository.findById(binaryContentId)
+                .ifPresent(binaryContentJPARepository::delete);
     }
 }
