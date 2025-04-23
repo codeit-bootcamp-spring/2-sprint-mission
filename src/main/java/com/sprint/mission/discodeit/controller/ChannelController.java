@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.Api.ChannelApi;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.Api.ChannelApi;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,21 +23,29 @@ import java.util.UUID;
 public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
+  private final ChannelMapper channelMapper;
 
   @Override
-  public ResponseEntity<Channel> create3(PublicChannelCreateRequest publicChannelCreateRequest) {
-    Channel createdChannel =  channelService.create(publicChannelCreateRequest);
+  public ResponseEntity<ChannelDto> create3(PublicChannelCreateRequest publicChannelCreateRequest) {
+    Channel created = channelService.create(publicChannelCreateRequest);
+
+    ChannelDto dto = new ChannelDto(created.getId(), created.getType(),
+        created.getName(), created.getDescription(), null, created.getCreatedAt());
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdChannel);
+        .body(dto);
   }
 
   @Override
-  public ResponseEntity<Channel> create4(PrivateChannelCreateRequest privateChannelCreateRequest) {
-    Channel createdChannel =  channelService.create(privateChannelCreateRequest);
+  public ResponseEntity<ChannelDto> create4(
+      PrivateChannelCreateRequest privateChannelCreateRequest) {
+    Channel created = channelService.create(privateChannelCreateRequest);
+    ChannelDto dto = channelMapper.toDto(created);
+
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(createdChannel);
+        .body(dto);
   }
 
   @Override
@@ -48,13 +58,19 @@ public class ChannelController implements ChannelApi {
   }
 
   @Override
-  public ResponseEntity<Channel> update3(Object getChannelId,
+  public ResponseEntity<ChannelDto> update3(Object getChannelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest) {
     UUID uuid = UUID.fromString(getChannelId.toString());
-    Channel updatedChannel =  channelService.update(uuid, publicChannelUpdateRequest);
+    Channel updated = channelService.update(uuid, publicChannelUpdateRequest);
+
+    ChannelDto dto = new ChannelDto(updated.getId(), updated.getType(), updated.getName()
+        , updated.getDescription(), null, updated.getCreatedAt()
+
+    );
+
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(updatedChannel);
+        .body(dto);
   }
 
   @Override

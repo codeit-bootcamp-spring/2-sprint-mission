@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 public record UserStatusUpdateRequest(
-    OffsetDateTime newLastActiveAt
+    Instant newLastActiveAt
 ) {
 
 }

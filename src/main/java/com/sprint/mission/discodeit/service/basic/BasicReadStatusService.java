@@ -8,7 +8,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -28,6 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
+  @Transactional
   public ReadStatus create(ReadStatusCreateRequest request) {
     UUID userId = UUID.fromString(request.userId().toString());
     UUID getChannelId = UUID.fromString(request.getChannelId().toString());
@@ -39,19 +42,21 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new NoSuchElementException("Channel with id " + getChannelId + " does not exist");
     }
     if (readStatusRepository.findAllByUserId(userId).stream()
-        .anyMatch(readStatus -> readStatus.getGetChannelId().equals(getChannelId))) {
+        .anyMatch(readStatus -> readStatus.getChannel().getId().equals(getChannelId))) {
       throw new IllegalArgumentException(
           "ReadStatus with userId " + userId + " and getChannelId " + getChannelId
               + " already exists");
     }
 
-    OffsetDateTime lastReadAt = parse(request.lastReadAt().toString());
+    Instant lastReadAt = request.lastReadAt();
 
-    ReadStatus readStatus = new ReadStatus(userId, getChannelId, lastReadAt);
+    ReadStatus readStatus = new ReadStatus(userRepository.findById(userId).orElseThrow(),
+        channelRepository.findById(getChannelId).orElseThrow(), lastReadAt);
     return readStatusRepository.save(readStatus);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ReadStatus find(UUID readStatusId) {
     return readStatusRepository.findById(readStatusId)
         .orElseThrow(
@@ -59,14 +64,16 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatus> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream()
         .toList();
   }
 
   @Override
+  @Transactional
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
-    OffsetDateTime newLastReadAt = parse(request.newLastReadAt().toString());
+    Instant newLastReadAt = request.newLastReadAt();
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
@@ -75,6 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID readStatusId) {
     if (!readStatusRepository.existsById(readStatusId)) {
       throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
@@ -82,10 +90,5 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatusRepository.deleteById(readStatusId);
   }
 
-  private OffsetDateTime parse(String date) {
-    LocalDateTime parse = LocalDateTime.parse(date,
-        DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));  // Stirng to Instant
-    Instant instant = parse.atZone(ZoneId.systemDefault()).toInstant();
-    return OffsetDateTime.ofInstant(instant, ZoneId.systemDefault());
-  }
+
 }

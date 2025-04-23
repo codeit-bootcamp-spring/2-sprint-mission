@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.Api.UserApi;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
@@ -9,8 +9,10 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.Api.UserApi;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
@@ -32,13 +34,11 @@ public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
+  private final UserMapper userMapper;
 
   @Override
-
-  public ResponseEntity<User> create(
-      @RequestPart(value = "userCreateRequest", required = false) @Valid
-      UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+  public ResponseEntity<UserDto> create(UserCreateRequest userCreateRequest,
+      MultipartFile profile) {
     if (userCreateRequest == null) {
       throw new IllegalArgumentException("UserCreateRequest가 null입니다!");
     }
@@ -46,15 +46,16 @@ public class UserController implements UserApi {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
 
-    User user =   userService.create(userCreateRequest, profileRequest);
+    User user = userService.create(userCreateRequest, profileRequest);
     UserStatusCreateRequest userStatusCreateRequest = new UserStatusCreateRequest(
         user.getId(), user.getCreatedAt()
     );
     userStatusService.create(userStatusCreateRequest);
+    UserDto dto = userMapper.toDto(user);
 
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
   }
+
 
   @Override
   public ResponseEntity<Void> delete(UUID userId) {
@@ -67,14 +68,14 @@ public class UserController implements UserApi {
 
   @Override
   public ResponseEntity<List<UserDto>> findAll() {
-    List<UserDto> userDtos =  userService.findAll(); // Spring ImmutableCollections$ListN
+    List<UserDto> userDtos = userService.findAll(); // Spring ImmutableCollections$ListN
 
     return ResponseEntity.status(HttpStatus.OK).body(userDtos);
   }
 
   @Override
-  public ResponseEntity<User> update(UUID userId, UserUpdateRequest userUpdateRequest,
-  @RequestPart(value = "profile", required = false) MultipartFile profile) {
+  public ResponseEntity<UserDto> update(UUID userId, UserUpdateRequest userUpdateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
@@ -86,21 +87,25 @@ public class UserController implements UserApi {
 
     userStatusService.update(userId, userStatusUpdateRequest);
 
+    UserDto dto = userMapper.toDto(updatedUser);
+
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(updatedUser);
+        .body(dto);
   }
 
   @Override
-  public ResponseEntity<UserStatus> updateUserStatusByUserId(UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(UUID userId,
       UserStatusUpdateRequest userStatusUpdateRequest) {
 
-    UserStatus updatedUserStatus = userStatusService.update(userId, userStatusUpdateRequest);
+    UserStatus updated = userStatusService.update(userId, userStatusUpdateRequest);
 
+    UserStatusDto dto = new UserStatusDto(updated.getId(), updated.getUser().getId(),
+        updated.getLastActiveAt());
 
-    return  ResponseEntity
+    return ResponseEntity
         .status(HttpStatus.OK)
-        .body(updatedUserStatus);
+        .body(dto);
   }
 
   /*

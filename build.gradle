@@ -10,21 +10,21 @@ version = '0.0.1-SNAPSHOT'
 
 openApiGenerate {
     generatorName = "spring" // 사용할 generator 이름
-    inputSpec = "C:/Users/dlwns/2-sprint-mission/src/main/resources/api-docs.json"
+    inputSpec = "C:/Users/dlwns/2-sprint-mission/src/main/resources/api-docs_1.1.json"
 // JSON 파일 경로
     outputDir = "${buildDir}/generated"
     apiPackage = "com.sprint.mission.discodeit.controller" // API 클래스 패키지 경로
     modelPackage = "import com.sprint.mission.discodeit.dto" // 모델 클래스 패키지 경로
     configOptions = [
-            useSpringBoot3: "true",
+            useSpringBoot3     : "true",
             useSpringController: "true",
-            supportingFiles: "ApiUtil.java",
-            interfaceOnly    : "true", // API 인터페이스만 생성 (구현 클래스 제외)
-            generateModels   : "true",// DTO 생성 활성화
-            useBeanValidation: "true",
-            generateApis     : "true", // API 인터페이스 생성 활성화
-            dateLibrary      : "java8", // 날짜 라이브러리 설정
-            useTags          : "true"
+            supportingFiles    : "ApiUtil.java",
+            interfaceOnly      : "true", // API 인터페이스만 생성 (구현 클래스 제외)
+            generateModels     : "true",// DTO 생성 활성화
+            useBeanValidation  : "true",
+            generateApis       : "true", // API 인터페이스 생성 활성화
+            dateLibrary        : "java8", // 날짜 라이브러리 설정
+            useTags            : "true"
     ]
     importMappings = [
             "MultipartFile": "org.springframework.web.multipart.MultipartFile"
@@ -54,7 +54,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
     implementation 'org.glassfish:jakarta.el:3.0.3'  // 필요할 수도 있음
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'

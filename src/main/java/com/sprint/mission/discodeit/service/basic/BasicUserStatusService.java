@@ -7,16 +7,17 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -26,6 +27,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public UserStatus create(UserStatusCreateRequest request) {
     UUID userId = request.userId();
 
@@ -36,12 +38,14 @@ public class BasicUserStatusService implements UserStatusService {
       throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
     }
 
-    OffsetDateTime lastActiveAt = request.lastActiveAt();
-    UserStatus userStatus = new UserStatus(userId, lastActiveAt);
+    Instant lastActiveAt = request.lastActiveAt();
+    UserStatus userStatus = new UserStatus(userRepository.findById(userId).orElseThrow(),
+        lastActiveAt);
     return userStatusRepository.save(userStatus);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserStatus find(UUID userStatusId) {
     return userStatusRepository.findById(userStatusId)
         .orElseThrow(
@@ -49,12 +53,14 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserStatus> findAll() {
     return userStatusRepository.findAll().stream()
         .toList();
   }
 
   @Override
+  @Transactional
   public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
 
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
@@ -66,6 +72,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
 
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
@@ -77,6 +84,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public void delete(UUID userStatusId) {
     if (!userStatusRepository.existsById(userStatusId)) {
       throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");

@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record UserStatusCreateRequest(
     UUID userId,
-    OffsetDateTime lastActiveAt
+    Instant lastActiveAt
 ) {
 
 }
