@@ -1,32 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import java.io.Serial;
-import lombok.Getter;
-
-import java.io.Serializable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
 @Getter
-public class ReadStatus extends BaseUpdatableEntity implements Serializable {
+@Entity
+@Table(name = "read_statuses")
+@NoArgsConstructor
+public class ReadStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  private final User user;
-  private final Channel channel;
-  private Instant lastReadTime;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+
+  private Instant lastReadAt;
 
   public ReadStatus(User user, Channel channel, Instant lastReadTime) {
-    super();
     this.user = user;
     this.channel = channel;
-    this.lastReadTime = lastReadTime;
+    this.lastReadAt = lastReadTime;
   }
 
   public void updateLastReadTime(Instant lastReadTime) {
-    this.lastReadTime = lastReadTime;
-    setUpdatedAt(Instant.now());
+    if (lastReadTime != null && !lastReadTime.equals(this.lastReadAt)) {
+      this.lastReadAt = lastReadTime;
+    }
   }
 }
