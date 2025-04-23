@@ -1,24 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import java.io.Serial;
-import java.io.Serializable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class UserStatus extends BaseUpdatableEntity implements Serializable {
+@Table(name = "user_statuses")
+@Entity
+@NoArgsConstructor
+public class UserStatus extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  private final User user;
+  @Column(nullable = false)
   private Instant lastActiveAt;
   private boolean online;
 
   public UserStatus(User user, Instant lastActiveAt) {
-    super();
     this.user = user;
     this.lastActiveAt = lastActiveAt;
     this.online = isOnline();

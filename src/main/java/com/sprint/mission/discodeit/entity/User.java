@@ -1,39 +1,58 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import java.io.Serial;
-import java.io.Serializable;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-public class User extends BaseUpdatableEntity implements Serializable {
+@Entity
+@Table(name = "users")
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
-  @Serial
-  private static final long serialVersionUID = 1L;
-
+  @Column(name = "username", nullable = false, unique = true, length = 50)
   private String username;
+
+  @Column(name = "email", nullable = false, unique = true, length = 100)
   private String email;
+
+  @Column(name = "password", nullable = false, length = 60)
   private String password;
+
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_id")
   private BinaryContent profile;
+
+  @JsonManagedReference
+  @Setter(AccessLevel.PROTECTED)
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserStatus status;
 
   public User(String username, String email, String password, BinaryContent profile) {
-    super();
     this.username = username;
     this.email = email;
     this.password = password;
     this.profile = profile;
   }
 
-  public UserStatus setStatus(UserStatus status) {
-    return this.status = status;
+  public void setStatus(UserStatus status) {
+    this.status = status;
   }
 
-  public BinaryContent setProfile(BinaryContent binaryContent) {
+  public void setProfile(BinaryContent binaryContent) {
     this.profile = binaryContent;
     setUpdatedAt(Instant.now());
-    return this.profile;
   }
 
   public void update(String newUsername, String newEmail, String newPassword) {

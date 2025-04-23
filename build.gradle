@@ -27,6 +27,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     //Spring Data JPA와 PostgreSQL을 위한 의존성을 추가하세요.
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.mapstruct:mapstruct:1.4.2.Final'
+//    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
     runtimeOnly 'org.postgresql:postgresql:42.6.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
