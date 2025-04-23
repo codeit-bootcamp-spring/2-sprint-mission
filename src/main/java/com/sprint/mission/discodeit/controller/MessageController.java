@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.FileUtil;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +36,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<Message> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -45,16 +47,16 @@ public class MessageController {
             .toList()
         )
         .orElseGet(ArrayList::new);
-    Message createdMessage = messageService.createMessage(request, attachmentRequests);
+    MessageDto createdMessage = messageService.createMessage(request, attachmentRequests);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
+  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    Message updatedMessage = messageService.updateMessage(messageId, request);
+    MessageDto updatedMessage = messageService.updateMessage(messageId, request);
     return ResponseEntity.ok(updatedMessage);
   }
 
@@ -65,10 +67,23 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<List<Message>> findAllByChannelId(
-      @RequestParam("channelId") UUID channelId) {
-    List<Message> messages = messageService.findAllByChannelId(channelId);
+  public ResponseEntity<PageResponse<MessageDto>> getAllByChannelIdByOffset(
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(defaultValue = "0") int page) {
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, page);
     return ResponseEntity.ok(messages);
   }
+
+//  @GetMapping
+//  public ResponseEntity<PageResponse<MessageDto>> getAllByChannelIdByCursor(
+//      @RequestParam("channelId") UUID channelId,
+//      @RequestParam("createdAt") Instant createdAt) {
+//
+//    Instant cursor = createdAt != null ? createdAt : Instant.now();
+//    PageResponse<MessageDto> messages = messageService.findALLByChannelIdWithCursor(channelId,
+//        cursor);
+//
+//    return ResponseEntity.ok(messages);
+//  }
 
 }
