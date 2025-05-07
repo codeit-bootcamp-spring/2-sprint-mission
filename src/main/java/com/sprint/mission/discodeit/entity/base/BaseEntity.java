@@ -1,27 +1,31 @@
 package com.sprint.mission.discodeit.entity.base;
 
-import ch.qos.logback.classic.spi.LoggingEventVO;
-import jakarta.persistence.*;
-import java.io.Serializable;
-import lombok.Getter;
-import org.hibernate.annotations.CreationTimestamp;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@MappedSuperclass
 @Getter
-public abstract class BaseEntity implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity {
 
-  private static final long serialVersionUID = 1L;
   @Id
-  @GeneratedValue
-  @Column(columnDefinition = "BINARY(16)")
-  protected UUID id;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+  private UUID id;
 
-  @CreationTimestamp
-  @Column(updatable = false, nullable = false)
-  protected Instant createdAt;
-
-  //public abstract LoggingEventVO getType();
+  @CreatedDate
+  @Column(columnDefinition = "timestamp with time zone", updatable = false, nullable = false)
+  private Instant createdAt;
 }

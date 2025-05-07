@@ -2,17 +2,18 @@ package com.sprint.mission.discodeit.entity.base;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import java.io.Serializable;
-import lombok.Getter;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.Instant;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
-@MappedSuperclass
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@MappedSuperclass
 public abstract class BaseUpdatableEntity extends BaseEntity {
 
-  @UpdateTimestamp
-  @Column(nullable = false)
-  protected Instant updatedAt;
+  @LastModifiedDate
+  @Column(columnDefinition = "timestamp with time zone")
+  private Instant updatedAt;
 }

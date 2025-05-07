@@ -1,165 +1,46 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.Api.MessageApi;
-import com.sprint.mission.discodeit.dto.request.Pageable;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
-
-import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RestController
-//@RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/messages")
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
-  private final ChannelService channelService;
-  private final UserService userService;
-  private final BinaryContentService binaryContentService;
-  private final MessageMapper messageMapper;
 
-  @Override
-  public ResponseEntity<MessageDto> create2(
-      MessageCreateRequest messageCreateRequest
-      , List<MultipartFile> attachments) {
-    if (messageCreateRequest == null) {
-      return ResponseEntity.badRequest().build();
-    }
-    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              try {
-                return new BinaryContentCreateRequest(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
-                );
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            })
-            .toList())
-        .orElse(new ArrayList<>());
-
-    Message message = messageService.create(messageCreateRequest, attachmentRequests);
-
-    UserDto author = userService.find(message.getAuthor().getId());
-
-    List<BinaryContentDto> binaryContentDtos = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              return new BinaryContentDto(
-                  UUID.randomUUID(),
-                  file.getName(),
-                  file.getSize(),
-                  file.getContentType()
-              );
-            })
-            .toList())
-        .orElse(new ArrayList<>());
-
-    MessageDto dto = messageMapper.toDto(message);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(dto);
-  }
-
-  @Override
-  public ResponseEntity<Void> delete1(Object messageId) {
-    UUID uuid = UUID.fromString(String.valueOf(messageId));
-    messageService.delete(uuid);
-    return ResponseEntity.noContent().build();
-  }
-
-  @Override
-  public ResponseEntity<PageResponse> findAllByChannelId(UUID ChannelId,
-      Pageable pageable) {
-    UUID uuid = UUID.fromString(String.valueOf(ChannelId));
-    List<Message> messages = messageService.findAllByChannelId(uuid);
-
-    PageResponse<Message> pageResponse = new PageResponse<Message>(
-        messages,        // 실제 데이터 리스트
-        pageable.page(),            // 현재 페이지 번호
-        pageable.size(),               // 페이지 당 항목 수
-        hashNext(pageable),        // 다음 페이지 존재 여부
-        Long.valueOf(messages.size())
-    );
-
-    return ResponseEntity.ok(pageResponse);
-  }
-
-  @Override
-  public ResponseEntity<MessageDto> update2(Object messageId,
-      MessageUpdateRequest messageUpdateRequest) {
-    UUID uuid = UUID.fromString(String.valueOf(messageId));
-    Message updated = messageService.update(uuid,
-        messageUpdateRequest);
-
-    UserDto author = userService.find(updated.getAuthor().getId());
-
-    List<BinaryContent> attachments =
-        binaryContentService.findAllByIdIn(updated.getAttachments().stream()
-            .map(attactments -> {
-              return attactments.getId();
-            }).toList());
-
-    List<BinaryContentDto> binaryContentDtos = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              return new BinaryContentDto(
-                  file.getId(),
-                  file.getFileName(),
-                  file.getSize(),
-                  file.getContentType()
-              );
-            })
-            .toList())
-        .orElse(new ArrayList<>());
-
-    MessageDto dto = messageMapper.toDto(updated);
-
-    return ResponseEntity.ok(dto);
-  }
-
-  private Boolean hashNext(Pageable pageable) {
-    if (pageable.size() == pageable.page()) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-}
-
-
-/*
-  @RequestMapping(
-      path = "create",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-  )
-  public ResponseEntity<Message> create(
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
@@ -178,35 +59,43 @@ public class MessageController implements MessageApi {
             })
             .toList())
         .orElse(new ArrayList<>());
-    Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+    MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdMessage);
   }
 
-  @RequestMapping(path = "update")
-  public ResponseEntity<Message> update(@RequestParam("messageId") UUID messageId,
+  @PatchMapping(path = "{messageId}")
+  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
-    Message updatedMessage = messageService.update(messageId, request);
+    MessageDto updatedMessage = messageService.update(messageId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedMessage);
   }
 
-  @RequestMapping(path = "delete")
-  public ResponseEntity<Void> delete(@RequestParam("messageId") UUID messageId) {
+  @DeleteMapping(path = "{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
   }
 
-  @RequestMapping("findAllBygetChannelId")
-  public ResponseEntity<List<Message>> findAllBygetChannelId(
-      @RequestParam("getChannelId") UUID getChannelId) {
-    List<Message> messages = messageService.findAllBygetChannelId(getChannelId);
+  @GetMapping
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false) Instant cursor,
+      @PageableDefault(
+          size = 50,
+          page = 0,
+          sort = "createdAt",
+          direction = Direction.DESC
+      ) Pageable pageable) {
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
+        pageable);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(messages);
   }
-  */
+}
