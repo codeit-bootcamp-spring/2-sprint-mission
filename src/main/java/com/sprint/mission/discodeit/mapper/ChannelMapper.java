@@ -2,76 +2,47 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Component
-@RequiredArgsConstructor
-public class ChannelMapper {
+@Mapper(componentModel = "spring", uses = {UserMapper.class})
+public abstract class ChannelMapper {
 
-  private final MessageRepository messageRepository;
-  private final ReadStatusRepository readStatusRepository;
-  private final UserMapper userMapper;
+  @Autowired
+  private MessageRepository messageRepository;
+  @Autowired
+  private ReadStatusRepository readStatusRepository;
+  @Autowired
+  private UserMapper userMapper;
 
-  private Instant getLastMessageAt(UUID channelId) {
-    return messageRepository.findTopByChannel_IdOrderByCreatedAtDesc(channelId)
-        .map(Message::getCreatedAt)
-        .orElse(null);
+  @Mapping(target = "participants", expression = "java(resolveParticipants(channel))")
+  @Mapping(target = "lastMessageAt", expression = "java(resolveLastMessageAt(channel))")
+  abstract public ChannelDto toDto(Channel channel);
+
+  protected Instant resolveLastMessageAt(Channel channel) {
+    return messageRepository.findLastMessageAtByChannelId(
+            channel.getId())
+        .orElse(Instant.MIN);
   }
 
-  private List<UserDto> getPrivateChannelParticipants(UUID channelId) {
-    return readStatusRepository.findAllByChannel_Id(channelId).stream()
-        .map(ReadStatus::getUser)
-        .map(userMapper::toDto)
-        .toList();
-  }
-
-  public ChannelDto toDto(Channel channel) {
-    if (channel == null) {
-      return null;
+  protected List<UserDto> resolveParticipants(Channel channel) {
+    List<UserDto> participants = new ArrayList<>();
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      readStatusRepository.findAllByChannelIdWithUser(channel.getId())
+          .stream()
+          .map(ReadStatus::getUser)
+          .map(userMapper::toDto)
+          .forEach(participants::add);
     }
-
-    return ChannelDto.builder()
-        .id(channel.getId())
-        .type(channel.getType())
-        .name(channel.getName())
-        .description(channel.getDescription())
-        .participants(
-            channel.getType() == ChannelType.PRIVATE ? getPrivateChannelParticipants(
-                channel.getId())
-                : null)
-        .lastMessageAt(getLastMessageAt(channel.getId()))
-        .build();
-  }
-
-  public Channel toEntity(PublicChannelCreateRequest dto) {
-    if (dto == null) {
-      return null;
-    }
-    Channel channel = new Channel();
-    channel.updateName(dto.name());
-    channel.updateDescription(dto.description());
-    channel.updateType(ChannelType.PUBLIC);
-    return channel;
-  }
-
-  public Channel toEntity(PrivateChannelCreateRequest dto) {
-    if (dto == null) {
-      return null;
-    }
-    Channel channel = new Channel();
-    channel.updateType(ChannelType.PRIVATE);
-    return channel;
+    return participants;
   }
 }
