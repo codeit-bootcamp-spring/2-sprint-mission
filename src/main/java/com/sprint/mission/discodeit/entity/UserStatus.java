@@ -45,7 +45,6 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   public boolean isUserOnline() {
     return Duration.between(getUpdatedAt(), Instant.now()).getSeconds() < ONLINE_THRESHOLD;
-
   }
 
   public void updateLastActiveAt() {
