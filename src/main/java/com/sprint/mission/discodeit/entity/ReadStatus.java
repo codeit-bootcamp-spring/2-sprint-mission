@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "read_statues")
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @ManyToOne
@@ -37,4 +38,5 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable {
     public void updateLastReadTime() {
         this.lastReadTime = ZonedDateTime.now().toInstant();
     }
+
 }

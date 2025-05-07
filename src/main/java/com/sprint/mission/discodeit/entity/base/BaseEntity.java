@@ -20,4 +20,5 @@ public abstract class BaseEntity {
 
     @CreatedDate
     private Instant createdAt;
+
 }

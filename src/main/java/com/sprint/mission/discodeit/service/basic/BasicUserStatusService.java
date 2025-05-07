@@ -35,11 +35,9 @@ public class BasicUserStatusService implements UserStatusService {
                     throw new IllegalArgumentException("해당 유저의 상태가 이미 존재합니다.");
                 });
 
-        UserStatus userStatus = userStatusRepository.save(
-                new UserStatus(user, request.lastActiveAt()));
+        UserStatus userStatus = userStatusRepository.save(new UserStatus(user, request.lastActiveAt()));
 
-        return UserStatusResult.fromEntity(userStatus,
-                userStatus.isOnline(ZonedDateTime.now().toInstant()));
+        return UserStatusResult.fromEntity(userStatus, userStatus.isOnline(ZonedDateTime.now().toInstant()));
     }
 
     @Transactional(readOnly = true)

@@ -44,4 +44,5 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
             this.name = name;
         }
     }
+
 }

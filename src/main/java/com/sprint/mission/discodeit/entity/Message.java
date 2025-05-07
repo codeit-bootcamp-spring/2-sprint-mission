@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 @Table(name = "messages")
 public class Message extends BaseUpdatableEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @ManyToOne
@@ -45,4 +46,5 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     public void updateContext(String context) {
         this.context = context;
     }
+
 }

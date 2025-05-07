@@ -12,4 +12,5 @@ public abstract class BaseUpdatableEntity extends BaseEntity {
 
     @LastModifiedDate
     private Instant updatedAt;
+
 }

@@ -12,6 +12,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private static final int DEFAULT_DURATION = 5 * 60 * 1000;
 
@@ -37,4 +38,5 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
     public boolean isOnline(Instant now) {
         return Duration.between(this.lastActiveAt, now).toMillis() <= DEFAULT_DURATION;
     }
+
 }

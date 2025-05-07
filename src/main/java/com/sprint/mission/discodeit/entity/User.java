@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "users")
 public class User extends BaseUpdatableEntity implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     @Column(name = "username")
@@ -50,10 +51,6 @@ public class User extends BaseUpdatableEntity implements Serializable {
         }
     }
 
-    public boolean isSameName(String name) {
-        return this.name.equals(name);
-    }
-
     public boolean isSameEmail(String email) {
         return this.email.equals(email);
     }
@@ -61,4 +58,5 @@ public class User extends BaseUpdatableEntity implements Serializable {
     public boolean isSamePassword(String password) {
         return this.password.equals(password);
     }
+
 }

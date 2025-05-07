@@ -19,7 +19,7 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentStorage binaryContentStorage; // TODO: 5/7/25 서비스로 변경
 
     @Transactional
     @Override
@@ -28,9 +28,7 @@ public class BasicBinaryContentService implements BinaryContentService {
             return null;
         }
 
-        BinaryContent binaryContent = new BinaryContent(
-                binaryContentRequest.fileName(),
-                binaryContentRequest.contentType());
+        BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType());
 
         binaryContentStorage.put(binaryContent.getId(), binaryContentRequest.bytes());
         BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);

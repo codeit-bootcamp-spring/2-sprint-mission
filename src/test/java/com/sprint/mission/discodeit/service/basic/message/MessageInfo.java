@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.util.mock.message;
+package com.sprint.mission.discodeit.service.basic.message;
 
 public class MessageInfo {
 

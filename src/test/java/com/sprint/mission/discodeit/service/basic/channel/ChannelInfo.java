@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.util.mock.channel;
+package com.sprint.mission.discodeit.service.basic.channel;
 
 public class ChannelInfo {
 

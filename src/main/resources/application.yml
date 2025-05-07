@@ -1,13 +1,4 @@
 discodeit:
-  repository:
-    type: jcf  # jcf | file | local
-    file-directory:
-      binary-content-path: filestorage/binary-content.ser
-      channel-path: filestorage/channel.ser
-      message-path: filestorage/message.ser
-      readStatus-path: filestorage/readStatus.ser
-      user-path: filestorage/user.ser
-      user-status-path: filestorage/userStatus.ser
   storage:
     type: local
     local:

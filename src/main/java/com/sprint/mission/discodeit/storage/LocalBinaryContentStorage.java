@@ -25,9 +25,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public UUID put(UUID binaryContentId, byte[] bytes) {
-
-        if (binaryContentId == null || bytes == null) {
-            throw new IllegalArgumentException("UUID와 content는 null일 수 없습니다.");
+        if (binaryContentId == null) {
+            throw new IllegalArgumentException("ID는 null일 수 없습니다.");
+        }
+        if (bytes == null) {
+            throw new IllegalArgumentException("content bytes는 null일 수 없습니다.");
         }
 
         Path filePath = resolvePath(binaryContentId);
@@ -37,7 +39,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
         }
 
-        return null;
+        return binaryContentId;
     }
 
     @Override
@@ -62,11 +64,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         return rootPath.resolve(binaryContentId.toString());
     }
 
-    public static void initDirectory(Path directoryPath) {
+    private static void initDirectory(Path directoryPath) {
         if (directoryPath == null) {
             return;
         }
 
         FileUtils.creatDirectory(directoryPath);
     }
+
 }

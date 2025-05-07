@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.util.mock.user;
+package com.sprint.mission.discodeit.service.basic.user;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 
