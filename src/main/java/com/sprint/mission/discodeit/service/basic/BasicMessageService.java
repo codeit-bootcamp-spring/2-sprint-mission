@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.common.PageableRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
@@ -12,16 +11,17 @@ import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.transaction.Transactional;
+import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +38,7 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -65,22 +66,21 @@ public class BasicMessageService implements MessageService {
             () -> new ResourceNotFoundException("Message with id " + messageId + " not found")));
   }
 
-  @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, PageableRequest page) {
-    validateChannelExistence(channelId);
-    
-    String[] sortParams = page.getSort().split(",");
-    String sortProperty = sortParams[0];
-    Sort.Direction direction =
-        sortParams.length > 1 && sortParams[1].trim().equalsIgnoreCase("desc")
-            ? Sort.Direction.DESC
-            : Sort.Direction.ASC;
+  @Transactional(readOnly = true)
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
+      Pageable pageable) {
+    Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+            Optional.ofNullable(createAt).orElse(Instant.now()),
+            pageable)
+        .map(messageMapper::toResponse);
 
-//    Sort.Direction direction = Sort.Direction.DESC;
-    Pageable pageable = PageRequest.of(page.getPage(), page.getSize(),
-        Sort.by(direction, sortProperty));
-    Slice<Message> slice = messageRepository.findByChannel_Id(channelId, pageable);
-    return messageMapper.toSliceResponse(slice);
+    Instant nextCursor = null;
+    if (!slice.getContent().isEmpty()) {
+      nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+          .createdAt();
+    }
+
+    return pageResponseMapper.fromSlice(slice, nextCursor);
   }
 
   @Override
