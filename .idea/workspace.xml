@@ -4,11 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="베이스 코드로 리베이스">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-prod.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="yaml 프로 파일 생성">
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/.github/PULL_REQUEST_TEMPLATE.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/HELP.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/api-docs_1.2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/2-sprint-mission/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +145,7 @@
       <workItem from="1744848432651" duration="7601000" />
       <workItem from="1744863195581" duration="9413000" />
       <workItem from="1744952771446" duration="4366000" />
-      <workItem from="1746606322091" duration="782000" />
+      <workItem from="1746606322091" duration="2317000" />
     </task>
     <task id="LOCAL-00001" summary="고급 구현 과정">
       <option name="closed" value="true" />
@@ -210,7 +219,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746606793968</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="yaml 프로 파일 생성">
+      <option name="closed" value="true" />
+      <created>1746607118895</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1746607118895</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,6 +266,7 @@
     <MESSAGE value="DTO, Mapper 컴포넌트 정의" />
     <MESSAGE value="BinaryContent 저장 로직 고도화" />
     <MESSAGE value="베이스 코드로 리베이스" />
-    <option name="LAST_COMMIT_MESSAGE" value="베이스 코드로 리베이스" />
+    <MESSAGE value="yaml 프로 파일 생성" />
+    <option name="LAST_COMMIT_MESSAGE" value="yaml 프로 파일 생성" />
   </component>
 </project>
