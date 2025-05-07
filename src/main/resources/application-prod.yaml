@@ -1,0 +1,9 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://prod-db-host:5432/discodeit
+    username: prod_user
+    password: prod-secure-password
