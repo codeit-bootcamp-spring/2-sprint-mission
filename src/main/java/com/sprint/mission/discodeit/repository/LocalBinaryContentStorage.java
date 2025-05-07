@@ -89,6 +89,20 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
+    public void delete(UUID id) {
+        Path filePath = resolvePath(id);
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("요청한 파일을 찾을 수 없습니다: " + filePath);
+        }
+
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 삭제 실패: " + filePath, e);
+        }
+    }
+
+    @Override
     public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
         if (binaryContentDto == null || binaryContentDto.id() == null) {
             return ResponseEntity.badRequest().build();

@@ -5,11 +5,13 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.LocalBinaryContentStorage;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentStorage;
@@ -36,24 +38,24 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentStorage binaryContentStorage;// 실제 데이터 관리
     private final UserMapper userMapper;
+    private final LocalBinaryContentStorage localBinaryContentStorage;
+    private final MessageRepository messageRepository;
 
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        log.info("사용자 생성 시작. 사용자명: {}", userCreateRequest.username());
 
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
-        String password = userCreateRequest.password();
 
         validateUserDoesNotExist(username, email);
 
-        // 프로필 존재 시
         BinaryContent profile = null;
         if (optionalProfileCreateRequest.isPresent()) {
             BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
             byte[] bytes = profileRequest.bytes();
-
             if (bytes != null && bytes.length > 0) {
                 profile = new BinaryContent(
                     profileRequest.contentType(),
@@ -61,11 +63,12 @@ public class BasicUserService implements UserService {
                     (long) bytes.length
                 );
                 UUID profileId = profile.getId();
-
                 try {
                     binaryContentStorage.put(profileId, bytes);
                     binaryContentRepository.save(profile);
+                    log.info("프로필 이미지 저장 완료. 프로필 ID: {}", profileId);
                 } catch (Exception e) {
+                    log.error("사용자 '{}'의 프로필 이미지 저장 중 오류 발생", username, e);
                     throw new RuntimeException("프로필 이미지 저장 중 오류 발생", e);
                 }
             }
@@ -74,57 +77,89 @@ public class BasicUserService implements UserService {
         User user = new User(
             username,
             email,
-            password,
+            userCreateRequest.password(),
             profile
         );
         User createdUser = userRepository.save(user);
-        // 유저 스테이터스 생성
+        log.info("사용자 정보 DB 저장 완료. ID: {}", createdUser.getId());
+
         UserStatus userStatus = new UserStatus(createdUser);
         userStatusRepository.save(userStatus);
         createdUser.setUserStatus(userStatus);
+        log.info("사용자 상태 정보 생성 및 연결 완료. 사용자 ID: {}", createdUser.getId());
 
-        return userMapper.toDto(createdUser);
+        UserDto userDto = userMapper.toDto(createdUser);
+        log.info("사용자 생성 완료. 반환된 사용자 ID: {}", userDto.id());
+        return userDto;
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDto find(UUID userId) {
+        log.info("사용자 조회 시도. ID: {}", userId);
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+            .orElseThrow(() -> {
+                log.warn("ID '{}'에 해당하는 사용자를 찾을 수 없습니다.", userId);
+                return new NoSuchElementException("ID " + userId + " 사용자를 찾을 수 없습니다.");
+            });
+        log.info("사용자 조회 성공. ID: {}", userId);
         return userMapper.toDto(user);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAll() {
+        log.info("모든 사용자 조회 시도.");
         List<User> users = userRepository.findAll();
+        log.info("총 {}명의 사용자를 조회했습니다.", users.size());
         return userMapper.toDto(users);
     }
-
 
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
-
-        log.info("사용자 업데이트 시작: ID={}", userId);
+        log.info("사용자 업데이트 시작. ID: {}", userId);
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+            .orElseThrow(() -> {
+                log.warn("ID '{}'에 해당하는 업데이트할 사용자를 찾을 수 없습니다.", userId);
+                return new NoSuchElementException("ID " + userId + " 사용자를 찾을 수 없습니다.");
+            });
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
-        if (!user.getUsername().equals(newUsername) && userRepository.existsByUsername(
-            newUsername)) {
-            throw new IllegalArgumentException("Username '" + newUsername + "' is already taken");
-        }
-        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
-            throw new IllegalArgumentException("Email '" + newEmail + "' is already taken");
+
+        if (newUsername != null && !newUsername.isEmpty() && !user.getUsername()
+            .equals(newUsername)) {
+            if (userRepository.existsByUsername(newUsername)) {
+                log.warn("사용자 업데이트 실패 (사용자명 중복). ID: {}, 시도한 사용자명: '{}'", userId, newUsername);
+                throw new IllegalArgumentException("사용자명 '" + newUsername + "'은(는) 이미 사용 중입니다.");
+            }
+            user.setUsername(newUsername);
+            log.info("사용자 ID '{}'의 사용자명을 '{}'(으)로 변경.", userId, newUsername);
         }
 
-        // 기존 프로필 처리
-        user.setProfile(null);
+        if (newEmail != null && !newEmail.isEmpty() && !user.getEmail().equals(newEmail)) {
+            if (userRepository.existsByEmail(newEmail)) {
+                log.warn("사용자 업데이트 실패 (이메일 중복). ID: {}, 시도한 이메일: '{}'", userId, newEmail);
+                throw new IllegalArgumentException("이메일 '" + newEmail + "'은(는) 이미 사용 중입니다.");
+            }
+            user.setEmail(newEmail);
+            log.info("사용자 ID '{}'의 이메일을 '{}'(으)로 변경.", userId, newEmail);
+        }
 
-        // 새 프로필 처리 - isPresent 확인 후 진행
+        if (userUpdateRequest.newPassword() != null && !userUpdateRequest.newPassword().isEmpty()) {
+            user.setPassword(userUpdateRequest.newPassword());
+            log.info("사용자 ID '{}'의 비밀번호를 변경했습니다.", userId);
+        }
+        
+        UUID oldProfileId = null;
+        if (user.getProfile() != null) {
+            oldProfileId = user.getProfile().getId();
+            log.info("사용자 ID '{}'의 기존 프로필 참조를 제거합니다. (프로필 ID: {}) orphanRemoval에 의해 삭제 예정", userId, oldProfileId);
+            user.setProfile(null); 
+        }
+
         if (optionalProfileCreateRequest.isPresent()) {
             BinaryContentCreateRequest profileRequest = optionalProfileCreateRequest.get();
             byte[] bytes = profileRequest.bytes();
@@ -134,53 +169,70 @@ public class BasicUserService implements UserService {
                     profileRequest.fileName(),
                     (long) bytes.length
                 );
-                BinaryContent savedEntity = binaryContentRepository.save(newProfileEntity);
-
+                user.setProfile(newProfileEntity); 
                 try {
-                    binaryContentStorage.put(savedEntity.getId(), bytes);
-                    user.setProfile(savedEntity);
+                    log.info("새 프로필 이미지 정보를 설정했습니다. 파일명: '{}'. 실제 저장은 사용자 저장 후 진행.", profileRequest.fileName());
                 } catch (Exception e) {
-                    throw new RuntimeException("새 프로필 이미지 저장 중 오류 발생" + e.getMessage());
+                    log.error("사용자 ID '{}'의 새 프로필 이미지 설정 중 오류 발생 (파일 저장 전)", userId, e);
+                    throw new RuntimeException("새 프로필 이미지 설정 중 오류 발생: " + e.getMessage());
                 }
             }
         }
 
-        if (newUsername != null && !newUsername.isEmpty()) {
-            user.setUsername(newUsername);
-        }
-
-        if (newEmail != null && !newEmail.isEmpty()) {
-            user.setEmail(newEmail);
-        }
-        if (userUpdateRequest.newPassword() != null && !userUpdateRequest.newPassword().isEmpty()) {
-            user.setPassword(userUpdateRequest.newPassword());
-        }
-
         User updatedUser = userRepository.save(user);
-        log.info("사용자 업데이트 완료: ID={}", userId);
+        log.info("사용자 업데이트 DB 저장 완료. ID: {}", userId);
+
+        if (updatedUser.getProfile() != null && optionalProfileCreateRequest.isPresent() && 
+            optionalProfileCreateRequest.get().bytes() != null && optionalProfileCreateRequest.get().bytes().length > 0) {
+            BinaryContent newProfile = updatedUser.getProfile();
+            try {
+                binaryContentStorage.put(newProfile.getId(), optionalProfileCreateRequest.get().bytes());
+                log.info("새 프로필 이미지 실제 파일 저장 완료. 프로필 ID: {}", newProfile.getId());
+            } catch (Exception e) {
+                log.error("사용자 ID '{}', 새 프로필 ID '{}'의 실제 파일 저장 중 오류 발생", userId, newProfile.getId(), e);
+                throw new RuntimeException("새 프로필의 실제 파일 저장 중 오류 발생: " + e.getMessage(), e);
+            }
+        }
+        
+        log.info("사용자 업데이트 로직 종료. ID: {}", userId);
         return userMapper.toDto(updatedUser);
     }
 
     @Transactional
     @Override
     public void delete(UUID userId) {
-        log.info("사용자 삭제 시작: ID={}", userId);
+        log.info("사용자 삭제 시작. ID: '{}'", userId);
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+            .orElseThrow(() -> {
+                log.warn("ID '{}'에 해당하는 삭제할 사용자를 찾을 수 없습니다.", userId);
+                return new NoSuchElementException("ID " + userId + " 사용자를 찾을 수 없습니다.");
+            });
 
-        userRepository.delete(user);
+        log.info("사용자 ID '{}'가 작성한 메시지들의 작성자 정보를 null로 변경 시작.", userId);
+        List<Message> messagesToUpdate = messageRepository.findByAuthorId(userId);
+        if (!messagesToUpdate.isEmpty()) {
+            for (Message message : messagesToUpdate) {
+                message.setAuthor(null);
+            }
+            messageRepository.saveAll(messagesToUpdate); 
+            log.info("총 {}개의 메시지에서 작성자 정보를 null로 변경 완료.", messagesToUpdate.size());
+        } else {
+            log.info("사용자 ID '{}'가 작성한 메시지가 없습니다.", userId);
+        }
+
+        log.info("사용자 엔티티 삭제 시도. ID: '{}'. 연관된 UserStatus, UserChannel, Profile(DB)이 함께 삭제됩니다.", userId);
+        userRepository.delete(user); 
+        log.info("사용자 삭제 완료. ID: '{}'", userId);
     }
-
 
     private void validateUserDoesNotExist(String username, String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("User with email " + email + " already exists");
+            log.warn("유효성 검사 실패: 이메일 '{}'은(는) 이미 존재합니다.", email);
+            throw new IllegalArgumentException("이메일 " + email + " (은)는 이미 존재합니다.");
         }
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException(
-                "User with username " + username + " already exists");
+            log.warn("유효성 검사 실패: 사용자명 '{}'은(는) 이미 존재합니다.", username);
+            throw new IllegalArgumentException("사용자명 " + username + " (은)는 이미 존재합니다.");
         }
     }
-
-
 }

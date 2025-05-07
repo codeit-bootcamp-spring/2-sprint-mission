@@ -36,18 +36,21 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto create(PublicChannelCreateRequest request) {
+        log.info("공개 채널 생성 시작. 채널명: '{}', 소유자 ID: '{}'", request.name(), request.ownerId());
         validatePublicChannelRequest(request);
 
         String channelName = request.name();
         if (!StringUtils.hasText(channelName)) {
-            throw new IllegalArgumentException("Public channel name must be provided.");
+            log.warn("공개 채널 생성 실패: 채널명이 제공되지 않았습니다.");
+            throw new IllegalArgumentException("공개 채널명은 필수입니다.");
         }
 
         if (channelRepository.existsByName(channelName)) {
-            throw new RuntimeException("Channel with name '" + channelName + "' already exists.");
+            log.warn("공개 채널 생성 실패: 채널명 '{}'이(가) 이미 존재합니다.", channelName);
+            throw new RuntimeException("채널명 '" + channelName + "'이(가) 이미 존재합니다.");
         }
 
-        User owner = findUserByIdOrThrow(request.ownerId());
+        User owner = findUserByIdOrThrow(request.ownerId(), "채널 소유자");
 
         Channel channel;
         String description = request.description();
@@ -58,25 +61,29 @@ public class BasicChannelService implements ChannelService {
         }
 
         channel.addParticipant(owner);
-        channelRepository.save(channel);
-        return channelMapper.toDto(channel);
+        Channel savedChannel = channelRepository.save(channel);
+        log.info("공개 채널 생성 완료. 채널 ID: '{}', 채널명: '{}'", savedChannel.getId(), savedChannel.getName());
+        return channelMapper.toDto(savedChannel);
     }
 
     @Transactional
     @Override
     public ChannelDto create(PrivateChannelCreateRequest request) {
+        log.info("비공개 채널 생성 시작. 소유자 ID: '{}'", request.ownerId());
         validatePrivateChannelRequest(request);
 
         String channelName = request.channelName();
         if (!StringUtils.hasText(channelName)) {
             channelName = generatePrivateChannelName(request.ownerId(), request.participantIds());
+            log.info("비공개 채널명이 제공되지 않아 자동 생성합니다. 생성된 채널명: '{}'", channelName);
         }
 
         if (channelRepository.existsByName(channelName)) {
-            throw new RuntimeException("Channel with name '" + channelName + "' already exists.");
+            log.warn("비공개 채널 생성 실패: 채널명 '{}'이(가) 이미 존재합니다.", channelName);
+            throw new RuntimeException("채널명 '" + channelName + "'이(가) 이미 존재합니다.");
         }
 
-        User owner = findUserByIdOrThrow(request.ownerId());
+        User owner = findUserByIdOrThrow(request.ownerId(), "채널 소유자");
 
         Channel channel = Channel.createPrivateChannel(channelName);
         channel.addParticipant(owner);
@@ -84,23 +91,26 @@ public class BasicChannelService implements ChannelService {
         if (request.participantIds() != null) {
             for (UUID participantId : request.participantIds()) {
                 if (!participantId.equals(request.ownerId())) {
-                    User participant = findUserByIdOrThrow(participantId);
+                    User participant = findUserByIdOrThrow(participantId, "참여자");
                     channel.addParticipant(participant);
                 }
             }
         }
-        channelRepository.save(channel);
-        return channelMapper.toDto(channel);
+        Channel savedChannel = channelRepository.save(channel);
+        log.info("비공개 채널 생성 완료. 채널 ID: '{}', 채널명: '{}'", savedChannel.getId(), savedChannel.getName());
+        return channelMapper.toDto(savedChannel);
     }
 
     @Transactional(readOnly = true)
     @Override
     public ChannelDto find(UUID channelId) {
-        Channel channel = findChannelByIdOrThrow(channelId);
-
+        log.info("채널 조회 시도. ID: '{}'", channelId);
+        Channel channel = findChannelByIdOrThrow(channelId, "조회할");
+        log.info("채널 조회 성공. ID: '{}', 이름: '{}'", channel.getId(), channel.getName());
         try {
             return channelMapper.toDto(channel);
         } catch (Exception e) {
+            log.error("채널 ID '{}' DTO 변환 중 오류 발생", channelId, e);
             throw new RuntimeException("채널 정보 조회 중 오류 발생 (Mapper)", e);
         }
     }
@@ -108,31 +118,39 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-
+        log.info("사용자 ID '{}'의 모든 채널 조회 시도.", userId);
         if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
+            log.warn("사용자 ID '{}'에 해당하는 사용자를 찾을 수 없어 채널 조회를 중단합니다.", userId);
+            throw new NoSuchElementException("사용자 ID " + userId + "를 찾을 수 없습니다.");
         }
-
         List<Channel> channelList = channelRepository.findChannelsByUserId(userId);
-
+        log.info("사용자 ID '{}'의 채널 {}개를 조회했습니다.", userId, channelList.size());
         return channelMapper.toDto(channelList);
     }
 
     @Transactional
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
-        Channel channel = findChannelByIdOrThrow(channelId);
+        log.info("채널 업데이트 시작. ID: '{}'", channelId);
+        Channel channel = findChannelByIdOrThrow(channelId, "업데이트할");
 
         if (channel.isPrivate()) {
+            log.warn("채널 업데이트 실패: 비공개 채널(ID: '{}')은 수정할 수 없습니다.", channelId);
             throw new IllegalArgumentException("비공개 채널은 수정할 수 없습니다.");
         }
+        
+        String oldName = channel.getName();
+        String oldDescription = channel.getDescription();
 
         boolean updated = channel.update(request.newName(), request.newDescription());
 
         if (updated) {
             Channel updatedChannel = channelRepository.save(channel);
+            log.info("채널 업데이트 완료. ID: '{}'. 이전 이름: '{}', 새 이름: '{}'. 이전 설명: '{}', 새 설명: '{}'",
+                channelId, oldName, updatedChannel.getName(), oldDescription, updatedChannel.getDescription());
             return channelMapper.toDto(updatedChannel);
         } else {
+            log.info("채널 업데이트 변경 사항 없음. ID: '{}'", channelId);
             return channelMapper.toDto(channel);
         }
     }
@@ -140,32 +158,41 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public void delete(UUID channelId) {
-
+        log.info("채널 삭제 시작. ID: '{}'", channelId);
         if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("채널이 존재 하지 않음");
+            log.warn("채널 삭제 실패: ID '{}'에 해당하는 채널을 찾을 수 없습니다.", channelId);
+            throw new NoSuchElementException("채널 ID " + channelId + "를 찾을 수 없습니다.");
         }
-
         channelRepository.deleteById(channelId);
+        log.info("채널 삭제 완료. ID: '{}'", channelId);
     }
 
-    private User findUserByIdOrThrow(UUID userId) {
+    private User findUserByIdOrThrow(UUID userId, String userType) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new NoSuchElementException("유저가 존재 하지 않음"));
+            .orElseThrow(() -> {
+                log.warn("{} ID '{}'에 해당하는 사용자를 찾을 수 없습니다.", userType, userId);
+                return new NoSuchElementException(userType + " ID " + userId + "를 찾을 수 없습니다.");
+            });
     }
 
-    private Channel findChannelByIdOrThrow(UUID channelId) {
+    private Channel findChannelByIdOrThrow(UUID channelId, String actionType) {
         return channelRepository.findById(channelId)
-            .orElseThrow(() -> new NoSuchElementException("채널이 존재 하지 않음"));
+            .orElseThrow(() -> {
+                log.warn("{} 채널 ID '{}'에 해당하는 채널을 찾을 수 없습니다.", actionType, channelId);
+                return new NoSuchElementException(actionType + " 채널 ID " + channelId + "를 찾을 수 없습니다.");
+            });
     }
 
     private void validatePublicChannelRequest(PublicChannelCreateRequest request) {
         if (request == null || request.ownerId() == null || !StringUtils.hasText(request.name())) {
+            log.warn("공개 채널 생성 요청 유효성 검사 실패: {}", request);
             throw new IllegalArgumentException("공개 채널 생성 요청 정보가 유효하지 않습니다.");
         }
     }
 
     private void validatePrivateChannelRequest(PrivateChannelCreateRequest request) {
         if (request == null || request.ownerId() == null) {
+            log.warn("비공개 채널 생성 요청 유효성 검사 실패: {}", request);
             throw new IllegalArgumentException("비공개 채널 생성 요청 정보가 유효하지 않습니다.");
         }
     }

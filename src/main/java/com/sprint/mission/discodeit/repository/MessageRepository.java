@@ -31,4 +31,6 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
         Instant createdAt, Pageable pageable);
 
     List<Message> findByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
+
+    List<Message> findByAuthorId(UUID authorId);
 }
