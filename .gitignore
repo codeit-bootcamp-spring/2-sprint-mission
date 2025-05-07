@@ -27,9 +27,6 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-### docker ###
-docker-compose.yaml
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
