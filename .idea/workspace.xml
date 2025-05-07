@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="logback-spring.xml 생성과, BasicUserService 로깅추가" />
+    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="BasicAuthService 로깅 추가">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -221,7 +224,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746610346431</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="BasicAuthService 로깅 추가">
+      <option name="closed" value="true" />
+      <created>1746610796220</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1746610796220</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -262,6 +273,7 @@
     <MESSAGE value="베이스 코드로 리베이스" />
     <MESSAGE value="yaml 프로 파일 생성" />
     <MESSAGE value="logback-spring.xml 생성과, BasicUserService 로깅추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="logback-spring.xml 생성과, BasicUserService 로깅추가" />
+    <MESSAGE value="BasicAuthService 로깅 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="BasicAuthService 로깅 추가" />
   </component>
 </project>
