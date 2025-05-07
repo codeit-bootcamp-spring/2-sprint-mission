@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS binary_contents;
 CREATE TABLE binary_contents (
                                  uuid UUID PRIMARY KEY,
                                  id VARCHAR,
-                                 created_at TIMESTAMPTZ NOT NULL,
+                                 created_at TIMESTAMP WITH TIME ZONE NOT NULL,
                                  file_name VARCHAR(255) NOT NULL,
                                  size BIGINT NOT NULL,
                                  content_type VARCHAR(100) NOT NULL,
@@ -22,8 +22,8 @@ CREATE TABLE binary_contents (
 CREATE TABLE users (
                        uuid UUID PRIMARY KEY,
                        id VARCHAR,
-                       created_at TIMESTAMPTZ NOT NULL,
-                       updated_at TIMESTAMPTZ,
+                       created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                       updated_at TIMESTAMP WITH TIME ZONE,
                        username VARCHAR(50) UNIQUE NOT NULL,
                        email VARCHAR(100) UNIQUE NOT NULL,
                        password VARCHAR(60) NOT NULL,
@@ -35,8 +35,8 @@ CREATE TABLE users (
 CREATE TABLE channels (
                           uuid UUID PRIMARY KEY,
                           id VARCHAR,
-                          created_at TIMESTAMPTZ NOT NULL,
-                          updated_at TIMESTAMPTZ,
+                          created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                          updated_at TIMESTAMP WITH TIME ZONE,
                           name VARCHAR(100),
                           description VARCHAR(500),
                           type VARCHAR(10) NOT NULL,
@@ -47,10 +47,10 @@ CREATE TABLE channels (
 CREATE TABLE user_statuses (
                                uuid UUID PRIMARY KEY,
                                id VARCHAR,
-                               created_at TIMESTAMPTZ NOT NULL,
-                               updated_at TIMESTAMPTZ,
+                               created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                               updated_at TIMESTAMP WITH TIME ZONE,
                                user_id UUID NOT NULL,
-                               last_active_at TIMESTAMPTZ NOT NULL,
+                               last_active_at TIMESTAMP WITH TIME ZONE NOT NULL,
                                CONSTRAINT fk_user_status_user FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE
 );
 
@@ -58,11 +58,11 @@ CREATE TABLE user_statuses (
 CREATE TABLE read_statuses (
                                uuid UUID PRIMARY KEY,
                                id VARCHAR,
-                               created_at TIMESTAMPTZ NOT NULL,
-                               updated_at TIMESTAMPTZ,
+                               created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                               updated_at TIMESTAMP WITH TIME ZONE,
                                user_id UUID NOT NULL,
                                channel_id UUID NOT NULL,
-                               last_read_at TIMESTAMPTZ NOT NULL,
+                               last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
                                CONSTRAINT fk_read_status_user FOREIGN KEY (user_id) REFERENCES users(uuid) ON DELETE CASCADE,
                                CONSTRAINT fk_read_status_channel FOREIGN KEY (channel_id) REFERENCES channels(uuid) ON DELETE CASCADE
 );
@@ -71,8 +71,8 @@ CREATE TABLE read_statuses (
 CREATE TABLE messages (
                           uuid UUID PRIMARY KEY,
                           id VARCHAR,
-                          created_at TIMESTAMPTZ NOT NULL,
-                          updated_at TIMESTAMPTZ,
+                          created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+                          updated_at TIMESTAMP WITH TIME ZONE,
                           content TEXT,
                           channel_id UUID NOT NULL,
                           author_id UUID,
