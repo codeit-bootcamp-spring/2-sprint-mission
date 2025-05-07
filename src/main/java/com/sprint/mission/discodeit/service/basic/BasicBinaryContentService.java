@@ -8,8 +8,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -20,11 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentMapper binaryContentMapper;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   @Transactional
@@ -66,7 +65,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private BinaryContent findBinaryContentById(UUID id) {
     return binaryContentRepository.findById(id)
         .orElseThrow(() -> {
-          logger.error("binaryContent 찾기 실패: {}", id);
+          log.error("binaryContent 찾기 실패: {}", id);
           return RestExceptions.BINARY_CONTENT_NOT_FOUND;
         });
   }

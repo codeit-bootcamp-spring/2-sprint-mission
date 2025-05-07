@@ -10,8 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -24,12 +23,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+@Slf4j
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Value(value = "${discodeit.storage.local.root-path}")
   private Path root;
 
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @PostConstruct
   private void init() {
@@ -48,7 +47,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       Files.write(filePath, bytes);
       return binaryContentId;
     } catch (IOException e) {
-      logger.error("파일 저장 실패: {}", binaryContentId, e);
+      log.error("파일 저장 실패: {}", binaryContentId, e);
       throw RestExceptions.FILE_WRITE_ERROR;
     }
   }
@@ -59,7 +58,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       return Files.newInputStream(filePath);
     } catch (IOException e) {
-      logger.error("파일 읽기 실패: {}", binaryContentId, e);
+      log.error("파일 읽기 실패: {}", binaryContentId, e);
       throw RestExceptions.FILE_READ_ERROR;
     }
   }
@@ -70,7 +69,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       Files.deleteIfExists(filePath);
     } catch (IOException e) {
-      logger.error("파일 삭제 실패: {}", binaryContentId, e);
+      log.error("파일 삭제 실패: {}", binaryContentId, e);
       throw RestExceptions.FILE_DELETE_ERROR;
     }
   }

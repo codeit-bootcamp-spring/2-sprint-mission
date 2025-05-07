@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
-import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
@@ -20,9 +19,8 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,6 +36,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -46,7 +45,6 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final UserStatusMapper userStatusMapper;
   private final BinaryContentStorage binaryContentStorage;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
   @Override
@@ -64,7 +62,7 @@ public class BasicUserService implements UserService {
       try {
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
-        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+        log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
         throw RestExceptions.FILE_READ_ERROR;
       }
     }
@@ -120,7 +118,7 @@ public class BasicUserService implements UserService {
       try {
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
-        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+        log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
         throw RestExceptions.FILE_READ_ERROR;
       }
 
@@ -177,7 +175,7 @@ public class BasicUserService implements UserService {
   private User findUserById(UUID userId) {
     return userRepository.findById(userId)
         .orElseThrow(() -> {
-          logger.error("유저 찾기 실패: {}", userId);
+          log.error("유저 찾기 실패: {}", userId);
           return RestExceptions.USER_NOT_FOUND;
         });
   }

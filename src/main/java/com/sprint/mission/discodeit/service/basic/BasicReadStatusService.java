@@ -17,8 +17,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   @Transactional
@@ -105,7 +104,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private User checkUserExists(CreateReadStatusCommand createReadStatusCommand) {
     return userRepository.findById(createReadStatusCommand.userId())
         .orElseThrow(() -> {
-          logger.error("읽음상태 생성 중 유저 찾기 실패: {}", createReadStatusCommand.userId());
+          log.error("읽음상태 생성 중 유저 찾기 실패: {}", createReadStatusCommand.userId());
           return RestExceptions.USER_NOT_FOUND;
         });
   }
@@ -113,7 +112,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private Channel checkChannelExists(CreateReadStatusCommand createReadStatusCommand) {
     return channelRepository.findById(createReadStatusCommand.channelId())
         .orElseThrow(() -> {
-          logger.error("읽음상태 생성 중 채널 찾기 실패: {}", createReadStatusCommand.channelId());
+          log.error("읽음상태 생성 중 채널 찾기 실패: {}", createReadStatusCommand.channelId());
           return RestExceptions.CHANNEL_NOT_FOUND;
         });
   }
@@ -130,7 +129,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private ReadStatus findReadStatusById(UUID id) {
     return readStatusRepository.findById(id)
         .orElseThrow(() -> {
-          logger.error("읽음상태 찾기 실패: {}", id);
+          log.error("읽음상태 찾기 실패: {}", id);
           return RestExceptions.READ_STATUS_NOT_FOUND;
         });
   }

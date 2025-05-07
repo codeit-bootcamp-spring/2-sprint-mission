@@ -16,8 +16,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -46,7 +46,6 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
   @Override
@@ -73,7 +72,7 @@ public class BasicMessageService implements MessageService {
         try {
           binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
         } catch (IOException e) {
-          logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+          log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
           throw RestExceptions.FILE_READ_ERROR;
         }
       }
@@ -169,7 +168,7 @@ public class BasicMessageService implements MessageService {
       try {
         binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
       } catch (IOException e) {
-        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
+        log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
         throw RestExceptions.FILE_READ_ERROR;
       }
     }
@@ -209,21 +208,21 @@ public class BasicMessageService implements MessageService {
   private Message findMessageById(UUID id) {
     return messageRepository.findById(id)
         .orElseThrow(() -> {
-          logger.error("메시지 찾기 실패: {}", id);
+          log.error("메시지 찾기 실패: {}", id);
           return RestExceptions.MESSAGE_NOT_FOUND;
         });
   }
 
   private User findUserById(UUID userId) {
     return userRepository.findById(userId).orElseThrow(() -> {
-      logger.error("메시지 생성 중 유저 찾기 실패: {}", userId);
+      log.error("메시지 생성 중 유저 찾기 실패: {}", userId);
       return RestExceptions.USER_NOT_FOUND;
     });
   }
 
   private Channel findChannelById(UUID channelId) {
     return channelRepository.findById(channelId).orElseThrow(() -> {
-      logger.error("메시지 생성 중 채널 찾기 실패: {}", channelId);
+      log.error("메시지 생성 중 채널 찾기 실패: {}", channelId);
       return RestExceptions.CHANNEL_NOT_FOUND;
     });
   }

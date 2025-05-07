@@ -8,19 +8,18 @@ import com.sprint.mission.discodeit.mapper.AuthMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final AuthMapper authMapper;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   @Transactional
@@ -36,7 +35,7 @@ public class BasicAuthService implements AuthService {
   private User findUserByUsername(LoginCommand loginCommand) {
     return userRepository.findByUsername(loginCommand.username())
         .orElseThrow(() -> {
-          logger.error("로그인 중 유저 찾기 실패: {}", loginCommand.username());
+          log.error("로그인 중 유저 찾기 실패: {}", loginCommand.username());
           return RestExceptions.USER_NOT_FOUND;
         });
   }
