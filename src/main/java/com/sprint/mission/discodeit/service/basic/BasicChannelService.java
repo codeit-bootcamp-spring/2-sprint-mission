@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
@@ -34,17 +35,17 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto create(PublicChannelCreateRequest request) {
-    String name = request.name();
-    String description = request.description();
-    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
-
+    log.debug("공개 채널 생성 요청: name={}, desc={}", request.name(), request.description());
+    Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
     channelRepository.save(channel);
+    log.info("공개 채널 생성 완료: id={}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
+    log.debug("비공개 채널 생성 요청: participantCount={}", request.participantIds().size());
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
 
@@ -52,27 +53,30 @@ public class BasicChannelService implements ChannelService {
         .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
     readStatusRepository.saveAll(readStatuses);
-
+    log.info("비공개 채널 생성 완료: id={}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
   @Transactional(readOnly = true)
   @Override
   public ChannelDto find(UUID channelId) {
+    log.debug("채널 조회 요청: id={}", channelId);
     return channelRepository.findById(channelId)
         .map(channelMapper::toDto)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("채널 조회 실패 - 존재하지 않음: id={}", channelId);
+          return new NoSuchElementException("Channel with id " + channelId + " not found");
+        });
   }
 
   @Transactional(readOnly = true)
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
+    log.debug("사용자 참여 채널 조회 요청: userId={}", userId);
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatus::getChannel)
         .map(Channel::getId)
         .toList();
-
     return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
         .stream()
         .map(channelMapper::toDto)
@@ -82,28 +86,34 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
-    String newName = request.newName();
-    String newDescription = request.newDescription();
+    log.debug("채널 업데이트 요청: id={}", channelId);
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("채널 업데이트 실패 - 존재하지 않음: id={}", channelId);
+          return new NoSuchElementException("Channel with id " + channelId + " not found");
+        });
+
     if (channel.getType().equals(ChannelType.PRIVATE)) {
+      log.warn("비공개 채널은 수정 불가: id={}", channelId);
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
-    channel.update(newName, newDescription);
+
+    channel.update(request.newName(), request.newDescription());
+    log.info("채널 정보 업데이트 완료: id={}", channelId);
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public void delete(UUID channelId) {
+    log.debug("채널 삭제 요청: id={}", channelId);
     if (!channelRepository.existsById(channelId)) {
+      log.warn("채널 삭제 실패 - 존재하지 않음: id={}", channelId);
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
-
     channelRepository.deleteById(channelId);
+    log.info("채널 삭제 완료: id={}", channelId);
   }
 }

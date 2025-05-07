@@ -7,3 +7,8 @@ spring:
     url: jdbc:postgresql://prod-db-host:5432/discodeit
     username: prod_user
     password: prod-secure-password
+
+logging:
+  level:
+    root: info
+    com.sprint: info

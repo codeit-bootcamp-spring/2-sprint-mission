@@ -19,11 +19,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
@@ -39,15 +41,20 @@ public class BasicUserService implements UserService {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
+    log.debug("사용자 생성 요청: username={}, email={}", username, email);
+
     if (userRepository.existsByEmail(email)) {
+      log.warn("중복된 이메일로 사용자 생성 시도: {}", email);
       throw new IllegalArgumentException("User with email " + email + " already exists");
     }
     if (userRepository.existsByUsername(username)) {
+      log.warn("중복된 사용자명으로 생성 시도: {}", username);
       throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
+          log.debug("프로필 이미지 저장 시작: filename={}", profileRequest.fileName());
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
@@ -58,25 +65,28 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
-    String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfile);
-    Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(user, now);
-
+    User user = new User(username, email, userCreateRequest.password(), nullableProfile);
     userRepository.save(user);
+    log.info("새 사용자 생성 완료: id={}, username={}", user.getId(), user.getUsername());
+
     return userMapper.toDto(user);
   }
 
   @Override
   public UserDto find(UUID userId) {
+    log.debug("사용자 조회 요청: id={}", userId);
     return userRepository.findById(userId)
         .map(userMapper::toDto)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("사용자 조회 실패 - 존재하지 않음: id={}", userId);
+          return new NoSuchElementException("User with id " + userId + " not found");
+        });
   }
 
   @Override
   public List<UserDto> findAll() {
+    log.debug("모든 사용자 조회 요청");
     return userRepository.findAllWithProfileAndStatus()
         .stream()
         .map(userMapper::toDto)
@@ -87,21 +97,29 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    log.debug("사용자 정보 수정 요청: id={}", userId);
+
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.warn("수정 실패 - 존재하지 않는 사용자: id={}", userId);
+          return new NoSuchElementException("User with id " + userId + " not found");
+        });
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
+
     if (userRepository.existsByEmail(newEmail)) {
+      log.warn("중복된 이메일로 사용자 수정 시도: {}", newEmail);
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
     if (userRepository.existsByUsername(newUsername)) {
+      log.warn("중복된 사용자명으로 수정 시도: {}", newUsername);
       throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
-
+          log.debug("새 프로필 이미지 저장 시작: filename={}", profileRequest.fileName());
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
@@ -113,8 +131,8 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfile);
+    user.update(newUsername, newEmail, userUpdateRequest.newPassword(), nullableProfile);
+    log.info("사용자 정보 수정 완료: id={}, newUsername={}", user.getId(), newUsername);
 
     return userMapper.toDto(user);
   }
@@ -122,10 +140,14 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public void delete(UUID userId) {
-    if (userRepository.existsById(userId)) {
+    log.debug("사용자 삭제 요청: id={}", userId);
+
+    if (!userRepository.existsById(userId)) {
+      log.warn("삭제 실패 - 존재하지 않는 사용자: id={}", userId);
       throw new NoSuchElementException("User with id " + userId + " not found");
     }
 
     userRepository.deleteById(userId);
+    log.info("사용자 삭제 완료: id={}", userId);
   }
 }

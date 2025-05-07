@@ -7,3 +7,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/discodeit_dev
     username: dev_user
     password: dev1234
+
+logging:
+  level:
+    root: debug
+    com.sprint: debug
