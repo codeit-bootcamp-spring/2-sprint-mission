@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
@@ -17,7 +18,7 @@ public interface UserService {
 
   List<UserDto> readAll();
 
-  User update(UUID userKey, UserUpdateRequest userRequest,
+  UserDto update(UUID userKey, UserUpdateRequest userRequest,
       BinaryContentCreateRequest profileRequest);
 
   void delete(UUID userKey);

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -25,8 +26,8 @@ public class ReadStatusController {
   private static final Logger log = LoggerFactory.getLogger(ReadStatusController.class);
 
   @PostMapping
-  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
-    ReadStatus readStatus = readStatusService.create(request);
+  public ResponseEntity<ReadStatusDto> create(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatusDto readStatus = readStatusService.create(request);
     log.info("{}", LogMapUtil.of("action", "create")
         .add("readStatus", readStatus));
 
@@ -34,9 +35,9 @@ public class ReadStatusController {
   }
 
   @PatchMapping({"/{readStatusId}"})
-  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+  public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {
-    ReadStatus updated = readStatusService.update(readStatusId, request);
+    ReadStatusDto updated = readStatusService.update(readStatusId, request);
     log.info("{}", LogMapUtil.of("action", "update")
         .add("updated", updated));
 
@@ -44,8 +45,8 @@ public class ReadStatusController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> readAllByUserKey(@RequestParam UUID userId) {
-    List<ReadStatus> list = readStatusService.findAllByUserKey(userId);
+  public ResponseEntity<List<ReadStatusDto>> readAllByUserKey(@RequestParam UUID userId) {
+    List<ReadStatusDto> list = readStatusService.findAllByUserId(userId);
     log.info("{}", LogMapUtil.of("action", "readAllByUser")
         .add("list", list));
 

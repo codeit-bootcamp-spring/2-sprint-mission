@@ -1,36 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Getter;
 
 import java.io.Serializable;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel extends SharedEntity implements Serializable {
+@ToString
+@NoArgsConstructor
+public class Channel extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
+  @Column(length = 100)
   private String name;
+
+  @Column(length = 500)
   private String description;
+
+  @Enumerated(EnumType.STRING)
+  @Column(length = 10, nullable = false)
   private ChannelType type;
 
-  public Channel(ChannelType type, String name, String description) {
-    this.type = type;
-    this.name = name;
-    this.description = description;
-  }
 
   public void updateName(String name) {
     this.name = name;
   }
 
-  public void updateIntroduction(String description) {
+  public void updateDescription(String description) {
     this.description = description;
   }
 
-  @Override
-  public String toString() {
-    return String.format(
-        "\n key= %s\n name= %s\n introduction= %s\n createdAt= %s\n updatedAt= %s\n",
-        id, name, description, createdAt, updatedAt);
+  public void updateType(ChannelType type) {
+    this.type = type;
   }
+
 }

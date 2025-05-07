@@ -28,9 +28,9 @@ public class ChannelController {
   private static final Logger log = LoggerFactory.getLogger(ChannelController.class);
 
   @PostMapping("/public")
-  public ResponseEntity<Channel> create(
+  public ResponseEntity<ChannelDto> create(
       @RequestBody PublicChannelCreateRequest request) {
-    Channel publicChannel = channelService.create(request);
+    ChannelDto publicChannel = channelService.create(request);
     log.info("{}", LogMapUtil.of("action", "createPublic")
         .add("publicChannel", publicChannel));
 
@@ -38,9 +38,9 @@ public class ChannelController {
   }
 
   @PostMapping("/private")
-  public ResponseEntity<Channel> create(
+  public ResponseEntity<ChannelDto> create(
       @RequestBody PrivateChannelCreateRequest request) {
-    Channel privateChannel = channelService.create(request);
+    ChannelDto privateChannel = channelService.create(request);
     log.info("{}", LogMapUtil.of("action", "createPrivate")
         .add("privateChannel", privateChannel));
 
@@ -48,9 +48,9 @@ public class ChannelController {
   }
 
   @PutMapping("/{channelId}")
-  public ResponseEntity<Channel> update(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @RequestBody PublicChannelUpdateRequest request) {
-    Channel updated = channelService.update(channelId, request);
+    ChannelDto updated = channelService.update(channelId, request);
     log.info("{}", LogMapUtil.of("action", "updatePublic")
         .add("updated", updated));
 
@@ -68,7 +68,7 @@ public class ChannelController {
 
   @GetMapping
   public ResponseEntity<List<ChannelDto>> readAll(@RequestParam UUID userId) {
-    List<ChannelDto> channelDtoList = channelService.readAllByUserKey(userId);
+    List<ChannelDto> channelDtoList = channelService.readAllByUserId(userId);
     log.info("{}", LogMapUtil.of("action", "readAll")
         .add("channelDtoList", channelDtoList));
 
