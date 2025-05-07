@@ -4,7 +4,6 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-/upload
 
 ### STS ###
 .apt_generated
@@ -33,6 +32,10 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### files ###
+/upload
+.logs
 
 ### VS Code ###
 .vscode/
