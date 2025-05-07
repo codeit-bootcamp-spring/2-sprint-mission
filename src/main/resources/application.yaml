@@ -18,7 +18,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none      # 직접 작성한 DDL(schema.sql)을 쓰려면 none 또는 validate
-    show-sql: true        # 실행되는 SQL 콘솔에 출력
+    show-sql: true        # 실행되는 SQL 콘솔에 시간 정보도 출력
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -29,3 +29,6 @@ discodeit:
   repository:
     type: file   # jcf | file
     file-directory: .discodeit
+logging:
+  level:
+    sql: debug
