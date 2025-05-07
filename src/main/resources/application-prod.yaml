@@ -1,0 +1,14 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+    username: discodeit
+    password: discodeit
+
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: info
