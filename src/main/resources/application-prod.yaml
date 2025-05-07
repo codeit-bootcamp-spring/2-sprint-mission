@@ -2,8 +2,6 @@ server:
   port: 8081
 
 spring:
-  application:
-    name: discodeit
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
     username: ${DB_USERNAME:discodeit_user}
@@ -13,6 +11,20 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       idle-timeout: 60000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  sql:
+    init:
+      mode: always
 
 logging:
   level:
