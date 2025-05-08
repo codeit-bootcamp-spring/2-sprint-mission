@@ -8,19 +8,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Table(name = "binary_contents")
 @Entity
+@Table(name = "binary_contents")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
 
-  @Column(name = "file_name", nullable = false, length = 255)
+  @Column(nullable = false)
   private String fileName;
-
-  @Column(name = "size", nullable = false)
+  @Column(nullable = false)
   private Long size;
-
-  @Column(name = "content_type", nullable = false, length = 100)
+  @Column(length = 100, nullable = false)
   private String contentType;
 
   public BinaryContent(String fileName, Long size, String contentType) {
