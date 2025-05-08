@@ -9,6 +9,6 @@ public record UserDto(
         String username,
         String email,
         BinaryContentDto profile,
-        boolean online
+        Boolean online
 ) {
 }

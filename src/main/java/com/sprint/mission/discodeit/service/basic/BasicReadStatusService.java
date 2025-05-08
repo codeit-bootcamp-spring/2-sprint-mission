@@ -36,29 +36,29 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID channelId = request.channelId();
 
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new NoSuchElementException("사용자를 찾을 수 없습니다."));
+                new NoSuchElementException("User with id " + userId + " does not exist"));
 
         Channel channel = channelRepository.findById(channelId).orElseThrow(() ->
-                new NoSuchElementException("채널을 찾을 수 없습니다."));
+                new NoSuchElementException("Channel with id " + channelId + " does not exist"));
 
-        if (readStatusRepository.findAllByUser_Id(userId).stream()
-                .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channelId))) {
-            throw new IllegalArgumentException("ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
+        if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
+            throw new IllegalArgumentException(
+                    "ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
         }
 
-        Instant readAt = request.lastReadAt();
-        ReadStatus readStatus = new ReadStatus(user, channel, readAt);
+        Instant lastReadAt = request.lastReadAt();
+        ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
         readStatusRepository.save(readStatus);
+
         return readStatusMapper.toDto(readStatus);
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public ReadStatus findById(UUID readStatusId) {
-        return getReadStatus(readStatusId);
+    public ReadStatusDto findById(UUID readStatusId) {
+        ReadStatus readStatus = getReadStatus(readStatusId);
+        return readStatusMapper.toDto(readStatus);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUser_Id(userId).stream()
@@ -78,24 +78,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Transactional
     @Override
-    public ReadStatus updateByChannelIdAndUserId(UUID userId, UUID channelId, ReadStatusUpdateRequest dto) {
-        Instant newReadAt = dto.newLastReadAt();
-        ReadStatus readStatus = readStatusRepository.findAllByUser_Id(userId).stream()
-                .filter(status -> status.getChannel().getId().equals(channelId))
-                .findFirst()
-                .orElseThrow(() ->
-                        new NoSuchElementException("ReadStatus not found for the given userId and channelId"));
-
-        readStatus.updateReadAt(newReadAt);
-        return readStatus;
-    }
-
-    @Transactional
-    @Override
     public void delete(UUID readStatusId) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
-
+        ReadStatus readStatus = getReadStatus(readStatusId);
         readStatusRepository.delete(readStatus);
     }
 

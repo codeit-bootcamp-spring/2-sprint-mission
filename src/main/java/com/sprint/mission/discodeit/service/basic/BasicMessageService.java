@@ -17,8 +17,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,12 +47,12 @@ public class BasicMessageService implements MessageService {
         String content = messageCreateRequest.content();
 
         UUID channelId = messageCreateRequest.channelId();
-        UUID userId = messageCreateRequest.authorId();
+        UUID authorId = messageCreateRequest.authorId();
 
-        User author = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자입니다."));
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> new NoSuchElementException("Author with id " + authorId + " does not exist"));
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " does not exist"));
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
                 .map(request -> {
@@ -77,23 +79,31 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public Message searchMessage(UUID messageId) {
-        return getMessage(messageId);
+    public MessageDto searchMessage(UUID messageId) {
+        Message message = getMessage(messageId);
+        return messageMapper.toDto(message);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createdAt, Pageable pageable) {
 
-        Slice<Message> slice = messageRepository.findAllByChannelId(channelId, pageable);
-        Slice<MessageDto> dtoSlice = slice.map(messageMapper::toDto);
-        return pageResponseMapper.fromSlice(dtoSlice);
+        Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+                        Optional.ofNullable(createdAt).orElse(Instant.now()), pageable)
+                .map(messageMapper::toDto);
+
+        Instant nextCursor = null;
+        if (!slice.getContent().isEmpty()) {
+            nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+                    .createdAt();
+        }
+        return pageResponseMapper.fromSlice(slice, nextCursor);
     }
 
     @Transactional
     @Override
-    public MessageDto updateMessage(UUID messageId, MessageUpdateRequest dto) {
-        String newContent = dto.newContent();
+    public MessageDto updateMessage(UUID messageId, MessageUpdateRequest request) {
+        String newContent = request.newContent();
         Message message = getMessage(messageId);
         message.updateContent(newContent);
         return messageMapper.toDto(message);
@@ -104,16 +114,11 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID messageId) {
         Message message = getMessage(messageId);
 
-        List<BinaryContent> attachments = message.getAttachments();
-        if (attachments != null && !attachments.isEmpty()) {
-            binaryContentRepository.deleteAll(attachments);
-        }
-
         messageRepository.delete(message);
     }
 
     private Message getMessage(UUID messageId) {
         return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("ID가 " + messageId + "인 메세지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 }

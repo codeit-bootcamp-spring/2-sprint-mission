@@ -1,16 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 
 @Getter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
@@ -21,15 +25,14 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Column(nullable = false, length = 60)
     private String password;
 
-    @OneToOne(optional = true)
-    @JoinColumn(name = "profile_id")
+    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id",columnDefinition = "UUID")
     private BinaryContent profile;
 
+    @JsonManagedReference
+    @Setter(AccessLevel.PROTECTED)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus status;
-
-    protected User() {
-    }
 
     public User(String username, String email, String password, BinaryContent profile) {
 

@@ -26,10 +26,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Transactional
     @Override
-    public BinaryContentDto create(BinaryContentCreateRequest dto) {
-        String fileName = dto.fileName();
-        byte[] bytes = dto.bytes();
-        String contentType = dto.contentType();
+    public BinaryContentDto create(BinaryContentCreateRequest request) {
+        String fileName = request.fileName();
+        byte[] bytes = request.bytes();
+        String contentType = request.contentType();
 
         BinaryContent binaryContent = new BinaryContent(
                 fileName,
@@ -42,7 +42,6 @@ public class BasicBinaryContentService implements BinaryContentService {
         return binaryContentMapper.toDto(binaryContent);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public BinaryContentDto find(UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
@@ -50,10 +49,9 @@ public class BasicBinaryContentService implements BinaryContentService {
         return binaryContentMapper.toDto(binaryContent);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+        return binaryContentRepository.findAllById(binaryContentIds).stream()
                 .map(binaryContentMapper::toDto)
                 .toList();
     }
@@ -61,8 +59,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     @Override
     public void delete(UUID binaryContentId) {
-        BinaryContent content = binaryContentRepository.findById(binaryContentId).orElseThrow(() ->
-                new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
-        binaryContentRepository.delete(content);
+        if (!binaryContentRepository.existsById(binaryContentId)) {
+            throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+        }
+        binaryContentRepository.deleteById(binaryContentId);
     }
 }

@@ -22,19 +22,24 @@ public class BinaryContentController implements BinaryContentApi {
 
     @Override
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<BinaryContentDto> findBinaryContent(@PathVariable UUID binaryContentId) {
+    public ResponseEntity<BinaryContentDto> findBinaryContent(
+            @PathVariable("binaryContentId") UUID binaryContentId) {
         BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
         return ResponseEntity.status(HttpStatus.OK).body(binaryContent);
     }
+
     @Override
     @GetMapping
-    public ResponseEntity<List<BinaryContentDto>> findAllBinaryContentByIds(@RequestParam List<UUID> binaryContentIds) {
+    public ResponseEntity<List<BinaryContentDto>> findAllBinaryContentByIds(
+            @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
         List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
         return ResponseEntity.ok(binaryContents);
     }
+
     @Override
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<?> download(@PathVariable UUID binaryContentId){
+    public ResponseEntity<?> download(
+            @PathVariable("binaryContentId") UUID binaryContentId) {
         BinaryContentDto dto = binaryContentService.find(binaryContentId);
         return binaryContentStorage.download(dto);
     }

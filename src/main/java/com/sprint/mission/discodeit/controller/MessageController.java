@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +60,7 @@ public class MessageController implements MessageApi {
     @Override
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> updateMessage(
-            @PathVariable UUID messageId,
+            @PathVariable("messageId") UUID messageId,
             @RequestBody MessageUpdateRequest request) {
         MessageDto updatedMessage = messageService.updateMessage(messageId, request);
         return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
@@ -67,7 +68,7 @@ public class MessageController implements MessageApi {
 
     @Override
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<Void> deleteMessageById(@PathVariable UUID messageId) {
+    public ResponseEntity<Void> deleteMessageById(@PathVariable("messageId") UUID messageId) {
         messageService.deleteMessage(messageId);
         return ResponseEntity.noContent().build();
     }
@@ -75,9 +76,14 @@ public class MessageController implements MessageApi {
     @Override
     @GetMapping
     public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
-            @RequestParam UUID channelId,
-            @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, pageable);
+            @RequestParam("channelId") UUID channelId,
+            @RequestParam(value = "cursor", required = false) Instant cursor,
+            @PageableDefault(
+                    size = 50,
+                    page = 0,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC) Pageable pageable) {
+        PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(messages);
     }
 

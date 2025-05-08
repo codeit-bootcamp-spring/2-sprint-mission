@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -13,22 +15,19 @@ import java.time.Instant;
         name = "read_statuses",
         uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"})
 )
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    @ManyToOne()
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @JoinColumn(name = "user_id", columnDefinition = "UUID")
     private User user;
 
-    @ManyToOne()
-    @JoinColumn(name = "channel_id")
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @JoinColumn(name = "channel_id",columnDefinition = "UUID")
     private Channel channel;
 
-    @Column(name = "last_read_at", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE",nullable = false)
     private Instant lastReadAt;
-
-    protected ReadStatus() {
-    }
 
     public ReadStatus(User user, Channel channel, Instant lastReadAt) {
         this.user = user;

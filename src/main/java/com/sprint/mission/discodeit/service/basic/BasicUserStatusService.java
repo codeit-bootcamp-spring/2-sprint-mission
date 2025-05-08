@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,34 +29,38 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Transactional
     @Override
-    public UserStatus createUserStatus(UserStatusCreateRequest dto) {
-        UUID userId = dto.userId();
-        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자입니다."));
+    public UserStatusDto createUserStatus(UserStatusCreateRequest request) {
+        UUID userId = request.userId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-        if (userStatusRepository.findByUser_Id(userId).isPresent()) {
-            throw new IllegalStateException("이미 존재하는 사용자 상태입니다.");
-        }
-        Instant lastActiveAt = dto.lastActiveAt();
+        Optional.ofNullable(user.getStatus())
+                .ifPresent(status -> {
+                    throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
+                });
+        Instant lastActiveAt = request.lastActiveAt();
         UserStatus userStatus = new UserStatus(user, lastActiveAt);
-        return userStatusRepository.save(userStatus);
+        userStatusRepository.save(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public UserStatus findById(UUID userStatusId) {
+    public UserStatusDto find(UUID userStatusId) {
         return userStatusRepository.findById(userStatusId)
+                .map(userStatusMapper::toDto)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll();
+    public List<UserStatusDto> findAll() {
+        return userStatusRepository.findAll().stream()
+                .map(userStatusMapper::toDto)
+                .toList();
     }
 
     @Transactional
     @Override
-    public UserStatus updateUserStatus(UUID userStatusId, UserStatusUpdateRequest request) {
+    public UserStatusDto updateUserStatus(UUID userStatusId, UserStatusUpdateRequest request) {
         Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
@@ -63,13 +68,13 @@ public class BasicUserStatusService implements UserStatusService {
 
         userStatus.updateLastActiveAt(newLastActiveAt);
 
-        return userStatus;
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Transactional
     @Override
     public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
 
         Instant newLastActiveAt = request.newLastActiveAt();

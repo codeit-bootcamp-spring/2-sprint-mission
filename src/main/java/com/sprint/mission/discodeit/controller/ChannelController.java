@@ -38,7 +38,7 @@ public class ChannelController implements ChannelApi {
     @Override
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(
-            @PathVariable UUID channelId,
+            @PathVariable("channelId") UUID channelId,
             @RequestBody PublicChannelUpdateRequest request) {
         ChannelDto updatedChannel = channelService.updateChannel(channelId, request);
         return ResponseEntity.status(HttpStatus.OK).body(updatedChannel);
@@ -46,14 +46,14 @@ public class ChannelController implements ChannelApi {
 
     @Override
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> deleteChannelById(@PathVariable UUID channelId) {
+    public ResponseEntity<Void> deleteChannelById(@PathVariable("channelId") UUID channelId) {
         channelService.deleteChannel(channelId);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @GetMapping
-    public ResponseEntity<List<ChannelDto>> findAllChannelsByUserId(@RequestParam UUID userId) {
+    public ResponseEntity<List<ChannelDto>> findAllChannelsByUserId(@RequestParam("userId") UUID userId) {
         List<ChannelDto> channels = channelService.findAllChannelsByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(channels);
     }

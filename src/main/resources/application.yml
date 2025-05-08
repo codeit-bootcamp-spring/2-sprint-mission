@@ -1,7 +1,10 @@
 spring:
   application:
     name: discodeit
-
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -16,8 +19,12 @@ spring:
         format_sql: true
     show-sql: true
 
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
 discodeit:
   storage:
     type: local
     local:
-      root-path: ./storage
+      root-path: .discodeit/storage
