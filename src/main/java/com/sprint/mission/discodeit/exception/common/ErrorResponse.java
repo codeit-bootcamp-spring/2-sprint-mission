@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.exception;
+package com.sprint.mission.discodeit.exception.common;
 
 import java.time.Instant;
 import java.util.Map;

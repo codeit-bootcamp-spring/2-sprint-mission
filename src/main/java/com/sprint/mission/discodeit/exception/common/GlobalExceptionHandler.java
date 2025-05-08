@@ -1,5 +1,12 @@
-package com.sprint.mission.discodeit.exception;
+package com.sprint.mission.discodeit.exception.common;
 
+import com.sprint.mission.discodeit.exception.AuthException;
+import com.sprint.mission.discodeit.exception.BinaryContentException;
+import com.sprint.mission.discodeit.exception.ChannelException;
+import com.sprint.mission.discodeit.exception.MessageException;
+import com.sprint.mission.discodeit.exception.ReadStatusException;
+import com.sprint.mission.discodeit.exception.UserException;
+import com.sprint.mission.discodeit.exception.UserStatusException;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
