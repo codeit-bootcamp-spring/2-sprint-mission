@@ -10,5 +10,5 @@ spring:
 
 logging:
   level:
-    root: debug
-    com.sprint: debug
+    root: info
+    com.sprint: info
