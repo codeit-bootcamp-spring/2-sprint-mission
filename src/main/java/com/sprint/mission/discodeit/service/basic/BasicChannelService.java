@@ -21,6 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// 생략된 import 포함
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -65,7 +69,7 @@ public class BasicChannelService implements ChannelService {
         .map(channelMapper::toDto)
         .orElseThrow(() -> {
           log.warn("채널 조회 실패 - 존재하지 않음: id={}", channelId);
-          return new NoSuchElementException("Channel with id " + channelId + " not found");
+          return new ChannelNotFoundException(channelId);
         });
   }
 
@@ -90,12 +94,12 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> {
           log.warn("채널 업데이트 실패 - 존재하지 않음: id={}", channelId);
-          return new NoSuchElementException("Channel with id " + channelId + " not found");
+          return new ChannelNotFoundException(channelId);
         });
 
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       log.warn("비공개 채널은 수정 불가: id={}", channelId);
-      throw new IllegalArgumentException("Private channel cannot be updated");
+      throw new PrivateChannelUpdateException(channelId);
     }
 
     channel.update(request.newName(), request.newDescription());
@@ -109,8 +113,9 @@ public class BasicChannelService implements ChannelService {
     log.debug("채널 삭제 요청: id={}", channelId);
     if (!channelRepository.existsById(channelId)) {
       log.warn("채널 삭제 실패 - 존재하지 않음: id={}", channelId);
-      throw new NoSuchElementException("Channel with id " + channelId + " not found");
+      throw new ChannelNotFoundException(channelId);
     }
+
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
     channelRepository.deleteById(channelId);
