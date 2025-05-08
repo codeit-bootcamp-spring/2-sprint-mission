@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -27,6 +29,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     @Override
     public BinaryContentDto create(BinaryContentCreateRequest request) {
+        log.info("Creating BinaryContent");
         String fileName = request.fileName();
         byte[] bytes = request.bytes();
         String contentType = request.contentType();
@@ -38,6 +41,8 @@ public class BasicBinaryContentService implements BinaryContentService {
         );
         binaryContentRepository.save(binaryContent);
         binaryContentStorage.put(binaryContent.getId(), bytes);
+
+        log.info("BinaryContent created successfully : id = {}", binaryContent.getId());
 
         return binaryContentMapper.toDto(binaryContent);
     }
@@ -59,9 +64,14 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     @Override
     public void delete(UUID binaryContentId) {
+        log.info("Deleting binaryContent : id = {}", binaryContentId);
+
         if (!binaryContentRepository.existsById(binaryContentId)) {
+            log.warn("BinaryContent not found : id = {}", binaryContentId);
             throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
         }
         binaryContentRepository.deleteById(binaryContentId);
+
+        log.info("BinaryContent deleted successfully : id = {}", binaryContentId);
     }
 }
