@@ -1,43 +1,9 @@
 spring:
-  application:
-    newName:discodeit
-  datasource: #앞서 구성한 데이터베이스에 연결하기 위한 설정값을 application.yaml 파일에 작성하세요.
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
-  jpa:
-    hibernate:
-      ddl-auto: update
+  profiles:
+    active: dev
 
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
+logging:
+  level:
+    root: INFO
 
-  #디버깅을 위해 SQL 로그와 관련된 설정값을 application.yaml 파일에 작성하세요.
-  logging:
-    level:
-      org:
-        hibernate:
-          SQL: DEBUG
-          orm.jdbc.bind: TRACE  # Hibernate 6?? ??? ??
-        springframework:
-          data: DEBUG
-      com:
-        example:
-          myapp: DEBUG
-server:
-  port: 8080
 
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
