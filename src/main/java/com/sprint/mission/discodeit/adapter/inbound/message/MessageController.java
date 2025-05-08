@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageComman
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class MessageController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageResponse> create(
-      @RequestPart("messageCreateRequest") MessageCreateRequest requestBody,
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest requestBody,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
       throws IOException {
 

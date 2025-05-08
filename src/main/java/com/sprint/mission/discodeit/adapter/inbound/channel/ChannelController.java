@@ -64,7 +64,7 @@ public class ChannelController {
    */
   @PostMapping("/private")
   public ResponseEntity<ChannelResponse> create(
-      @RequestBody PrivateChannelCreateRequest requestBody) {
+      @RequestBody @Valid PrivateChannelCreateRequest requestBody) {
     //Dto Mapper를 통해서 request를 command로 교체
     CreatePrivateChannelCommand command = ChannelDtoMapper.toCreatePrivateChannelCommand(
         requestBody);
@@ -98,7 +98,7 @@ public class ChannelController {
    */
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelResponse> update(@PathVariable UUID channelId,
-      @RequestBody ChannelUpdateRequest requestBody) {
+      @RequestBody @Valid ChannelUpdateRequest requestBody) {
     //Dto Mapper를 통해서 request를 command로 교체
     UpdateChannelCommand command = ChannelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
     ChannelResult result = channelService.update(command);

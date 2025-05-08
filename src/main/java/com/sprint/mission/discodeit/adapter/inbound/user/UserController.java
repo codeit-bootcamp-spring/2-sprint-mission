@@ -104,7 +104,7 @@ public class UserController {
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> updateUser(
       @PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest requestBody,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file) {
 
     //유저 생성할 때와 동일하게 DTO로 감싸는 작업
