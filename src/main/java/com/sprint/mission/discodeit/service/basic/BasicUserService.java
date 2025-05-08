@@ -5,13 +5,18 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryDataUploadStorageException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryMetadataUploadException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,33 +35,25 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public UserDto save(UserCreateRequest userCreateRequest, MultipartFile profile)
-        throws IOException {
+    public UserDto save(UserCreateRequest userCreateRequest, MultipartFile profile) {
         log.info("사용자 생성 진행: username = {}, email = {}", userCreateRequest.username(),
             userCreateRequest.email());
 
         if (userRepository.findByUsername(userCreateRequest.username()).isPresent()) {
             log.warn("사용자 생성 중 이미 존재하는 사용자 이름 발견: username = {}", userCreateRequest.username());
-            throw new IllegalArgumentException(
-                String.format("User with username %s already exists",
-                    userCreateRequest.username()));
+            throw UserAlreadyExistsException.forUsername(userCreateRequest.username());
         }
 
         if (userRepository.findByEmail(userCreateRequest.email()).isPresent()) {
             log.warn("사용자 생성 중 이미 존재하는 이메일: email = {}", userCreateRequest.email());
-            throw new IllegalArgumentException(
-                String.format("User with email %s already exists", userCreateRequest.email()));
+            throw UserAlreadyExistsException.forEmail(userCreateRequest.email());
         }
 
         BinaryContent binaryContent = null;
         if (profile != null && !profile.isEmpty()) {
-            log.debug("사용자 생성 중 프로필 이미지 메타데이터 저장: filename = {}, contentType = {}, size = {}",
+            log.info("사용자 생성 중 프로필 이미지 메타데이터 저장: filename = {}, contentType = {}, size = {}",
                 profile.getOriginalFilename(), profile.getContentType(), profile.getSize());
-            binaryContent = BinaryContent.builder()
-                .fileName(profile.getOriginalFilename())
-                .contentType(profile.getContentType())
-                .size((long) profile.getBytes().length)
-                .build();
+            binaryContent = extractBinaryContent(profile);
         }
 
         User user = new User(
@@ -68,8 +65,16 @@ public class BasicUserService implements UserService {
         userRepository.save(user);
 
         if (binaryContent != null) {
-            log.debug("사용자 생성 중 프로필 저장: profileId = {}", binaryContent.getId());
-            binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+            log.info("사용자 생성 중 프로필 저장: profileId = {}", binaryContent.getId());
+            try {
+                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+            } catch (IOException e) {
+                throw new BinaryDataUploadStorageException(Map.of(
+                    "filename", Objects.requireNonNull(profile.getOriginalFilename(), "파일 명 null"),
+                    "contentType", Objects.requireNonNull(profile.getContentType(), "파일 타입 null"),
+                    "size", profile.getSize()),
+                    e);
+            }
         }
 
         log.info("사용자 생성 완료: userId = {}", user.getId());
@@ -87,14 +92,13 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-        MultipartFile profile) throws IOException {
+        MultipartFile profile) {
         log.info("사용자 수정 진행: userId={}", userId);
 
         User user = userRepository.findById(userId).
             orElseThrow(() -> {
                 log.error("사용자 수정 중 대상 사용자를 찾을 수 없음: userId={}", userId);
-                return new NoSuchElementException(
-                    String.format("User with id %s not found", userId));
+                return UserNotFoundException.forId(userId.toString());
             });
 
         if (userRepository.findByUsername(userUpdateRequest.newUsername())
@@ -116,20 +120,15 @@ public class BasicUserService implements UserService {
 
         BinaryContent binaryContent = null;
         if (profile != null && !profile.isEmpty()) {
-            log.debug("사용자 수정 중 프로필 이미지 메타데이터 저장: filename = {}, contentType = {}, size = {}",
+            log.info("사용자 수정 중 프로필 이미지 메타데이터 저장: filename = {}, contentType = {}, size = {}",
                 profile.getOriginalFilename(), profile.getContentType(), profile.getSize());
-            binaryContent = BinaryContent.builder()
-                .fileName(profile.getOriginalFilename())
-                .contentType(profile.getContentType())
-                .size((long) profile.getBytes().length)
-                .build();
-
-            user.updateProfile(binaryContent);
+            binaryContent = extractBinaryContent(profile);
         }
 
         user.updateUsername(userUpdateRequest.newUsername());
         user.updatePassword(userUpdateRequest.newPassword());
         user.updateEmail(userUpdateRequest.newEmail());
+        user.updateProfile(binaryContent);
 
         User updatedUser = userRepository.saveAndFlush(user);
 
@@ -137,8 +136,16 @@ public class BasicUserService implements UserService {
 
         if (updatedUser.getProfile() != null) {
             System.out.println(updatedUser.getProfile().getId());
-            log.debug("프로필 이미지 파일 저장: profileId = {}", updatedUser.getProfile().getId());
-            binaryContentStorage.put(updatedUser.getProfile().getId(), profile.getBytes());
+            log.info("프로필 이미지 파일 저장: profileId = {}", updatedUser.getProfile().getId());
+            try {
+                binaryContentStorage.put(updatedUser.getProfile().getId(), profile.getBytes());
+            } catch (IOException e) {
+                throw new BinaryDataUploadStorageException(Map.of(
+                    "filename", Objects.requireNonNull(profile.getOriginalFilename(), "파일 명 null"),
+                    "contentType", Objects.requireNonNull(profile.getContentType(), "파일 타입 null"),
+                    "size", profile.getSize()),
+                    e);
+            }
         }
 
         return userMapper.toDto(updatedUser);
@@ -150,10 +157,27 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.error("사용자 삭제 중 사용자를 찾을 수 없음: userId = {}", userId);
-                return new NoSuchElementException(
-                    String.format("User with id %s not found", userId));
+                return UserNotFoundException.forId(userId.toString());
             });
         log.info("사용자 삭제 완료: userId = {}", userId);
         userRepository.delete(user);
+    }
+
+    private BinaryContent extractBinaryContent(MultipartFile profile) {
+        try {
+            return BinaryContent.builder()
+                .fileName(profile.getOriginalFilename())
+                .contentType(profile.getContentType())
+                .size((long) profile.getBytes().length)
+                .build();
+        } catch (IOException e) {
+            log.error("파일 메타 데이터 저장 실패: filename = {}, contentType = {}, size = {}",
+                profile.getOriginalFilename(), profile.getContentType(), profile.getSize());
+            throw new BinaryMetadataUploadException(Map.of(
+                "filename", Objects.requireNonNull(profile.getOriginalFilename(), "파일 명 null"),
+                "contentType", Objects.requireNonNull(profile.getContentType(), "파일 타입 null"),
+                "size", profile.getSize()),
+                e);
+        }
     }
 }
