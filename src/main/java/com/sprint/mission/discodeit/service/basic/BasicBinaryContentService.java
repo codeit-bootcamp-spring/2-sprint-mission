@@ -32,6 +32,9 @@ public class BasicBinaryContentService implements BinaryContentService {
         log.info("Creating BinaryContent");
         String fileName = request.fileName();
         byte[] bytes = request.bytes();
+
+        log.debug("Saving BinaryContent to storage: filename = {}, size = {}", fileName, bytes.length);
+
         String contentType = request.contentType();
 
         BinaryContent binaryContent = new BinaryContent(

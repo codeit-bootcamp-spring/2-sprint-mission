@@ -39,6 +39,11 @@ public class UserController implements UserApi {
 
         log.info("Request to create user: username = {}", userCreateRequest.username());
 
+        if (profile != null && !profile.isEmpty()) {
+            log.info("Uploading profile image: filename = {}", profile.getOriginalFilename());
+            log.debug("Profile image size = {} bytes", profile.getSize());
+        }
+
         Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
 
@@ -64,6 +69,11 @@ public class UserController implements UserApi {
             @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
         log.info("Updating user: id = {}", userId);
+
+        if (profile != null && !profile.isEmpty()) {
+            log.info("Uploading profile image: filename = {}", profile.getOriginalFilename());
+            log.debug("Profile image size = {} bytes", profile.getSize());
+        }
 
         Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);

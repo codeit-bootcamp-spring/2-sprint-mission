@@ -70,6 +70,7 @@ public class BasicMessageService implements MessageService {
                             (long) request.bytes().length,
                             request.contentType()
                     );
+                    log.debug("Attachment saved: id = {}, filename = {}", binaryContent.getId(), binaryContent.getFileName());
                     binaryContentRepository.save(binaryContent);
                     binaryContentStorage.put(binaryContent.getId(), request.bytes());
                     return binaryContent;

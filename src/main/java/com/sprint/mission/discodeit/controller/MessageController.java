@@ -40,6 +40,14 @@ public class MessageController implements MessageApi {
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         log.info("Request to create message");
+
+        if (attachments != null && !attachments.isEmpty()) {
+            log.info("Uploading {} attachment file(s)", attachments.size());
+            for (MultipartFile file : attachments) {
+                log.debug("Attachment received: name = {}, size = {} bytes", file.getOriginalFilename(), file.getSize());
+            }
+        }
+
         List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
                 .map(files -> files.stream()
                         .map(file -> {

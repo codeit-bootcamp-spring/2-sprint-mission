@@ -61,6 +61,7 @@ public class BasicUserService implements UserService {
                     String fileName = request.fileName();
                     String contentType = request.contentType();
                     byte[] bytes = request.bytes();
+                    log.debug("Profile image bytes processed: size = {} bytes", bytes.length);
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                             contentType);
                     binaryContentRepository.save(binaryContent);
@@ -117,10 +118,10 @@ public class BasicUserService implements UserService {
 
         BinaryContent profile = profileCreateRequest
                 .map(request -> {
-
                     String fileName = request.fileName();
                     String contentType = request.contentType();
                     byte[] bytes = request.bytes();
+                    log.debug("Updated profile image bytes: size = {} bytes", bytes.length);
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                             contentType);
                     binaryContentRepository.save(binaryContent);
