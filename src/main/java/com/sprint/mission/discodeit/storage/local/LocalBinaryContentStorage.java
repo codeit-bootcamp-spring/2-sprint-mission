@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.storage.BinaryStorageDownloadException;
+import com.sprint.mission.discodeit.exception.storage.BinaryStorageGetException;
+import com.sprint.mission.discodeit.exception.storage.BinaryStorageMakeDirException;
+import com.sprint.mission.discodeit.exception.storage.BinaryStoragePutException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -27,66 +31,66 @@ import org.springframework.stereotype.Component;
 )
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-  private final Path root;
+    private final Path root;
 
-  private LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path root) {
-    this.root = root;
-  }
-
-  @PostConstruct
-  private void init() {
-    try {
-      if (!Files.exists(this.root)) {
-        Files.createDirectories(this.root);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("루트 디렉토리 초기화 실패" + e);
+    private LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path root) {
+        this.root = root;
     }
-  }
 
-  private Path resolvePath(UUID id) {
-    return root.resolve(id.toString());
-  }
-
-  @Override
-  public UUID put(UUID id, byte[] bytes) {
-    try (OutputStream os = Files.newOutputStream(resolvePath(id))) {
-      os.write(bytes);
-    } catch (IOException e) {
-      throw new RuntimeException("파일 저장 실패 : ", e);
+    @PostConstruct
+    private void init() {
+        try {
+            if (!Files.exists(this.root)) {
+                Files.createDirectories(this.root);
+            }
+        } catch (IOException e) {
+            throw BinaryStorageMakeDirException.from(root.toString(), e);
+        }
     }
-    return id;
-  }
 
-  @Override
-  public InputStream get(UUID id) {
-    try {
-      return Files.newInputStream(resolvePath(id));
-    } catch (IOException e) {
-      throw new RuntimeException("파일을 불러오는 중 오류 발생 : ", e);
+    private Path resolvePath(UUID id) {
+        return root.resolve(id.toString());
     }
-  }
 
-  @Override
-  public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
-    try {
-      InputStream is = get(binaryContentDto.id());
-      InputStreamResource resource = new InputStreamResource(is);
-
-      String fileName = binaryContentDto.fileName();
-      String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
-          .replaceAll("\\+", "%20");
-
-      String contentDisposition =
-          "attachment; filename=\"download\"; filename*=UTF-8''" + encodedFileName;
-
-      return ResponseEntity.ok()
-          .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-          .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
-          .contentLength(binaryContentDto.size())
-          .body(resource);
-    } catch (Exception e) {
-      return ResponseEntity.internalServerError().body(null);
+    @Override
+    public UUID put(UUID id, byte[] bytes) {
+        try (OutputStream os = Files.newOutputStream(resolvePath(id))) {
+            os.write(bytes);
+        } catch (IOException e) {
+            throw BinaryStoragePutException.forId(id.toString(), e);
+        }
+        return id;
     }
-  }
+
+    @Override
+    public InputStream get(UUID id) {
+        try {
+            return Files.newInputStream(resolvePath(id));
+        } catch (IOException e) {
+            throw BinaryStorageGetException.forId(id.toString(), e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
+        try {
+            InputStream is = get(binaryContentDto.id());
+            InputStreamResource resource = new InputStreamResource(is);
+
+            String fileName = binaryContentDto.fileName();
+            String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+            String contentDisposition =
+                "attachment; filename=\"download\"; filename*=UTF-8''" + encodedFileName;
+
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
+                .contentLength(binaryContentDto.size())
+                .body(resource);
+        } catch (Exception e) {
+            throw BinaryStorageDownloadException.forId(binaryContentDto.id().toString(), e);
+        }
+    }
 }

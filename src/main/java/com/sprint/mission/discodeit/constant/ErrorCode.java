@@ -15,7 +15,11 @@ public enum ErrorCode {
     READ_STATUS_NOT_FOUND("읽음 상태 정보를 찾을 수 없습니다."),
     DUPLICATE_READ_STATUS("중복된 읽음 상태입니다."),
     BINARY_METADATA_UPLOAD_ERROR("파일 메타데이터 저장 중 오류가 발생했습니다."),
-    BINARY_DATA_UPLOAD_STORAGE_ERROR("파일 저장 중 오류가 발생했습니다.");
+    BINARY_DATA_UPLOAD_STORAGE_ERROR("파일 저장 중 오류가 발생했습니다."),
+    BINARY_STORAGE_MAKE_DIR_ERROR("파일 스토리지 디렉토리 생성 중 오류가 발생했습니다."),
+    BINARY_STORAGE_PUT_ERROR("파일 스토리지 저장 중 오류가 발생했습니다."),
+    BINARY_STORAGE_GET_ERROR("파일 스토리지 로드 중 오류가 발생했습니다."),
+    BINARY_STORAGE_DOWNLOAD_ERROR("파일 다운로드 중 오류가 발생했습니다.");
 
     private final String message;
 
