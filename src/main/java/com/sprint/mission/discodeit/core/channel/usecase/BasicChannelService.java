@@ -16,8 +16,8 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.exception.UnmodifiableException;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -76,7 +76,7 @@ public class BasicChannelService implements ChannelService {
     command.participantIds().stream()
         .map(userId -> {
           User user = userRepository.findById(userId).orElseThrow(
-              () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId)
+              () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId)
           );
           //유저 아이디를 바탕으로 읽기 상태를 생성함
           //각각의 읽기 상태를 저장함
@@ -100,7 +100,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public ChannelResult findByChannelId(UUID channelId) {
     Channel channel = channelRepository.findByChannelId(channelId).orElseThrow(
-        () -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
+        () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
     );
     return toChannelResult(channel);
   }
@@ -148,12 +148,12 @@ public class BasicChannelService implements ChannelService {
   public ChannelResult update(UpdateChannelCommand command) {
     //채널이 있는지 없는지 확인한다.
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
-        () -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
+        () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
     //만약 채널이 private 이면 수정할 수 없기에 오류 발생
     if (channel.getType() == ChannelType.PRIVATE) {
-      new UnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR, channel.getId());
+      new ChannelUnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR, channel.getId());
     }
 
     //채널 업데이트 시작

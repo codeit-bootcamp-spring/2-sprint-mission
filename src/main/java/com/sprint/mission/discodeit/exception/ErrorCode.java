@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.exception;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@AllArgsConstructor
 @Getter
 public enum ErrorCode {
+  USER_ERROR(400, "U000", "error.user.error"),
   USER_NOT_FOUND(404, "U001", "error.user.not-found"),
   USER_STATUS_NOT_FOUND(404, "US001", "error.user-status.not-found"),
   READ_STATUS_NOT_FOUND(404, "RS001", "error.read-status.not-found"),
@@ -28,9 +31,4 @@ public enum ErrorCode {
   private final String code;
   private final String message;
 
-  ErrorCode(int httpStatus, String code, String message) {
-    this.httpStatus = httpStatus;
-    this.code = code;
-    this.message = message;
-  }
 }

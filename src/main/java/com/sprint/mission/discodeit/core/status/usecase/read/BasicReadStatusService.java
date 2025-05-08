@@ -9,9 +9,9 @@ import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResul
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
-import com.sprint.mission.discodeit.exception.AlreadyExistsException;
+import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -43,18 +43,19 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusResult create(CreateReadStatusCommand command) {
     //유저가 있는지 체크
     User user = userRepository.findById(command.userId()).orElseThrow(
-        () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
     );
 
     //채널가 있는지 체크
     Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
-        () -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
+        () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
     //기존에 이미 생성된 읽기 상태가 존재하는 지 체크, 존재하면 오류 발생
     if (readStatusRepository.findAllByUserId(command.userId()).stream()
         .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channel.getId()))) {
-      throw new AlreadyExistsException(ErrorCode.READ_STATUS_ALREADY_EXISTS, command.channelId());
+      throw new UserAlreadyExistsException(ErrorCode.READ_STATUS_ALREADY_EXISTS,
+          command.channelId());
     }
 
     //읽기 상태 생성
@@ -79,7 +80,8 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional(readOnly = true)
   public ReadStatusResult findByReadStatusId(UUID readStatusId) {
     ReadStatus status = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId));
+        .orElseThrow(
+            () -> new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId));
     return ReadStatusResult.create(status);
   }
 
@@ -123,7 +125,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusResult update(UpdateReadStatusCommand command) {
     //읽기 상태를 조회한다.
     ReadStatus status = readStatusRepository.findById(command.readStatusId()).orElseThrow(
-        () -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, command.readStatusId())
+        () -> new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, command.readStatusId())
     );
     status.update(command.newLastReadAt());
 
@@ -143,7 +145,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public void delete(UUID readStatusId) {
     //읽기 상태가 존재하지 않으면 삭제를 진행하지 않음
     if (!readStatusRepository.existsId(readStatusId)) {
-      throw new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId);
+      throw new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId);
     }
     logger.info("Read Status delete : id {}", readStatusId);
     readStatusRepository.delete(readStatusId);

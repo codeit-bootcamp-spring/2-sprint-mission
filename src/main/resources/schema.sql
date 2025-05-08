@@ -43,7 +43,7 @@ create table if not exists channels
     updated_at  timestamp,
     name        varchar(100),
     description varchar(500),
-    type        channel_type                        not null
+    type        varchar(10)                         not null
 );
 
 create table if not exists messages

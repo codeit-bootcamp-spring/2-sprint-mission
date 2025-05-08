@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.adapter.inbound.error;
 
-import com.sprint.mission.discodeit.exception.AlreadyExistsException;
-import com.sprint.mission.discodeit.exception.CriticalException;
+import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.LoginFailedException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.exception.UnmodifiableException;
+import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -23,54 +22,48 @@ public class GlobalExceptionAdvice {
 
   private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionAdvice.class);
 
-  @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex,
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleNotFoundException(UserNotFoundException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
 
     String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(errorCode, message);
+    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
     logger.error(message);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
-  @ExceptionHandler(AlreadyExistsException.class)
-  public ResponseEntity<ErrorResponse> handleAlreadyExistsException(AlreadyExistsException ex,
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponse> handleAlreadyExistsException(UserAlreadyExistsException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
 
     String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(errorCode, message);
+    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
     logger.error(message);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
-  @ExceptionHandler(UnmodifiableException.class)
-  public ResponseEntity<ErrorResponse> handleUnmodifiableException(UnmodifiableException ex,
+  @ExceptionHandler(ChannelUnmodifiableException.class)
+  public ResponseEntity<ErrorResponse> handleUnmodifiableException(ChannelUnmodifiableException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
 
     String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(errorCode, message);
+    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
     logger.error(message);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
-  @ExceptionHandler(LoginFailedException.class)
-  public ResponseEntity<ErrorResponse> handleLoginFailedException(LoginFailedException ex,
+  @ExceptionHandler(UserLoginFailedException.class)
+  public ResponseEntity<ErrorResponse> handleLoginFailedException(UserLoginFailedException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
 
     String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(errorCode, message);
+    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
     logger.error(message);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
-  @ExceptionHandler(CriticalException.class)
-  public ResponseEntity<ErrorResponse> handleCriticalException(CriticalException ex) {
-    ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-    ErrorResponse response = ErrorResponse.of(errorCode, ex.getMessage());
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
-  }
 }

@@ -16,10 +16,10 @@ import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
-import com.sprint.mission.discodeit.exception.AlreadyExistsException;
+import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.LoginFailedException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -94,12 +94,12 @@ public class BasicUserService implements UserService {
   public UserResult login(LoginUserCommand command) {
     //DB에 유저 이름이 존재하는 지 확인, 없으면 로그인할 아이디가 없으므로 throw
     User user = userRepository.findByName(command.username()).orElseThrow(
-        () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
     );
 
     //비밀번호가 틀리면 throw
     if (!command.password().equals(user.getPassword())) {
-      throw new LoginFailedException(ErrorCode.LOGIN_FAILED, user.getId(), "Password mismatch");
+      throw new UserLoginFailedException(ErrorCode.LOGIN_FAILED, user.getId(), "Password mismatch");
     }
 
     //로그인한 시점에 유저 상태의 정보를 업데이트해야함
@@ -120,11 +120,11 @@ public class BasicUserService implements UserService {
    */
   private void validateUser(String name, String email) {
     if (userRepository.findByName(name).isPresent()) {
-      throw new AlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, name);
+      throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, name);
     }
 
     if (userRepository.findByEmail(email).isPresent()) {
-      throw new AlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, email);
+      throw new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, email);
     }
   }
 
@@ -139,7 +139,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public UserResult findById(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
     return UserResult.create(user, user.getUserStatus().isOnline());
   }
 
@@ -176,7 +176,7 @@ public class BasicUserService implements UserService {
     //유저를 찾음, 없으면 오류 발생
     User user = userRepository.findById(command.requestUserId())
         .orElseThrow(
-            () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.requestUserId()));
+            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.requestUserId()));
 
     //유저의 프로필 이미지를 가져옴
     BinaryContent profile = user.getProfile();
@@ -206,7 +206,7 @@ public class BasicUserService implements UserService {
   public void delete(UUID userId) {
     //유저를 찾음, 유저가 없으면 오류 발생
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
+        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
 
     //유저 이미지가 존재하면 삭제를 진행함
     //Update와 동일한 방식이나, 업데이트에서는 binaryContent 값이 존재할 경우에만 삭제를 진행함
@@ -233,7 +233,7 @@ public class BasicUserService implements UserService {
   public UserStatusResult online(OnlineUserStatusCommand command) {
     //유저가 존재하는 지 확인, 없으면 오류 발생
     User user = userRepository.findById(command.userId()).orElseThrow(
-        () -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
     );
 
     // 현재 코드: 유저 엔티티에서 바로 유저 상태를 불러옴
