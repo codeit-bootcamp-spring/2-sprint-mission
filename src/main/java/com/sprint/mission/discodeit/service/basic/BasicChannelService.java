@@ -8,6 +8,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.User.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,7 +19,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,7 +51,7 @@ public class BasicChannelService implements ChannelService {
 
     request.participantIds().forEach(userId -> {
       User user = userRepository.findById(userId)
-          .orElseThrow(() -> new NoSuchElementException("UserId :" + userId + "not found"));
+          .orElseThrow(() -> new UserNotFoundException(userId));
       ReadStatus readStatus = ReadStatus.builder()
           .user(user)
           .channel(channel)
@@ -95,7 +97,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new IllegalArgumentException("UserId: " + userId + " not found");
+      throw new UserNotFoundException(userId);
     }
 
     List<ChannelDto> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC).stream()
@@ -121,7 +123,7 @@ public class BasicChannelService implements ChannelService {
 
     if (channel.getType() == ChannelType.PRIVATE) {
       log.warn("Can't update private channel : {}", channelId);
-      throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
+      throw new PrivateChannelUpdateException(channelId);
     }
 
     if (request.newName() != null) {
@@ -149,12 +151,12 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void validateChannelExists(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new IllegalArgumentException("ChannelId: " + channelId + " not found");
+      throw new ChannelNotFoundException(channelId);
     }
   }
 
   private Channel findChannelOrThrow(UUID channelId) {
     return channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("ChannelId: " + channelId + "not found"));
+        .orElseThrow(() -> new ChannelNotFoundException(channelId));
   }
 }

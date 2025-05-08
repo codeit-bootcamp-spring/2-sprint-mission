@@ -6,13 +6,15 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.User.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +41,11 @@ public class BasicUserService implements UserService {
 
     if (userRepository.existsByEmail(request.email())) {
       log.warn("User created failed: Email already exists - {}", request.email());
-      throw new IllegalArgumentException("이미 존재하는 Email입니다");
+      throw new DiscodeitException(ErrorCode.EMAIL_ALREADY_EXISTS);
     }
     if (userRepository.existsByUsername(request.username())) {
       log.warn("User created failed: Username already exists - {}", request.username());
-      throw new IllegalArgumentException("이미 존재하는 Username입니다");
+      throw new DiscodeitException(ErrorCode.USERNAME_ALREADY_EXISTS);
     }
 
     User user = User.builder()
@@ -136,13 +138,13 @@ public class BasicUserService implements UserService {
   public void validateUserExists(UUID userId) {
     if (!userRepository.existsById(userId)) {
       log.warn("Validate user by id: {}", userId);
-      throw new NoSuchElementException("UserId: " + userId + " not found");
+      throw new UserNotFoundException(userId);
     }
   }
 
   private User findUserOrThrow(UUID userId) {
 
     return userRepository.findWithDetailsById(userId)
-        .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + " not found"));
+        .orElseThrow(() -> new UserNotFoundException(userId));
   }
 }

@@ -8,6 +8,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.User.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -18,7 +22,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +53,9 @@ public class BasicMessageService implements MessageService {
     UUID authorId = request.authorId();
 
     User author = userRepository.findById(authorId)
-        .orElseThrow(() -> new NoSuchElementException("AuthorId:" + authorId + " not found"));
+        .orElseThrow(() -> new UserNotFoundException(authorId));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("ChannelId:" + channelId + " not found"));
+        .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
     Message message = messageRepository.save(
         Message.builder()
@@ -141,12 +145,13 @@ public class BasicMessageService implements MessageService {
   @Override
   public void validateMessageExists(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
-      throw new IllegalArgumentException("MessageId:" + messageId + " not found");
+      throw new DiscodeitException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId));
     }
   }
 
   private Message findMessageOrThrow(UUID messageId) {
     return messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("MessageId:" + messageId + " not found"));
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.MESSAGE_NOT_FOUND,
+            Map.of("messageId", messageId)));
   }
 }

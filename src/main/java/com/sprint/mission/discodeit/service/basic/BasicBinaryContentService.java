@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,15 +38,14 @@ public class BasicBinaryContentService implements BinaryContentService {
 
       return binaryContent;
     } catch (IOException e) {
-      throw new RuntimeException("프로필 이미지 업로드 실패", e);
+      throw new DiscodeitException(ErrorCode.FILE_UPLOAD_FAILED);
     }
   }
 
   @Override
   public BinaryContentDto findBinaryContent(UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "BinaryContentId: " + binaryContentId + " not found"));
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
     return binaryContentMapper.toDto(binaryContent);
   }
 
