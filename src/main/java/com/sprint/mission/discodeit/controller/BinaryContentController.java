@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
+@Slf4j
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
@@ -45,7 +47,9 @@ public class BinaryContentController implements BinaryContentApi {
   @Override
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<Resource> download(@PathVariable("binaryContentId") UUID binaryContentId) {
+    log.debug("파일 다운로드 요청: id={}", binaryContentId);
     BinaryContentDto contentDto = binaryContentService.findById(binaryContentId);
+    log.info("파일 다운로드 응답: {}", contentDto);
     return binaryContentStorage.download(contentDto);
   }
 }

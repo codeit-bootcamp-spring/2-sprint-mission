@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 @RequestMapping("/api/channels")
 public class ChannelController implements ChannelApi {
 
@@ -35,7 +37,9 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> createPublic(
       @RequestBody @Valid PublicChannelRequest request) {
+    log.debug("공개 채널 생성 요청: {}", request);
     ChannelDto response = channelService.create(request);
+    log.info("공개 채널 생성 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 
@@ -44,7 +48,9 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createPrivate(
       @RequestBody @Valid PrivateChannelRequest request) {
+    log.debug("비공개 채널 생성 요청: {}", request);
     ChannelDto response = channelService.create(request);
+    log.info("비공개 채널 생성 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 
@@ -52,6 +58,7 @@ public class ChannelController implements ChannelApi {
   @Override
   @DeleteMapping("/{channelId}")
   public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
+    log.debug("채널 삭제 요청: id={}", channelId);
     channelService.delete(channelId);
     return ResponseEntity.noContent().build();
   }
@@ -61,7 +68,9 @@ public class ChannelController implements ChannelApi {
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> updatePublic(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest request) {
+    log.debug("채널 수정 요청: id={}, request={}", channelId, request);
     ChannelDto response = channelService.update(channelId, request);
+    log.info("채널 수정 응답: id={}, request={}", channelId, response);
     return ResponseEntity.ok(response);
   }
 

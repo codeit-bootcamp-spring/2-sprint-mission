@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 @RequestMapping("/api/users")
 public class UserController implements UserApi {
 
@@ -43,8 +45,10 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") @Valid UserCreateRequest userRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.debug("사용자 생성 요청: request={}, file={}", userRequest, profile);
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
     UserDto response = userService.create(userRequest, fileData);
+    log.info("사용자 생성 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 
@@ -56,8 +60,10 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.debug("사용자 수정 요청: id={}, request={}, file={}", userId, request, profile);
     BinaryContentCreateRequest fileData = BinaryContentCreateRequest.of(profile);
     UserDto response = userService.update(userId, request, fileData);
+    log.info("사용자 수정 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 
@@ -65,6 +71,7 @@ public class UserController implements UserApi {
   @Override
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+    log.debug("사용자 삭제 요청: id={}", userId);
     userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
@@ -84,7 +91,9 @@ public class UserController implements UserApi {
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request
   ) {
+    log.debug("사용자 상태 수정 요청: userId={}, request={}", userId, request);
     UserStatusDto response = userStatusService.updateByUserId(userId, request);
+    log.info("사용자 상태 수정 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 }
