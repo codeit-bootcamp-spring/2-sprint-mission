@@ -78,16 +78,7 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     @Override
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-        Slice<MessageDto> messageDtoSlice = messageRepository.findAllByChannelId(channelId, pageable)
-                .map(messageMapper::toDto);
-
-        return pageResponseMapper.fromSlice(messageDtoSlice);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public PageResponse<MessageDto> findAllByAuthorId(UUID authorId, Pageable pageable) {
-        Slice<MessageDto> messageDtoSlice = messageRepository.findAllByAuthorId(authorId, pageable)
+        Slice<MessageDto> messageDtoSlice = messageRepository.findAllByChannelIdWithAuthor(channelId, pageable)
                 .map(messageMapper::toDto);
 
         return pageResponseMapper.fromSlice(messageDtoSlice);

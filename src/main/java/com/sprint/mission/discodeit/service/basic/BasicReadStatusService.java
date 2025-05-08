@@ -73,14 +73,6 @@ public class BasicReadStatusService implements ReadStatusService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    @Override
-    public List<ReadStatusDto> findAllByChannelId(UUID channelId) {
-        return readStatusRepository.findAllByChannelId(channelId).stream()
-                .map(readStatusMapper::toDto)
-                .toList();
-    }
-
     @Transactional
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto) {
