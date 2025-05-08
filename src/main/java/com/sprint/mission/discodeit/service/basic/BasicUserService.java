@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
@@ -39,13 +41,18 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
                           Optional<BinaryContentCreateRequest> profileCreateRequest) {
+
+        log.info("Creating user");
+
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
         if (userRepository.existsByUsername(username)) {
+            log.warn("Username {} already exists", username);
             throw new IllegalArgumentException("User with email " + email + " already exists");
         }
         if (userRepository.existsByEmail(email)) {
+            log.warn("Email {} already exists", email);
             throw new IllegalArgumentException("User with username " + username + " already exists");
         }
 
@@ -68,6 +75,8 @@ public class BasicUserService implements UserService {
         UserStatus userStatus = new UserStatus(user, Instant.now());
         userRepository.save(user);
 
+        log.info("User created successfully: username = {}", username);
+
         return userMapper.toDto(user);
     }
 
@@ -88,16 +97,22 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+
+        log.info("Updating user : id = {}", userId);
+
         User user = getUser(userId);
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
 
-        if (!newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
-            throw new IllegalArgumentException("User with email " + newEmail + " already exists");
-        }
         if (!newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
+            log.warn("Username {} already exists", newUsername);
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+        }
+
+        if (!newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
+            log.warn("Email {} already exists", newEmail);
+            throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
 
         BinaryContent profile = profileCreateRequest
@@ -116,19 +131,30 @@ public class BasicUserService implements UserService {
 
         String newPassword = userUpdateRequest.newPassword();
         user.updateUser(newUsername, newEmail, newPassword, profile);
+
+        log.info("User updated successfully: username = {}", newUsername);
+
         return userMapper.toDto(user);
     }
 
     @Transactional
     @Override
     public void delete(UUID userId) {
+
+        log.info("Deleting user : id = {}", userId);
+
         User user = getUser(userId);
         userRepository.delete(user);
+
+        log.info("User deleted successfully : id = {}", userId);
     }
 
     private User getUser(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() -> {
+                    log.warn("User with id {} not found", userId);
+                    return new NoSuchElementException("User with id " + userId + " not found");
+                });
     }
 
 
