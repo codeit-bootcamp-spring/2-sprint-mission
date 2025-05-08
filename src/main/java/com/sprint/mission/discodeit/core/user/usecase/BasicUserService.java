@@ -51,47 +51,31 @@ public class BasicUserService implements UserService {
   public UserResult create(CreateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
     BinaryContent profile = null;
-    //동일한 이름, 이메일이 존재하는 지 확인하는 메서드
-    //동일한 이름이 존재하면 throw함
     validateUser(command.username(), command.email());
 
-    //이미지 DTO값이 존재하는 지 확인
     if (binaryContentDTO.isPresent()) {
-      //이미지 DTO가 존재하면 BinaryContent를 만드는 메서드 실행
       profile = binaryContentService.create(binaryContentDTO.orElse(null));
     }
 
-    //유저 생성 및 저장, 로그 출력
     User user = User.create(command.username(), command.email(), command.password(), profile);
     userRepository.save(user);
-    log.info("[UserService] User registered: {}", user.getId());
+    log.info("[UserService] User registered: id {}, name {}", user.getId(), user.getName());
 
-    //유저 상태를 생성하기 위해 userStatusService를 호출
     CreateUserStatusCommand statusCommand = new CreateUserStatusCommand(user, Instant.now());
     UserStatus userStatus = userStatusService.create(statusCommand);
 
     user.setUserStatus(userStatus);
 
-    //결과물을 DTO로 감싸서 호출
     return UserResult.create(user, true);
   }
 
-  /**
-   * <h2>유저 로그인 메서드</h2>
-   * 로그인을 위한 메서드, 이름과 패스워드가 같은 지 확인, 틀리면 throw
-   *
-   * @param command 유저 이름, 패스워드
-   * @return 아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부
-   */
   @Override
   @Transactional
   public UserResult login(LoginUserCommand command) {
-    //DB에 유저 이름이 존재하는 지 확인, 없으면 로그인할 아이디가 없으므로 throw
     User user = userRepository.findByName(command.username()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
     );
 
-    //비밀번호가 틀리면 throw
     if (!command.password().equals(user.getPassword())) {
       throw new UserLoginFailedException(ErrorCode.LOGIN_FAILED, user.getId(), "Password mismatch");
     }
@@ -114,11 +98,11 @@ public class BasicUserService implements UserService {
    * @param email 확인할 이메일
    */
   private void validateUser(String name, String email) {
-    if (userRepository.findByName(name).isPresent()) {
+    if (userRepository.existsByName(name)) {
       throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, name);
     }
 
-    if (userRepository.findByEmail(email).isPresent()) {
+    if (userRepository.existsByEmail(email)) {
       throw new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, email);
     }
   }

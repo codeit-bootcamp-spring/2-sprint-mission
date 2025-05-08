@@ -34,7 +34,6 @@ public class BinaryContent extends BaseEntity {
     this.extension = extractExtension(fileName);
 
     this.size = size;
-//    this.bytes = bytes;
   }
 
   public static BinaryContent create(String fileName, Long size, String contentType) {

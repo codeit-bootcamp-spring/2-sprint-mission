@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.core.user.exception;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserException;
+import lombok.Getter;
 
+@Getter
 public class UserLoginFailedException extends UserException {
 
   private final Object[] args;

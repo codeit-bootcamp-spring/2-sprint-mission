@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.exception;
 
+import com.sprint.mission.discodeit.core.channel.exception.ChannelInvalidRequestException;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
+import com.sprint.mission.discodeit.core.message.exception.MessageInvalidRequestException;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
 import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import java.time.Instant;
@@ -21,14 +24,19 @@ public class GlobalExceptionAdvice {
 
   private final MessageSource messageSource;
 
+  private ErrorResponse createResponse(DiscodeitException ex, ErrorCode errorCode, Object[] args,
+      Locale locale) {
+    String message = messageSource.getMessage(errorCode.getMessage(), args, locale);
+    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
+    log.error(message);
+    return response;
+  }
+
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleNotFoundException(UserNotFoundException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
-
-    String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
-    log.error(message);
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
@@ -36,21 +44,7 @@ public class GlobalExceptionAdvice {
   public ResponseEntity<ErrorResponse> handleAlreadyExistsException(UserAlreadyExistsException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
-
-    String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
-    log.error(message);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
-  }
-
-  @ExceptionHandler(ChannelUnmodifiableException.class)
-  public ResponseEntity<ErrorResponse> handleUnmodifiableException(ChannelUnmodifiableException ex,
-      Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-
-    String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
-    log.error(message);
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
@@ -58,10 +52,41 @@ public class GlobalExceptionAdvice {
   public ResponseEntity<ErrorResponse> handleLoginFailedException(UserLoginFailedException ex,
       Locale locale) {
     ErrorCode errorCode = ex.getErrorCode();
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+  }
 
-    String message = messageSource.getMessage(errorCode.getMessage(), ex.getArgs(), locale);
-    ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
-    log.error(message);
+  @ExceptionHandler(UserInvalidRequestException.class)
+  public ResponseEntity<ErrorResponse> handleUserInvalidRequestException(
+      UserInvalidRequestException ex,
+      Locale locale) {
+    ErrorCode errorCode = ex.getErrorCode();
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+  }
+
+  @ExceptionHandler(ChannelUnmodifiableException.class)
+  public ResponseEntity<ErrorResponse> handleUnmodifiableException(ChannelUnmodifiableException ex,
+      Locale locale) {
+    ErrorCode errorCode = ex.getErrorCode();
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+  }
+
+  @ExceptionHandler(ChannelInvalidRequestException.class)
+  public ResponseEntity<ErrorResponse> handleMessageInvalidRequestException(
+      ChannelInvalidRequestException ex, Locale locale) {
+    ErrorCode errorCode = ex.getErrorCode();
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+  }
+
+
+  @ExceptionHandler(MessageInvalidRequestException.class)
+  public ResponseEntity<ErrorResponse> handleMessageInvalidRequestException(
+      MessageInvalidRequestException ex, Locale locale) {
+    ErrorCode errorCode = ex.getErrorCode();
+    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
   }
 
