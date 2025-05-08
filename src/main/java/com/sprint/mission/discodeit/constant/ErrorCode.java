@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.constant;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
     USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
     DUPLICATE_USER("이미 존재하는 사용자입니다."),
@@ -20,7 +23,4 @@ public enum ErrorCode {
         this.message = message;
     }
 
-    public String getMessage() {
-        return message;
-    }
 }
