@@ -41,46 +41,26 @@ public class UserController {
 
   private final UserService userService;
 
-  /**
-   * <h2>유저 등록 메서드</h2>
-   * 유저를 등록한다.
-   *
-   * @param requestBody 유저 이름, 이메일, 패스워드
-   * @param file        이미지 데이터
-   * @return 유저 아이디, 이름, 이메일, 프로필 이미지 메타 데이터, 유저 온라인 여부
-   */
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> register(
       @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) {
 
-    //파일이 존재하는지 안하는지 확인
-    //파일이 존재하면 Optional로 감싸서 반환
-    //널값 허용
     Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
 
-    //Request DTO를 Command DTO로 변환
-    //why? 컨트롤러단에서 서비스단으로 변수를 넘길 때, 관리하기 편하게 묶어서 보내려고
-    // 또 영향을 컨트롤러단에서 서비스단에 영향을 적게 주려고
     CreateUserCommand command = UserDtoMapper.toCreateUserCommand(requestBody);
-
-    //서비스단에서 컨트롤러 단으로 결과물을 DTO로 반환
-    //Why? 서비스단에서 컨트롤러 단 영향을 적게 주기위해서
     UserResult result = userService.create(command, binaryContentRequest);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(UserDtoMapper.toCreateResponse(result));
   }
 
-  //파일이 존재하면 DTO로 만든 뒤, Optional로 감싸서 반환
   private Optional<CreateBinaryContentCommand> resolveProfileRequest(MultipartFile profileFile) {
     if (profileFile.isEmpty()) {
-      //파일이 비어있으면 빈 값을 반환
       return Optional.empty();
     } else {
       try {
-        //파일을 DTO로 변환시킴
         CreateBinaryContentCommand binaryContentCreateRequest = CreateBinaryContentCommand.create(
             profileFile);
         return Optional.of(binaryContentCreateRequest);
@@ -90,7 +70,6 @@ public class UserController {
     }
   }
 
-  //전체 유저 목록을 반환시킴
   @GetMapping
   public ResponseEntity<List<UserResult>> findAll() {
     List<UserResult> result = userService.findAll();
@@ -98,41 +77,30 @@ public class UserController {
     return ResponseEntity.ok(result);
   }
 
-  //유저를 업데이트함
-  //유저아이디를 PathVariable로 받고, RequestBody로 업데이트할 내용을 받음
-  //추가로 이미지파일 역시 받음
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> updateUser(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file) {
 
-    //유저 생성할 때와 동일하게 DTO로 감싸는 작업
     Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
     UpdateUserCommand command = UserDtoMapper.toUpdateUserCommand(userId, requestBody);
 
-    //서비스단에서 컨트롤러 단으로 결과물을 DTO로 반환
-    //Why? 서비스단에서 컨트롤러 단 영향을 적게 주기위해서
     UserResult result = userService.update(command, binaryContentRequest);
     return ResponseEntity.ok(UserDtoMapper.toCreateResponse(result));
   }
 
-  //유저 삭제
-  //삭제후 단순히 true, false 값만 반환
   @DeleteMapping("/{userId}")
   public ResponseEntity<UserDeleteResponse> deleteUser(@PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.ok(new UserDeleteResponse(true));
   }
 
-  //온라인 상태 변환
-  //유저 아이디와 현재 시각을 담은 request를 받음
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusResponse> online(@PathVariable UUID userId,
       @RequestBody UserStatusRequest requestBody) {
 
-    //DTO로 감싸는 작업
     OnlineUserStatusCommand command = OnlineUserStatusCommand.create(userId,
         requestBody);
 
