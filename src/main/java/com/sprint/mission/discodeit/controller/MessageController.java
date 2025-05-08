@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -70,13 +71,14 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
             @RequestParam UUID channelId,
+            @RequestParam(required = false) Instant cursor,
             @PageableDefault(
                     size = 50,
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
-        PageResponse<MessageDto> messageDtos = messageService.findAllByChannelId(channelId, pageable);
+        PageResponse<MessageDto> messageDtos = messageService.findAllByChannelId(channelId, cursor, pageable);
         return ResponseEntity.ok(messageDtos);
     }
 }

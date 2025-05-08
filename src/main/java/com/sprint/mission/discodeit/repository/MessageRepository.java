@@ -16,8 +16,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
             + "LEFT JOIN FETCH m.author a "
             + "JOIN FETCH a.status "
             + "LEFT JOIN FETCH m.attachments "
-            + "WHERE m.channel.id = :channelId")
-    Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId, Pageable pageable);
+            + "WHERE m.channel.id = :channelId AND m.createdAt < :createdAt ")
+    Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
+                                                @Param("createdAt") Instant createdAt,
+                                                Pageable pageable);
 
     @Query("SELECT MAX(m.createdAt) FROM Message m WHERE m.channel.id = :channelId")
     Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
