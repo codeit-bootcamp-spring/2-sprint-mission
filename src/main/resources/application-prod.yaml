@@ -11,5 +11,13 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+
   server:
     port: 8090
+
+logging:
+  level:
+    root: INFO
+    com.sprint.mission.discodeit.service.basic: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: WARN

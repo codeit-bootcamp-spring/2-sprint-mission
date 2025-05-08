@@ -23,17 +23,18 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  //
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final MessageMapper messageMapper;
@@ -48,13 +49,19 @@ public class BasicMessageService implements MessageService {
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
 
+    log.info("Creating message in channel with id: {} by user with id: {}", channelId, authorId);
+
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " does not exist"));
+        .orElseThrow(() -> {
+          log.error("Channel with id {} does not exist", channelId);
+          return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+        });
+
     User author = userRepository.findById(authorId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Author with id " + authorId + " does not exist")
-        );
+        .orElseThrow(() -> {
+          log.error("Author with id {} does not exist", authorId);
+          return new NoSuchElementException("Author with id " + authorId + " does not exist");
+        });
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
@@ -66,6 +73,7 @@ public class BasicMessageService implements MessageService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("Saved attachment with file name: {}", fileName);
           return binaryContent;
         })
         .toList();
@@ -79,6 +87,7 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+    log.info("Message created successfully with id: {}", message.getId());
     return messageMapper.toDto(message);
   }
 
@@ -112,21 +121,31 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    log.info("Updating message with id: {}", messageId);
+
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        .orElseThrow(() -> {
+          log.error("Message with id {} not found", messageId);
+          return new NoSuchElementException("Message with id " + messageId + " not found");
+        });
+
     message.update(newContent);
+    log.info("Message with id {} updated successfully", messageId);
     return messageMapper.toDto(message);
   }
 
   @Transactional
   @Override
   public void delete(UUID messageId) {
+    log.info("Deleting message with id: {}", messageId);
+
     if (!messageRepository.existsById(messageId)) {
+      log.error("Message with id {} not found", messageId);
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }
 
     messageRepository.deleteById(messageId);
+    log.info("Message with id {} deleted successfully", messageId);
   }
 }

@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
@@ -36,15 +37,21 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto create(PublicChannelCreateRequest request) {
     String name = request.name();
     String description = request.description();
-    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
+    log.info("Creating public channel with name: {}, description: {}", name, description);
+
+    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
     channelRepository.save(channel);
+
+    log.info("Public channel created successfully with id: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
+    log.info("Creating private channel for participants: {}", request.participantIds());
+
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
 
@@ -53,6 +60,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
     readStatusRepository.saveAll(readStatuses);
 
+    log.info("Private channel created successfully with id: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -82,28 +90,42 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
+    log.info("Updating channel with id: {}", channelId);
+
     String newName = request.newName();
     String newDescription = request.newDescription();
+
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        .orElseThrow(() -> {
+          log.error("Channel with id {} not found", channelId);
+          return new NoSuchElementException("Channel with id " + channelId + " not found");
+        });
+
     if (channel.getType().equals(ChannelType.PRIVATE)) {
+      log.error("Private channel cannot be updated: Channel id {}", channelId);
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
+
     channel.update(newName, newDescription);
+
+    log.info("Channel with id {} updated successfully", channelId);
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public void delete(UUID channelId) {
+    log.info("Deleting channel with id: {}", channelId);
+
     if (!channelRepository.existsById(channelId)) {
+      log.error("Channel with id {} not found", channelId);
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
 
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
-
     channelRepository.deleteById(channelId);
+
+    log.info("Channel with id {} deleted successfully", channelId);
   }
 }

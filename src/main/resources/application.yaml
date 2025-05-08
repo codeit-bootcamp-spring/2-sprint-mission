@@ -10,11 +10,6 @@ spring:
       maxFileSize: 10MB
       maxRequestSize: 30MB
 
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
-
 discodeit:
   storage:
     type: local
