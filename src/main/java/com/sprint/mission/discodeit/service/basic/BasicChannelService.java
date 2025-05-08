@@ -21,9 +21,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -37,6 +39,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto createPrivateChannel(CreatePrivateChannelRequest request) {
+    log.info("Create private channel : {}", request);
     Channel channel = channelRepository.save(
         Channel.builder()
             .type(ChannelType.PRIVATE)
@@ -54,12 +57,15 @@ public class BasicChannelService implements ChannelService {
           .build();
       readStatusRepository.save(readStatus);
     });
+
+    log.info("Create private channel successfully: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public ChannelDto createPublicChannel(CreatePublicChannelRequest request) {
+    log.info("Create public channel : {}", request);
     Channel channel = channelRepository.save(
         Channel.builder()
             .type(ChannelType.PUBLIC)
@@ -67,6 +73,7 @@ public class BasicChannelService implements ChannelService {
             .description(request.description())
             .build());
 
+    log.info("Create public channel successfully: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -109,9 +116,11 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto updateChannel(UUID channelId, UpdateChannelRequest request) {
+    log.info("Update channel Id: {}, request: {}", channelId, request);
     Channel channel = findChannelOrThrow(channelId);
 
     if (channel.getType() == ChannelType.PRIVATE) {
+      log.warn("Can't update private channel : {}", channelId);
       throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
     }
 
@@ -122,16 +131,19 @@ public class BasicChannelService implements ChannelService {
       channel.updateDescription(request.newDescription());
     }
 
+    log.info("Update channel successfully: {}", channel.getId());
     return channelMapper.toDto(channel);
   }
 
   @Transactional
   @Override
   public void deleteChannel(UUID channelId) {
+    log.warn("Delete channel Id: {}", channelId);
     validateChannelExists(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
     messageRepository.deleteAllByChannelId(channelId);
     channelRepository.deleteById(channelId);
+    log.info("Delete channel successfully: {}", channelId);
   }
 
   @Override

@@ -16,11 +16,13 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -30,13 +32,17 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
 
   @Override
+  @Transactional
   public UserDto createUser(CreateUserRequest request) {
+    log.info("Create user requested: {}", request);
     String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
     if (userRepository.existsByEmail(request.email())) {
+      log.warn("User created failed: Email already exists - {}", request.email());
       throw new IllegalArgumentException("이미 존재하는 Email입니다");
     }
     if (userRepository.existsByUsername(request.username())) {
+      log.warn("User created failed: Username already exists - {}", request.username());
       throw new IllegalArgumentException("이미 존재하는 Username입니다");
     }
 
@@ -55,6 +61,7 @@ public class BasicUserService implements UserService {
     userStatusRepository.save(userStatus);
     user.setStatus(userStatus);
 
+    log.info("User created successfully: {}", user.getUsername());
     return userMapper.toDto(user);
   }
 
@@ -90,14 +97,17 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public UserDto updateProfile(UUID userId, BinaryContent binaryContent) {
+    log.info("Update profile by id: {}", userId);
     User user = findUserOrThrow(userId);
     user.updateProfile(binaryContent);
+    log.info("User profile updated successfully: {}", user);
     return userMapper.toDto(user);
   }
 
   @Transactional
   @Override
   public UserDto updateUser(UUID userId, UpdateUserRequest request) {
+    log.info("Update user by id: {}, request: {}", userId, request);
     User user = findUserOrThrow(userId);
 
     if (request.newUsername() != null) {
@@ -110,23 +120,28 @@ public class BasicUserService implements UserService {
       user.updateEmail(request.newEmail());
     }
 
+    log.info("User updated successfully: {}", userId);
     return userMapper.toDto(user);
   }
 
   @Override
   public void deleteUser(UUID userId) {
+    log.warn("Delete user by id: {}", userId);
     validateUserExists(userId);
     userRepository.deleteById(userId);
+    log.info("User deleted successfully: {}", userId);
   }
 
   @Override
   public void validateUserExists(UUID userId) {
     if (!userRepository.existsById(userId)) {
+      log.warn("Validate user by id: {}", userId);
       throw new NoSuchElementException("UserId: " + userId + " not found");
     }
   }
 
   private User findUserOrThrow(UUID userId) {
+
     return userRepository.findWithDetailsById(userId)
         .orElseThrow(() -> new NoSuchElementException("UserId: " + userId + " not found"));
   }

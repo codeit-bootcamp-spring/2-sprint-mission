@@ -12,10 +12,12 @@ import com.sprint.mission.discodeit.service.AuthService;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
@@ -27,12 +29,15 @@ public class BasicAuthService implements AuthService {
   @Transactional
   @Override
   public UserDto register(CreateUserRequest request) {
+    log.info("Registering user: {}", request);
     String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
     if (userRepository.existsByEmail(request.email())) {
+      log.warn("Email already exists: {}", request.email());
       throw new IllegalArgumentException("이미 존재하는 Email입니다");
     }
     if (userRepository.existsByUsername(request.username())) {
+      log.warn("Username already exists: {}", request.username());
       throw new IllegalArgumentException("이미 존재하는 Username입니다");
     }
 
@@ -51,22 +56,26 @@ public class BasicAuthService implements AuthService {
     userStatusRepository.save(userStatus);
     user.setStatus(userStatus);
 
+    log.info("Registered user successfully: {}", user.getId());
     return userMapper.toDto(user);
   }
 
   @Transactional
   @Override
   public UserDto login(LoginRequest request) {
+    log.info("Login user: {}", request);
     User user = userRepository.findByUsername(request.username())
         .orElseThrow(NoSuchElementException::new);
 
     if (!BCrypt.checkpw(request.password(), user.getPassword())) {
+      log.warn("Wrong password: {}", request.password());
       throw new RuntimeException("비밀번호가 일치하지 않습니다.");
     }
 
     userStatusRepository.findByUserId(user.getId())
         .ifPresent(UserStatus::updateLastActiveAt);
 
+    log.info("Login user successfully: {}", user.getId());
     return userMapper.toDto(user);
   }
 }
