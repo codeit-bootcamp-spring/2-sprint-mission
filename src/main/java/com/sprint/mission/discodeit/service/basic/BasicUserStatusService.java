@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.UserStatus.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -18,25 +20,23 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserStatusRepository userStatusRepository;
-  private final UserRepository userRepository;
-  private final UserStatusMapper userStatusMapper;
+    private final UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
+    private final UserStatusMapper userStatusMapper;
 
-  @Override
-  @Transactional
-  public UserStatusDto updateByUserId(UUID userId,
-      UserStatusUpdateRequest userStatusUpdateRequest) {
+    @Override
+    @Transactional
+    public UserStatusDto updateByUserId(UUID userId,
+        UserStatusUpdateRequest userStatusUpdateRequest) {
 
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException(
-            String.format("User with userId %s not found", userId)));
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> UserNotFoundException.forId(userId.toString()));
 
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(() -> new NoSuchElementException(
-            String.format("UserStatus with userId %s not found", userId)));
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+            .orElseThrow(() -> UserStatusNotFoundException.forUserId(userId.toString()));
 
-    userStatus.updateLastLoginTime(userStatusUpdateRequest.newLastActiveAt());
+        userStatus.updateLastLoginTime(userStatusUpdateRequest.newLastActiveAt());
 
-    return userStatusMapper.toDto(userStatus);
-  }
+        return userStatusMapper.toDto(userStatus);
+    }
 }
