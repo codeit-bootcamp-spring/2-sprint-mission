@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.BinaryContentException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +29,12 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public BinaryContentDto create(BinaryContentCreateRequest request) {
-    log.info("Received request to upload binary content with file name: {}", request.fileName());
-
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
+
+    log.info("Attempting to upload binary content with file name: {}", fileName);
+
     BinaryContent binaryContent = new BinaryContent(
         fileName,
         (long) bytes.length,
@@ -40,7 +43,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     binaryContentRepository.save(binaryContent);
     binaryContentStorage.put(binaryContent.getId(), bytes);
 
-    log.info("Successfully uploaded binary content with ID: {}", binaryContent.getId());
+    log.info("Binary content with ID {} successfully uploaded", binaryContent.getId());
     return binaryContentMapper.toDto(binaryContent);
   }
 
@@ -48,8 +51,11 @@ public class BasicBinaryContentService implements BinaryContentService {
   public BinaryContentDto find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
         .map(binaryContentMapper::toDto)
-        .orElseThrow(() -> new NoSuchElementException(
-            "BinaryContent with id " + binaryContentId + " not found"));
+        .orElseThrow(() -> {
+          log.error("Binary content with ID {} not found", binaryContentId);
+          return BinaryContentException.binaryContentNotFound(
+              Map.of("binaryContentId", binaryContentId));
+        });
   }
 
   @Override
@@ -62,14 +68,15 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public void delete(UUID binaryContentId) {
-    log.info("Received request to delete binary content with ID: {}", binaryContentId);
+    log.info("Attempting to delete binary content with ID: {}", binaryContentId);
 
     if (!binaryContentRepository.existsById(binaryContentId)) {
       log.error("Binary content with ID {} not found during deletion", binaryContentId);
-      throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+      throw BinaryContentException.binaryContentNotFound(
+          Map.of("binaryContentId", binaryContentId));
     }
 
     binaryContentRepository.deleteById(binaryContentId);
-    log.info("Successfully deleted binary content with ID: {}", binaryContentId);
+    log.info("Binary content with ID {} successfully deleted", binaryContentId);
   }
 }
