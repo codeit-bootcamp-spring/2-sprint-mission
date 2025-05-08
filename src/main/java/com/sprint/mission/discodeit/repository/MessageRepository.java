@@ -1,24 +1,32 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
-
-  // 이 부분도 N + 1 문제를 유발하는 것 같은데 어떻게 수정해야될지 모르겠다
-  Slice<Message> findAllByChannelIdAndCreatedAtLessThan(UUID channelId, Instant cratedAt,
+  @Query("SELECT m FROM Message m "
+      + "LEFT JOIN FETCH m.author a "
+      + "JOIN FETCH a.status "
+      + "LEFT JOIN FETCH a.profile "
+      + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
+  Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
+      @Param("createdAt") Instant createdAt,
       Pageable pageable);
-  
-  // 이 부분도 N + 1 문제를 유발하는 것 같은데 어떻게 수정해야될지 모르겠다
-  Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(UUID channelId);
+
+
+  @Query("SELECT m.createdAt "
+      + "FROM Message m "
+      + "WHERE m.channel.id = :channelId "
+      + "ORDER BY m.createdAt DESC LIMIT 1")
+  Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 
   void deleteAllByChannelId(UUID channelId);
 }

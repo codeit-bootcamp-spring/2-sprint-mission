@@ -11,16 +11,14 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional
 @RequiredArgsConstructor
 @Service
 public class BasicReadStatusService implements ReadStatusService {
@@ -30,37 +28,40 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
 
+  @Transactional
   @Override
   public ReadStatusDto create(ReadStatusCreateRequest request) {
     UUID userId = request.userId();
+    UUID channelId = request.channelId();
+
     User user = userRepository.findById(userId)
         .orElseThrow(
-            () -> new NoSuchElementException("User with id " + userId + " not found")
-        );
-
-    UUID channelId = request.channelId();
+            () -> new NoSuchElementException("User with id " + userId + " does not exist"));
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " not found")
+            () -> new NoSuchElementException("Channel with id " + channelId + " does not exist")
         );
 
-    if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
+    if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
       throw new IllegalArgumentException(
           "ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
     }
 
     Instant lastReadAt = request.lastReadAt();
     ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
-    return readStatusMapper.toDto(readStatusRepository.save(readStatus));
+    readStatusRepository.save(readStatus);
+
+    return readStatusMapper.toDto(readStatus);
   }
 
-  @Transactional(readOnly = true)
   @Override
   public ReadStatusDto find(UUID readStatusId) {
-    return readStatusMapper.toDto(this.findReadStatus(readStatusId));
+    return readStatusRepository.findById(readStatusId)
+        .map(readStatusMapper::toDto)
+        .orElseThrow(
+            () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
   }
 
-  @Transactional(readOnly = true)
   @Override
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream()
@@ -68,23 +69,23 @@ public class BasicReadStatusService implements ReadStatusService {
         .toList();
   }
 
+  @Transactional
   @Override
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
     Instant newLastReadAt = request.newLastReadAt();
-    ReadStatus readStatus = this.findReadStatus(readStatusId);
+    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+        .orElseThrow(
+            () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
     readStatus.update(newLastReadAt);
     return readStatusMapper.toDto(readStatus);
   }
 
+  @Transactional
   @Override
   public void delete(UUID readStatusId) {
-    ReadStatus readStatus = this.findReadStatus(readStatusId);
-    readStatusRepository.delete(readStatus);
-  }
-
-  private ReadStatus findReadStatus(UUID readStatusId) {
-    return readStatusRepository.findById(readStatusId)
-        .orElseThrow(
-            () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+    if (!readStatusRepository.existsById(readStatusId)) {
+      throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
+    }
+    readStatusRepository.deleteById(readStatusId);
   }
 }

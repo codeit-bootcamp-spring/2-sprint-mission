@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.dto.data;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.time.Instant;
 
 public record MessageDto(
     UUID id,
