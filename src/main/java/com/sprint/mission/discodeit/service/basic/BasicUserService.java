@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -40,10 +42,14 @@ public class BasicUserService implements UserService {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
+        log.info("▶▶ [SERVICE] Creating user - username: {}, email: {}", username, email);
+
         if (userRepository.existsByEmail(email)) {
+            log.warn("◀◀ [SERVICE] User with email already exists - email: {}", email);
             throw new IllegalArgumentException("User with email " + email + " already exists");
         }
         if (userRepository.existsByUsername(username)) {
+            log.warn("◀◀ [SERVICE] User with username already exists - username: {}", username);
             throw new IllegalArgumentException("User with username " + username + " already exists");
         }
 
@@ -52,6 +58,8 @@ public class BasicUserService implements UserService {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
+
+                    log.info("▶▶ [SERVICE] Creating profile binaryContent for user - fileName: {}", fileName);
 
                     BinaryContent binaryContent = BinaryContent.builder()
                             .fileName(fileName)
@@ -62,6 +70,8 @@ public class BasicUserService implements UserService {
                     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
                     binaryContentStorage.put(savedBinaryContent.getId(), bytes);
+
+                    log.info("◀◀ [SERVICE] Profile binaryContent created and saved - id: {}", savedBinaryContent.getId());
                     return savedBinaryContent;
                 })
                 .orElse(null);
@@ -84,45 +94,65 @@ public class BasicUserService implements UserService {
                 .build();
         userStatusRepository.save(userStatus);
 
+        log.info("◀◀ [SERVICE] User created successfully - id: {}", createdUser.getId());
         return userMapper.toDto(createdUser);
     }
 
     @Override
     public UserDto find(UUID userId) {
+        log.info("▶▶ [SERVICE] Finding user - id: {}", userId);
         return userRepository.findById(userId)
-                .map(userMapper::toDto)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .map(user -> {
+                    log.info("◀◀ [SERVICE] User found - id: {}", userId);
+                    return userMapper.toDto(user);
+                })
+                .orElseThrow(() -> {
+                    log.warn("◀◀ [SERVICE] User not found - id: {}", userId);
+                    return new NoSuchElementException("User with id " + userId + " not found");
+                });
     }
 
     @Override
     public List<UserDto> findAll() {
-        return userMapper.toDtoList(userRepository.findAll());
+        log.info("▶▶ [SERVICE] Finding all users");
+        List<User> users = userRepository.findAll();
+        log.info("◀◀ [SERVICE] Found {} users", users.size());
+        return userMapper.toDtoList(users);
     }
 
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        log.info("▶▶ [SERVICE] Updating user - id: {}", userId);
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() -> {
+                    log.warn("◀◀ [SERVICE] User not found for update - id: {}", userId);
+                    return new NoSuchElementException("User with id " + userId + " not found");
+                });
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
         if (newEmail != null && !newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
+            log.warn("◀◀ [SERVICE] Email already in use during update - email: {}", newEmail);
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
         if (newUsername != null && !newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
+            log.warn("◀◀ [SERVICE] Username already in use during update - username: {}", newUsername);
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
 
         optionalProfileCreateRequest.ifPresent(profileRequest -> {
-
             if (user.getProfile() != null) {
                 UUID profileId = user.getProfile().getId();
+                log.info("▶▶ [SERVICE] Removing old profile binaryContent - id: {}", profileId);
                 binaryContentRepository.deleteById(profileId);
             }
 
             String fileName = profileRequest.fileName();
             String contentType = profileRequest.contentType();
             byte[] bytes = profileRequest.bytes();
+
+            log.info("▶▶ [SERVICE] Creating new profile binaryContent for user update - fileName: {}", fileName);
 
             BinaryContent newProfile = BinaryContent.builder()
                     .fileName(fileName)
@@ -133,6 +163,8 @@ public class BasicUserService implements UserService {
             BinaryContent savedProfile = binaryContentRepository.save(newProfile);
             binaryContentStorage.put(savedProfile.getId(), bytes);
             user.updateProfile(savedProfile);
+
+            log.info("◀◀ [SERVICE] New profile binaryContent created and saved - id: {}", savedProfile.getId());
         });
 
         if (newUsername != null) {
@@ -145,20 +177,25 @@ public class BasicUserService implements UserService {
             user.setPassword(userUpdateRequest.newPassword());
         }
 
+        log.info("◀◀ [SERVICE] User updated successfully - id: {}", userId);
         return userMapper.toDto(user);
     }
 
-
     @Override
     public void delete(UUID userId) {
+        log.info("▶▶ [SERVICE] Deleting user - id: {}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() -> {
+                    log.warn("◀◀ [SERVICE] User not found for deletion - id: {}", userId);
+                    return new NoSuchElementException("User with id " + userId + " not found");
+                });
 
         if (user.getProfile() != null) {
+            log.info("▶▶ [SERVICE] Deleting user's profile binaryContent - id: {}", user.getProfile().getId());
             binaryContentRepository.deleteById(user.getProfile().getId());
         }
 
         userRepository.deleteById(userId);
+        log.info("◀◀ [SERVICE] User deleted successfully - id: {}", userId);
     }
-
 }
