@@ -4,9 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="BasicAuthService 로깅 추가">
+    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="BasicMessageService 로깅 추가">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/ApiErrorResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/DiscodeitException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/ErrorCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/ErrorResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/UserNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserNotFoundException.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +45,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
+        <option value="Record" />
+        <option value="Enum" />
         <option value="Class" />
       </list>
     </option>
@@ -232,7 +240,31 @@
       <option name="project" value="LOCAL" />
       <updated>1746610796220</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="BasicBinaryContentService 로깅추가">
+      <option name="closed" value="true" />
+      <created>1746611533454</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1746611533454</updated>
+    </task>
+    <task id="LOCAL-00014" summary="BasicChannelService 로깅 추가">
+      <option name="closed" value="true" />
+      <created>1746667668491</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1746667668491</updated>
+    </task>
+    <task id="LOCAL-00015" summary="BasicMessageService 로깅 추가">
+      <option name="closed" value="true" />
+      <created>1746670393633</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1746670393633</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -274,6 +306,9 @@
     <MESSAGE value="yaml 프로 파일 생성" />
     <MESSAGE value="logback-spring.xml 생성과, BasicUserService 로깅추가" />
     <MESSAGE value="BasicAuthService 로깅 추가" />
-    <option name="LAST_COMMIT_MESSAGE" value="BasicAuthService 로깅 추가" />
+    <MESSAGE value="BasicBinaryContentService 로깅추가" />
+    <MESSAGE value="BasicChannelService 로깅 추가" />
+    <MESSAGE value="BasicMessageService 로깅 추가" />
+    <option name="LAST_COMMIT_MESSAGE" value="BasicMessageService 로깅 추가" />
   </component>
 </project>
