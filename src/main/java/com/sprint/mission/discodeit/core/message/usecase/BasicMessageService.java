@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.core.message.usecase;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
+import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
+import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.List;
@@ -29,9 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicMessageService implements MessageService {
 
-  private final UserRepositoryPort userRepository;
-  private final ChannelRepositoryPort channelRepository;
-  private final MessageRepositoryPort messageRepository;
+  private final JpaUserRepository userRepository;
+  private final JpaChannelRepository channelRepository;
+  private final JpaMessageRepository messageRepository;
   private final BinaryContentService binaryContentService;
 
 
@@ -52,7 +52,7 @@ public class BasicMessageService implements MessageService {
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.authorId())
     );
     // 채널이 존재하는 지 확인
-    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
+    Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
@@ -92,10 +92,11 @@ public class BasicMessageService implements MessageService {
 
     //커서값이 없다면, cursor 없이 기존 페이지네이션 방식으로 조회
     if (cursor == null) {
-      messageSlice = messageRepository.findAllByChannelId(channelId, pageable);
+      messageSlice = messageRepository.findAllByChannel_Id(channelId, pageable);
     } else {
       //커서가 존재하면 커서를 통해서 커서 페이지네이션 진행
-      messageSlice = messageRepository.findAllByChannelId(channelId, cursor, pageable);
+      messageSlice = messageRepository.findAllByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(
+          channelId, cursor, pageable);
     }
     //메시지를 반환 dto로 변환하는 작업 진행
     return messageSlice.map(message -> MessageResult.create(message, message.getAuthor()));
@@ -139,7 +140,7 @@ public class BasicMessageService implements MessageService {
         .forEach(binaryContent -> binaryContentService.delete(binaryContent.getId())
         );
     //메시지 삭제
-    messageRepository.delete(messageId);
+    messageRepository.deleteById(messageId);
     log.info("[MessageService] message deleted successfully : id {}", messageId);
   }
 }

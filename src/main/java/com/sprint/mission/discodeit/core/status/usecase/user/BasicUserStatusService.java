@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.status.usecase.user;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
-import com.sprint.mission.discodeit.core.status.port.UserStatusRepositoryPort;
+import com.sprint.mission.discodeit.core.status.repository.JpaUserStatusRepository;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicUserStatusService implements UserStatusService {
 
-  private final UserStatusRepositoryPort userStatusRepository;
+  private final JpaUserStatusRepository userStatusRepository;
 
   /**
    * <h2>유저 상태 생성 메서드</h2>
@@ -34,7 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
   public UserStatus create(CreateUserStatusCommand command) {
     User user = command.user();
     //유저 상태가 이미 존재하면 오류 발생
-    if (userStatusRepository.findByUserId(user.getId()).isPresent()) {
+    if (userStatusRepository.findByUser_Id(user.getId()).isPresent()) {
       log.warn("[UserStatusService] User Status is already Existed : user Id {}", user.getId());
       throw new UserAlreadyExistsException(ErrorCode.USER_STATUS_ALREADY_EXISTS,
           user.getUserStatus().getId());
@@ -86,12 +86,12 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus;
     //dto에 유저 아이디가 존재하면 repo에서 유저 아이디를 바탕으로 유저 상태를 검색
     if (command.userId() != null) {
-      userStatus = userStatusRepository.findByUserId(command.userId()).orElseThrow(
+      userStatus = userStatusRepository.findByUser_Id(command.userId()).orElseThrow(
           () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, command.userId())
       );
       //dto에 유저 상태 아이디가 존재하면 repo에서 유저 상태를 바탕으로 유저 상태를 검색
     } else if (command.userStatusId() != null) {
-      userStatus = userStatusRepository.findByStatusId(command.userStatusId()).orElseThrow(
+      userStatus = userStatusRepository.findById(command.userStatusId()).orElseThrow(
           () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, command.userStatusId())
       );
     } else {
@@ -115,7 +115,7 @@ public class BasicUserStatusService implements UserStatusService {
    */
   @Override
   public boolean isOnline(UUID userId) {
-    UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow(
+    UserStatus status = userStatusRepository.findByUser_Id(userId).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, userId)
     );
     return status.isOnline();
@@ -130,10 +130,10 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional
   public void delete(UUID userId) {
-    UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
+    UserStatus userStatus = userStatusRepository.findByUser_Id(userId).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, userId)
     );
-    userStatusRepository.delete(userStatus.getId());
+    userStatusRepository.deleteById(userStatus.getId());
     log.info("[UserStatusService] User Status deleted : id {}", userStatus.getId());
   }
 

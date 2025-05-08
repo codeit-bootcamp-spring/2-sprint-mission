@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.core.user.usecase;
 
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.usecase.CreateBinaryContentUseCase;
-import com.sprint.mission.discodeit.core.content.usecase.DeleteBinaryContentUseCase;
+import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
@@ -14,7 +13,7 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
@@ -34,11 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicUserService implements UserService {
 
-  private final UserRepositoryPort userRepository;
-
+  private final JpaUserRepository userRepository;
   private final UserStatusService userStatusService;
-  private final CreateBinaryContentUseCase createBinaryContentUseCase;
-  private final DeleteBinaryContentUseCase deleteBinaryContentUseCase;
+  private final BinaryContentService binaryContentService;
+
 
   /**
    * <h2>유저 생성 메서드</h2>
@@ -60,7 +58,7 @@ public class BasicUserService implements UserService {
     //이미지 DTO값이 존재하는 지 확인
     if (binaryContentDTO.isPresent()) {
       //이미지 DTO가 존재하면 BinaryContent를 만드는 메서드 실행
-      profile = createBinaryContentUseCase.create(binaryContentDTO.orElse(null));
+      profile = binaryContentService.create(binaryContentDTO.orElse(null));
     }
 
     //유저 생성 및 저장, 로그 출력
@@ -75,7 +73,7 @@ public class BasicUserService implements UserService {
     user.setUserStatus(userStatus);
 
     //결과물을 DTO로 감싸서 호출
-    return UserResult.create(user, user.getUserStatus().isOnline());
+    return UserResult.create(user, true);
   }
 
   /**
@@ -181,9 +179,9 @@ public class BasicUserService implements UserService {
     //프로필이 있으면 새로 만들어야하기에 기존 이미지를 삭제 진행함
     //업데이트할 이미지가 없는데 기존 프로필이 존재하면 기존 프로필 이미지를 유지함
     if (profile != null && binaryContentDTO.isPresent()) {
-      deleteBinaryContentUseCase.delete(profile.getId());
+      binaryContentService.delete(profile.getId());
     }
-    BinaryContent newProfile = createBinaryContentUseCase.create(binaryContentDTO.orElse(null));
+    BinaryContent newProfile = binaryContentService.create(binaryContentDTO.orElse(null));
 
     //유저 엔티티 내부의 업데이트 메서드를 진행함
     user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
@@ -209,11 +207,11 @@ public class BasicUserService implements UserService {
     //유저 이미지가 존재하면 삭제를 진행함
     //Update와 동일한 방식이나, 업데이트에서는 binaryContent 값이 존재할 경우에만 삭제를 진행함
     Optional.ofNullable(user.getProfile().getId())
-        .ifPresent(deleteBinaryContentUseCase::delete);
+        .ifPresent(binaryContentService::delete);
 
     //유저 상태와 유저를 DB에서 제거
     userStatusService.delete(user.getId());
-    userRepository.delete(user.getId());
+    userRepository.deleteById(user.getId());
 
     log.info("[UserService] User deleted {}", userId);
   }

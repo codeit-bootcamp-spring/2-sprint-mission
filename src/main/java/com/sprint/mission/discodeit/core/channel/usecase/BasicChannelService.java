@@ -4,18 +4,18 @@ package com.sprint.mission.discodeit.core.channel.usecase;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
+import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
+import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
+import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -33,10 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicChannelService implements ChannelService {
 
-  private final UserRepositoryPort userRepository;
-  private final ChannelRepositoryPort channelRepository;
-  private final MessageRepositoryPort messageRepository;
-  private final ReadStatusRepositoryPort readStatusRepository;
+  private final JpaUserRepository userRepository;
+  private final JpaChannelRepository channelRepository;
+  private final JpaMessageRepository messageRepository;
+  private final JpaReadStatusRepository readStatusRepository;
 
   /**
    * <h2>공개 채널 생성</h2>
@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional(readOnly = true)
   public ChannelResult findByChannelId(UUID channelId) {
-    Channel channel = channelRepository.findByChannelId(channelId).orElseThrow(
+    Channel channel = channelRepository.findById(channelId).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
     );
     return toChannelResult(channel);
@@ -114,7 +114,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public List<ChannelResult> findAllByUserId(UUID userId) {
     //읽기 상태를 토대로 채널 목록의 아이디를 전부 가져온다.
-    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
         .map(readStatus -> {
           //유저의 읽기 상태 엔티티에서 채널을 뽑아온다.
           Channel channel = readStatus.getChannel();
@@ -145,7 +145,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public ChannelResult update(UpdateChannelCommand command) {
     //채널이 있는지 없는지 확인한다.
-    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
+    Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
@@ -177,7 +177,7 @@ public class BasicChannelService implements ChannelService {
     //참가 유저 리스트를 저장할 리스트 생성
     List<UserResult> userIdList = new ArrayList<>();
     //읽기 상태 레포지토리에서 읽기 상태 엔티티들을 추출함
-    readStatusRepository.findAllByChannelId(channel.getId())
+    readStatusRepository.findAllByChannel_Id(channel.getId())
         .stream().map(readStatus -> {
           User user = readStatus.getUser();
           //유저 엔티티를 그대로 노출시킬 수 없기에 UserResult로 감싸서 보냄
@@ -199,7 +199,7 @@ public class BasicChannelService implements ChannelService {
    */
   private Instant findLastMessageAt(Channel channel) {
     //메시지 레포지토리에서 채널 아이디를 검색함
-    return messageRepository.findAllByChannelId(channel.getId())
+    return messageRepository.findAllByChannel_Id(channel.getId())
         .stream()
         //메시지 생성 시각을 비교해서 생성시간 최신순 정렬해서 가장 큰 값 = 최신 값만 메시지 한개 추출
         .max(Comparator.comparing(Message::getCreatedAt).reversed())
@@ -218,24 +218,24 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public void delete(UUID channelId) {
-    channelRepository.delete(channelId);
+    channelRepository.deleteById(channelId);
     deleteAllMessage(channelId);
     deleteAllReadStatus(channelId);
     log.info("Channel deleted {}", channelId);
   }
 
   private void deleteAllMessage(UUID channelId) {
-    List<Message> list = messageRepository.findAllByChannelId(channelId);
+    List<Message> list = messageRepository.findAllByChannel_Id(channelId);
     for (Message message : list) {
-      messageRepository.delete(message.getId());
+      messageRepository.deleteById(message.getId());
       log.info("message deleted {}", message.getId());
     }
   }
 
   private void deleteAllReadStatus(UUID channelId) {
-    List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
+    List<ReadStatus> readStatusList = readStatusRepository.findAllByChannel_Id(channelId);
     for (ReadStatus status : readStatusList) {
-      readStatusRepository.delete(status.getId());
+      readStatusRepository.deleteById(status.getId());
       log.info("Read Status deleted {}", status.getId());
     }
   }

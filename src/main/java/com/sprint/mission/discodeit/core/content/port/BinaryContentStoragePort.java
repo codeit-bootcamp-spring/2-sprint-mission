@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.content.port;
 
-import com.sprint.mission.discodeit.adapter.inbound.content.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.core.content.controller.response.BinaryContentResponse;
 import java.io.InputStream;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;

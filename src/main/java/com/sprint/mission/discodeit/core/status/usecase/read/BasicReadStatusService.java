@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.core.status.usecase.read;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
-import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
+import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
+import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicReadStatusService implements ReadStatusService {
 
-  private final UserRepositoryPort userRepository;
-  private final ReadStatusRepositoryPort readStatusRepository;
-  private final ChannelRepositoryPort channelRepository;
+  private final JpaUserRepository userRepository;
+  private final JpaReadStatusRepository readStatusRepository;
+  private final JpaChannelRepository channelRepository;
 
   /**
    * <h2>읽기 상태 생성 메서드</h2>
@@ -44,12 +44,12 @@ public class BasicReadStatusService implements ReadStatusService {
     );
 
     //채널가 있는지 체크
-    Channel channel = channelRepository.findByChannelId(command.channelId()).orElseThrow(
+    Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
     //기존에 이미 생성된 읽기 상태가 존재하는 지 체크, 존재하면 오류 발생
-    if (readStatusRepository.findAllByUserId(command.userId()).stream()
+    if (readStatusRepository.findAllByUser_Id(command.userId()).stream()
         .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channel.getId()))) {
       throw new UserAlreadyExistsException(ErrorCode.READ_STATUS_ALREADY_EXISTS,
           command.channelId());
@@ -93,7 +93,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional(readOnly = true)
   public ReadStatusResult findByUserId(UUID userId) {
-    ReadStatus status = readStatusRepository.findByUserId(userId);
+    ReadStatus status = readStatusRepository.findByUser_Id(userId);
     return ReadStatusResult.create(status);
   }
 
@@ -106,7 +106,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional(readOnly = true)
   public List<ReadStatusResult> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId).stream().map(
+    return readStatusRepository.findAllByUser_Id(userId).stream().map(
         ReadStatusResult::create
     ).toList();
   }
@@ -142,11 +142,11 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public void delete(UUID readStatusId) {
     //읽기 상태가 존재하지 않으면 삭제를 진행하지 않음
-    if (!readStatusRepository.existsId(readStatusId)) {
+    if (!readStatusRepository.existsById(readStatusId)) {
       throw new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId);
     }
     log.info("[ReadStatusService] Read Status deleted : id {}", readStatusId);
-    readStatusRepository.delete(readStatusId);
+    readStatusRepository.deleteById(readStatusId);
   }
 
 }

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.core.content.usecase;
 
-import com.sprint.mission.discodeit.adapter.outbound.content.LocalBinaryContentStorage;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
+import com.sprint.mission.discodeit.core.content.repository.JpaBinaryContentRepository;
+import com.sprint.mission.discodeit.core.content.repository.LocalBinaryContentStorage;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
-  private final BinaryContentMetaRepositoryPort binaryContentMetaRepository;
+  private final JpaBinaryContentRepository binaryContentMetaRepository;
   private final LocalBinaryContentStorage binaryContentStorage;
 
   /**
@@ -73,7 +73,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional(readOnly = true)
   public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentMetaRepository.findAllByIdIn(binaryContentIds);
+    return binaryContentMetaRepository.findAllByIdIn((binaryContentIds));
   }
 
   /**
@@ -85,11 +85,11 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional
   public void delete(UUID binaryId) {
-    if (!binaryContentMetaRepository.existsId(binaryId)) {
+    if (!binaryContentMetaRepository.existsById(binaryId)) {
       log.warn("[BinaryContentService] To Delete Binary Content is failed");
       throw new UserNotFoundException(ErrorCode.FILE_NOT_FOUND, binaryId);
     }
-    binaryContentMetaRepository.delete(binaryId);
+    binaryContentMetaRepository.deleteById(binaryId);
     log.info("[BinaryContentService] Binary Content deleted successfully");
   }
 }
