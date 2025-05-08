@@ -105,17 +105,14 @@ public class BasicUserService implements UserService {
             .filter(otherUser -> !otherUser.getId().equals(user.getId()))
             .isPresent()) {
             log.warn("사용자 수정중 중복된 사용자 이름 발견: newUsername = {}", userUpdateRequest.newUsername());
-            throw new IllegalArgumentException(
-                String.format("User with username %s already exists",
-                    userUpdateRequest.newUsername()));
+            throw UserAlreadyExistsException.forUsername(userUpdateRequest.newUsername());
         }
 
         if (userRepository.findByEmail(userUpdateRequest.newEmail())
             .filter(otherUser -> !otherUser.getId().equals(user.getId()))
             .isPresent()) {
             log.warn("사용자 수정중 중복된 이메일 발견: newEmail = {}", userUpdateRequest.newEmail());
-            throw new IllegalArgumentException(
-                String.format("User with email %s already exists", userUpdateRequest.newEmail()));
+            throw UserAlreadyExistsException.forEmail(userUpdateRequest.newEmail());
         }
 
         BinaryContent binaryContent = null;
