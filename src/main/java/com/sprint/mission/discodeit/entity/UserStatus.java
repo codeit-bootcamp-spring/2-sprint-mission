@@ -60,13 +60,4 @@ public class UserStatus extends BaseUpdatableEntity {
                 id.equals(userStatus.getId()) &&
                 user.getId().equals(userStatus.user.getId());
     }
-
-    @Override
-    public String toString() {
-        return "\nID: " + getId() +
-                "\nUser ID: " + user +
-                "\nLastConnectionTime: " + getLastActiveAt() +
-                "\nUser Status: " + currentUserStatus();
-
-    }
 }

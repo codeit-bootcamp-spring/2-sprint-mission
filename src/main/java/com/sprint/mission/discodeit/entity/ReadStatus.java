@@ -55,13 +55,4 @@ public class ReadStatus extends BaseUpdatableEntity {
                 user.getId().equals(readStatus.user.getId()) &&
                 channel.getId().equals(readStatus.channel.getId());
     }
-
-    @Override
-    public String toString() {
-        return "\nID: " + getId() +
-                "\nUser ID: " + user +
-                "\nChannel ID: " + channel +
-                "\nLast Read Time: " + getLastReadAt();
-    }
-
 }

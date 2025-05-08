@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.service.dto.response.BinaryContentResponseDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -19,6 +21,8 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local", matchIfMissing = true)
 @Repository
 public class LocalBinaryContentStorage implements BinaryContentStorage {
+
+    private static final Logger logger = LoggerFactory.getLogger(LocalBinaryContentStorage.class);
 
     private final Path ROOT;
 
@@ -52,6 +56,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         ) {
             bos.write(bytes);
         } catch (IOException e) {
+            logger.error("[BinaryContentStorage][put] Exception occurred while saving profile image", e);
             throw new RuntimeException(e);
         }
         return id;
@@ -69,6 +74,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public ResponseEntity<Resource> download(BinaryContentResponseDto binaryContentResponse) {
+        logger.debug("[BinaryContentStorage][download] Entity constructed: binaryContentId={}", binaryContentResponse.id());
         Resource resource = new InputStreamResource(get(binaryContentResponse.id()));
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(binaryContentResponse.contentType()))

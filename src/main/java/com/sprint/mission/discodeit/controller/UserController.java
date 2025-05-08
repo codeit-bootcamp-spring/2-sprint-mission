@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,8 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     private final UserService userService;
     private final UserStatusService userStatusService;
 
@@ -44,6 +48,8 @@ public class UserController {
             @RequestPart("userCreateRequest") UserCreateDto userCreateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "User 프로필 이미지") MultipartFile profile
     ) {
+        logger.debug("[User Controller][createUser] Received userCreateRequest: username={}, email={}", userCreateRequest.username(), userCreateRequest.email());
+        logger.debug("[User Controller][createUser] Starting profile upload process: filename:{}, type:{}", profile.getOriginalFilename(), profile.getContentType());
         Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
         if (profile != null && !profile.isEmpty()) {
             try {
@@ -52,12 +58,15 @@ public class UserController {
                         profile.getContentType(),
                         profile.getBytes()
                 ));
+                logger.debug("[User Controller][createUser] BinaryContentCreateDto constructed");
             } catch (IOException e) {
+                logger.error("[User Controller][createUser] Exception occurred while uploading profile image", e);
                 throw new RuntimeException(e);
             }
         }
-
+        logger.debug("[User Controller][createUser] Calling userService.create()");
         UserResponseDto user = userService.create(userCreateRequest, contentCreate);
+        logger.info("[UserController][Create] Created successfully: userId={}", user.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -70,7 +79,10 @@ public class UserController {
             @PathVariable @Parameter(description = "상태를 변경할 User ID") UUID userId,
             @RequestBody UserStatusUpdateDto userStatusUpdateRequest
     ) {
+        logger.debug("[User Controller][updateUserStatusByUserId] Received userStatusUpdateRequest: userId={}", userId);
+        logger.debug("[User Controller][updateUserStatusByUserId] Calling userStatusService.updateByUserId()");
         UserStatusResponseDto updateUserStatusResponse = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
+        logger.info("[User Controller][updateUserStatusByUserId] Updated successfully: userId={}", userId);
         return ResponseEntity.ok(updateUserStatusResponse);
     }
 
@@ -85,6 +97,8 @@ public class UserController {
             @RequestPart("userUpdateRequest") @Valid UserUpdateDto userUpdateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "수정 할 User 프로필 이미지") MultipartFile profile
     ) {
+        logger.debug("[User Controller][updateUser] Received userUpdateRequest: userId={}", userId);
+        logger.debug("[User Controller][updateUser] Starting profile upload process: filename={}, type={}", profile.getOriginalFilename(), profile.getContentType());
         Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
         if (profile != null && !profile.isEmpty()) {
             try {
@@ -93,11 +107,15 @@ public class UserController {
                         profile.getContentType(),
                         profile.getBytes()
                 ));
+                logger.debug("[User Controller][updateUser] BinaryContentCreateDto constructed");
             } catch (IOException e) {
+                logger.error("[User Controller][updateUser] Exception occurred while uploading profile image", e);
                 throw new RuntimeException(e);
             }
         }
+        logger.debug("[User Controller][updateUser] Calling userService.update()");
         UserResponseDto user = userService.update(userId, userUpdateRequest, contentCreate);
+        logger.info("[User Controller][updateUser] Updated successfully: userId={}", userId);
         return ResponseEntity.ok(user);
     }
 
@@ -109,7 +127,10 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(
             @PathVariable @Parameter(description = "삭제 할 User ID") UUID userId
     ) {
+        logger.debug("[User Controller][deleteUser] Received delete request: userId={}", userId);
+        logger.debug("[User Controller][deleteUser] Calling userService.delete()");
         userService.delete(userId);
+        logger.info("[User Controller][deleteUser] Deleted successfully: userId={}", userId);
         return ResponseEntity.noContent().build();
     }
 

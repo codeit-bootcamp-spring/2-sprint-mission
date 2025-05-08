@@ -60,14 +60,4 @@ public class User extends BaseUpdatableEntity {
         }
         return false;
     }
-
-    @Override
-    public String toString() {
-        return "\nName: " + username + "\nMail: " + email + "\nPassword: " + password +
-                "\nUser ID: " + this.getId() +
-                "\nProfile ID: " + profile +
-                "\nCreatedAt: " + this.getCreatedAt() +
-                "\nUpdatedAt: " + this.getUpdatedAt();
-
-    }
 }

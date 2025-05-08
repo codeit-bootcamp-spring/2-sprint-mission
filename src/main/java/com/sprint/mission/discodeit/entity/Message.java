@@ -57,14 +57,4 @@ public class Message extends BaseUpdatableEntity {
                 getId().equals(message.getId()) &&
                 channel.getId().equals(message.channel.getId());
     }
-
-    @Override
-    public String toString() {
-        return "\nMessage ID: " + this.getId() +
-                "\nchannelID: " + channel + "\nSenderID: " + author + "\nMessage: " + content +
-                "\nAttachments ID: " + attachments +
-                "\nCreatedAt: " + this.getCreatedAt() +
-                "\nUpdatedAt: " + this.getUpdatedAt() +
-                "\nUUID: " + this.getId();
-    }
 }
