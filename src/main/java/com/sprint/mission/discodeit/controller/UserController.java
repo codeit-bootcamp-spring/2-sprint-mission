@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class UserController {
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<UserDto> createUser(
-      @RequestPart("userCreateRequest") CreateUserRequest request,
+      @Valid @RequestPart("userCreateRequest") CreateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     UserDto user = authService.register(request);
@@ -59,7 +60,7 @@ public class UserController {
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
   public ResponseEntity<UserDto> update(
-      @RequestPart("userUpdateRequest") UpdateUserRequest request,
+      @Valid @RequestPart("userUpdateRequest") UpdateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
       @PathVariable("userId") UUID userId
   ) {
