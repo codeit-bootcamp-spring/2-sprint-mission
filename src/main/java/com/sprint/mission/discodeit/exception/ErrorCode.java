@@ -8,6 +8,7 @@ public enum ErrorCode {
 
   // USER
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User Not Found"),
+  USERNAME_NOT_FOUND(HttpStatus.NOT_FOUND, "Username Not Found"),
   DUPLICATE_USER(HttpStatus.CONFLICT, "Duplicate User"),
   EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "Email Already Exists"),
   USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "Username Already Exists"),
