@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.auth.LoginResponse;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserWrongPasswordException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -17,20 +19,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-  private final UserRepository userRepository;
-  private final UserMapper userMapper;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-  @Override
-  @Transactional(readOnly = true)
-  public UserDto login(LoginRequest loginRequest) {
-    User user = userRepository.findByUsername(loginRequest.username())
-        .orElseThrow(() -> new NoSuchElementException(
-            String.format("User with username %s not found", loginRequest.username())));
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto login(LoginRequest loginRequest) {
+        User user = userRepository.findByUsername(loginRequest.username())
+            .orElseThrow(() -> UserNotFoundException.forUsername(loginRequest.username()));
 
-    if (!user.getPassword().equals(loginRequest.password())) {
-      throw new IllegalArgumentException("Wrong password");
+        if (!user.getPassword().equals(loginRequest.password())) {
+            throw new UserWrongPasswordException();
+        }
+
+        return userMapper.toDto(user);
     }
-
-    return userMapper.toDto(user);
-  }
 }

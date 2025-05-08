@@ -12,4 +12,8 @@ public class UserNotFoundException extends UserException {
     public static UserNotFoundException forId(String userId) {
         return new UserNotFoundException(Map.of("userId", userId));
     }
+
+    public static UserNotFoundException forUsername(String username) {
+        return new UserNotFoundException(Map.of("username", username));
+    }
 }

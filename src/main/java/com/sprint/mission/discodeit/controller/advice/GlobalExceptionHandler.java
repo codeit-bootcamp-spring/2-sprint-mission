@@ -42,6 +42,7 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND;
             case DUPLICATE_USER -> HttpStatus.CONFLICT;
             case PRIVATE_CHANNEL_UPDATE -> HttpStatus.BAD_REQUEST;
+            case WRONG_PASSWORD -> HttpStatus.UNAUTHORIZED;
 
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };
