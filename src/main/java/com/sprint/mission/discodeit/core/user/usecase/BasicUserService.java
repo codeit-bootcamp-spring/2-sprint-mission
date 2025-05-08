@@ -118,17 +118,20 @@ public class BasicUserService implements UserService {
             () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.requestUserId()));
 
     BinaryContent profile = user.getProfile();
-
     if (profile != null && binaryContentDTO.isPresent()) {
       binaryContentService.delete(profile.getId());
     }
     BinaryContent newProfile = binaryContentService.create(binaryContentDTO.orElse(null));
 
-    user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
+    user.update(command.newName(), command.newEmail(), command.newPassword(),
+        newProfile);
+    userRepository.save(user);
+
     log.info("[UserService] User Updated: username {}, email {}, password {}", user.getName(),
         user.getEmail(),
         user.getPassword());
-    return UserResult.create(user, user.getUserStatus().isOnline());
+    boolean online = user.getUserStatus().isOnline();
+    return UserResult.create(user, online);
   }
 
 

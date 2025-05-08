@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,7 +19,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 @Entity
 public class User extends BaseUpdatableEntity {
@@ -54,17 +55,14 @@ public class User extends BaseUpdatableEntity {
   public void update(String newUserName, String newEmail, String newPassword,
       BinaryContent newProfile) {
     if (newUserName != null && !newUserName.equals(this.name)) {
-      //정규패턴 적용할 때 유효성 검증 목적으로 사용
       Validator.validateName(newUserName);
       this.name = newUserName;
     }
     if (newEmail != null && !newEmail.equals(this.email)) {
-      //정규패턴 적용할 때 유효성 검증 목적으로 사용
       Validator.validateEmail(newEmail);
       this.email = newEmail;
     }
     if (newPassword != null && !newPassword.equals(this.password)) {
-      //정규패턴 적용할 때 유효성 검증 목적으로 사용
       Validator.validatePassword(newPassword);
       this.password = newPassword;
     }
