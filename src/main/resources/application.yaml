@@ -20,10 +20,33 @@ discodeit:
       max-request-size: 10MB
 
 management:
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
   endpoints:
     web:
       exposure:
         include: "*"
-      base-path: /management
+      base-path: /actuator
     health:
       show-details: always
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java-version: 17
+  datasource:
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
+  jpa:
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  storage:
+    type: ${discodeit.storage.type}
+    path: ${discodeit.storage.local.root-path}
+  multipart:
+    max-file-size: ${discodeit.servlet.multipart.max-file-size}
+    max-request-size: ${discodeit.servlet.multipart.max-request-size}
