@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.core.message.usecase;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.usecase.CreateBinaryContentUseCase;
-import com.sprint.mission.discodeit.core.content.usecase.DeleteBinaryContentUseCase;
+import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
@@ -12,15 +11,14 @@ import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageComman
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -28,16 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicMessageService implements MessageService {
-
-  private static final Logger logger = LoggerFactory.getLogger(BasicMessageService.class);
 
   private final UserRepositoryPort userRepository;
   private final ChannelRepositoryPort channelRepository;
   private final MessageRepositoryPort messageRepository;
+  private final BinaryContentService binaryContentService;
 
-  private final CreateBinaryContentUseCase createBinaryContentUseCase;
-  private final DeleteBinaryContentUseCase deleteBinaryContentUseCase;
 
   /**
    * <h2>메시지 생성 메서드</h2>
@@ -62,7 +58,7 @@ public class BasicMessageService implements MessageService {
 
     //첨부파일을 각각 조회해서 생성한 뒤 리스트로 변환
     List<BinaryContent> binaryContentIdList = binaryContentCommands.stream().map(
-            createBinaryContentUseCase::create)
+            binaryContentService::create)
         .toList();
 
     //메시지 생성하기
@@ -71,19 +67,13 @@ public class BasicMessageService implements MessageService {
 
     Message save = messageRepository.save(message);
 
-    logger.info(
-        "Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachments {}",
+    log.info(
+        "[MessageService] Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachments {}",
         message.getId(), channel.getId(), user.getId(), message.getContent(),
         message.getAttachment());
 
     return MessageResult.create(save, user);
   }
-
-//  @Override
-//  public MessageResult find(UUID messageId, Pageable pageable) {
-//    Slice<Message> messages = messageRepository.findById(messageId, pageable);
-//    return MessageResult.create(message, message.getAuthor());
-//  }
 
   /**
    * <h2>메시지 검색 메서드</h2>
@@ -126,6 +116,8 @@ public class BasicMessageService implements MessageService {
             () -> new UserNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, command.messageId()));
 
     message.update(command.newText());
+    log.info("[MessageService] Message Updated: Message Id {}, New Text {}", command.messageId(),
+        command.newText());
     return MessageResult.create(message, message.getAuthor());
   }
 
@@ -144,9 +136,10 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, messageId));
     //메시지 내 첨부파일들 삭제
     message.getAttachment()
-        .forEach(binaryContent -> deleteBinaryContentUseCase.delete(binaryContent.getId())
+        .forEach(binaryContent -> binaryContentService.delete(binaryContent.getId())
         );
     //메시지 삭제
     messageRepository.delete(messageId);
+    log.info("[MessageService] message deleted successfully : id {}", messageId);
   }
 }

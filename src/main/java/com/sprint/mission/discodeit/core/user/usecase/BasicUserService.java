@@ -11,30 +11,28 @@ import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatu
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
-import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
-
-  private static final Logger logger = LoggerFactory.getLogger(BasicUserService.class);
 
   private final UserRepositoryPort userRepository;
 
@@ -68,13 +66,11 @@ public class BasicUserService implements UserService {
     //유저 생성 및 저장, 로그 출력
     User user = User.create(command.username(), command.email(), command.password(), profile);
     userRepository.save(user);
-    logger.info("User registered: {}", user.getId());
+    log.info("[UserService] User registered: {}", user.getId());
 
     //유저 상태를 생성하기 위해 userStatusService를 호출
     CreateUserStatusCommand statusCommand = new CreateUserStatusCommand(user, Instant.now());
     UserStatus userStatus = userStatusService.create(statusCommand);
-
-    logger.info("User Status created: {}", userStatus.getId());
 
     user.setUserStatus(userStatus);
 
@@ -105,7 +101,8 @@ public class BasicUserService implements UserService {
     //로그인한 시점에 유저 상태의 정보를 업데이트해야함
     user.getUserStatus().updateTime(Instant.now());
 
-    logger.info("User login: id {}, username {}, password  {}", user.getId(), user.getName(),
+    log.info("[UserService] User login: id {}, username {}, password  {}", user.getId(),
+        user.getName(),
         user.getPassword());
 
     return UserResult.create(user, user.getUserStatus().isOnline());
@@ -190,7 +187,8 @@ public class BasicUserService implements UserService {
 
     //유저 엔티티 내부의 업데이트 메서드를 진행함
     user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
-    logger.info("User Updated: username {}, email {}, password {}", user.getName(), user.getEmail(),
+    log.info("[UserService] User Updated: username {}, email {}, password {}", user.getName(),
+        user.getEmail(),
         user.getPassword());
     return UserResult.create(user, user.getUserStatus().isOnline());
   }
@@ -217,7 +215,7 @@ public class BasicUserService implements UserService {
     userStatusService.delete(user.getId());
     userRepository.delete(user.getId());
 
-    logger.info("User deleted {}", userId);
+    log.info("[UserService] User deleted {}", userId);
   }
 
   @Override

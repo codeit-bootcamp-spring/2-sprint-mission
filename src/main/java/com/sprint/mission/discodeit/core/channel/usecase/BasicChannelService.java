@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.core.channel.usecase;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.port.ChannelRepositoryPort;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
@@ -13,27 +14,24 @@ import com.sprint.mission.discodeit.core.message.port.MessageRepositoryPort;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.port.ReadStatusRepositoryPort;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicChannelService implements ChannelService {
-
-  private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
 
   private final UserRepositoryPort userRepository;
   private final ChannelRepositoryPort channelRepository;
@@ -54,7 +52,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
     channelRepository.save(channel);
-    logger.info("Public Channel created {}", channel.getId());
+    log.info("Public Channel created {}", channel.getId());
     return toChannelResult(channel);
   }
 
@@ -84,7 +82,7 @@ public class BasicChannelService implements ChannelService {
         })
         .forEach(readStatusRepository::save);
 
-    logger.info("Private Channel created {}", channel.getId());
+    log.info("Private Channel created {}", channel.getId());
     //반환 DTO 제작을 위한 메서드 실행
     return toChannelResult(channel);
   }
@@ -153,13 +151,13 @@ public class BasicChannelService implements ChannelService {
 
     //만약 채널이 private 이면 수정할 수 없기에 오류 발생
     if (channel.getType() == ChannelType.PRIVATE) {
-      new ChannelUnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR, channel.getId());
+      throw new ChannelUnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR, channel.getId());
     }
 
     //채널 업데이트 시작
     channel.update(command.newName(), command.newDescription());
 
-    logger.info("Channel Updated: username {}, newDescription {}", channel.getName(),
+    log.info("Channel Updated: username {}, newDescription {}", channel.getName(),
         channel.getDescription());
     return toChannelResult(channel);
   }
@@ -223,14 +221,14 @@ public class BasicChannelService implements ChannelService {
     channelRepository.delete(channelId);
     deleteAllMessage(channelId);
     deleteAllReadStatus(channelId);
-    logger.info("Channel deleted {}", channelId);
+    log.info("Channel deleted {}", channelId);
   }
 
   private void deleteAllMessage(UUID channelId) {
     List<Message> list = messageRepository.findAllByChannelId(channelId);
     for (Message message : list) {
       messageRepository.delete(message.getId());
-      logger.info("message deleted {}", message.getId());
+      log.info("message deleted {}", message.getId());
     }
   }
 
@@ -238,7 +236,7 @@ public class BasicChannelService implements ChannelService {
     List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
     for (ReadStatus status : readStatusList) {
       readStatusRepository.delete(status.getId());
-      logger.info("Read Status deleted {}", status.getId());
+      log.info("Read Status deleted {}", status.getId());
     }
   }
 }

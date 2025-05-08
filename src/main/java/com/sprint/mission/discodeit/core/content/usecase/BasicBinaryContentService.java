@@ -4,21 +4,19 @@ import com.sprint.mission.discodeit.adapter.outbound.content.LocalBinaryContentS
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentMetaRepositoryPort;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
-
-  private static final Logger logger = LoggerFactory.getLogger(BasicBinaryContentService.class);
 
   private final BinaryContentMetaRepositoryPort binaryContentMetaRepository;
   private final LocalBinaryContentStorage binaryContentStorage;
@@ -43,9 +41,10 @@ public class BasicBinaryContentService implements BinaryContentService {
       binaryContentMetaRepository.save(binaryContent);
       //byte를 로컬 storage에 저장시킴
       binaryContentStorage.put(binaryContent.getId(), command.bytes());
-      logger.info("Binary Content Created: {}", binaryContent.getId());
+      log.info("[BinaryContentService] Binary Content Created: {}", binaryContent.getId());
       return binaryContent;
     }
+    log.warn("[BinaryContentService] Parameter is empty");
     return null;
   }
 
@@ -87,8 +86,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   public void delete(UUID binaryId) {
     if (!binaryContentMetaRepository.existsId(binaryId)) {
+      log.warn("[BinaryContentService] To Delete Binary Content is failed");
       throw new UserNotFoundException(ErrorCode.FILE_NOT_FOUND, binaryId);
     }
     binaryContentMetaRepository.delete(binaryId);
+    log.info("[BinaryContentService] Binary Content deleted successfully");
   }
 }

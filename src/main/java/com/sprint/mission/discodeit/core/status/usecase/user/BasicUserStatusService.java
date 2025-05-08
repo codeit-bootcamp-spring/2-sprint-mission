@@ -6,21 +6,19 @@ import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatu
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.UserException;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserStatusService implements UserStatusService {
-
-  private final Logger logger = LoggerFactory.getLogger(BasicUserStatusService.class);
 
   private final UserStatusRepositoryPort userStatusRepository;
 
@@ -37,6 +35,7 @@ public class BasicUserStatusService implements UserStatusService {
     User user = command.user();
     //유저 상태가 이미 존재하면 오류 발생
     if (userStatusRepository.findByUserId(user.getId()).isPresent()) {
+      log.warn("[UserStatusService] User Status is already Existed : user Id {}", user.getId());
       throw new UserAlreadyExistsException(ErrorCode.USER_STATUS_ALREADY_EXISTS,
           user.getUserStatus().getId());
     }
@@ -44,7 +43,8 @@ public class BasicUserStatusService implements UserStatusService {
     //유저 상태가 존재하지 않으면 진행
     UserStatus userStatus = UserStatus.create(user, command.lastActiveAt());
     userStatusRepository.save(userStatus);
-    logger.info("User Status created : id {}, user id {}, last Active At {}", userStatus.getId(),
+    log.info("[UserStatusService] User Status created : id {}, user id {}, last Active At {}",
+        userStatus.getId(),
         user.getId(), userStatus.getLastActiveAt());
 
     return userStatus;
@@ -95,11 +95,13 @@ public class BasicUserStatusService implements UserStatusService {
           () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, command.userStatusId())
       );
     } else {
+      log.warn("[UserStatusService] Bad Request");
       throw new UserException(ErrorCode.USER_NOT_FOUND);
     }
     //업데이트 진행
     userStatus.update(command.newLastActiveAt());
-    logger.info("User Status update : id {}, last Active At {}", userStatus.getId(),
+    log.info("[UserStatusService] User Status updated : id {}, last Active At {}",
+        userStatus.getId(),
         userStatus.getLastActiveAt());
     return userStatus;
   }
@@ -131,8 +133,8 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, userId)
     );
-    logger.info("User Status delete : id {}", userStatus.getId());
     userStatusRepository.delete(userStatus.getId());
+    log.info("[UserStatusService] User Status deleted : id {}", userStatus.getId());
   }
 
 }

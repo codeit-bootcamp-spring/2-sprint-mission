@@ -8,24 +8,21 @@ import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatu
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.core.user.port.UserRepositoryPort;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicReadStatusService implements ReadStatusService {
-
-  private final Logger logger = LoggerFactory.getLogger(BasicReadStatusService.class);
-
 
   private final UserRepositoryPort userRepository;
   private final ReadStatusRepositoryPort readStatusRepository;
@@ -62,7 +59,8 @@ public class BasicReadStatusService implements ReadStatusService {
     ReadStatus status = ReadStatus.create(user, channel,
         command.lastReadAt());
     readStatusRepository.save(status);
-    logger.info("ReadStatus Created: id: {}, user id: {}, channel id: {}, last Read At : {} ",
+    log.info(
+        "[ReadStatusService] ReadStatus Created: id: {}, user id: {}, channel id: {}, last Read At : {} ",
         status.getId(), user.getId(), channel.getId(), status.getLastReadAt());
 
     //직접 컨트롤러단과 연결하기에 result로 감싸서 반환
@@ -129,7 +127,7 @@ public class BasicReadStatusService implements ReadStatusService {
     );
     status.update(command.newLastReadAt());
 
-    logger.info("Read Status update : id {}, last Read At {}", status.getId(),
+    log.info("[ReadStatusService] Read Status updated : id {}, last Read At {}", status.getId(),
         status.getLastReadAt());
     return ReadStatusResult.create(status);
   }
@@ -147,7 +145,7 @@ public class BasicReadStatusService implements ReadStatusService {
     if (!readStatusRepository.existsId(readStatusId)) {
       throw new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId);
     }
-    logger.info("Read Status delete : id {}", readStatusId);
+    log.info("[ReadStatusService] Read Status deleted : id {}", readStatusId);
     readStatusRepository.delete(readStatusId);
   }
 

@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
+@Slf4j
 public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
   private final BinaryContentMetaRepositoryPort binaryContentRepository;
@@ -51,8 +53,10 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
   private void init() {
     if (Files.notExists(storagePath)) {
       try {
+        log.info("[LocalBinaryContentStorage] Directories created");
         Files.createDirectories(storagePath);
       } catch (IOException e) {
+        log.warn("[LocalBinaryContentStorage] To create Directories is failed");
         throw new DiscodeitException(ErrorCode.INTERNAL_SERVER_ERROR);
       }
     }
@@ -92,7 +96,9 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
     try (OutputStream outputStream = Files.newOutputStream(destination)) {
       //bytes를 작성한다.
       outputStream.write(bytes);
+      log.info("[LocalBinaryContentStorage] Image uploaded successfully : {}", id);
     } catch (IOException e) {
+      log.warn("[LocalBinaryContentStorage] To Upload Image is failed : {}", id);
       throw new RuntimeException();
     }
     return id;
@@ -136,7 +142,7 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
         "attachments; filename=\"" + binaryContentResponse.fileName() + "\"");
     headers.setContentType(MediaType.parseMediaType(binaryContentResponse.contentType()));
     headers.setContentLength(binaryContentResponse.size());
-
+    log.info("[LocalBinaryContentStorage] Image Download successfully");
     return ResponseEntity.ok().headers(headers).body(resource);
   }
 }
