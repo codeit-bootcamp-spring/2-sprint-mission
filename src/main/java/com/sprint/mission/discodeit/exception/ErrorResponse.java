@@ -21,6 +21,17 @@ public class ErrorResponse {
     this.status = status;
   }
 
+  public ErrorResponse(Instant timestamp, String code, String message, Map<String, Object> details,
+      String exceptionType, int status) {
+    this.timestamp = timestamp;
+    this.code = code;
+    this.message = message;
+    this.details = details;
+    this.exceptionType = exceptionType;
+    this.status = status;
+
+  }
+
   // Getter methods (생략 가능 - 필요 시 Lombok @Getter 사용 가능)
   public Instant getTimestamp() {
     return timestamp;
