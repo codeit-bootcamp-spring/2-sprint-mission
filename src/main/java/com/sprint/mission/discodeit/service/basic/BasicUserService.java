@@ -3,8 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exceptions.InvalidInputException;
-import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.exceptions.ErrorCode;
+import com.sprint.mission.discodeit.exceptions.user.DuplicateUserOrEmailException;
+import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +43,7 @@ public class BasicUserService implements UserService {
 
         if (userJpaRepository.existsByUsernameOrEmail(userCreateDto.username(), userCreateDto.email())) {
             logger.warn("[User][create] Username or email already exists: username={}, email={}", userCreateDto.username(), userCreateDto.email());
-            throw new InvalidInputException("Username or email already exists");
+            throw new DuplicateUserOrEmailException(Instant.now(), ErrorCode.DUPLICATE_USER_OR_EMAIL, Map.of("userName", userCreateDto.username(), "email", userCreateDto.email()));
         }
 
         BinaryContent nullableProfile = mapProfile(optionalBinaryContentCreateDto);
@@ -64,7 +62,7 @@ public class BasicUserService implements UserService {
     @Transactional(readOnly = true)
     public UserResponseDto find(UUID userId) {
         User matchingUser = userJpaRepository.findByIdWithProfile(userId)
-                .orElseThrow(() -> new NotFoundException("User does not exist."));
+                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
         return responseMapStruct.toUserDto(matchingUser);
     }
 
@@ -78,7 +76,7 @@ public class BasicUserService implements UserService {
                 .forEach(userAllList::add);
         if (userAllList.isEmpty()) {
             logger.warn("[User][findAllUser] User list is empty.");
-            throw new NotFoundException("User list is empty.");
+            throw new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", List.of()));
         }
         return userAllList;
     }
@@ -89,7 +87,7 @@ public class BasicUserService implements UserService {
     public UserResponseDto update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
         logger.debug("[User][update] Calling userJpaRepository.findById(): userId={}", userId);
         User matchingUser = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User does not exist."));
+                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
 
         BinaryContent nullableProfile = mapProfile(optionalBinaryContentCreateDto);
 
@@ -112,7 +110,7 @@ public class BasicUserService implements UserService {
     public void delete(UUID userId) {
         logger.debug("[User][delete] Calling userJpaRepository.findById(): userId={}", userId);
         User matchingUser = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User does not exist."));
+                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
 
         logger.debug("[User][delete] Calling userJpaRepository.delete(): userId={}", userId);
         userJpaRepository.delete(matchingUser);

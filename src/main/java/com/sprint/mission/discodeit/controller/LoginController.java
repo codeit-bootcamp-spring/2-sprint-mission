@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class LoginController {
     @ApiResponse(responseCode = "401", description = "사용자를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "User not found")))
     @ApiResponse(responseCode = "401", description = "비밀번호가 일치하지 않음", content = @Content(examples = @ExampleObject(value = "Password does not match")))
     public ResponseEntity<User> postLogin(
-            @RequestBody AuthServiceLoginDto authServiceLoginDto
+            @Valid @RequestBody AuthServiceLoginDto authServiceLoginDto
     ) {
         User loginResponse = authService.login(authServiceLoginDto);
         return ResponseEntity.ok(loginResponse);

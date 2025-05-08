@@ -4,7 +4,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.exceptions.ErrorCode;
+import com.sprint.mission.discodeit.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exceptions.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.PageMapper;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
@@ -31,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -48,16 +52,17 @@ public class BasicMessageService implements MessageService {
     private final PageMapper pageMapper;
     private final ResponseMapStruct responseMapStruct;
 
+
     @Override
     @Transactional
     public MessageResponseDto create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtoList) {
         logger.debug("[Message][create] Calling userJpaRepository.findById(): authorId={}", messageCreateDto.authorId());
         User matchingUser = userJpaRepository.findById(messageCreateDto.authorId())
-                .orElseThrow(() -> new NotFoundException("User not found."));
+                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("authorId", messageCreateDto.authorId())));
 
         logger.debug("[Message][create] Calling channelJpaRepository.findById(): channelId={}", messageCreateDto.channelId());
         Channel matchingChannel = channelJpaRepository.findById(messageCreateDto.channelId())
-                .orElseThrow(() -> new NotFoundException("Channel not found."));
+                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", messageCreateDto.channelId())));
 
         List<BinaryContent> attachments = binaryContentCreateDtoList.stream()
                 .map(profileRequest -> {
@@ -89,7 +94,7 @@ public class BasicMessageService implements MessageService {
                 .findByIdEntityGraph(messageId, pageRequestSortByCreatedAt(page, size))
                 .map(responseMapStruct::toMessageDto);
         if (matchingMessage.isEmpty()) {
-            throw new NotFoundException("Message not found.");
+            throw new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId));
         }
         return pageMapper.fromPage(matchingMessage);
     }
@@ -110,7 +115,7 @@ public class BasicMessageService implements MessageService {
     public MessageResponseDto update(UUID messageId, MessageUpdateDto messageUpdateDto) {
         logger.debug("[Message][update] Calling messageJpaRepository.findById(): messageId={}", messageId);
         Message matchingMessage = messageJpaRepository.findById(messageId)
-                .orElseThrow(() -> new NotFoundException("Message does not exist."));
+                .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
 
         logger.debug("[Message][update] Calling updateChannel(): messageId={}", messageId);
         matchingMessage.updateMessage(messageUpdateDto.newContent());
@@ -126,7 +131,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID messageId) {
         logger.debug("[Message][delete] Calling messageJpaRepository.findById(): messageId={}", messageId);
         Message matchingMessage = messageJpaRepository.findById(messageId)
-                .orElseThrow(() -> new NotFoundException("Message does not exist."));
+                .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
 
         logger.debug("[Message][delete] Calling matchingMessage.getAttachments()");
         matchingMessage.getAttachments().stream()

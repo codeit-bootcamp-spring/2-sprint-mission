@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
@@ -21,13 +22,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Tag(name = "User", description = "User API")
 @RestController
@@ -44,26 +44,13 @@ public class UserController {
     @Operation(summary = "User 등록")
     @ApiResponse(responseCode = "201", description = "user가 성공적으로 생성됨")
     @ApiResponse(responseCode = "400", description = "같은 email 또는 username을 사용하는 User가 이미 존재함", content = @Content(examples = @ExampleObject(value = "User already exists or Email already exists")))
-    public ResponseEntity<UserResponseDto> createUser(
-            @RequestPart("userCreateRequest") UserCreateDto userCreateRequest,
+    public ResponseEntity<?> createUser(
+            @RequestPart("userCreateRequest") @Valid UserCreateDto userCreateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "User 프로필 이미지") MultipartFile profile
     ) {
+
         logger.debug("[User Controller][createUser] Received userCreateRequest: username={}, email={}", userCreateRequest.username(), userCreateRequest.email());
-        logger.debug("[User Controller][createUser] Starting profile upload process: filename:{}, type:{}", profile.getOriginalFilename(), profile.getContentType());
-        Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
-        if (profile != null && !profile.isEmpty()) {
-            try {
-                contentCreate = Optional.of(new BinaryContentCreateDto(
-                        profile.getOriginalFilename(),
-                        profile.getContentType(),
-                        profile.getBytes()
-                ));
-                logger.debug("[User Controller][createUser] BinaryContentCreateDto constructed");
-            } catch (IOException e) {
-                logger.error("[User Controller][createUser] Exception occurred while uploading profile image", e);
-                throw new RuntimeException(e);
-            }
-        }
+        Optional<BinaryContentCreateDto> contentCreate = toBinaryContent(profile);
         logger.debug("[User Controller][createUser] Calling userService.create()");
         UserResponseDto user = userService.create(userCreateRequest, contentCreate);
         logger.info("[UserController][Create] Created successfully: userId={}", user.id());
@@ -92,27 +79,14 @@ public class UserController {
     @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "User does not exist")))
     @ApiResponse(responseCode = "400", description = "같은 email 또는 username을 사용하는 User가 이미 존재함", content = @Content(examples = @ExampleObject(value = "User or Email already exists")))
     @ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
-    public ResponseEntity<UserResponseDto> updateUser(
+    public ResponseEntity<?> updateUser(
             @PathVariable @Parameter(description = "수정 할 User ID") UUID userId,
             @RequestPart("userUpdateRequest") @Valid UserUpdateDto userUpdateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "수정 할 User 프로필 이미지") MultipartFile profile
     ) {
+
         logger.debug("[User Controller][updateUser] Received userUpdateRequest: userId={}", userId);
-        logger.debug("[User Controller][updateUser] Starting profile upload process: filename={}, type={}", profile.getOriginalFilename(), profile.getContentType());
-        Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
-        if (profile != null && !profile.isEmpty()) {
-            try {
-                contentCreate = Optional.of(new BinaryContentCreateDto(
-                        profile.getOriginalFilename(),
-                        profile.getContentType(),
-                        profile.getBytes()
-                ));
-                logger.debug("[User Controller][updateUser] BinaryContentCreateDto constructed");
-            } catch (IOException e) {
-                logger.error("[User Controller][updateUser] Exception occurred while uploading profile image", e);
-                throw new RuntimeException(e);
-            }
-        }
+        Optional<BinaryContentCreateDto> contentCreate = toBinaryContent(profile);
         logger.debug("[User Controller][updateUser] Calling userService.update()");
         UserResponseDto user = userService.update(userId, userUpdateRequest, contentCreate);
         logger.info("[User Controller][updateUser] Updated successfully: userId={}", userId);
@@ -152,4 +126,24 @@ public class UserController {
         return ResponseEntity.ok(userFindAllResponse);
     }
 
+
+    // profile -> BinaryContent 변환
+    private Optional<BinaryContentCreateDto> toBinaryContent(MultipartFile profile) {
+        Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
+        if (profile != null && !profile.isEmpty()) {
+            logger.debug("[User Controller][createUser] Starting profile upload process: filename:{}, type:{}", profile.getOriginalFilename(), profile.getContentType());
+            try {
+                contentCreate = Optional.of(new BinaryContentCreateDto(
+                        profile.getOriginalFilename(),
+                        profile.getContentType(),
+                        profile.getBytes()
+                ));
+                logger.debug("[User Controller][createUser] BinaryContentCreateDto constructed");
+            } catch (IOException e) {
+                logger.error("[User Controller][createUser] Exception occurred while uploading profile image", e);
+                throw new RuntimeException(e);
+            }
+        }
+        return contentCreate;
+    }
 }

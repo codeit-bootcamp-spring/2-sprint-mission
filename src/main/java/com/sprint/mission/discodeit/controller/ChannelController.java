@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class ChannelController {
     @Operation(summary = "Public Channel 생성")
     @ApiResponse(responseCode = "201", description = "Public Channel 이 성공적으로 생성됨")
     public ResponseEntity<ChannelResponseDto> createPublicChannel(
-            @RequestBody ChannelCreatePublicDto channelCreateRequest
+            @Valid @RequestBody ChannelCreatePublicDto channelCreateRequest
     ) {
         logger.debug("[Channel Controller][createPublicChannel] Received channelCreateRequest_public");
         logger.debug("[Channel Controller][createPublicChannel] Calling channelService.createPublic()");
@@ -51,7 +52,7 @@ public class ChannelController {
     @ApiResponse(responseCode = "200", description = "Private Channel 이 성공적으로 생성됨")
     @ApiResponse(responseCode = "400", description = "Private Channel 이 생성되지 않음", content = @Content(examples = @ExampleObject(value = "User does not exist")))
     public ResponseEntity<ChannelResponseDto> createPrivateChannel(
-            @RequestBody ChannelCreatePrivateDto channelCreateRequest
+            @Valid @RequestBody ChannelCreatePrivateDto channelCreateRequest
     ) {
         logger.debug("[Channel Controller][createPrivateChannel] Received channelCreateRequest_private");
         logger.debug("[Channel Controller][createPrivateChannel] Calling channelService.createPrivate()");
@@ -68,7 +69,7 @@ public class ChannelController {
     @ApiResponse(responseCode = "200", description = "Channel 정보가 성공적으로 수정됨")
     public ResponseEntity<ChannelResponseDto> updateChannel(
             @PathVariable @Parameter(description = "수정 할 Channel ID") UUID channelId,
-            @RequestBody ChannelUpdateDto channelUpdateRequest
+            @Valid @RequestBody ChannelUpdateDto channelUpdateRequest
     ) {
         logger.debug("[Channel Controller][updateChannel] Received channelUpdateRequest: channelId={}", channelId);
         logger.debug("[Channel Controller][updateChannel] Calling channelService.update()");

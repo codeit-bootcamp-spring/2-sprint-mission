@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,7 @@ public class MessageController {
     @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "User or Channel not found")))
     @ApiResponse(responseCode = "200", description = "Message가 성공적으로 성생됨")
     public ResponseEntity<MessageResponseDto> createMessage(
-            @RequestPart("messageCreateRequest") MessageCreateDto messageCreateRequest,
+            @Valid @RequestPart("messageCreateRequest") MessageCreateDto messageCreateRequest,
             @RequestPart(value = "attachments", required = false) @Parameter(description = "Message 첨부 파일들") List<MultipartFile> attachments
 
     ) {
@@ -81,7 +82,7 @@ public class MessageController {
     @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = "Message does not found")))
     public ResponseEntity<MessageResponseDto> updateMessage(
             @PathVariable @Parameter(description = "수정 할 Message ID") UUID messageId,
-            @RequestBody MessageUpdateDto messageUpdateRequest
+            @Valid @RequestBody MessageUpdateDto messageUpdateRequest
     ) {
         logger.debug("[Message Controller][updateMessage] Received messageUpdateRequest: messageId={}", messageId);
         logger.debug("[Message Controller][updateMessage] Calling messageService.update()");

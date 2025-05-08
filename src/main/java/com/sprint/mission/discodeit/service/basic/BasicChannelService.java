@@ -4,8 +4,10 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.exceptions.InvalidInputException;
-import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.exceptions.ErrorCode;
+import com.sprint.mission.discodeit.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exceptions.channel.DuplicateChannelException;
+import com.sprint.mission.discodeit.exceptions.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelJPARepository;
 import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
@@ -22,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -63,7 +67,7 @@ public class BasicChannelService implements ChannelService {
         logger.debug("[Channel][createPublic] Calling channelJpaRepository.existsByTypeAndName()");
         if (channelJpaRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
             logger.warn("[Channel][createPublic] A channel already exists: channelName={}", channelCreatePublicDto.name());
-            throw new InvalidInputException("A channel already exists");
+            throw new DuplicateChannelException(Instant.now(), ErrorCode.DUPLICATE_CHANNEL, Map.of("channelName", channelCreatePublicDto.name()));
         }
 
         logger.debug("[Channel][createPublic] Entity constructed");
@@ -105,11 +109,11 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
         logger.debug("[Channel][update] Calling channelJpaRepository.findById(): channelId={}", channelId);
         Channel matchingChannel = channelJpaRepository.findById(channelId)
-                .orElseThrow(() -> new NotFoundException("A channel does not exist"));
+                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
 
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
             logger.warn("[Channel][update] Private channels cannot be changed.");
-            throw new InvalidInputException("Private channels cannot be changed.");
+            throw new PrivateChannelUpdateException(Instant.now(), ErrorCode.PRIVATE_CHANNEL_UPDATE, Map.of("channelId", channelId));
         }
 
         logger.debug("[Channel][update] Calling updateChannel(): channelId={}", channelId);
@@ -127,7 +131,7 @@ public class BasicChannelService implements ChannelService {
     public void delete(UUID channelId) {
         logger.debug("[Channel][delete] Calling userJpaRepository.findById()");
         Channel matchingChannel = channelJpaRepository.findById(channelId)
-                .orElseThrow(() -> new NotFoundException("A channel does not exist"));
+                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
         channelJpaRepository.delete(matchingChannel);
         logger.info("[Channel][delete] Deleted successfully: channelId]{}", channelId);
     }

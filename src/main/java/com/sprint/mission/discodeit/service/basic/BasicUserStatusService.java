@@ -2,15 +2,15 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.exceptions.ErrorCode;
+import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exceptions.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.repository.UserStatusJPARepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusCreateDto;
-import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusDeleteDto;
-import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusFindDto;
 import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -35,7 +36,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public UserStatusResponseDto create(UserStatusCreateDto userStatusCreateDto) {
         User matchingUser = userJPARepository.findById(userStatusCreateDto.userId())
-                .orElseThrow(() -> new NotFoundException("User does not exist."));
+                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userStatusCreateDto.userId())));
 
         Instant currentTime = Instant.now();
         UserStatus userStatus = new UserStatus(matchingUser, currentTime);
@@ -47,9 +48,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserStatusResponseDto find(UserStatusFindDto userStatusFindDto) {
-        UserStatus userStatus = userStatusJPARepository.findByUser_Id(userStatusFindDto.userId())
-                .orElseThrow(() -> new NotFoundException("User does not exist."));
+    public UserStatusResponseDto find(UUID userId) {
+        UserStatus userStatus = userStatusJPARepository.findByUser_Id(userId)
+                .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userId", userId)));
         return responseMapStruct.toUserStatusDto(userStatus);
     }
 
@@ -69,7 +70,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateDto userStatusUpdateRequest) {
         UserStatus matchingUserStatus = userStatusJPARepository.findByUser_Id(userId)
-                .orElseThrow(() -> new NotFoundException("UserStatus does not exist."));
+                .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userId", userId)));
 
         Instant currentTime = userStatusUpdateRequest.newLastActiveAt();
         matchingUserStatus.updateLastConnectionTime(currentTime);
@@ -80,9 +81,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public void delete(UserStatusDeleteDto userStatusDeleteDto) {
-        UserStatus matchingUserStatus = userStatusJPARepository.findByUser_Id(userStatusDeleteDto.userId())
-                .orElseThrow(() -> new NotFoundException("User does not exist."));
+    public void delete(UUID userId) {
+        UserStatus matchingUserStatus = userStatusJPARepository.findByUser_Id(userId)
+                .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userId", userId)));
         userStatusJPARepository.delete(matchingUserStatus);
     }
 }
