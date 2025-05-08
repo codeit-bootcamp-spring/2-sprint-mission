@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,46 +8,43 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.Duration;
 import java.time.Instant;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Table(name = "user_statuses")
 @Entity
-@NoArgsConstructor
+@Table(name = "user_statuses")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStatus extends BaseUpdatableEntity {
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
   private User user;
-
-  @Column(nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastActiveAt;
-  private boolean online;
 
   public UserStatus(User user, Instant lastActiveAt) {
-    this.user = user;
+    setUser(user);
     this.lastActiveAt = lastActiveAt;
-    this.online = isOnline();
   }
 
-  public void updateLastActiveAt(Instant lastActiveAt) {
-    boolean anyValueUpdated = false;
+  public void update(Instant lastActiveAt) {
     if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
       this.lastActiveAt = lastActiveAt;
-      anyValueUpdated = true;
-    }
-    this.online = isOnline();
-
-    if (anyValueUpdated) {
-      setUpdatedAt(Instant.now());
     }
   }
 
-  public boolean isOnline() {
-    Instant fiveMinuteAgo = Instant.now().minusSeconds(5 * 60);
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 
-    return lastActiveAt.isAfter(fiveMinuteAgo);
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
   }
 }
