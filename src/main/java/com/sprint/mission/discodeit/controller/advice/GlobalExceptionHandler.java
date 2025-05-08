@@ -6,8 +6,11 @@ import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.mapper.ErrorResponseMapper;
 import java.time.Instant;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -33,6 +36,30 @@ public class GlobalExceptionHandler {
                 Map.of(),
                 e.getClass().getSimpleName(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value()
+            ));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
+        MethodArgumentNotValidException e) {
+        Map<String, Object> fieldErrorDetails = e.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .collect(Collectors.toMap(
+                FieldError::getField,
+                FieldError::getDefaultMessage,
+                (existing, replacement) -> existing
+            ));
+
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(new ErrorResponse(
+                Instant.now(),
+                ErrorCode.INVALID_ARGUMENT.name(),
+                ErrorCode.INVALID_ARGUMENT.getMessage(),
+                fieldErrorDetails,
+                e.getClass().getSimpleName(),
+                HttpStatus.BAD_REQUEST.value()
             ));
     }
 

@@ -19,7 +19,8 @@ public enum ErrorCode {
     BINARY_STORAGE_MAKE_DIR_ERROR("파일 스토리지 디렉토리 생성 중 오류가 발생했습니다."),
     BINARY_STORAGE_PUT_ERROR("파일 스토리지 저장 중 오류가 발생했습니다."),
     BINARY_STORAGE_GET_ERROR("파일 스토리지 로드 중 오류가 발생했습니다."),
-    BINARY_STORAGE_DOWNLOAD_ERROR("파일 다운로드 중 오류가 발생했습니다.");
+    BINARY_STORAGE_DOWNLOAD_ERROR("파일 다운로드 중 오류가 발생했습니다."),
+    INVALID_ARGUMENT("유효하지 않은 요청입니다.");
 
     private final String message;
 
