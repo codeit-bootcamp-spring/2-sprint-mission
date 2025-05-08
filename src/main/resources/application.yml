@@ -37,4 +37,4 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: /path/to/storage
+      root-path: .discodeit/storage
