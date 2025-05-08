@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -27,6 +28,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@Slf4j
 public class MessageController implements MessageApi {
 
     private final MessageService messageService;
@@ -37,6 +39,7 @@ public class MessageController implements MessageApi {
             @RequestPart("messageCreateRequest") MessageCreateRequest request,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
+        log.info("Request to create message");
         List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
                 .map(files -> files.stream()
                         .map(file -> {
@@ -47,6 +50,7 @@ public class MessageController implements MessageApi {
                                         file.getBytes()
                                 );
                             } catch (IOException e) {
+                                log.error("Failed to process attachment file: {}", file.getOriginalFilename(), e);
                                 throw new RuntimeException(e);
                             }
                         })
@@ -54,6 +58,9 @@ public class MessageController implements MessageApi {
                 .orElse(new ArrayList<>());
 
         MessageDto message = messageService.create(request, attachmentRequests);
+
+        log.info("Message created successfully: id = {}", message.id());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(message);
     }
 
@@ -62,14 +69,25 @@ public class MessageController implements MessageApi {
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable("messageId") UUID messageId,
             @RequestBody MessageUpdateRequest request) {
+
+        log.info("Updating message: id = {}", messageId);
+
         MessageDto updatedMessage = messageService.updateMessage(messageId, request);
+
+        log.info("Message updated successfully: id = {}", updatedMessage.id());
+
         return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
     }
 
     @Override
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessageById(@PathVariable("messageId") UUID messageId) {
+        log.info("Deleting message: id = {}", messageId);
+
         messageService.deleteMessage(messageId);
+
+        log.info("Message deleted successfully: id = {}", messageId);
+
         return ResponseEntity.noContent().build();
     }
 
