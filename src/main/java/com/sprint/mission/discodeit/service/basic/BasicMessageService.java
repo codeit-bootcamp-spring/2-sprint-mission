@@ -8,6 +8,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryMetadataUploadException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -21,7 +25,7 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -58,16 +62,14 @@ public class BasicMessageService implements MessageService {
             .orElseThrow(() -> {
                 log.error("메세지 생성 중 해당하는 사용자를 찾을 수 없음: authorId = {}",
                     messageCreateRequest.authorId());
-                return new NoSuchElementException(
-                    messageCreateRequest.authorId() + "에 해당하는 사용자를 찾을 수 없습니다.");
+                return UserNotFoundException.forId(messageCreateRequest.authorId().toString());
             });
 
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
             .orElseThrow(() -> {
                 log.error("메세지 생성 중 해당하는 채널 찾을 수 없음: channelId = {}",
                     messageCreateRequest.channelId());
-                return new NoSuchElementException(
-                    messageCreateRequest.channelId() + "에 해당하는 채널을 찾을 수 없습니다.");
+                return ChannelNotFoundException.forId(messageCreateRequest.channelId().toString());
             });
 
         attachmentEntryList = Optional.ofNullable(attachments)
@@ -93,7 +95,11 @@ public class BasicMessageService implements MessageService {
                     log.error(
                         "메세지 보내는 중 파일 메타 데이터 저장 진행 중 오류 발생: originalFileName = {}, contentType = {}, size = {}",
                         file.getOriginalFilename(), file.getContentType(), file.getSize());
-                    throw new RuntimeException("파일 처리 중 오류 발생", e);
+                    throw new BinaryMetadataUploadException(Map.of(
+                        "filename", Objects.requireNonNull(file.getOriginalFilename(), "파일 명 null"),
+                        "contentType", Objects.requireNonNull(file.getContentType(), "파일 타입 null"),
+                        "size", file.getSize()),
+                        e);
                 }
             })
             .collect(Collectors.toList());
@@ -142,7 +148,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> {
                 log.error("메세지 수정 중 메세지 아이디를 찾을 수 없음: messageId = {}", messageId);
-                return new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다.");
+                return MessageNotFoundException.forId(messageId.toString());
             });
         message.updateContent(messageUpdateRequest.newContent());
         log.info("메세지 수정 완료: messageId = {}", messageId);
@@ -156,7 +162,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> {
                 log.error("메세지 삭제 중 메세지 아이디를 찾을 수 없음 : messageId = {}", messageId);
-                return new NoSuchElementException(messageId + "에 해당하는 메세지를 찾을 수 없습니다.");
+                return MessageNotFoundException.forId(messageId.toString());
             });
         messageRepository.delete(message);
         log.info("메세지 삭제 완료: messageId = {}", messageId);
