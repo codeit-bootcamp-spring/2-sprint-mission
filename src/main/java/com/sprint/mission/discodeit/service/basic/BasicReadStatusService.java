@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicReadStatusService implements ReadStatusService {
 
   private final UserRepository userRepository;
@@ -30,6 +32,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional
   public ReadStatusDto create(ReadStatusCreateRequest request) {
+    log.debug("읽기 상태 생성 시작: {}", request);
     UUID userId = request.userId();
     UUID channelId = request.channelId();
 
@@ -44,6 +47,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     ReadStatus status = new ReadStatus(user, channel, request.lastReadAt());
     readStatusRepository.save(status);
+    log.info("읽기 상태 생성 완료: id={}, userId={}, channelId={}", status.getId(), userId, channelId);
     return readStatusMapper.toDto(status);
   }
 
@@ -75,18 +79,21 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional
   public ReadStatusDto update(UUID id, ReadStatusUpdateRequest request) {
+    log.debug("읽기 상태 수정 시작: id={}, request={}", id, request);
     ReadStatus status = find(id);
     status.update(request.newLastReadAt());
-
+    log.info("읽기 상태 수정 완료: id={}", id);
     return readStatusMapper.toDto(status);
   }
 
   @Override
   @Transactional
   public void delete(UUID id) {
+    log.debug("읽기 상태 삭제 시작: id={}", id);
     if (!readStatusRepository.existsById(id)) {
       throw new NoSuchElementException(id + " 에 해당하는 ReadStatus를 찾을 수 없음.");
     }
     readStatusRepository.deleteById(id);
+    log.info("읽기 상태 삭제 완료: id={}", id);
   }
 }

@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -41,6 +43,7 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public MessageDto create(MessageCreateRequest createRequest,
       List<BinaryContentCreateRequest> binaryRequestList) {
+    log.debug("메시지 생성 시작: request={}, file={}", createRequest, binaryRequestList);
     UUID channelId = createRequest.channelId();
     UUID authorId = createRequest.authorId();
 

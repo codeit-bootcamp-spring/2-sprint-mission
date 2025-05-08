@@ -13,11 +13,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
@@ -27,6 +29,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   @Transactional
   public BinaryContent create(BinaryContentCreateRequest request) {
+    log.debug("파일 생성 시작: {}", request);
     String originalFilename = request.file().getOriginalFilename();
     String contentType = request.file().getContentType();
     long size = request.file().getSize();
@@ -43,6 +46,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     binaryContentRepository.save(binaryContent);
     binaryContentStorage.put(binaryContent.getId(), bytes);
+    log.info("파일 생성 완료: id={}", binaryContent.getId());
     return binaryContent;
   }
 
@@ -60,9 +64,11 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public void delete(UUID id) {
+    log.debug("파일 삭제 시작: id={}", id);
     if (!binaryContentRepository.existsById(id)) {
       throw new NoSuchElementException(id + "에 해당하는 BinaryContent를 찾을 수 없음");
     }
     binaryContentRepository.deleteById(id);
+    log.info("파일 삭제 완료: id={}", id);
   }
 }

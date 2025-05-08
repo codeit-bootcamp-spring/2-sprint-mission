@@ -14,11 +14,13 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
@@ -28,6 +30,7 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional
   public UserStatusDto create(UserStatusCreateRequest request) {
+    log.debug("사용자 상태 생성 시작: {}", request);
     User user = userRepository.findById(request.userId())
         .orElseThrow(() -> new NoSuchElementException(request.userId() + " 에 해당하는 User를 찾을 수 없음"));
 
@@ -37,6 +40,7 @@ public class BasicUserStatusService implements UserStatusService {
     Instant lastActiveAt = request.lastActiveAt();
     UserStatus userStatus = new UserStatus(user, lastActiveAt);
     userStatusRepository.save(userStatus);
+    log.info("사용자 상태 생성 완료: id={}", userStatus.getId());
     return userStatusMapper.toDto(userStatus);
   }
 
@@ -63,21 +67,27 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @Transactional
-  public UserStatus update(UUID id, UserStatusUpdateRequest request) {
+  public UserStatusDto update(UUID id, UserStatusUpdateRequest request) {
+    log.debug("사용자 상태 수정 시작: id={}, request={}", id, request);
     Instant newLastActiveAt = request.newLastActiveAt();
     UserStatus userStatus = userStatusRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 UserStatus를 찾을 수 없음"));
     userStatus.update(newLastActiveAt);
 
-    return userStatusRepository.save(userStatus);
+    userStatusRepository.save(userStatus);
+    log.info("사용자 상태 수정 완료: id={}", userStatus.getId());
+    return userStatusMapper.toDto(userStatus);
   }
 
   @Override
   @Transactional
   public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    log.debug("사용자의 사용자 상태 수정 시작: userId={}, request={}", userId, request);
     UserStatus userStatus = findByUserId(userId);
     Instant newLastActiveAt = request.newLastActiveAt();
     userStatus.update(newLastActiveAt);
+    userStatusRepository.save(userStatus);
+    log.info("사용자의 사용자 상태 수정 완료: id={}", userStatus.getId());
 
     return userStatusMapper.toDto(userStatus);
   }
@@ -85,9 +95,11 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   @Transactional
   public void delete(UUID id) {
+    log.debug("사용자 상태 삭제 시작: id={}", id);
     if (!userStatusRepository.existsById(id)) {
       throw new NoSuchElementException(id + " 에 해당하는 UserStatus를 찾을 수 없음");
     }
     userStatusRepository.deleteById(id);
+    log.info("사용자 상태 삭제 완료: id={}", id);
   }
 }
