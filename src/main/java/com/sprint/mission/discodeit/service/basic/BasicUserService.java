@@ -112,6 +112,15 @@ public class BasicUserService implements UserService {
     log.info("Update user by id: {}, request: {}", userId, request);
     User user = findUserOrThrow(userId);
 
+    if (userRepository.existsByEmail(request.newEmail())) {
+      log.warn("User updated failed: Email already exists - {}", request.newEmail());
+      throw new DiscodeitException(ErrorCode.EMAIL_ALREADY_EXISTS);
+    }
+    if (userRepository.existsByUsername(request.newUsername())) {
+      log.warn("User updated failed: Username already exists - {}", request.newUsername());
+      throw new DiscodeitException(ErrorCode.USERNAME_ALREADY_EXISTS);
+    }
+
     if (request.newUsername() != null) {
       user.updateUsername(request.newUsername());
     }
