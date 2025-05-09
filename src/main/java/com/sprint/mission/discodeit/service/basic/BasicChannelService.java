@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.message.Message;
@@ -11,6 +12,7 @@ import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -35,51 +37,48 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
+  private final UserMapper userMapper;
 
 
   @Override
   public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
     channelRepository.save(channel);
-    return channelMapper.toResponse(channel);
+    return assembleChannelDto(channel);
   }
 
   @Override
   public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
-    List<UUID> participantIds = request.participantIds();
-    validateParticipantExistence(participantIds);
+    List<User> participants = userRepository.findAllById(request.participantIds());
+
+    if (participants.size() != request.participantIds().size()) {
+      throw new ResourceNotFoundException("존재하지 않는 유저 ID가 있습니다");
+    }
 
     Channel channel = new Channel(ChannelType.PRIVATE);
     channelRepository.save(channel);
+    createParticipantReadStatuses(participants, channel);
 
-    createParticipantReadStatuses(participantIds, channel);
-
-    return channelMapper.toResponse(channel);
+    return assembleChannelDto(channel);
   }
 
   @Override
   public ChannelDto find(UUID channelId) {
-    return channelMapper.toResponse(getChannel(channelId));
+    Channel channel = getChannel(channelId);
+    return assembleChannelDto(channel);
   }
 
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     validateUserExistence(userId);
-    List<Channel> allChannels = channelRepository.findAll();
 
-    List<Channel> publicChannels = allChannels.stream()
-        .filter(channel -> channel.getType() == ChannelType.PUBLIC)
+    List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
+    List<Channel> privateChannels = channelRepository.findAllPrivateByUserId(userId,
+        ChannelType.PRIVATE);
+
+    return Stream.concat(publicChannels.stream(), privateChannels.stream())
+        .map(this::assembleChannelDto)
         .toList();
-
-    List<Channel> privateChannels = allChannels.stream()
-        .filter(channel -> channel.getType() == ChannelType.PRIVATE
-            && getParticipantIds(channel).contains(userId))
-        .toList();
-
-    List<ChannelDto> publicChannelDtoList = getDtoList(publicChannels);
-    List<ChannelDto> privateChannelDtoList = getDtoList(privateChannels);
-
-    return Stream.concat(publicChannelDtoList.stream(), privateChannelDtoList.stream()).toList();
   }
 
   @Override
@@ -92,8 +91,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     channel.update(request.newName(), request.newDescription());
+    channelRepository.save(channel);
 
-    return channelMapper.toResponse(channel);
+    return assembleChannelDto(channel);
   }
 
   @Override
@@ -103,19 +103,23 @@ public class BasicChannelService implements ChannelService {
     }
 
     messageRepository.deleteByChannel_Id(channelId);
-
     readStatusRepository.deleteByChannel_Id(channelId);
-
     channelRepository.deleteById(channelId);
   }
 
 
-  private List<ChannelDto> getDtoList(List<Channel> publicChannels) {
-    return publicChannels.stream()
-        .map(channelMapper::toResponse)
+  private ChannelDto assembleChannelDto(Channel channel) {
+    List<UUID> participantIds = readStatusRepository.findUserIdsByChannel(channel);
+    List<UserDto> participants = userRepository.findAllById(participantIds).stream()
+        .map(userMapper::toResponse)
         .toList();
-  }
+    Instant lastMessageAt = messageRepository
+        .findTop1ByChannelOrderByCreatedAtDesc(channel)
+        .map(Message::getCreatedAt)
+        .orElse(null);
 
+    return channelMapper.toResponse(channel, participants, lastMessageAt);
+  }
 
   private void validateUserExistence(UUID userId) {
     if (!userRepository.existsById(userId)) {
@@ -128,31 +132,9 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
   }
 
-  private Instant getLatestMessageAt(Channel channel) {
-    return messageRepository.findTop1ByChannelOrderByCreatedAtDesc(channel)
-        .map(Message::getCreatedAt)
-        .orElse(null);
-  }
-
-  private void createParticipantReadStatuses(List<UUID> participantIds, Channel channel) {
-    participantIds.forEach(userId -> {
-      User user = userRepository.getReferenceById(userId);
+  private void createParticipantReadStatuses(List<User> participants, Channel channel) {
+    participants.forEach(user -> {
       readStatusRepository.save(new ReadStatus(user, channel, Instant.EPOCH));
     });
   }
-
-  private List<UUID> getParticipantIds(Channel channel) {
-    return channel.getType() == ChannelType.PRIVATE
-        ? readStatusRepository.findAllByChannel(channel).stream()
-        .map(ReadStatus::getUser)
-        .map(User::getId)
-        .toList()
-        : List.of();
-  }
-
-  private void validateParticipantExistence(List<UUID> participantIds) {
-    participantIds.forEach(userId -> userRepository.findById(userId)
-        .orElseThrow(() -> new ResourceNotFoundException("유저가 없습니다")));
-  }
-
 }

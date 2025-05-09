@@ -24,6 +24,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
       @Param("createdAt") Instant createdAt, Pageable pageable);
 
+  @Query("SELECT m.createdAt FROM Message m "
+      + "WHERE m.channel = :channel "
+      + "ORDER BY m.createdAt DESC")
+  Optional<Instant> findLastCreatedAtByChannel(@Param("channel") Channel channel);
 
   void deleteByChannel_Id(UUID channelId);
 }

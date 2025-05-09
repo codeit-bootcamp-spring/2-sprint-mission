@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
@@ -15,7 +17,8 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
   void deleteByChannel_Id(UUID channelId);
 
-  List<ReadStatus> findAllByChannel(Channel channel);
-
   List<ReadStatus> findAllByUser_Id(UUID userId);
+
+  @Query("select rs.user.id from ReadStatus rs where rs.channel = :channel")
+  List<UUID> findUserIdsByChannel(@Param("channel") Channel channel);
 }

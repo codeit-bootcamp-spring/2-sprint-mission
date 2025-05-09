@@ -34,15 +34,21 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
+    userRepository.findByUsername(userCreateRequest.username())
+        .ifPresent(u -> {
+          throw new DuplicateResourceException("username 중복");
+        });
+    userRepository.findByEmail(userCreateRequest.email())
+        .ifPresent(u -> {
+          throw new DuplicateResourceException("이메일 중복");
+        });
+
     BinaryContent profile = (profileCreateRequest != null)
         ? binaryContentService.create(profileCreateRequest)
         : null;
 
     User user = new User(userCreateRequest.username(),
         userCreateRequest.email(), userCreateRequest.password(), profile);
-
-    User other = userRepository.findByUsername(userCreateRequest.username()).orElse(null);
-    user.validateNotDuplicateWith(other);
 
     userRepository.save(user);
 
