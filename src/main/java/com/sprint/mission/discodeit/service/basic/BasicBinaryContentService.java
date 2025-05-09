@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -53,7 +53,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContentDto find(UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found"));
+                .orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
         return binaryContentMapper.toDto(binaryContent);
     }
 
@@ -71,7 +71,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         if (!binaryContentRepository.existsById(binaryContentId)) {
             log.warn("BinaryContent not found : id = {}", binaryContentId);
-            throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+            throw new BinaryContentNotFoundException(binaryContentId);
         }
         binaryContentRepository.deleteById(binaryContentId);
 

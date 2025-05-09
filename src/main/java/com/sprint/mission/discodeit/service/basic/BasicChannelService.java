@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -91,7 +93,7 @@ public class BasicChannelService implements ChannelService {
 
         if (channel.getType() == ChannelType.PRIVATE) {
             log.warn("Cannot update private channel: id = {}", channelId);
-            throw new UnsupportedOperationException(("Private channel cannot be updated"));
+            throw new PrivateChannelUpdateException(channelId);
         }
 
         channel.updateChannel(newName, newDescription);
@@ -120,7 +122,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("Channel with id {} not found", channelId);
-                    return new NoSuchElementException("Channel with id " + channelId + " not found");
+                    return new ChannelNotFoundException(channelId);
                 });
     }
 }

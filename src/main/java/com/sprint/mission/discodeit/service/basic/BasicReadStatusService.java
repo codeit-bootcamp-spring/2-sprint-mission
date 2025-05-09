@@ -6,6 +6,10 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -17,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -36,14 +39,13 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID channelId = request.channelId();
 
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new NoSuchElementException("User with id " + userId + " does not exist"));
+                new UserNotFoundException(userId));
 
         Channel channel = channelRepository.findById(channelId).orElseThrow(() ->
-                new NoSuchElementException("Channel with id " + channelId + " does not exist"));
+                new ChannelNotFoundException(channelId));
 
         if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
-            throw new IllegalArgumentException(
-                    "ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
+            throw new ReadStatusAlreadyExistsException(userId, channelId);
         }
 
         Instant lastReadAt = request.lastReadAt();
@@ -85,6 +87,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private ReadStatus getReadStatus(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+                .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
     }
 }

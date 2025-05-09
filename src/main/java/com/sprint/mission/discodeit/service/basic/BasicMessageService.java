@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
@@ -20,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,12 +57,12 @@ public class BasicMessageService implements MessageService {
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> {
                     log.warn("Author not found : id = {}", authorId);
-                    return new NoSuchElementException("Author with id " + authorId + " does not exist");
+                    return new UserNotFoundException(authorId);
                 });
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("Channel not found : id = {}", channelId);
-                    return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+                    return new ChannelNotFoundException(channelId);
                 });
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
@@ -143,7 +145,7 @@ public class BasicMessageService implements MessageService {
         return messageRepository.findById(messageId)
                 .orElseThrow(() -> {
                     log.warn("Message not found : id = {}", messageId);
-                    return new NoSuchElementException("Message with id " + messageId + " not found");
+                    return new MessageNotFoundException(messageId);
                 });
     }
 }

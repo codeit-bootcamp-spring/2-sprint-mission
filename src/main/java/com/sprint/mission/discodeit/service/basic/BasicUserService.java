@@ -7,6 +7,9 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -20,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,11 +51,11 @@ public class BasicUserService implements UserService {
 
         if (userRepository.existsByUsername(username)) {
             log.warn("Username {} already exists", username);
-            throw new IllegalArgumentException("User with username " + username + " already exists");
+            throw new UserAlreadyExistException(username);
         }
         if (userRepository.existsByEmail(email)) {
             log.warn("Email {} already exists", email);
-            throw new IllegalArgumentException("User with email " + email + " already exists");
+            throw new EmailAlreadyExistException(email);
         }
 
         BinaryContent profile = profileCreateRequest
@@ -75,6 +77,7 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = new UserStatus(user, Instant.now());
         userRepository.save(user);
+        userStatusRepository.save(userStatus);
 
         log.info("User created successfully: username = {}", username);
 
@@ -108,12 +111,12 @@ public class BasicUserService implements UserService {
 
         if (!newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
             log.warn("Username {} already exists", newUsername);
-            throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+            throw new UserAlreadyExistException(newUsername);
         }
 
         if (!newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
             log.warn("Email {} already exists", newEmail);
-            throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+            throw new EmailAlreadyExistException(newEmail);
         }
 
         BinaryContent profile = profileCreateRequest
@@ -154,7 +157,7 @@ public class BasicUserService implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("User with id {} not found", userId);
-                    return new NoSuchElementException("User with id " + userId + " not found");
+                    return new UserNotFoundException(userId);
                 });
     }
 
