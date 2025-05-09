@@ -1,0 +1,13 @@
+spring:
+  profiles: prod
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://db-server.prod:5432/discodeit
+    username: discodeit_user_prod
+    password: prod_secure_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  server:
+    port: 8080
+

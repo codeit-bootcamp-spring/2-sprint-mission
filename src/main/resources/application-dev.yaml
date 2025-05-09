@@ -1,0 +1,12 @@
+spring:
+  profiles: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit_dev
+    username: discodeit_user_dev
+    password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+  server:
+    port: 8081
