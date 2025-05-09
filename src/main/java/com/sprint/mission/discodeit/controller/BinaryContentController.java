@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class BinaryContentController implements BinaryContentApi {
     @Override
     @GetMapping
     public ResponseEntity<List<BinaryContentDto>> findAllBinaryContentByIds(
-            @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+            @Valid @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
         List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
         return ResponseEntity.ok(binaryContents);
     }

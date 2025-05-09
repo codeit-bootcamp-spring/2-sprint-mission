@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +37,8 @@ public class MessageController implements MessageApi {
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
-            @RequestPart("messageCreateRequest") MessageCreateRequest request,
-            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+            @Valid @RequestPart("messageCreateRequest") MessageCreateRequest request,
+            @Valid @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         log.info("Request to create message");
 
@@ -76,7 +77,7 @@ public class MessageController implements MessageApi {
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable("messageId") UUID messageId,
-            @RequestBody MessageUpdateRequest request) {
+            @Valid @RequestBody MessageUpdateRequest request) {
 
         log.info("Updating message: id = {}", messageId);
 

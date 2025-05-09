@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,8 +35,8 @@ public class UserController implements UserApi {
     @Override
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> create(
-            @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-            @RequestPart(value = "profile", required = false) MultipartFile profile) {
+            @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+            @Valid @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
         log.info("Request to create user: username = {}", userCreateRequest.username());
 
@@ -65,8 +66,8 @@ public class UserController implements UserApi {
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> update(
             @PathVariable UUID userId,
-            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-            @RequestPart(value = "profile", required = false) MultipartFile profile) {
+            @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @Valid @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
         log.info("Updating user: id = {}", userId);
 
@@ -101,7 +102,7 @@ public class UserController implements UserApi {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
             @PathVariable("userId") UUID userId,
-            @RequestBody UserStatusUpdateRequest request) {
+            @Valid @RequestBody UserStatusUpdateRequest request) {
 
         log.info("Updating user status: userId = {}", userId);
 
