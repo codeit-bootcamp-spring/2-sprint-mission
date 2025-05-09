@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 @Getter
 public class ErrorResponse {
@@ -30,5 +31,15 @@ public class ErrorResponse {
     this.details = new HashMap<>();
     this.exceptionType = exception.getClass().getSimpleName();
     this.status = status;
+  }
+
+  public ErrorResponse(MethodArgumentNotValidException exception,
+      Map<String,Object> details, int status) {
+    this.timestamp     = Instant.now();
+    this.code          = exception.getClass().getSimpleName();
+    this.message       = exception.getMessage();
+    this.details       = details;
+    this.exceptionType = exception.getClass().getSimpleName();
+    this.status        = status;
   }
 }

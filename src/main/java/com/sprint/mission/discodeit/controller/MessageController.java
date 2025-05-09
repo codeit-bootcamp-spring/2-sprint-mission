@@ -63,7 +63,7 @@ public class MessageController implements MessageApi {
   @Override
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> update(@PathVariable UUID messageId,
-      @RequestBody MessageUpdateRequest request) {
+      @RequestBody @Valid MessageUpdateRequest request) {
     log.debug("메시지 수정 요청: id={}, request={}", messageId, request);
     MessageDto response = messageService.update(messageId, request);
     log.info("메시지 수정 응답: {}", response);
