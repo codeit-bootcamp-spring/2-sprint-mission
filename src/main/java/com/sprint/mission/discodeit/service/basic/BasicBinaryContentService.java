@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.UnsupportedFileTypeException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -10,7 +12,6 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.util.FileUtil;
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +38,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     try {
       bytes = request.file().getBytes();
     } catch (IOException e) {
-      throw new RuntimeException("파일 변환 중 오류 발생: " + e);
+      log.error("파일 변환 도중 예외 발생", e);
+      throw new RuntimeException(e);
     }
     if (originalFilename != null && !FileUtil.isAllowedExtension(originalFilename)) {
-      throw new IllegalArgumentException("허용하지 않는 파일");
+      throw new UnsupportedFileTypeException().isNotAllowedFile(originalFilename);
     }
     BinaryContent binaryContent = new BinaryContent(originalFilename, contentType, size);
 
@@ -53,7 +55,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public BinaryContentDto findById(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException(id + " 에 해당하는 BinaryContent를 찾을 수 없음"));
+        .orElseThrow(() -> new BinaryContentNotFoundException().notFoundWithId(id));
     return binaryContentMapper.toDto(binaryContent);
   }
 
@@ -66,7 +68,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   public void delete(UUID id) {
     log.debug("파일 삭제 시작: id={}", id);
     if (!binaryContentRepository.existsById(id)) {
-      throw new NoSuchElementException(id + "에 해당하는 BinaryContent를 찾을 수 없음");
+      throw new BinaryContentNotFoundException().notFoundWithId(id);
     }
     binaryContentRepository.deleteById(id);
     log.info("파일 삭제 완료: id={}", id);
