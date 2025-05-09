@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,9 @@ public class ChannelController implements ChannelApi {
   private final ChannelService channelService;
 
   @PostMapping(path = "public")
-  public ResponseEntity<ChannelDto> create(@RequestBody PublicChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(
+      @RequestBody @Valid PublicChannelCreateRequest request) {
+
     log.info("Received request to create public channel: {}", request);
 
     ChannelDto createdChannel = channelService.create(request);
@@ -43,7 +46,9 @@ public class ChannelController implements ChannelApi {
   }
 
   @PostMapping(path = "private")
-  public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(
+      @RequestBody @Valid PrivateChannelCreateRequest request) {
+
     log.info("Received request to create private channel with participants: {}",
         request.participantIds());
 
@@ -56,8 +61,10 @@ public class ChannelController implements ChannelApi {
   }
 
   @PatchMapping(path = "{channelId}")
-  public ResponseEntity<ChannelDto> update(@PathVariable("channelId") UUID channelId,
-      @RequestBody PublicChannelUpdateRequest request) {
+  public ResponseEntity<ChannelDto> update(
+      @PathVariable("channelId") UUID channelId,
+      @RequestBody @Valid PublicChannelUpdateRequest request) {
+
     log.info("Received request to update channel with id: {}", channelId);
 
     ChannelDto updatedChannel = channelService.update(channelId, request);
@@ -69,7 +76,9 @@ public class ChannelController implements ChannelApi {
   }
 
   @DeleteMapping(path = "{channelId}")
-  public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable("channelId") UUID channelId) {
+
     log.info("Received request to delete channel with id: {}", channelId);
 
     channelService.delete(channelId);
@@ -81,7 +90,9 @@ public class ChannelController implements ChannelApi {
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+  public ResponseEntity<List<ChannelDto>> findAll(
+      @RequestParam("userId") UUID userId) {
+
     List<ChannelDto> channels = channelService.findAllByUserId(userId);
     return ResponseEntity
         .status(HttpStatus.OK)

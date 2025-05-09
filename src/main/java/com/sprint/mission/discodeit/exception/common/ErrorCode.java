@@ -24,7 +24,10 @@ public enum ErrorCode {
   USERNAME_ALREADY_EXISTS("이미 존재하는 사용자 이름입니다."),
   EMAIL_ALREADY_EXISTS("이미 존재하는 이메일입니다."),
   USER_STATUS_ALREADY_EXISTS("이미 존재하는 사용자 상태입니다."),
-  READ_STATUS_ALREADY_EXISTS("이미 존재하는 읽은 상태입니다.");
+  READ_STATUS_ALREADY_EXISTS("이미 존재하는 읽은 상태입니다."),
+
+  // 400 Bad Request
+  VALIDATION_ERROR("입력값 검증에 실패했습니다.");
 
   private final String message;
 

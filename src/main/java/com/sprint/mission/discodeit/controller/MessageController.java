@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class MessageController implements MessageApi {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     log.info("Received request to create message in channel with id: {} by user with id: {}",
@@ -74,8 +75,10 @@ public class MessageController implements MessageApi {
   }
 
   @PatchMapping(path = "{messageId}")
-  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
-      @RequestBody MessageUpdateRequest request) {
+  public ResponseEntity<MessageDto> update(
+      @PathVariable("messageId") UUID messageId,
+      @RequestBody @Valid MessageUpdateRequest request) {
+
     log.info("Received request to update message with id: {}", messageId);
 
     MessageDto updatedMessage = messageService.update(messageId, request);
@@ -87,7 +90,9 @@ public class MessageController implements MessageApi {
   }
 
   @DeleteMapping(path = "{messageId}")
-  public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable("messageId") UUID messageId) {
+
     log.info("Received request to delete message with id: {}", messageId);
 
     messageService.delete(messageId);
@@ -107,6 +112,7 @@ public class MessageController implements MessageApi {
           sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
+
     PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
     return ResponseEntity

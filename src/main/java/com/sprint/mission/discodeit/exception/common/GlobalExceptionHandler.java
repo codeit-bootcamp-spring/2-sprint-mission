@@ -7,14 +7,39 @@ import com.sprint.mission.discodeit.exception.MessageException;
 import com.sprint.mission.discodeit.exception.ReadStatusException;
 import com.sprint.mission.discodeit.exception.UserException;
 import com.sprint.mission.discodeit.exception.UserStatusException;
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleValidationExceptions(
+      MethodArgumentNotValidException e) {
+    Map<String, Object> details = new HashMap<>();
+
+    e.getBindingResult().getAllErrors().forEach(error -> {
+      String fieldName = ((FieldError) error).getField();
+      String message = error.getDefaultMessage();
+      details.put(fieldName, message);
+    });
+
+    ErrorResponse response = new ErrorResponse(
+        ErrorCode.VALIDATION_ERROR.name(),
+        ErrorCode.VALIDATION_ERROR.getMessage(),
+        details,
+        e.getClass().getSimpleName(),
+        HttpStatus.BAD_REQUEST.value()
+    );
+    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+  }
 
   @ExceptionHandler(AuthException.class)
   public ResponseEntity<ErrorResponse> handleInvalidUserPassword(AuthException e) {

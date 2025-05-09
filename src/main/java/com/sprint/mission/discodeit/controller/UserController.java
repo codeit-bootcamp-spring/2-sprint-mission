@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +42,9 @@ public class UserController implements UserApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+
     log.info("Received request to create user with username: {} and email: {}",
         userCreateRequest.username(), userCreateRequest.email());
 
@@ -64,9 +65,9 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile
-  ) {
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+
     log.info("Received request to update user with id: {}", userId);
 
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
@@ -81,7 +82,9 @@ public class UserController implements UserApi {
 
   @DeleteMapping(path = "{userId}")
   @Override
-  public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable("userId") UUID userId) {
+
     log.info("Received request to delete user with id: {}", userId);
 
     userService.delete(userId);
@@ -102,8 +105,10 @@ public class UserController implements UserApi {
 
   @PatchMapping(path = "{userId}/userStatus")
   @Override
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
+      @PathVariable("userId") UUID userId,
+      @RequestBody @Valid UserStatusUpdateRequest request) {
+
     log.info("Received request to update status for user with id: {}", userId);
 
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
