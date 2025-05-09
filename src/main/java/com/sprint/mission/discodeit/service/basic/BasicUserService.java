@@ -65,6 +65,7 @@ public class BasicUserService implements UserService {
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
+        // 로그를 binaryContentStorage 내부에서 남기기 떄문에 추적이 어려움 - MDC traceId로 해결
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
         log.error("User create failed: multipartFile read failed (filename: {})",

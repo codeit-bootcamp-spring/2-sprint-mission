@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.exception.file.FileDeleteException;
-import com.sprint.mission.discodeit.exception.file.FileReadException;
-import com.sprint.mission.discodeit.exception.file.ProfileFileTypeException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 @Slf4j
@@ -29,28 +25,6 @@ public class GlobalExceptionHandler {
     log.warn("ConstraintViolationException handled: {}", e.getMessage());
     return ResponseEntity.badRequest().body(new ResponseErrorBody(e));
   }
-
-  @ExceptionHandler(MaxUploadSizeExceededException.class)
-  public ResponseEntity<ResponseErrorBody> handleMaxSizeException(
-      MaxUploadSizeExceededException e) {
-    log.warn("MaxUploadSizeExceededException handled: {}", e.getMessage());
-    return ResponseEntity.badRequest().body(new ResponseErrorBody(e));
-  }
-
-  @ExceptionHandler(ProfileFileTypeException.class)
-  public ResponseEntity<ResponseErrorBody> handleProfileFileException(
-      ProfileFileTypeException e) {
-    log.warn("ProfileFileContentTypeException handled: {}, details: {}", e.getMessage(),
-        e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
-  }
-
-  @ExceptionHandler(FileReadException.class)
-  public ResponseEntity<ResponseErrorBody> handleFileReadException(FileReadException e) {
-    log.error("FileReadException handled: {}, details: {}", e.getMessage(), e.getDetails(), e);
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
-  }
-
 
   // 예상하지 못한 예외만 error 로그 남김 (+ stack trace)
   @ExceptionHandler(Exception.class)
