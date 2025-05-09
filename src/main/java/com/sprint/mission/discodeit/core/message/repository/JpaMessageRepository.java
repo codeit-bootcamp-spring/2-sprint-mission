@@ -22,4 +22,6 @@ public interface JpaMessageRepository extends JpaRepository<Message, UUID> {
   @EntityGraph(attributePaths = {"author", "channel", "attachment"})
   Slice<Message> findAllByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(UUID channelId,
       Instant createdAtIsLessThan, Pageable pageable);
+
+  List<Message> findByChannel_Id(UUID channelId);
 }

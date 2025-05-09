@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.core.message.usecase;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
+import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
+import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
@@ -42,7 +44,7 @@ public class BasicMessageService implements MessageService {
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.authorId())
     );
     Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
+        () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
     List<BinaryContent> binaryContentIdList = binaryContentCommands.stream().map(
@@ -52,14 +54,21 @@ public class BasicMessageService implements MessageService {
     Message message = Message.create(user, channel, command.content(),
         binaryContentIdList);
 
-    Message save = messageRepository.save(message);
+    messageRepository.save(message);
 
     log.info(
         "[MessageService] Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachments {}",
         message.getId(), channel.getId(), user.getId(), message.getContent(),
         message.getAttachment());
 
-    return MessageResult.create(save, user);
+    return MessageResult.create(message, user);
+  }
+
+  @Override
+  public List<MessageResult> findByChannelId(UUID channelId) {
+    List<Message> messages = messageRepository.findByChannel_Id(channelId);
+    return messages.stream().map(message -> MessageResult.create(message, message.getAuthor()))
+        .toList();
   }
 
   @Override
@@ -82,9 +91,10 @@ public class BasicMessageService implements MessageService {
   public MessageResult update(UpdateMessageCommand command) {
     Message message = messageRepository.findById(command.messageId())
         .orElseThrow(
-            () -> new UserNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, command.messageId()));
+            () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, command.messageId()));
 
     message.update(command.newText());
+    messageRepository.save(message);
     log.info("[MessageService] Message Updated: Message Id {}, New Text {}", command.messageId(),
         command.newText());
     return MessageResult.create(message, message.getAuthor());
@@ -94,7 +104,7 @@ public class BasicMessageService implements MessageService {
   @Transactional
   public void delete(UUID messageId) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new UserNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, messageId));
+        .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, messageId));
     message.getAttachment()
         .forEach(binaryContent -> binaryContentService.delete(binaryContent.getId())
         );
