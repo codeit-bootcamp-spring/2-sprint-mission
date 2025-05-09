@@ -52,7 +52,7 @@ public class UserController implements UserApi {
   public ResponseEntity<CreateUserResponseDTO> createUser(
       @RequestPart("userCreateRequest") @Valid CreateUserRequestDTO createUserRequestDTO,
       @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
-    log.info("User create attempt (username: {}, email: {}, profile size: {})",
+    log.info("User create attempt (username: {}, email: {}, profileSize: {})",
         // username이나 email은 개인 정보이므로, 로그에 노출하면 위험 + 로그에 userId를 사용할 수 없는 로직 -> 마스킹하여 처리
         MaskingUtil.maskUsername(createUserRequestDTO.username()),
         MaskingUtil.maskEmail(createUserRequestDTO.email()),

@@ -91,8 +91,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   @Cacheable(value = "user", key = "#p0")
   public FindUserResult find(UUID userId) {
-    User findUser = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+    User findUser = findUserById(userId, "find");
     return userMapper.toFindUserResult(findUser);
   }
 
@@ -113,12 +112,7 @@ public class BasicUserService implements UserService {
   @CacheEvict(value = "allUsers", allEntries = true)
   public UpdateUserResult update(UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
-    User findUser = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("User update failed: user not found (userId: {})", userId);
-          return new UserNotFoundException(Map.of("userId", userId));
-        });
-
+    User findUser = findUserById(userId, "update");
     findUser.updateUserInfo(updateUserCommand.newUsername(), updateUserCommand.newEmail(),
         updateUserCommand.newPassword());
     if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
@@ -156,11 +150,7 @@ public class BasicUserService implements UserService {
       @CacheEvict(value = "allUsers", allEntries = true)
   })
   public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("User delete failed: user not found (userId: {})", userId);
-          return new UserNotFoundException(Map.of("userId", userId));
-        });
+    User user = findUserById(userId, "delete");
     userRepository.deleteById(userId);
     if (user.getProfile() != null) {
       binaryContentService.delete(user.getProfile().getId());
@@ -205,5 +195,13 @@ public class BasicUserService implements UserService {
         .size(multipartFile.getSize())
         .filename(multipartFile.getOriginalFilename())
         .build();
+  }
+
+  private User findUserById(UUID userId, String method) {
+    return userRepository.findById(userId).
+        orElseThrow(() -> {
+          log.warn("User {} failed: user not found (userId: {})", method, userId);
+          return new UserNotFoundException(Map.of("userId", userId, "method", method));
+        });
   }
 }

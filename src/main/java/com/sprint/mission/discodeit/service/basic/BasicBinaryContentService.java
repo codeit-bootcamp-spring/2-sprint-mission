@@ -39,11 +39,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional(readOnly = true)
   @Cacheable(value = "binaryContent", key = "#p0")
   public FindBinaryContentResult find(UUID id) {
-    BinaryContent binaryContent = binaryContentRepository.findById(id)
-        .orElseThrow(() -> {
-          log.warn("BinaryContent find failed: binaryContent not found (binaryContentId: {})", id);
-          return new BinaryContentNotFoundException(Map.of("binaryContentId", id));
-        });
+    BinaryContent binaryContent = findBinaryContentById(id, "find");
     return binaryContentMapper.toFindBinaryContentResult(binaryContent);
   }
 
@@ -63,12 +59,17 @@ public class BasicBinaryContentService implements BinaryContentService {
       @CacheEvict(value = "allBinaryContents", allEntries = true)
   })
   public void delete(UUID id) {
-    binaryContentRepository.findById(id)
-        .orElseThrow(() -> {
-          log.warn("BinaryContent delete failed: binaryContent not found (binaryContentId: {})",
-              id);
-          return new BinaryContentNotFoundException(Map.of("binaryContentId", id));
-        });
+    findBinaryContentById(id, "delete");
     binaryContentRepository.deleteById(id);
+  }
+
+  private BinaryContent findBinaryContentById(UUID id, String method) {
+    return binaryContentRepository.findById(id)
+        .orElseThrow(() -> {
+          log.warn("BinaryContent {} failed: binaryContent not found (binaryContentId: {})", method,
+              id);
+          return new BinaryContentNotFoundException(
+              Map.of("binaryContentId", id, "method", method));
+        });
   }
 }
