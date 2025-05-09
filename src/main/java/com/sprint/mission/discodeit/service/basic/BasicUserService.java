@@ -49,11 +49,11 @@ public class BasicUserService implements UserService {
 
         if (userRepository.existsByUsername(username)) {
             log.warn("Username {} already exists", username);
-            throw new IllegalArgumentException("User with email " + email + " already exists");
+            throw new IllegalArgumentException("User with username " + username + " already exists");
         }
         if (userRepository.existsByEmail(email)) {
             log.warn("Email {} already exists", email);
-            throw new IllegalArgumentException("User with username " + username + " already exists");
+            throw new IllegalArgumentException("User with email " + email + " already exists");
         }
 
         BinaryContent profile = profileCreateRequest
