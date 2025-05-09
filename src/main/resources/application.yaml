@@ -9,6 +9,15 @@ spring:
       maxFileSize: 10MB
       maxRequestSize: 30MB
 
+
+# 기본 로깅 레벨 (info)
+logging:
+  level:
+    root: INFO
+    # SQL 로그
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
+
 discodeit:
   repository:
     type: jpa     # jcf | file | jpa

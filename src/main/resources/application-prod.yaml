@@ -28,3 +28,8 @@ spring:
 
 server:
   port: 80
+
+# 운영 환경에서는 info 로만 남기기
+logging:
+  level:
+    com.sprint.mission.discodeit: INFO

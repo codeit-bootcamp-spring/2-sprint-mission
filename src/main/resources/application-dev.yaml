@@ -31,4 +31,8 @@ spring:
       mode: always
 
 server:
-  port: 8081
+  port: 8080
+
+logging:
+  level:
+    com.sprint.mission.discodeit: DEBUG
