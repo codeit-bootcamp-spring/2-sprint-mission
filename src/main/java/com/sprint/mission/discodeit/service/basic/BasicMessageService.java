@@ -23,11 +23,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -50,10 +52,16 @@ public class BasicMessageService implements MessageService {
 
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(
-            () -> new NoSuchElementException("Channel with id " + channelId + " does not exist"));
+            () -> {
+              log.warn("메시지 생성 실패 - 존재하지않는 채널 ID: {}", channelId);
+              return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+            });
     User author = userRepository.findById(authorId)
         .orElseThrow(
-            () -> new NoSuchElementException("Author with id " + authorId + " does not exist")
+            () -> {
+              log.warn("메시지 생성 실패 - 존재하지않는 유저 ID: {}", authorId);
+              return new NoSuchElementException("Author with id " + authorId + " does not exist");
+            }
         );
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
@@ -62,10 +70,12 @@ public class BasicMessageService implements MessageService {
           String contentType = attachmentRequest.contentType();
           byte[] bytes = attachmentRequest.bytes();
 
+          log.info("첨부 파일 저장 시도 - 파일명: {}", fileName);
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("첨부 파일 저장 완료 - 파일명: {}", fileName);
           return binaryContent;
         })
         .toList();
@@ -115,7 +125,10 @@ public class BasicMessageService implements MessageService {
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> {
+              log.warn("메시지 수정 실패 - 존재하지않는 메시지 ID: {}", messageId);
+              return new NoSuchElementException("Message with id " + messageId + " not found");
+            });
     message.update(newContent);
     return messageMapper.toDto(message);
   }
@@ -124,6 +137,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public void delete(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
+      log.warn("메시지 삭제 실패 - 존재하지않는 메시지 ID: {}", messageId);
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }
 
