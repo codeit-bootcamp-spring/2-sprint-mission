@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic.message;
 
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageResult;
-import com.sprint.mission.discodeit.dto.user.UserResult;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.service.message.MessageResult;
+import com.sprint.mission.discodeit.dto.service.user.UserResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -141,7 +141,7 @@ class BasicMessageServiceTest {
         Assertions.assertThatThrownBy(() -> messageService.getById(UUID.randomUUID()))
                 .isInstanceOf(EntityNotFoundException.class);
     }
-    
+
     @DisplayName("메세지 내용 수정본을 받으면, 메세지 내용을 덮어쓴다")
     @Test
     void updateContextTest() {

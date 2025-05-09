@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.dto.user;
+package com.sprint.mission.discodeit.dto.service.user;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;

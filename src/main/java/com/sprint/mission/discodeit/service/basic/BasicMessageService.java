@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
-import com.sprint.mission.discodeit.dto.message.MessageByChannelRequest;
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageResult;
+import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.request.message.MessageByChannelRequest;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.dto.service.message.MessageResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageResultMapper;
-import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -62,10 +61,10 @@ public class BasicMessageService implements MessageService {
     public PageResponse<MessageResult> getAllByChannelId(MessageByChannelRequest messageByChannelRequest) {
         Pageable page = Pageable.ofSize(messageByChannelRequest.size());
 
-        Slice<Message> slices = messageRepository.findByChannelIdOrderByCreatedAtDesc(
+        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(
                 messageByChannelRequest.channelId(), page);
 
-        return PageResponseMapper.fromSlice(slices, message ->
+        return PageResponse.of(messages, message ->
                 messageResultMapper.convertToMessageResult(message, message.getUser())
         );
     }

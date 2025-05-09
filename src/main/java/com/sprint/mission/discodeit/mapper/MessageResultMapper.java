@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.message.MessageResult;
-import com.sprint.mission.discodeit.dto.user.UserResult;
+import com.sprint.mission.discodeit.dto.service.message.MessageResult;
+import com.sprint.mission.discodeit.dto.service.user.UserResult;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;

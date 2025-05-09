@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic.binartContentStorageService;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.basic.BinaryContentStorageService;
 import org.assertj.core.api.Assertions;

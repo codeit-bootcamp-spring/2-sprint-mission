@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.userstatus;
+package com.sprint.mission.discodeit.dto.service.userstatus;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 

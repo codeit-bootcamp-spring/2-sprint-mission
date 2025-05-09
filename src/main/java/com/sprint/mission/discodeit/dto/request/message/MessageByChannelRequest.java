@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.message;
+package com.sprint.mission.discodeit.dto.request.message;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.RequestParam;

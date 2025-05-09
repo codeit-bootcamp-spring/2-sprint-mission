@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentResult;
 import com.sprint.mission.discodeit.util.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

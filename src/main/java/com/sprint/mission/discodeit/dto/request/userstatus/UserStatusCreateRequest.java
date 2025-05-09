@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.userstatus;
+package com.sprint.mission.discodeit.dto.request.userstatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

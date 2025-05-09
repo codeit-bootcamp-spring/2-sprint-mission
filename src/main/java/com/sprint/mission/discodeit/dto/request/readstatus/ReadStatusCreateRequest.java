@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.readstatus;
+package com.sprint.mission.discodeit.dto.request.readstatus;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
