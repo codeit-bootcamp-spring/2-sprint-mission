@@ -24,6 +24,14 @@ public enum ErrorCode {
     BINARY_CONTENT_NOT_FOUND("BINARY_CONTENT_NOT_FOUND", "파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     INVALID_FILE_TYPE("INVALID_FILE_TYPE", "잘못된 파일 형식입니다.", HttpStatus.BAD_REQUEST),
 
+    // ReadStatus 관련
+    READ_STATUS_NOT_FOUND("READ_STATUS_NOT_FOUND", "읽음 상태 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    READ_STATUS_ALREADY_EXISTS("READ_STATUS_ALREADY_EXISTS", "이미 존재하는 읽음 상태입니다.", HttpStatus.CONFLICT),
+
+    // UserStatus 관련
+    USER_STATUS_NOT_FOUND("USER_STATUS_NOT_FOUND", "사용자 상태 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    USER_STATUS_ALREADY_EXISTS("USER_STATUS_ALREADY_EXISTS", "이미 존재하는 사용자 상태입니다.", HttpStatus.CONFLICT),
+
     // 공통
     INVALID_INPUT_VALUE("INVALID_INPUT_VALUE", "잘못된 입력 값입니다.", HttpStatus.BAD_REQUEST),
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
