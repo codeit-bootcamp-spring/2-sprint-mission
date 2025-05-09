@@ -1,31 +1,22 @@
 package com.sprint.mission.discodeit.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.NoSuchElementException;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> handleException(DiscodeitException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getTimestamp(),
+                e.getErrorCode().getCode(),
+                e.getErrorCode().getMessage(),
+                e.getDetails(),
+                e.getClass().getSimpleName(),
+                e.getErrorCode().getHttpStatus().value()
+        );
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
     }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
-
 }
