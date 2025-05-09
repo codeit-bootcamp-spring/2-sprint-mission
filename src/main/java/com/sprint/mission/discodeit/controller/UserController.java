@@ -52,7 +52,7 @@ public class UserController implements UserApi {
   public ResponseEntity<CreateUserResponseDTO> createUser(
       @RequestPart("userCreateRequest") @Valid CreateUserRequestDTO createUserRequestDTO,
       @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
-    log.info("User create attempt (username: {}, email: {}, profileSize: {})",
+    log.info("User create request (username: {}, email: {}, profileSize: {})",
         // username이나 email은 개인 정보이므로, 로그에 노출하면 위험 + 로그에 userId를 사용할 수 없는 로직 -> 마스킹하여 처리
         MaskingUtil.maskUsername(createUserRequestDTO.username()),
         MaskingUtil.maskEmail(createUserRequestDTO.email()),
@@ -91,7 +91,7 @@ public class UserController implements UserApi {
   public ResponseEntity<UpdateUserResponseDTO> updateUser(@PathVariable("userId") UUID id,
       @RequestPart("userUpdateRequest") @Valid UpdateUserRequestDTO updateUserRequestDTO,
       @RequestPart(value = "profile", required = false) MultipartFile multipartFile) {
-    log.info("User update attempt (userId: {},profile size: {})", id,
+    log.info("User update request (userId: {},profile size: {})", id,
         multipartFile != null ? multipartFile.getSize() : 0);
     validateProfileImageType(multipartFile);
     UpdateUserCommand updateUserCommand = userMapper.toUpdateUserCommand(updateUserRequestDTO);
@@ -105,7 +105,7 @@ public class UserController implements UserApi {
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UpdateUserStatusResponseDTO> updateUserStatus(
       @PathVariable("userId") UUID id) {
-    log.info("UserStatus update attempt (userId: {})", id);
+    log.info("UserStatus update request (userId: {})", id);
     UpdateUserStatusResult updateUserStatusResult = userStatusService.updateByUserId(id);
     UpdateUserStatusResponseDTO updatedUserStatus = userStatusMapper.toUpdateUserStatusResponseDTO(
         updateUserStatusResult);
@@ -115,7 +115,7 @@ public class UserController implements UserApi {
   @Override
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable("userId") UUID id) {
-    log.info("User delete attempt (userId: {})", id);
+    log.info("User delete request (userId: {})", id);
     userService.delete(id);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)

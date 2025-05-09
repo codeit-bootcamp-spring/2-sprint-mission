@@ -31,7 +31,7 @@ public class AuthController implements AuthApi {
   @PostMapping("/login")
   public ResponseEntity<LoginResponseDTO> login(
       @RequestBody @Valid LoginRequestDTO loginRequest) {
-    log.info("Login attempt (username = {})", MaskingUtil.maskUsername(loginRequest.username()));
+    log.info("Login request (username = {})", MaskingUtil.maskUsername(loginRequest.username()));
     LoginCommand loginCommand = authMapper.toLoginCommand(loginRequest);
     LoginResult loginResult = authService.login(loginCommand);
     LoginResponseDTO user = authMapper.toLoginResponseDTO(loginResult);

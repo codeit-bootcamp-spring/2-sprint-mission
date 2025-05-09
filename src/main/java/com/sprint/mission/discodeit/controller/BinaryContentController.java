@@ -49,7 +49,7 @@ public class BinaryContentController implements BinaryContentApi {
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> downloadBinaryContent(
       @PathVariable("binaryContentId") UUID binaryContentId) {
-    log.info("binaryContent download attempt (binaryContentId: {})", binaryContentId);
+    log.info("binaryContent download request (binaryContentId: {})", binaryContentId);
     FindBinaryContentResult findBinaryContentResult = binaryContentService.find(binaryContentId);
     return binaryContentStorage.download(findBinaryContentResult);
   }
