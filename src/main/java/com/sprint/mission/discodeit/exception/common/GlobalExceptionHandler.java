@@ -19,12 +19,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidationExceptions(
       MethodArgumentNotValidException e) {
     Map<String, Object> details = new HashMap<>();
-
     e.getBindingResult().getAllErrors().forEach(error -> {
       String fieldName = ((FieldError) error).getField();
       String message = error.getDefaultMessage();
@@ -58,10 +56,12 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ChannelException.class)
-  public ResponseEntity<ErrorResponse> handlePrivateChannelUpdateNotAllowed(ChannelException e) {
+  public ResponseEntity<ErrorResponse> handleChannelException(ChannelException e) {
+    Map<String, Object> details = e.getDetails();
+    ErrorResponse response;
+
     if (e.getErrorCode() == ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
+      response = new ErrorResponse(
           e.getErrorCode().name(),
           e.getErrorCode().getMessage(),
           details,
@@ -69,15 +69,26 @@ public class GlobalExceptionHandler {
           HttpStatus.FORBIDDEN.value()
       );
       return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
+      response = new ErrorResponse(
+          e.getErrorCode().name(),
+          e.getErrorCode().getMessage(),
+          details,
+          e.getClass().getSimpleName(),
+          HttpStatus.NOT_FOUND.value()
+      );
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
     throw e;
   }
 
   @ExceptionHandler(UserException.class)
-  public ResponseEntity<ErrorResponse> handleUserNotFound(UserException e) {
+  public ResponseEntity<ErrorResponse> handleUserException(UserException e) {
+    Map<String, Object> details = e.getDetails();
+    ErrorResponse response;
+
     if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
+      response = new ErrorResponse(
           e.getErrorCode().name(),
           e.getErrorCode().getMessage(),
           details,
@@ -85,15 +96,8 @@ public class GlobalExceptionHandler {
           HttpStatus.NOT_FOUND.value()
       );
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-    throw e;
-  }
-
-  @ExceptionHandler(UserException.class)
-  public ResponseEntity<ErrorResponse> handleUsernameNotFound(UserException e) {
-    if (e.getErrorCode() == ErrorCode.USERNAME_NOT_FOUND) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
+    } else if (e.getErrorCode() == ErrorCode.USERNAME_NOT_FOUND) {
+      response = new ErrorResponse(
           e.getErrorCode().name(),
           e.getErrorCode().getMessage(),
           details,
@@ -101,22 +105,24 @@ public class GlobalExceptionHandler {
           HttpStatus.NOT_FOUND.value()
       );
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-    throw e;
-  }
-
-  @ExceptionHandler(ChannelException.class)
-  public ResponseEntity<ErrorResponse> handleChannelNotFound(ChannelException e) {
-    if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
+    } else if (e.getErrorCode() == ErrorCode.USERNAME_ALREADY_EXISTS) {
+      response = new ErrorResponse(
           e.getErrorCode().name(),
           e.getErrorCode().getMessage(),
           details,
           e.getClass().getSimpleName(),
-          HttpStatus.NOT_FOUND.value()
+          HttpStatus.CONFLICT.value()
       );
-      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    } else if (e.getErrorCode() == ErrorCode.EMAIL_ALREADY_EXISTS) {
+      response = new ErrorResponse(
+          e.getErrorCode().name(),
+          e.getErrorCode().getMessage(),
+          details,
+          e.getClass().getSimpleName(),
+          HttpStatus.CONFLICT.value()
+      );
+      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
     throw e;
   }
@@ -138,10 +144,12 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(UserStatusException.class)
-  public ResponseEntity<ErrorResponse> handleUserStatusNotFound(UserStatusException e) {
+  public ResponseEntity<ErrorResponse> handleUserStatusException(UserStatusException e) {
+    Map<String, Object> details = e.getDetails();
+    ErrorResponse response;
+
     if (e.getErrorCode() == ErrorCode.USER_STATUS_NOT_FOUND) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
+      response = new ErrorResponse(
           e.getErrorCode().name(),
           e.getErrorCode().getMessage(),
           details,
@@ -149,15 +157,26 @@ public class GlobalExceptionHandler {
           HttpStatus.NOT_FOUND.value()
       );
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    } else if (e.getErrorCode() == ErrorCode.USER_STATUS_ALREADY_EXISTS) {
+      response = new ErrorResponse(
+          e.getErrorCode().name(),
+          e.getErrorCode().getMessage(),
+          details,
+          e.getClass().getSimpleName(),
+          HttpStatus.CONFLICT.value()
+      );
+      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
     throw e;
   }
 
   @ExceptionHandler(ReadStatusException.class)
-  public ResponseEntity<ErrorResponse> handleReadStatusNotFound(ReadStatusException e) {
+  public ResponseEntity<ErrorResponse> handleReadStatusException(ReadStatusException e) {
+    Map<String, Object> details = e.getDetails();
+    ErrorResponse response;
+
     if (e.getErrorCode() == ErrorCode.READ_STATUS_NOT_FOUND) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
+      response = new ErrorResponse(
           e.getErrorCode().name(),
           e.getErrorCode().getMessage(),
           details,
@@ -165,6 +184,15 @@ public class GlobalExceptionHandler {
           HttpStatus.NOT_FOUND.value()
       );
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    } else if (e.getErrorCode() == ErrorCode.READ_STATUS_ALREADY_EXISTS) {
+      response = new ErrorResponse(
+          e.getErrorCode().name(),
+          e.getErrorCode().getMessage(),
+          details,
+          e.getClass().getSimpleName(),
+          HttpStatus.CONFLICT.value()
+      );
+      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
     throw e;
   }
@@ -181,70 +209,6 @@ public class GlobalExceptionHandler {
           HttpStatus.NOT_FOUND.value()
       );
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-    throw e;
-  }
-
-  @ExceptionHandler(UserException.class)
-  public ResponseEntity<ErrorResponse> handleUsernameAlreadyExists(UserException e) {
-    if (e.getErrorCode() == ErrorCode.USERNAME_ALREADY_EXISTS) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
-          e.getErrorCode().name(),
-          e.getErrorCode().getMessage(),
-          details,
-          e.getClass().getSimpleName(),
-          HttpStatus.CONFLICT.value()
-      );
-      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-    throw e;
-  }
-
-  @ExceptionHandler(UserException.class)
-  public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(UserException e) {
-    if (e.getErrorCode() == ErrorCode.EMAIL_ALREADY_EXISTS) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
-          e.getErrorCode().name(),
-          e.getErrorCode().getMessage(),
-          details,
-          e.getClass().getSimpleName(),
-          HttpStatus.CONFLICT.value()
-      );
-      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-    throw e;
-  }
-
-  @ExceptionHandler(UserStatusException.class)
-  public ResponseEntity<ErrorResponse> handleUserStatusAlreadyExists(UserStatusException e) {
-    if (e.getErrorCode() == ErrorCode.USER_STATUS_ALREADY_EXISTS) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
-          e.getErrorCode().name(),
-          e.getErrorCode().getMessage(),
-          details,
-          e.getClass().getSimpleName(),
-          HttpStatus.CONFLICT.value()
-      );
-      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-    throw e;
-  }
-
-  @ExceptionHandler(ReadStatusException.class)
-  public ResponseEntity<ErrorResponse> handleReadStatusAlreadyExists(ReadStatusException e) {
-    if (e.getErrorCode() == ErrorCode.READ_STATUS_ALREADY_EXISTS) {
-      Map<String, Object> details = e.getDetails();
-      ErrorResponse response = new ErrorResponse(
-          e.getErrorCode().name(),
-          e.getErrorCode().getMessage(),
-          details,
-          e.getClass().getSimpleName(),
-          HttpStatus.CONFLICT.value()
-      );
-      return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
     throw e;
   }
