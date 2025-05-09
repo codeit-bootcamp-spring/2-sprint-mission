@@ -71,7 +71,7 @@ public class User extends BaseUpdatableEntity {
     }
   }
 
-  public static class Validator {
+  private static class Validator {
 
     //TODO 정규패턴을 사용해서 유효성 검증할 예정 => 이름 조건, 비밀번호 조건, 이메일 조건 등
     public static void validate(String name, String password, String email) {

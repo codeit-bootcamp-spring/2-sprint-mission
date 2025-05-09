@@ -101,7 +101,7 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional(readOnly = true)
   public List<UserResult> findAll() {
-    List<User> userList = userRepository.findAll();
+    List<User> userList = userRepository.findAllWithProfileAndStatus();
 
     return userList.stream().map(user -> UserResult.create(
         user,
