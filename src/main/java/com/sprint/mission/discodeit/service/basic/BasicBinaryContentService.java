@@ -3,10 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
 import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -38,7 +39,11 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional(readOnly = true)
   @Cacheable(value = "binaryContent", key = "#p0")
   public FindBinaryContentResult find(UUID id) {
-    BinaryContent binaryContent = findBinaryContentById(id);
+    BinaryContent binaryContent = binaryContentRepository.findById(id)
+        .orElseThrow(() -> {
+          log.warn("BinaryContent find failed: binaryContent not found (binaryContentId: {})", id);
+          return new BinaryContentNotFoundException(Map.of("binaryContentId", id));
+        });
     return binaryContentMapper.toFindBinaryContentResult(binaryContent);
   }
 
@@ -47,8 +52,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Cacheable(value = "allBinaryContents", key = "#p0")
   // attachmentIds를 받아서 리스트를 조회
   public List<FindBinaryContentResult> findAllByIdIn(List<UUID> attachmentsId) {
-    return attachmentsId.stream()
-        .map(this::findBinaryContentById)
+    return binaryContentRepository.findAllByIdIn(attachmentsId).stream()
         .map(binaryContentMapper::toFindBinaryContentResult)
         .toList();
   }
@@ -59,16 +63,12 @@ public class BasicBinaryContentService implements BinaryContentService {
       @CacheEvict(value = "allBinaryContents", allEntries = true)
   })
   public void delete(UUID id) {
+    binaryContentRepository.findById(id)
+        .orElseThrow(() -> {
+          log.warn("BinaryContent delete failed: binaryContent not found (binaryContentId: {})",
+              id);
+          return new BinaryContentNotFoundException(Map.of("binaryContentId", id));
+        });
     binaryContentRepository.deleteById(id);
   }
-
-  private BinaryContent findBinaryContentById(UUID id) {
-    return binaryContentRepository.findById(id)
-        .orElseThrow(() -> {
-          log.error("binaryContent 찾기 실패: {}", id);
-          return RestExceptions.BINARY_CONTENT_NOT_FOUND;
-        });
-  }
-
-
 }
