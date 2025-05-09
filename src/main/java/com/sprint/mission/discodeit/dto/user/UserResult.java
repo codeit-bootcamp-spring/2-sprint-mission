@@ -15,12 +15,22 @@ public record UserResult(UUID id,
                          boolean online) {
 
     public static UserResult fromEntity(User user, boolean isOnline) {
+        BinaryContentResult binaryContentResult = getBinaryContentResult(user);
+
         return new UserResult(user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getName(),
                 user.getEmail(),
-                BinaryContentResult.fromEntity(user.getBinaryContent()),
+                binaryContentResult,
                 isOnline);
+    }
+
+    private static BinaryContentResult getBinaryContentResult(User user) {
+        if (user.getBinaryContent() != null) {
+            return BinaryContentResult.fromEntity(user.getBinaryContent());
+        }
+
+        return null;
     }
 }

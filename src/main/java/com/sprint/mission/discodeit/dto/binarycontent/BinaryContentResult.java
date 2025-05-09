@@ -8,9 +8,11 @@ import java.util.UUID;
 public record BinaryContentResult(UUID id, Instant createdAt, String name, String contentType) {
 
     public static BinaryContentResult fromEntity(BinaryContent binaryContent) {
-        return new BinaryContentResult(binaryContent.getId(),
+        return new BinaryContentResult(
+                binaryContent.getId(),
                 binaryContent.getCreatedAt(),
                 binaryContent.getFileName(),
-                binaryContent.getContentType());
+                binaryContent.getContentType()
+        );
     }
 }

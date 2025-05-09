@@ -31,15 +31,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         if (bytes == null) {
             throw new IllegalArgumentException("content bytes는 null일 수 없습니다.");
         }
+        saveBinaryContentFile(binaryContentId, bytes);
 
+        return binaryContentId;
+    }
+
+    private void saveBinaryContentFile(UUID binaryContentId, byte[] bytes) {
         Path filePath = resolvePath(binaryContentId);
         try (FileOutputStream fileOutputStream = new FileOutputStream(filePath.toFile())) {
             fileOutputStream.write(bytes);
         } catch (IOException e) {
             throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
         }
-
-        return binaryContentId;
     }
 
     @Override
@@ -68,7 +71,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         if (directoryPath == null) {
             return;
         }
-
         FileUtils.creatDirectory(directoryPath);
     }
 

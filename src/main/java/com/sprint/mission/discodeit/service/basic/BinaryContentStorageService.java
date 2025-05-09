@@ -23,9 +23,10 @@ public class BinaryContentStorageService {
     public List<BinaryContent> createBinaryContents(List<BinaryContentRequest> binaryContentRequests) {
         List<BinaryContent> binaryContents = new ArrayList<>();
         for (BinaryContentRequest binaryContentRequest : binaryContentRequests) {
-            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType()));
-            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+            BinaryContent savedBinaryContent = binaryContentRepository.save(
+                    new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType()));
 
+            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
             binaryContents.add(savedBinaryContent);
         }
 
@@ -34,8 +35,6 @@ public class BinaryContentStorageService {
 
     public void deleteBinaryContentsBatch(List<UUID> attachmentIds) {
         binaryContentRepository.deleteAllByIdInBatch(attachmentIds);
-
-        // TODO: 5/7/25 스토리지에 있는 것도 삭제 되어야한다
     }
 
 }

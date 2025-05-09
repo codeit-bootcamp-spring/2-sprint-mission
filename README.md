@@ -36,9 +36,9 @@
   - [ ] 다음 서비스의 핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
     - [ ] UserService: create, update, delete 메소드
     - [ ] ChannelService: create(PUBLIC, PRIVATE), update, delete, findByUserId 메소드
-    - [ ] MessageService: create, update, delete, findByChannelId 메소드
-- [ ] Mockito를 활용해 Repository 의존성을 모의(mock)하세요.
-- [ ] BDDMockito를 활용해 테스트 가독성을 높이세요.
+    - [x] MessageService: create, update, delete, findByChannelId 메소드
+- [x] Mockito를 활용해 Repository 의존성을 모의(mock)하세요.
+- [x] BDDMockito를 활용해 테스트 가독성을 높이세요.
 
 
 3. 슬라이스(컴포넌트) 테스트

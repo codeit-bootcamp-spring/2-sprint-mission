@@ -34,7 +34,6 @@ public class BasicAuthService implements AuthService {
         return UserResult.fromEntity(user, userStatus.isOnline(now));
     }
 
-    // 메서드 몇칸 띌건지
     private User findUserByNameAndValidatePassword(LoginRequest loginRequestUser) {
         User user = validateUserName(loginRequestUser);
         validatePassword(user, loginRequestUser.password());

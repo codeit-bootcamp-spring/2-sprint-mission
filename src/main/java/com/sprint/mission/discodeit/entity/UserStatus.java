@@ -16,8 +16,8 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private static final int DEFAULT_DURATION = 5 * 60 * 1000;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(name = "last_active_at")
