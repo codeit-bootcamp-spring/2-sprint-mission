@@ -28,4 +28,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserStatusNotFound(UserStatusNotFoundException e) {
         return ResponseEntity.status(404).body(e.getMessage());
     }
+
+    @ExceptionHandler(BinaryContentNotFoundException.class)
+    public ResponseEntity<String> handleBinaryContentNotFound(BinaryContentNotFoundException e) {
+        return ResponseEntity.status(404).body(e.getMessage());
+    }
 }
