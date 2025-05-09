@@ -1,4 +1,3 @@
-# src/main/resources/application.yaml
 spring:
   application:
     name: discodeit
@@ -9,20 +8,50 @@ spring:
       maxFileSize: 10MB
       maxRequestSize: 30MB
 
-
-# 기본 로깅 레벨 (info)
 logging:
   level:
     root: INFO
-    # SQL 로그
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: DEBUG
 
 discodeit:
   repository:
-    type: jpa     # jcf | file | jpa
+    type: jpa
     file-directory: .discodeit
   storage:
     type: local
     local:
       root-path: ${user.home}/Documents/discodeit-storage
+
+management:
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  datasource:
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
+  jpa:
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  storage:
+    type: ${discodeit.storage.type}
+    path: ${discodeit.storage.local.root-path}
+  multipart:
+    max-file-size: ${spring.servlet.multipart.maxFileSize}
+    max-request-size: ${spring.servlet.multipart.maxRequestSize}
