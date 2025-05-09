@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -46,11 +47,11 @@ public class BasicUserService implements UserService {
 
     if (userRepository.existsByEmail(email)) {
       log.warn("이미 존재하는 이메일: {}", email);
-      throw new IllegalArgumentException("User with email " + email + " already exists");
+      throw new UserAlreadyExistsException(email);
     }
     if (userRepository.existsByUsername(username)) {
       log.warn("이미 존재하는 사용자 이름: {}", username);
-      throw new IllegalArgumentException("User with username " + username + " already exists");
+      throw new UserAlreadyExistsException(username);
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -110,11 +111,11 @@ public class BasicUserService implements UserService {
     String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
       log.warn("이메일 중복: {}", newEmail);
-      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+      throw new UserAlreadyExistsException(newEmail);
     }
     if (userRepository.existsByUsername(newUsername)) {
       log.warn("사용자 이름 중복: {}", newUsername);
-      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+      throw new UserAlreadyExistsException(newUsername);
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
