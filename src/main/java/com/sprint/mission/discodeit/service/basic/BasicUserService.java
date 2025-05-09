@@ -32,7 +32,7 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
 
   @Override
-  public UserDto create(UserCreateRequest userCreateRequest,
+  public UserResponse create(UserCreateRequest userCreateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
     userRepository.findByUsername(userCreateRequest.username())
         .ifPresent(u -> {
@@ -58,20 +58,20 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserDto find(UUID userId) {
+  public UserResponse find(UUID userId) {
     User user = getUserBy(userId);
 
     return userMapper.toResponse(user);
   }
 
   @Override
-  public List<UserDto> findAll() {
+  public List<UserResponse> findAll() {
     return userRepository.findAll().stream()
         .map(userMapper::toResponse).toList();
   }
 
   @Override
-  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+  public UserResponse update(UUID userId, UserUpdateRequest userUpdateRequest,
       BinaryContentCreateRequest profileCreateRequest) {
     User user = getUserBy(userId);
 

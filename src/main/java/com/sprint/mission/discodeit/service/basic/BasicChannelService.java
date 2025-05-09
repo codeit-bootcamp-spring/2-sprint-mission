@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.message.Message;
@@ -41,14 +41,14 @@ public class BasicChannelService implements ChannelService {
 
 
   @Override
-  public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
+  public ChannelResponse createPublicChannel(PublicChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PUBLIC, request.name(), request.description());
     channelRepository.save(channel);
     return assembleChannelDto(channel);
   }
 
   @Override
-  public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
+  public ChannelResponse createPrivateChannel(PrivateChannelCreateRequest request) {
     List<User> participants = userRepository.findAllById(request.participantIds());
 
     if (participants.size() != request.participantIds().size()) {
@@ -63,13 +63,13 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelDto find(UUID channelId) {
+  public ChannelResponse find(UUID channelId) {
     Channel channel = getChannel(channelId);
     return assembleChannelDto(channel);
   }
 
   @Override
-  public List<ChannelDto> findAllByUserId(UUID userId) {
+  public List<ChannelResponse> findAllByUserId(UUID userId) {
     validateUserExistence(userId);
 
     List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
@@ -82,7 +82,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
+  public ChannelResponse update(UUID channelId, PublicChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
 
@@ -108,9 +108,9 @@ public class BasicChannelService implements ChannelService {
   }
 
 
-  private ChannelDto assembleChannelDto(Channel channel) {
+  private ChannelResponse assembleChannelDto(Channel channel) {
     List<UUID> participantIds = readStatusRepository.findUserIdsByChannel(channel);
-    List<UserDto> participants = userRepository.findAllById(participantIds).stream()
+    List<UserResponse> participants = userRepository.findAllById(participantIds).stream()
         .map(userMapper::toResponse)
         .toList();
     Instant lastMessageAt = messageRepository

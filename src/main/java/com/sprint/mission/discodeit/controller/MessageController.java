@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.common.PageableRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -29,7 +28,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @GetMapping
-  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+  public ResponseEntity<PageResponse<MessageResponse>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId,
       @RequestParam(value = "cursor", required = false) Instant cursor,
       @PageableDefault(
@@ -38,7 +37,7 @@ public class MessageController {
           sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
-    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
+    PageResponse<MessageResponse> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -46,7 +45,7 @@ public class MessageController {
   }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageDto> create(
+  public ResponseEntity<MessageResponse> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachmentFiles) {
 
@@ -58,15 +57,15 @@ public class MessageController {
           .toList();
     }
 
-    MessageDto message = messageService.create(messageCreateRequest, attachmentsCreateRequest);
+    MessageResponse message = messageService.create(messageCreateRequest, attachmentsCreateRequest);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageDto> update(
+  public ResponseEntity<MessageResponse> update(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
-    MessageDto updatedMessage = messageService.update(messageId, messageUpdateRequest);
+    MessageResponse updatedMessage = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(updatedMessage);
   }
 

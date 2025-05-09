@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.channel.Channel;
@@ -41,7 +41,7 @@ public class BasicMessageService implements MessageService {
   private final PageResponseMapper pageResponseMapper;
 
   @Override
-  public MessageDto create(MessageCreateRequest messageCreateRequest,
+  public MessageResponse create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> attachmentsCreateRequest) {
     Channel channel = channelRepository.getReferenceById(messageCreateRequest.channelId());
     User author = userRepository.getReferenceById(messageCreateRequest.authorId());
@@ -60,16 +60,16 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public MessageDto find(UUID messageId) {
+  public MessageResponse find(UUID messageId) {
     return messageMapper.toResponse(messageRepository.findById(messageId)
         .orElseThrow(
             () -> new ResourceNotFoundException("Message with id " + messageId + " not found")));
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
+  public PageResponse<MessageResponse> findAllByChannelId(UUID channelId, Instant createAt,
       Pageable pageable) {
-    Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+    Slice<MessageResponse> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
             Optional.ofNullable(createAt).orElse(Instant.now()),
             pageable)
         .map(messageMapper::toResponse);
@@ -84,7 +84,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+  public MessageResponse update(UUID messageId, MessageUpdateRequest request) {
     Message message = getMessage(messageId);
     message.update(request.newContent());
     return messageMapper.toResponse(message);

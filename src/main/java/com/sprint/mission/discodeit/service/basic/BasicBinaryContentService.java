@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -65,7 +65,7 @@ public class BasicBinaryContentService implements BinaryContentService {
       throw new ResourceNotFoundException("없다");
     }
 
-    BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
-    return binaryContentStorage.download(binaryContentDto);
+    BinaryContentResponse binaryContentResponse = binaryContentMapper.toDto(binaryContent);
+    return binaryContentStorage.download(binaryContentResponse);
   }
 }

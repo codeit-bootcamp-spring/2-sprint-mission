@@ -15,7 +15,6 @@ import org.hibernate.type.SqlTypes;
 public class Channel extends BaseUpdatableEntity {
 
   @Enumerated(EnumType.STRING)
-  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
   private ChannelType type;
 
   private String name; //PUBLIC 전용
