@@ -6,7 +6,10 @@ import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageCommand;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.file.FileReadException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -15,6 +18,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -72,8 +76,11 @@ public class BasicMessageService implements MessageService {
         try {
           binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
         } catch (IOException e) {
-          log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-          throw RestExceptions.FILE_READ_ERROR;
+          log.error("Message create failed: multipartFile read failed (filename: {})",
+              multipartFile.getOriginalFilename());
+          throw new FileReadException(Map.of("contentType", multipartFile.getContentType(),
+              "size", multipartFile.getSize(),
+              "filename", multipartFile.getOriginalFilename()));
         }
       }
     }
@@ -88,7 +95,7 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   @Cacheable(value = "message", key = "#p0")
   public FindMessageResult find(UUID messageId) {
-    Message message = findMessageById(messageId);
+    Message message = findMessageById(messageId, "find");
     return messageMapper.toFindMessageResult(message);
   }
 
@@ -119,9 +126,9 @@ public class BasicMessageService implements MessageService {
   @Transactional
   @CachePut(value = "message", key = "#p0")
   @CacheEvict(value = "allMessages", allEntries = true)
-  public UpdateMessageResult update(UUID id, UpdateMessageCommand updateMessageCommand,
+  public UpdateMessageResult update(UUID messageId, UpdateMessageCommand updateMessageCommand,
       List<MultipartFile> multipartFiles) {
-    Message message = findMessageById(id);
+    Message message = findMessageById(messageId, "update");
     message.updateMessageInfo(updateMessageCommand.newContent());
     replaceAttachments(message, multipartFiles);
     return messageMapper.toUpdateMessageResult(message);
@@ -135,7 +142,7 @@ public class BasicMessageService implements MessageService {
       @CacheEvict(value = "message", key = "#p0")
   })
   public void delete(UUID messageId) {
-    Message message = findMessageById(messageId);
+    Message message = findMessageById(messageId, "delete");
     if (message.getAttachments() != null) {
       message.getAttachments()
           .forEach(
@@ -168,8 +175,11 @@ public class BasicMessageService implements MessageService {
       try {
         binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
       } catch (IOException e) {
-        log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-        throw RestExceptions.FILE_READ_ERROR;
+        log.error("Message update failed: multipartFile read failed (filename: {})",
+            multipartFile.getOriginalFilename());
+        throw new FileReadException(Map.of("contentType", multipartFile.getContentType(),
+            "size", multipartFile.getSize(),
+            "filename", multipartFile.getOriginalFilename()));
       }
     }
 
@@ -205,25 +215,25 @@ public class BasicMessageService implements MessageService {
   }
 
 
-  private Message findMessageById(UUID id) {
+  private Message findMessageById(UUID id, String method) {
     return messageRepository.findById(id)
         .orElseThrow(() -> {
-          log.error("메시지 찾기 실패: {}", id);
-          return RestExceptions.MESSAGE_NOT_FOUND;
+          log.warn("Message {} failed: message not found (messageId: {})", method, id);
+          return new MessageNotFoundException(Map.of("messageId", id, "method", method));
         });
   }
 
   private User findUserById(UUID userId) {
     return userRepository.findById(userId).orElseThrow(() -> {
-      log.error("메시지 생성 중 유저 찾기 실패: {}", userId);
-      return RestExceptions.USER_NOT_FOUND;
+      log.warn("Message create failed: user not found (userId: {})", userId);
+      return new UserNotFoundException(Map.of("userId", userId));
     });
   }
 
   private Channel findChannelById(UUID channelId) {
     return channelRepository.findById(channelId).orElseThrow(() -> {
-      log.error("메시지 생성 중 채널 찾기 실패: {}", channelId);
-      return RestExceptions.CHANNEL_NOT_FOUND;
+      log.warn("Message create failed: channel not found (channelId: : {})", channelId);
+      return new ChannelNotFoundException(Map.of("channelId", channelId));
     });
   }
 }
