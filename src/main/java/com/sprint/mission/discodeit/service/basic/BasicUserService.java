@@ -19,9 +19,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
@@ -40,14 +42,18 @@ public class BasicUserService implements UserService {
     String email = userCreateRequest.email();
 
     if (userRepository.existsByEmail(email)) {
+      log.warn("이미 존재하는 Email로 생성 시도: {}", email);
       throw new IllegalArgumentException("User with email " + email + " already exists");
     }
     if (userRepository.existsByUsername(username)) {
+      log.warn("이미 존재하는 Username으로 생성 시도: {}", username);
       throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
+          log.info("프로필 이미지 저장 시도 - 파일명: {}", profileRequest.fileName());
+
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
@@ -55,6 +61,9 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+
+          log.info("프로필 이미지 저장 완료 - ID: {}", binaryContent.getId());
+
           return binaryContent;
         })
         .orElse(null);
@@ -88,19 +97,25 @@ public class BasicUserService implements UserService {
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> {
+          log.error("User 수정 실패 - ID: {} - 존재하지 않는 사용자", userId);
+          return new NoSuchElementException("User with id " + userId + " not found");
+        });
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
+      log.warn("이미 존재하는 Email로 수정 시도: {}", newEmail);
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
     if (userRepository.existsByUsername(newUsername)) {
+      log.warn("이미 존재하는 Username으로 수정 시도: {}", newUsername);
       throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
+          log.info("프로필 이미지 업데이트 시도 - 파일명: {}", profileRequest.fileName());
 
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
@@ -109,6 +124,9 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+
+          log.info("프로필 이미지 업데이트 완료 - ID: {}", binaryContent.getId());
+
           return binaryContent;
         })
         .orElse(null);
@@ -123,9 +141,9 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     if (userRepository.existsById(userId)) {
+      log.error("User 삭제 실패 - ID: {} - 존재하지 않는 사용자", userId);
       throw new NoSuchElementException("User with id " + userId + " not found");
     }
-
     userRepository.deleteById(userId);
   }
 }
