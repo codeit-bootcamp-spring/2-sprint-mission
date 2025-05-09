@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class ChannelController implements ChannelApi {
   private final ChannelMapper channelMapper;
 
   @PostMapping(path = "public")
-  public ResponseEntity<ChannelDto> create(@RequestBody PublicChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(@Valid @RequestBody PublicChannelCreateRequest request) {
     log.info("▶▶ [API] Creating public channel - name: {}", request.name());
     Channel createdChannel = channelService.create(request);
     log.info("◀◀ [API] Public channel created - id: {}", createdChannel.getId());
@@ -34,7 +35,7 @@ public class ChannelController implements ChannelApi {
   }
 
   @PostMapping(path = "private")
-  public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(@Valid @RequestBody PrivateChannelCreateRequest request) {
     log.info("▶▶ [API] Creating private channel with {} participants", request.participantIds().size());
     Channel createdChannel = channelService.create(request);
     log.info("◀◀ [API] Private channel created - id: {}", createdChannel.getId());
@@ -43,7 +44,7 @@ public class ChannelController implements ChannelApi {
 
   @PatchMapping(path = "{channelId}")
   public ResponseEntity<ChannelDto> update(@PathVariable("channelId") UUID channelId,
-                                           @RequestBody PublicChannelUpdateRequest request) {
+                                           @Valid @RequestBody PublicChannelUpdateRequest request) {
     log.info("▶▶ [API] Updating channel - id: {}", channelId);
     Channel updatedChannel = channelService.update(channelId, request);
     log.info("◀◀ [API] Channel updated - id: {}", channelId);

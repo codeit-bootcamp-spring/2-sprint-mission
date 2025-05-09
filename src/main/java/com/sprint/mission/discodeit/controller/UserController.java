@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class UserController implements UserApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
-          @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+          @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
           @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("▶▶ [API] Received user creation request - username: {}, email: {}", userCreateRequest.username(), userCreateRequest.email());
@@ -56,7 +57,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserDto> update(
           @PathVariable("userId") UUID userId,
-          @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+          @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
           @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("▶▶ [API] Received user update request - id: {}", userId);
@@ -94,7 +95,7 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}/userStatus")
   @Override
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-                                                                @RequestBody UserStatusUpdateRequest request) {
+                                                                @Valid @RequestBody UserStatusUpdateRequest request) {
     log.info("▶▶ [API] Received user status update request - userId: {}", userId);
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
     log.info("◀◀ [API] User status updated successfully - userId: {}", userId);
