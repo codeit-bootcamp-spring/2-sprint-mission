@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.dto.service.user.userstatus;
 
+import jakarta.validation.constraints.NotEmpty;
 import java.time.Instant;
 
 public record UserStatusUpdateRequest(
-    Instant newLastActiveAt
+    @NotEmpty Instant newLastActiveAt
 ) {
 
 }
