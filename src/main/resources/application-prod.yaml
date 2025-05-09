@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/discodeit_prod
     username: discodeit_user
-    password: discodeit1234
+    password: password1234
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 30
@@ -14,9 +14,9 @@ spring:
       show-sql: false
       properties:
         hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
           format_sql: false
           use_sql_comments: false
-          dialect: org.hibernate.dialect.PostgreSQLDialect
       open-in-view: false
     logging:
       level:
