@@ -10,6 +10,10 @@ spring:
     active:
   application:
     name: discodeit
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
   cache:
     type: simple
   datasource:
