@@ -28,6 +28,7 @@ public class Message extends BaseUpdatableEntity {
 
     //message-> user 단방향
     @ManyToOne(fetch = FetchType.LAZY)
+    //삭제시에 유저 이름 null 처리를 위해 true로 변경
     @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = true)
     private User author;
 

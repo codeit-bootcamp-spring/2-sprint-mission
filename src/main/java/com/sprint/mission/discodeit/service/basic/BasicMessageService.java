@@ -17,6 +17,10 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.exception.message.MessageException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +34,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -105,7 +109,7 @@ public class BasicMessageService implements MessageService {
                         savedMetadata.getId());
                 } catch (Exception e) {
                     log.error("첨부파일 '{}' 처리 중 오류 발생", fileName, e);
-                    throw new RuntimeException("첨부파일 '" + fileName + "' 처리 중 오류가 발생했습니다.", e);
+                    throw new MessageException(ErrorCode.FILE_PROCESSING_ERROR, Map.of("fileName", fileName, "originalError", e.getMessage()));
                 }
             }
             log.info("총 {}개의 첨부파일 처리 완료.", savedAttachmentEntities.size());
@@ -130,10 +134,7 @@ public class BasicMessageService implements MessageService {
     public MessageDto find(UUID messageId) {
         log.info("메시지 조회 시도. ID: '{}'", messageId);
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> {
-                log.warn("ID '{}'에 해당하는 메시지를 찾을 수 없습니다.", messageId);
-                return new NoSuchElementException("메시지 ID " + messageId + "를 찾을 수 없습니다.");
-            });
+            .orElseThrow(() -> new MessageException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId.toString())));
         log.info("메시지 조회 성공. ID: '{}'", messageId);
         return messageMapper.toDto(message);
     }
@@ -144,7 +145,7 @@ public class BasicMessageService implements MessageService {
         log.info("채널 ID '{}'의 메시지 목록 조회 시도. 커서: '{}', 크기: {}", channelId, cursor, size);
         if (!channelRepository.existsById(channelId)) {
             log.warn("채널 ID '{}'를 찾을 수 없어 메시지 목록 조회를 중단합니다.", channelId);
-            throw new NoSuchElementException("채널 ID " + channelId + "를 찾을 수 없습니다.");
+            throw new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId.toString()));
         }
 
         List<Message> messages;
@@ -180,10 +181,7 @@ public class BasicMessageService implements MessageService {
     public MessageDto update(UUID messageId, MessageUpdateRequest request) {
         log.info("메시지 업데이트 시작. ID: '{}'", messageId);
         Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> {
-                log.warn("ID '{}'에 해당하는 업데이트할 메시지를 찾을 수 없습니다.", messageId);
-                return new NoSuchElementException("메시지 ID " + messageId + "를 찾을 수 없습니다.");
-            });
+            .orElseThrow(() -> new MessageException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId.toString())));
 
         String oldContent = message.getContent();
         String newContent = request.newContent();
@@ -201,7 +199,7 @@ public class BasicMessageService implements MessageService {
         log.info("메시지 삭제 시작. ID: '{}'", messageId);
         if (!messageRepository.existsById(messageId)) {
             log.warn("ID '{}'에 해당하는 삭제할 메시지를 찾을 수 없습니다.", messageId);
-            throw new NoSuchElementException("메시지 ID " + messageId + "를 찾을 수 없습니다.");
+            throw new MessageException(ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId.toString()));
         }
         messageRepository.deleteById(messageId);
         log.info("메시지 삭제 완료. ID: '{}'", messageId);
@@ -209,17 +207,11 @@ public class BasicMessageService implements MessageService {
 
     private Channel findChannelOrThrow(UUID channelId) {
         return channelRepository.findById(channelId)
-            .orElseThrow(() -> {
-                log.warn("메시지 작업 실패: 채널 ID '{}'를 찾을 수 없습니다.", channelId);
-                return new NoSuchElementException("채널 ID " + channelId + "를 찾을 수 없습니다.");
-            });
+            .orElseThrow(() -> new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId.toString())));
     }
 
     private User findUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> {
-                log.warn("메시지 작업 실패: 사용자(작성자) ID '{}'를 찾을 수 없습니다.", userId);
-                return new NoSuchElementException("사용자(작성자) ID " + userId + "를 찾을 수 없습니다.");
-            });
+            .orElseThrow(() -> new UserNotFoundException(userId.toString()));
     }
 }
