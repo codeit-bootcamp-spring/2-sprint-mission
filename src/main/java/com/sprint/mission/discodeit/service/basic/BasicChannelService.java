@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFound;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdate;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -63,7 +66,7 @@ public class BasicChannelService implements ChannelService {
             .map(channelMapper::toDto)
             .orElseThrow(() -> {
               log.warn("채널 조회 실패: id={} not found", channelId);
-              return new NoSuchElementException("Channel with id " + channelId + " not found");
+              return new ChannelNotFound(Map.of("id", channelId));
             });
     log.info("채널 조회 완료: id={}", channelId);
     return dto;
@@ -91,11 +94,11 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {
               log.warn("채널 수정 실패 (not found): id={}", channelId);
-              return new NoSuchElementException("Channel with id " + channelId + " not found");
+              return new ChannelNotFound(Map.of("id", channelId));
             });
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       log.warn("채널 수정 실패 (private): id={}", channelId);
-      throw new IllegalArgumentException("Private channel cannot be updated");
+      throw new PrivateChannelUpdate(Map.of("id", channelId));
     }
     channel.update(newName, newDescription);
     Channel updated = channelRepository.save(channel);
@@ -110,7 +113,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {
               log.warn("채널 삭제 실패 (not found): id={}", channelId);
-              return new NoSuchElementException("Channel with id " + channelId + " not found");
+              return new ChannelNotFound(Map.of("id", channelId));
             });
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);

@@ -4,12 +4,16 @@ import com.sprint.mission.discodeit.Mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.auth.AuthException;
+import com.sprint.mission.discodeit.exception.auth.AuthInvalidCredentianls;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -30,12 +34,12 @@ public class BasicAuthService implements AuthService {
     User user = userRepository.findByUsername(username)
             .orElseThrow(() -> {
               log.warn("Login failed username={}", username);
-              return new NoSuchElementException("User with username " + username + " not found");
+              return new AuthInvalidCredentianls(Map.of("username", username));
             });
 
     if (!user.getPassword().equals(password)) {
       log.warn("Login failed username={}", username);
-      throw new IllegalArgumentException("Wrong password");
+      throw new AuthInvalidCredentianls(Map.of("username", username));
     }
 
     UserDto userDto = userMapper.toDto(user);
