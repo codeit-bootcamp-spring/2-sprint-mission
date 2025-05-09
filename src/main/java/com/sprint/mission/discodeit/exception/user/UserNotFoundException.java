@@ -15,4 +15,12 @@ public class UserNotFoundException extends UserException {
                 Map.of("userId", userId)
         );
     }
+
+    public UserNotFoundException(String username) {
+        super(
+                Instant.now(),
+                ErrorCode.USER_NOT_FOUND,
+                Map.of("username", username)
+        );
+    }
 }
