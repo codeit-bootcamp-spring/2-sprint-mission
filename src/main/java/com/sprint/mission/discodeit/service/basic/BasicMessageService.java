@@ -23,17 +23,18 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  //
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final MessageMapper messageMapper;
@@ -64,6 +65,7 @@ public class BasicMessageService implements MessageService {
 
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
+          log.info("[FILE] 파일 업로드 시도 - 파일명: {}", fileName);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
           return binaryContent;
@@ -78,6 +80,7 @@ public class BasicMessageService implements MessageService {
         attachments
     );
 
+    log.info("[MESSAGE] 생성 시도 - AUTHOR_ID: {}, CHANNEL_ID: {}", authorId, channelId);
     messageRepository.save(message);
     return messageMapper.toDto(message);
   }
@@ -116,6 +119,7 @@ public class BasicMessageService implements MessageService {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    log.info("[MESSAGE] 수정 시도 - ID: {}", messageId);
     message.update(newContent);
     return messageMapper.toDto(message);
   }
@@ -126,7 +130,7 @@ public class BasicMessageService implements MessageService {
     if (!messageRepository.existsById(messageId)) {
       throw new NoSuchElementException("Message with id " + messageId + " not found");
     }
-
+    log.warn("[MESSAGE] 삭제 시도 - ID: {}", messageId);
     messageRepository.deleteById(messageId);
   }
 }

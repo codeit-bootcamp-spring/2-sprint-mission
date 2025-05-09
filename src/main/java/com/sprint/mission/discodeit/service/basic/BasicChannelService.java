@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
@@ -36,8 +37,10 @@ public class BasicChannelService implements ChannelService {
   public ChannelDto create(PublicChannelCreateRequest request) {
     String name = request.name();
     String description = request.description();
+
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
+    log.info("[CHANNEL] PUBLIC 생성 시도 - ID: {}", channel.getId());
     channelRepository.save(channel);
     return channelMapper.toDto(channel);
   }
@@ -46,6 +49,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+
+    log.info("[CHANNEL] PRIVATE 생성 시도 - ID: {}", channel.getId());
     channelRepository.save(channel);
 
     List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
@@ -90,6 +95,7 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType().equals(ChannelType.PRIVATE)) {
       throw new IllegalArgumentException("Private channel cannot be updated");
     }
+    log.info("[CHANNEL] 수정 시도 - ID: {}", channel.getId());
     channel.update(newName, newDescription);
     return channelMapper.toDto(channel);
   }
@@ -100,7 +106,7 @@ public class BasicChannelService implements ChannelService {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("Channel with id " + channelId + " not found");
     }
-
+    log.warn("[CHANNEL] 삭제 시도 - ID: {}", channelId);
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
 

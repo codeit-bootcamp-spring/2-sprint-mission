@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
@@ -42,12 +44,19 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("[USER] 생성 요청 - 이름: {}", userCreateRequest.username());
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-    UserDto createdUser = userService.create(userCreateRequest, profileRequest);
-    return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdUser);
+
+    try {
+      UserDto createdUser = userService.create(userCreateRequest, profileRequest);
+      log.info("[USER] 생성 성공 - 이름: {}, ID: {}", createdUser.username(), createdUser.id());
+      return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    } catch (Exception e) {
+      log.error("[USER] 생성 실패 - 이름: {}, 원인: {}",
+          userCreateRequest.username(), e.getMessage(), e);
+      throw e;
+    }
   }
 
   @PatchMapping(
@@ -60,30 +69,31 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("[USER] 수정 요청 - ID: {}", userId);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
+
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedUser);
+    log.info("[USER] 수정 성공 - ID: {}, 프로필 이미지 변경: {}",
+        updatedUser.id(), profileRequest.isPresent());
+    return ResponseEntity.ok(updatedUser);
   }
 
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+    log.warn("[USER] 삭제 요청 - ID: {}", userId);
     userService.delete(userId);
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
+    log.info("[USER] 삭제 완료 - ID: {}", userId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    // ResponseEntity.noContent().build();
   }
 
   @GetMapping
   @Override
   public ResponseEntity<List<UserDto>> findAll() {
     List<UserDto> users = userService.findAll();
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(users);
+    return ResponseEntity.status(HttpStatus.OK).body(users);
   }
 
   @PatchMapping(path = "{userId}/userStatus")
@@ -91,9 +101,7 @@ public class UserController implements UserApi {
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedUserStatus);
+    return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
