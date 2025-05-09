@@ -9,7 +9,10 @@ import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.file.FileReadException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -17,7 +20,9 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.util.MaskingUtil;
 import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
@@ -62,8 +67,11 @@ public class BasicUserService implements UserService {
       try {
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
-        log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-        throw RestExceptions.FILE_READ_ERROR;
+        log.error("User create failed: multipartFile read failed (filename: {})",
+            multipartFile.getOriginalFilename());
+        throw new FileReadException(Map.of("contentType", multipartFile.getContentType(),
+            "size", multipartFile.getSize(),
+            "filename", multipartFile.getOriginalFilename()));
       }
     }
 
@@ -82,7 +90,8 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   @Cacheable(value = "user", key = "#p0")
   public FindUserResult find(UUID userId) {
-    User findUser = findUserById(userId);
+    User findUser = userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
     return userMapper.toFindUserResult(findUser);
   }
 
@@ -103,7 +112,12 @@ public class BasicUserService implements UserService {
   @CacheEvict(value = "allUsers", allEntries = true)
   public UpdateUserResult update(UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
-    User findUser = findUserById(userId);
+    User findUser = userRepository.findById(userId)
+        .orElseThrow(() -> {
+          log.warn("User update failed: user not found (userId: {})", userId);
+          return new UserNotFoundException(Map.of("userId", userId));
+        });
+
     findUser.updateUserInfo(updateUserCommand.newUsername(), updateUserCommand.newEmail(),
         updateUserCommand.newPassword());
     if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
@@ -118,10 +132,12 @@ public class BasicUserService implements UserService {
       try {
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
-        log.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-        throw RestExceptions.FILE_READ_ERROR;
+        log.error("User update failed: multipartFile read failed (filename: {})",
+            multipartFile.getOriginalFilename());
+        throw new FileReadException(Map.of("contentType", multipartFile.getContentType(),
+            "size", multipartFile.getSize(),
+            "filename", multipartFile.getOriginalFilename()));
       }
-
       findUser.updateProfile(binaryContent);
     } else { // 기본 프로필로 변경할 때
       binaryContentService.delete(findUser.getProfile().getId());
@@ -139,7 +155,11 @@ public class BasicUserService implements UserService {
       @CacheEvict(value = "allUsers", allEntries = true)
   })
   public void delete(UUID userId) {
-    User user = findUserById(userId);
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> {
+          log.warn("User delete failed: user not found (userId: {})", userId);
+          return new UserNotFoundException(Map.of("userId", userId));
+        });
     userRepository.deleteById(userId);
     if (user.getProfile() != null) {
       binaryContentService.delete(user.getProfile().getId());
@@ -151,13 +171,17 @@ public class BasicUserService implements UserService {
 
   private void checkDuplicateUsername(CreateUserCommand createUserCommand) {
     if (userRepository.existsByUsername(createUserCommand.username())) {
-      throw RestExceptions.DUPLICATE_USERNAME;
+      String maskedUsername = MaskingUtil.maskUsername(createUserCommand.username());
+      log.warn("User create failed: duplicate username (username: {})", maskedUsername);
+      throw new DuplicateUsernameException(Map.of("username", maskedUsername));
     }
   }
 
   private void checkDuplicateEmail(CreateUserCommand createUserCommand) {
     if (userRepository.existsByEmail(createUserCommand.email())) {
-      throw RestExceptions.DUPLICATE_EMAIL;
+      String maskedEmail = MaskingUtil.maskEmail(createUserCommand.email());
+      log.warn("User create failed: duplicate email (email: {})", maskedEmail);
+      throw new DuplicateEmailException(Map.of("email", maskedEmail));
     }
   }
 
@@ -171,15 +195,6 @@ public class BasicUserService implements UserService {
         .build();
   }
 
-
-  private User findUserById(UUID userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.error("유저 찾기 실패: {}", userId);
-          return RestExceptions.USER_NOT_FOUND;
-        });
-  }
-
   private BinaryContent createBinaryContentEntity(MultipartFile multipartFile) {
     if (multipartFile == null || multipartFile.isEmpty() || multipartFile.getSize() == 0) {
       return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
@@ -189,6 +204,5 @@ public class BasicUserService implements UserService {
         .size(multipartFile.getSize())
         .filename(multipartFile.getOriginalFilename())
         .build();
-
   }
 }

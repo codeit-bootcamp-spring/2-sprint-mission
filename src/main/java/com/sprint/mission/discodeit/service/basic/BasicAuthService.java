@@ -3,10 +3,13 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.service.auth.LoginCommand;
 import com.sprint.mission.discodeit.dto.service.auth.LoginResult;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.user.InvalidPasswordException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.AuthMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.util.MaskingUtil;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
@@ -29,21 +32,24 @@ public class BasicAuthService implements AuthService {
 
     // getUserStatus로 영속성 컨텍스트에 가져옴 (LAZY) -> 변경감지로 userStatus가 자동으로 save됨
     user.getUserStatus().updateUserStatus();
+    log.info("Login success: userStatus updated (userId = {})", user.getId());
     return authMapper.toLoginResult(user);
   }
 
   private User findUserByUsername(LoginCommand loginCommand) {
     return userRepository.findByUsername(loginCommand.username())
         .orElseThrow(() -> {
-          log.error("로그인 중 유저 찾기 실패: {}", loginCommand.username());
-          return RestExceptions.USER_NOT_FOUND;
+          String maskedUsername = MaskingUtil.maskUsername(loginCommand.username());
+          log.warn("Login failed: user not found (username = {})", maskedUsername);
+          return new UserNotFoundException(Map.of("username", maskedUsername));
         });
   }
 
-
   private void checkPassword(User user, LoginCommand loginCommand) {
     if (!BCrypt.checkpw(loginCommand.password(), user.getPassword())) {
-      throw RestExceptions.INVALID_PASSWORD;
+      String maskedUsername = MaskingUtil.maskUsername(loginCommand.username());
+      log.warn("Login failed: invalid password (username = {})", maskedUsername);
+      throw new InvalidPasswordException(Map.of("username", maskedUsername));
     }
   }
 }
