@@ -9,6 +9,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentStorageException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -53,13 +57,13 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Channel not found - id: {}", channelId);
-                    return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+                    return new ChannelNotFoundException(channelId);
                 });
 
         User author = userRepository.findById(authorId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Author not found - id: {}", authorId);
-                    return new NoSuchElementException("Author with id " + authorId + " does not exist");
+                    return new UserNotFoundException(authorId);
                 });
 
         Message message = Message.builder()
@@ -84,7 +88,7 @@ public class BasicMessageService implements MessageService {
                 binaryContentStorage.put(savedBinaryContent.getId(), attachmentRequest.bytes());
             } catch (Exception e) {
                 log.error("◀◀ [SERVICE] Failed to save attachment to storage - fileName: {}", attachmentRequest.fileName(), e);
-                throw e;
+                throw new BinaryContentStorageException(attachmentRequest.fileName());
             }
 
             savedMessage.addAttachment(savedBinaryContent);
@@ -123,7 +127,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Message not found for update - id: {}", messageId);
-                    return new NoSuchElementException("Message with id " + messageId + " not found");
+                    return new MessageNotFoundException(messageId);
                 });
         message.setContent(newContent);
         Message updatedMessage = messageRepository.save(message);
@@ -137,7 +141,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Message not found for deletion - id: {}", messageId);
-                    return new NoSuchElementException("Message with id " + messageId + " not found");
+                    return new MessageNotFoundException(messageId);
                 });
 
         message.getAttachments().forEach(attachment -> {

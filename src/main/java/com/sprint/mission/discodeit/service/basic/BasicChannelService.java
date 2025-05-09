@@ -5,6 +5,9 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -56,7 +59,7 @@ public class BasicChannelService implements ChannelService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> {
                         log.error("◀◀ [SERVICE] User not found - userId: {}", userId);
-                        return new NoSuchElementException("User with id " + userId + " not found");
+                        return new UserNotFoundException(userId);
                     });
 
             ReadStatus readStatus = ReadStatus.builder()
@@ -83,7 +86,7 @@ public class BasicChannelService implements ChannelService {
                 })
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Channel not found - id: {}", channelId);
-                    return new NoSuchElementException("Channel with id " + channelId + " not found");
+                    return new ChannelNotFoundException(channelId);
                 });
     }
 
@@ -93,7 +96,7 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] User not found - userId: {}", userId);
-                    return new NoSuchElementException("User with id " + userId + " not found");
+                    return new UserNotFoundException(userId);
                 });
 
         List<Channel> subscribedChannels = readStatusRepository.findAllByUser(user).stream()
@@ -122,7 +125,7 @@ public class BasicChannelService implements ChannelService {
                 });
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             log.error("◀◀ [SERVICE] Update failed: Private channel cannot be updated - id: {}", channelId);
-            throw new IllegalArgumentException("Private channel cannot be updated");
+            throw new PrivateChannelUpdateException(channelId);
         }
 
         if (request.newName() != null) {
@@ -146,7 +149,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Channel not found - id: {}", channelId);
-                    return new NoSuchElementException("Channel with id " + channelId + " not found");
+                    return new ChannelNotFoundException(channelId);
                 });
 
         log.debug("▶▶ [SERVICE] Deleting related messages for channel - id: {}", channelId);

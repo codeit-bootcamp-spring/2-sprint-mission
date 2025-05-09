@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.DuplicateUserException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -46,11 +48,11 @@ public class BasicUserService implements UserService {
 
         if (userRepository.existsByEmail(email)) {
             log.warn("◀◀ [SERVICE] User with email already exists - email: {}", email);
-            throw new IllegalArgumentException("User with email " + email + " already exists");
+            throw new DuplicateUserException("email", email);
         }
         if (userRepository.existsByUsername(username)) {
             log.warn("◀◀ [SERVICE] User with username already exists - username: {}", username);
-            throw new IllegalArgumentException("User with username " + username + " already exists");
+            throw new DuplicateUserException("username", username);
         }
 
         BinaryContent profileContent = optionalProfileCreateRequest
@@ -108,7 +110,7 @@ public class BasicUserService implements UserService {
                 })
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] User not found - id: {}", userId);
-                    return new NoSuchElementException("User with id " + userId + " not found");
+                    return new UserNotFoundException(userId);
                 });
     }
 
@@ -127,18 +129,18 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] User not found for update - id: {}", userId);
-                    return new NoSuchElementException("User with id " + userId + " not found");
+                    return new UserNotFoundException(userId);
                 });
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
         if (newEmail != null && !newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
             log.warn("◀◀ [SERVICE] Email already in use during update - email: {}", newEmail);
-            throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+            throw new DuplicateUserException("email", newEmail);
         }
         if (newUsername != null && !newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
             log.warn("◀◀ [SERVICE] Username already in use during update - username: {}", newUsername);
-            throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+            throw new DuplicateUserException("username", newUsername);
         }
 
         optionalProfileCreateRequest.ifPresent(profileRequest -> {
@@ -187,7 +189,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] User not found for deletion - id: {}", userId);
-                    return new NoSuchElementException("User with id " + userId + " not found");
+                    return new UserNotFoundException(userId);
                 });
 
         if (user.getProfile() != null) {

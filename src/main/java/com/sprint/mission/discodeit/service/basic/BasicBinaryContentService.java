@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentStorageException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -46,7 +48,7 @@ public class BasicBinaryContentService implements BinaryContentService {
             binaryContentStorage.put(binaryContent.getId(), bytes);
         } catch (Exception e) {
             log.error("◀◀ [SERVICE] Failed to save binaryContent to storage! fileName: {}", fileName, e);
-            throw e;
+            throw new BinaryContentStorageException(fileName);
         }
 
         log.info("◀◀ [SERVICE] Finished creating binaryContent - id: {}", binaryContent.getId());
@@ -65,7 +67,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 })
                 .orElseThrow(() -> {
                     log.warn("◀◀ [SERVICE] Failed to find binaryContent - id: {}", binaryContentId);
-                    return new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+                    return new BinaryContentNotFoundException(binaryContentId);
                 });
     }
 
@@ -87,7 +89,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         if (!binaryContentRepository.existsById(binaryContentId)) {
             log.warn("◀◀ [SERVICE] Failed to delete binaryContent (not found) - id: {}", binaryContentId);
-            throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+            throw new BinaryContentNotFoundException(binaryContentId);
         }
         binaryContentRepository.deleteById(binaryContentId);
         log.info("◀◀ [SERVICE] Successfully deleted binaryContent - id: {}", binaryContentId);
