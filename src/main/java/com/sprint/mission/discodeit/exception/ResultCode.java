@@ -36,7 +36,8 @@ public enum ResultCode implements Code {
   FILE_DELETE_ERROR(500, "File deleting fails"),
   INIT_DIRECTORY_ERROR(500, "Init directory fails"),
   FILE_DOWNLOAD_ERROR(500, "File download fails"),
-  UNSUPPORTED_MEDIA_TYPE(415, "Unsupported mediaType");
+  UNSUPPORTED_PROFILE_MEDIA_TYPE(415,
+      "Unsupported profile mediaType (allow: jpg, jpeg, gif, webp, png)");
 
 
   private final int status;
