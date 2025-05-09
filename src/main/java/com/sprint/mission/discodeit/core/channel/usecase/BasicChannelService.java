@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.core.channel.usecase;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
@@ -99,7 +100,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public ChannelResult update(UpdateChannelCommand command) {
     Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
+        () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
 
     if (channel.getType() == ChannelType.PRIVATE) {
@@ -107,6 +108,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     channel.update(command.newName(), command.newDescription());
+    channelRepository.save(channel);
 
     log.info("Channel Updated: username {}, newDescription {}", channel.getName(),
         channel.getDescription());
@@ -138,7 +140,11 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public void delete(UUID channelId) {
-    channelRepository.deleteById(channelId);
+    Channel channel = channelRepository.findById(channelId).orElseThrow(
+        () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
+    );
+
+    channelRepository.delete(channel);
     deleteAllMessage(channelId);
     deleteAllReadStatus(channelId);
     log.info("Channel deleted {}", channelId);

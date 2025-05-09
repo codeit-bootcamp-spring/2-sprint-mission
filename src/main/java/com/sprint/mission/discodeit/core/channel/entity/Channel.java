@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.core.channel.entity;
 
 import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelInvalidRequestException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -60,15 +58,9 @@ public class Channel extends BaseUpdatableEntity {
     }
 
     public static void validateName(String name) {
-      if (name == null || name.isBlank() || name.length() > 50) {
-        throw new ChannelInvalidRequestException(ErrorCode.CHANNEL_INVALID_REQUEST, name);
-      }
     }
 
     public static void validateDescription(String description) {
-      if (description == null || description.isBlank() || description.length() > 50) {
-        throw new ChannelInvalidRequestException(ErrorCode.CHANNEL_INVALID_REQUEST, description);
-      }
     }
   }
 }
