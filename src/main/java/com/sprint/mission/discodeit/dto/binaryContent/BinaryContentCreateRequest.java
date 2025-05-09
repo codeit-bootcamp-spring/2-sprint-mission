@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.dto.binaryContent;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public record BinaryContentCreateRequest(
-        String fileName,
-        String contentType,
-        byte[] bytes
+        @NotBlank String fileName,
+        @NotBlank String contentType,
+        @NotNull byte[] bytes
 ) {
 }
