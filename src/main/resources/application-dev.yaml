@@ -25,5 +25,5 @@ server:
 
 logging:
   level:
-    root: debug
+    root: info
     com.sprint.mission.discodeit: debug

@@ -26,3 +26,5 @@ logging:
   level:
     root: info
     com.sprint.mission.discodeit: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
