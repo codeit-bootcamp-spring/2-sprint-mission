@@ -19,9 +19,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
@@ -39,6 +41,8 @@ public class BasicUserService implements UserService {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
+    log.info("[USER] 생성 시도 - 이름: {}, 이메일: {}", username, email);
+
     if (userRepository.existsByEmail(email)) {
       throw new IllegalArgumentException("User with email " + email + " already exists");
     }
@@ -55,6 +59,7 @@ public class BasicUserService implements UserService {
               contentType);
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.debug("[FILE] 프로필 이미지 저장 완료 - 이름: {}, 파일명: {}", username, fileName);
           return binaryContent;
         })
         .orElse(null);
@@ -90,6 +95,8 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
+    log.info("[USER] 수정 시도 - ID: {}", userId);
+
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
@@ -107,8 +114,11 @@ public class BasicUserService implements UserService {
           byte[] bytes = profileRequest.bytes();
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
+
           binaryContentRepository.save(binaryContent);
           binaryContentStorage.put(binaryContent.getId(), bytes);
+          log.info("[FILE] 프로필 이미지 변환 성공 - 파일명: {}", binaryContent.getFileName());
+
           return binaryContent;
         })
         .orElse(null);
@@ -125,7 +135,7 @@ public class BasicUserService implements UserService {
     if (userRepository.existsById(userId)) {
       throw new NoSuchElementException("User with id " + userId + " not found");
     }
-
+    log.warn("[USER] 삭제 시도 - ID: {}", userId);
     userRepository.deleteById(userId);
   }
 }
