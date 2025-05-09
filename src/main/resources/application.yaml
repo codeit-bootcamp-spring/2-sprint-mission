@@ -15,3 +15,17 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+
+  endpoint:
+    health:
+      show-details: always
+
+  info:
+    java:
+      enabled: true
