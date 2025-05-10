@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,15 +76,12 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   public Slice<MessageResult> findAllByChannelId(UUID channelId, Instant cursor,
       Pageable pageable) {
-    Slice<Message> messageSlice;
+    Slice<MessageResult> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+            Optional.ofNullable(cursor).orElse(Instant.now()),
+            pageable)
+        .map(message -> MessageResult.create(message, message.getAuthor()));
 
-    if (cursor == null) {
-      messageSlice = messageRepository.findAllByChannel_Id(channelId, pageable);
-    } else {
-      messageSlice = messageRepository.findAllByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(
-          channelId, cursor, pageable);
-    }
-    return messageSlice.map(message -> MessageResult.create(message, message.getAuthor()));
+    return slice;
   }
 
   @Override

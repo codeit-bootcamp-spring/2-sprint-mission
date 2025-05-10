@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
@@ -26,11 +27,11 @@ import lombok.ToString;
 @Entity
 public class Message extends BaseUpdatableEntity {
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id")
   private User author;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
 

@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
-import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
@@ -21,7 +20,6 @@ import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -124,11 +122,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   private Instant findLastMessageAt(Channel channel) {
-    return messageRepository.findAllByChannel_Id(channel.getId())
-        .stream()
-        .max(Comparator.comparing(Message::getCreatedAt).reversed())
-        .map(Message::getCreatedAt)
-        .orElse(Instant.now());
+    return messageRepository.findLastMessageAtByChannelId(channel.getId()).orElse(Instant.MIN);
   }
 
   @Override
@@ -145,11 +139,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   private void deleteAllMessage(UUID channelId) {
-    List<Message> list = messageRepository.findAllByChannel_Id(channelId);
-    for (Message message : list) {
-      messageRepository.deleteById(message.getId());
-      log.info("message deleted {}", message.getId());
-    }
+    messageRepository.deleteAllByChannelId(channelId);
   }
 
   private void deleteAllReadStatus(UUID channelId) {
