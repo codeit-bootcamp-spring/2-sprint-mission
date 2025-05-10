@@ -39,8 +39,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // postman 요청 중 에러 발생으로 추가함
-    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names'
+    // validation 추가를 위해 선언
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {

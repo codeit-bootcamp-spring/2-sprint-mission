@@ -67,7 +67,7 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<UserDto> update(
         @PathVariable("userId") UUID userId,
-        @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+        @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
         @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
@@ -109,7 +109,8 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
         @PathVariable("userId") UUID userId,
-        @RequestBody UserStatusUpdateRequest request) {
+        @RequestBody @Valid UserStatusUpdateRequest request
+    ) {
         // log
         log.debug("사용자 상태 변경 요청: {}", userId);
         UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);

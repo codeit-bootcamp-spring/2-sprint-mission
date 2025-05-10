@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -42,6 +47,29 @@ public class GlobalExceptionHandler {
         };
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException e) {
+        Map<String, Object> errors = new HashMap<>();
+
+        // 검증 실패한 필드의 리스트 추출 진행 후
+        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+            // 어떤 필드가 실패했는지, 어노테이션에 작성된 오류 메시지
+            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+            Instant.now(),
+            "VALIDATION_FAILED",
+            "요청 값이 유효하지 않습니다.",
+            errors,
+            e.getClass().getSimpleName(),
+            HttpStatus.BAD_REQUEST.value()
+        );
+
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    /*
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleException(IllegalArgumentException e) {
         e.printStackTrace();
@@ -65,4 +93,5 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(e.getMessage());
     }
+    */
 }

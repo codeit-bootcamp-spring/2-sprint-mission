@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class MessageController implements MessageApi {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
-        @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+        @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         // log
@@ -77,8 +78,10 @@ public class MessageController implements MessageApi {
     }
 
     @PatchMapping(path = "{messageId}")
-    public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
-        @RequestBody MessageUpdateRequest request) {
+    public ResponseEntity<MessageDto> update(
+        @PathVariable("messageId") UUID messageId,
+        @RequestBody @Valid MessageUpdateRequest request
+    ) {
         log.debug("Message 업데이트 요청, message: {}", request.newContent());
         MessageDto updatedMessage = messageService.update(messageId, request);
         log.info("Message 업데이트 완료, message: {}", updatedMessage.content());
@@ -101,12 +104,14 @@ public class MessageController implements MessageApi {
     public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
         @RequestParam("channelId") UUID channelId,
         @RequestParam(value = "cursor", required = false) Instant cursor,
+        // Spring data 페이지네이션을 위한 기본값 정의
         @PageableDefault(
             size = 50,
             page = 0,
             sort = "createdAt",
             direction = Direction.DESC
-        ) Pageable pageable) {
+        ) Pageable pageable
+    ) {
         log.info("채널에 전체 message 조회 요청");
         PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
             pageable);
