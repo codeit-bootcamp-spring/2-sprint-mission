@@ -1,0 +1,16 @@
+spring:
+  profiles: prod
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/proddb
+    username: produser
+    password: prodpass
+
+server:
+  port: 8082
+  
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace

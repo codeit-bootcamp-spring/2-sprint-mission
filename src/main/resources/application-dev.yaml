@@ -1,0 +1,18 @@
+spring:
+  profiles: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devdb
+    username: devuser
+    password: devpass
+
+server:
+  port: 8081
+
+logging:
+  level:
+    root: debug
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
+
+
