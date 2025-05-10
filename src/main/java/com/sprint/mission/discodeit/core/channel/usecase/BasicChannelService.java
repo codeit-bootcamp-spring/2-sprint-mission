@@ -56,15 +56,11 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
-    command.participantIds().stream()
-        .map(userId -> {
-          User user = userRepository.findById(userId).orElseThrow(
-              () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId)
-          );
-          return ReadStatus.create(user, channel, channel.getCreatedAt());
-        })
-        .forEach(readStatusRepository::save);
+    List<ReadStatus> readStatuses = userRepository.findAllById(command.participantIds()).stream()
+        .map(user -> ReadStatus.create(user, channel, channel.getCreatedAt()))
+        .toList();
 
+    readStatusRepository.saveAll(readStatuses);
     log.info("Private Channel created {}", channel.getId());
     return toChannelResult(channel);
   }
@@ -83,13 +79,11 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   public List<ChannelResult> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
-        .map(readStatus -> {
-          Channel channel = readStatus.getChannel();
-          return channel.getId();
-        })
+        .map(ReadStatus::getChannel)
+        .map(Channel::getId)
         .toList();
 
-    List<Channel> channels = channelRepository.findAccessibleChannels(ChannelType.PUBLIC,
+    List<Channel> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
         mySubscribedChannelIds);
     return channels.stream()
         .map(this::toChannelResult)

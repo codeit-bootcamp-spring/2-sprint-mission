@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
@@ -26,7 +25,6 @@ import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
 import java.util.List;
@@ -83,29 +81,16 @@ public class ChannelServiceUnitTest {
     BinaryContent oldProfile = BinaryContent.create("old.png", 0L, "image/png");
     User user = User.create("a", "a@email.com", "a", oldProfile);
     user.setUserStatus(UserStatus.create(user, Instant.now()));
+
     CreatePrivateChannelCommand command = new CreatePrivateChannelCommand(
         List.of(userId));
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(userRepository.findAllById(List.of(userId))).thenReturn(List.of(user));
     // when
     ChannelResult channelResult = channelService.create(command);
     // then
     assertThat(channelResult.name()).isNull();
     assertThat(channelResult.description()).isNull();
     assertThat(channelResult.type()).isEqualTo(ChannelType.PRIVATE);
-  }
-
-  @Test
-  void PrivateChannelCreate_WithoutUserId_ShouldThrowException() {
-    // given
-    UUID userId = UUID.randomUUID();
-    CreatePrivateChannelCommand command = new CreatePrivateChannelCommand(
-        List.of(userId));
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
-    // when & then
-    assertThrows(UserNotFoundException.class, () -> {
-      channelService.create(command);
-    });
-    verifyNoInteractions(readStatusRepository);
   }
 
   @Test
@@ -187,21 +172,21 @@ public class ChannelServiceUnitTest {
 
     List<ReadStatus> readStatusList = List.of(rs1, rs2);
     List<Channel> accessibleChannels = List.of(channel1, channel2);
-    
+
     when(channel1.getId()).thenReturn(channelId1);
     when(channel2.getId()).thenReturn(channelId2);
     when(rs1.getChannel()).thenReturn(channel1);
     when(rs2.getChannel()).thenReturn(channel2);
 
     when(readStatusRepository.findAllByUser_Id(userId)).thenReturn(readStatusList);
-    when(channelRepository.findAccessibleChannels(ChannelType.PUBLIC, channelIds))
+    when(channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, channelIds))
         .thenReturn(accessibleChannels);
     // when
     List<ChannelResult> results = channelService.findAllByUserId(userId);
     // then
     assertThat(results.size()).isEqualTo(2);
     verify(readStatusRepository).findAllByUser_Id(userId);
-    verify(channelRepository).findAccessibleChannels(ChannelType.PUBLIC, channelIds);
+    verify(channelRepository).findAllByTypeOrIdIn(ChannelType.PUBLIC, channelIds);
 
   }
 

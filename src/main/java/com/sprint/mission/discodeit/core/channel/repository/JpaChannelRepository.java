@@ -6,17 +6,9 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface JpaChannelRepository extends JpaRepository<Channel, UUID> {
 
-  @Query("SELECT c FROM Channel c WHERE c.type = :type")
-  List<Channel> findAllByType(@Param("type") ChannelType type);
-
-  @Query("""
-        SELECT c FROM Channel c
-        WHERE c.type = :publicType OR c.id IN :subscribedChannelIds
-      """)
-  List<Channel> findAccessibleChannels(@Param("publicType") ChannelType publicType,
-      @Param("subscribedChannelIds") List<UUID> subscribedChannelIds);
+  @Query("SELECT c FROM Channel c WHERE c.type = :type or c.id IN :ids")
+  List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
 }
