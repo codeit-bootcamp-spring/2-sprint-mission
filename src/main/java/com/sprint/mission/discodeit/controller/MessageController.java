@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.time.Instant;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -32,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/messages")
@@ -44,22 +48,29 @@ public class MessageController implements MessageApi {
         @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
+        // log
+        log.info("BinaryContent 생성 요청");
         List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
             .map(files -> files.stream()
                 .map(file -> {
                     try {
+                        log.info("파일 저장 시도");
                         return new BinaryContentCreateRequest(
                             file.getOriginalFilename(),
                             file.getContentType(),
                             file.getBytes()
                         );
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        log.error("파일 저장 중 오류 발생", e);
+                        // 커스텀 에러처리
+                        throw new DiscodeitException(ErrorCode.FILE_STORAGE_ERROR, null);
                     }
                 })
                 .toList())
             .orElse(new ArrayList<>());
+        log.info("Message 생성 요청, message: {}", messageCreateRequest.content());
         MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
+        log.info("Message 생성 완료, message: {}", createdMessage.content());
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdMessage);
@@ -68,7 +79,9 @@ public class MessageController implements MessageApi {
     @PatchMapping(path = "{messageId}")
     public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
         @RequestBody MessageUpdateRequest request) {
+        log.debug("Message 업데이트 요청, message: {}", request.newContent());
         MessageDto updatedMessage = messageService.update(messageId, request);
+        log.info("Message 업데이트 완료, message: {}", updatedMessage.content());
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(updatedMessage);
@@ -76,7 +89,9 @@ public class MessageController implements MessageApi {
 
     @DeleteMapping(path = "{messageId}")
     public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
+        log.warn("Message 삭제 요청");
         messageService.delete(messageId);
+        log.info("Message 삭제 완료");
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .build();
@@ -92,8 +107,10 @@ public class MessageController implements MessageApi {
             sort = "createdAt",
             direction = Direction.DESC
         ) Pageable pageable) {
+        log.info("채널에 전체 message 조회 요청");
         PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
             pageable);
+        log.info("채널Id로 전제 message 조회 성공");
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(messages);

@@ -1,10 +1,11 @@
 spring:
   application:
-    name: discodeit
+    name: discodeit # 서비스 이름 설정
   servlet:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+      enabled: true
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/discodeit
@@ -12,21 +13,35 @@ spring:
     password: discodeit1234
   jpa:
     hibernate:
-      ddl-auto: validate
+      # validate = DDL 자동 생성 없이 유효성 검증만 진행(실제 배포시 사용)
+      ddl-auto: create # 실행 시 테이블을 자동 생성함, 기존 데이터 모두 삭제됨.
+
     properties:
       hibernate:
         format_sql: true
     #        default_batch_fetch_size: 100
-    open-in-view: false
-
+    open-in-view: false # OIV 비활성화로 성능/트랜잭션 관리 강화
+  profiles:
+    # 운영 배포 시에는 prod로 교체해줘야한다.
+    active: dev
+  sql:
+    init:
+      mode: always # spring boot가 자동으로 sql파일을 실행하도록 해준다.
 
 logging:
   level:
     org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.orm.jdbc.bind: trace # SQL 및 파라미터 로깅 설정
+    root: info # 모든 로그의 기본값을 info로 설정(애플리케이션 전체의 기본 로그 레벨를 의미한다)
+    # postman error로 추가
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+  # "로그시간 / 스레드 / 레벨 / 클래스 / 메시지" 형식으로 로그 구성
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 discodeit:
+  # 파일 저장 경로
   storage:
     type: local
     local:
-      root-path: .discodeit/storage
+      root-path: .discodeit/storage # 커스텀 설정
