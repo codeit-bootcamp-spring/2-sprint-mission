@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public interface MessageApi {
             description = "Message 첨부 파일들",
             content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
         ) List<MultipartFile> attachments
-    );
+    ) throws MethodArgumentNotValidException;
 
     @Operation(summary = "Message 내용 수정")
     @ApiResponses(value = {

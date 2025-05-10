@@ -3,11 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.data.UserStatusDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
+@Validated
 public class UserController implements UserApi {
 
     private final UserService userService;
@@ -33,12 +32,10 @@ public class UserController implements UserApi {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     @Override
     public ResponseEntity<UserDto> create(
-        @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+        @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
         @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-            .flatMap(this::resolveProfileRequest);
-        UserDto userDto = userService.create(userCreateRequest, profileRequest);
+        UserDto userDto = userService.create(userCreateRequest, profile);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(userDto);
@@ -51,12 +48,10 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<UserDto> update(
         @PathVariable("userId") UUID userId,
-        @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+        @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
         @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-            .flatMap(this::resolveProfileRequest);
-        UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+        UserDto updatedUser = userService.update(userId, userUpdateRequest, profile);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(updatedUser);
@@ -83,27 +78,10 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
         @PathVariable("userId") UUID userId,
-        @RequestBody UserStatusUpdateRequest request) {
+        @Valid @RequestBody UserStatusUpdateRequest request) {
         UserStatusDto statusDto = userStatusService.updateByUserId(userId, request);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(statusDto);
-    }
-
-    private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
-        if (profileFile.isEmpty()) {
-            return Optional.empty();
-        } else {
-            try {
-                BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
-                    profileFile.getOriginalFilename(),
-                    profileFile.getContentType(),
-                    profileFile.getBytes()
-                );
-                return Optional.of(binaryContentCreateRequest);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 }

@@ -14,24 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-    @NonNull
-    Channel save(@NonNull Channel channel);
-
-    @NonNull
-    Optional<Channel> findById(@NonNull UUID channelId);
-
-    @NonNull
-    List<Channel> findAll();
-
-    boolean existsById(@NonNull UUID channelId);
-
-    void deleteById(@NonNull UUID channelId);
-
-    Optional<Channel> findByName(@NonNull String name);
-
     boolean existsByName(@NonNull String name);
 
     @Transactional(readOnly = true)
-    @Query("SELECT c FROM Channel c JOIN c.participants uc WHERE uc.user.id = :userId")
+    @Query("SELECT rs.channel FROM ReadStatus rs WHERE rs.user.id = :userId")
     List<Channel> findChannelsByUserId(@Param("userId") UUID userId);
+
+    List<Channel> findAllByType(com.sprint.mission.discodeit.entity.ChannelType type);
+
+    List<Channel> findAllByIdInAndType(List<UUID> ids,
+        com.sprint.mission.discodeit.entity.ChannelType type);
 }

@@ -1,27 +1,67 @@
-# src/main/resources/application.yml
-
 spring:
+  profiles:
+    active: dev
   application:
     name: discodeit
-
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
   servlet:
     multipart:
-      maxFileSize: 10MB
-      maxRequestSize: 30MB
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   data:
     web:
       pageable:
         default-page-size: 50
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit1234
-    username: discodeit
-    password: decodeit_user
-    driver-class-name: org.postgresql.Driver
 
 discodeit:
   storage:
     type: local
     local:
       root-path: ./discodeit-storaget
+
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
+
+# Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+    info:
+      enabled: true
+  info:
+    app:
+      name: Discodeit
+      version: 1.7.0
+      java:
+        version: 17
+      spring-boot:
+        version: 3.4.0
+    env:
+      datasource:
+        url: ${spring.datasource.url}
+        driver-class-name: ${spring.datasource.driver-class-name}
+      jpa:
+        ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+      storage:
+        type: local
+        path: ./data
+      multipart:
+        max-file-size: ${spring.servlet.multipart.max-file-size}
+        max-request-size: ${spring.servlet.multipart.max-request-size}
+

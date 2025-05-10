@@ -26,12 +26,16 @@ public enum ErrorCode {
     CHANNEL_OPERATION_NOT_PERMITTED(HttpStatus.FORBIDDEN, "채널에 대한 작업 권한이 없습니다."),
 
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "메시지를 찾을 수 없습니다."),
+    MESSAGE_TOO_LONG(HttpStatus.BAD_REQUEST, "메시지 내용이 너무 깁니다."),
 
 
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."),
-    FILE_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 처리 중 오류가 발생했습니다.");
+    FILE_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 처리 중 오류가 발생했습니다."),
 
+    // 유효성 검증 실패
+    VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "입력값 유효성 검증에 실패했습니다."),
 
+    READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "요청한 읽음 상태 정보를 찾을 수 없습니다.");
     private final HttpStatus status;
     private final String message;
 

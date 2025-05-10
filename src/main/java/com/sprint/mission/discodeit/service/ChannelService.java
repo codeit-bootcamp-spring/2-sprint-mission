@@ -10,22 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface ChannelService {
 
-    @Transactional
     ChannelDto create(PublicChannelCreateRequest request);
 
-    @Transactional
     ChannelDto create(PrivateChannelCreateRequest request);
 
-    @Transactional(readOnly = true)
     ChannelDto find(UUID channelId);
 
-
-    @Transactional
     ChannelDto update(UUID channelId, PublicChannelUpdateRequest request);
 
-    @Transactional
     void delete(UUID channelId);
 
-    @Transactional(readOnly = true)
     List<ChannelDto> findAllByUserId(UUID userId);
 }

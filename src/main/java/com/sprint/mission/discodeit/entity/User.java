@@ -32,15 +32,13 @@ public class User extends BaseUpdatableEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<UserChannel> userChannels = new HashSet<>();
-
     public User(String username, String email, String password,
         BinaryContent nullableProfileObject) {
         super();
         this.email = email;
         this.password = password;
-        this.username = email.split("@")[0];
+        this.username = username;
+        this.profile = nullableProfileObject;
     }
 
     public void setUserStatus(UserStatus userStatus) {

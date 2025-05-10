@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -32,20 +34,23 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Transactional
     @Override
-    public BinaryContentDto create(BinaryContentCreateRequest biRequest) {
-        String fileName = biRequest.fileName();
-        long fileSize = (biRequest.bytes() != null) ? biRequest.bytes().length : 0;
-        log.info("파일 메타데이터 생성 및 저장 시작. 파일명: '{}', 크기: {} bytes", fileName, fileSize);
-
-        if (biRequest.bytes() == null || biRequest.bytes().length == 0) {
-            log.warn("파일 메타데이터 생성 실패 (내용 없음): 파일명: '{}'", fileName);
-            throw new FileProcessingCustomException("create", fileName, "파일 내용이 비어있어 메타데이터를 생성할 수 없습니다.");
+    public BinaryContentDto create(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            log.warn("파일 메타데이터 생성 실패 (파일이 없거나 비어있음)");
+            throw new FileProcessingCustomException("create", "업로드된 파일이 없거나 내용이 비어있습니다.");
         }
-        
+
+        String fileName = file.getOriginalFilename();
+        long fileSize = file.getSize();
+        String contentType = file.getContentType();
+
+        log.info("파일 메타데이터 생성 및 저장 시작. 파일명: '{}', 크기: {} bytes, 타입: '{}'", fileName, fileSize,
+            contentType);
+
         BinaryContent binaryContent = new BinaryContent(
             fileName,
-            biRequest.contentType(),
-            fileSize // 위에서 계산된 값 사용
+            contentType,
+            fileSize
         );
 
         BinaryContent savedMetadata = binaryContentRepository.save(binaryContent);
@@ -53,15 +58,19 @@ public class BasicBinaryContentService implements BinaryContentService {
         log.info("파일 메타데이터 DB 저장 완료. ID: '{}', 파일명: '{}'", metadataId, fileName);
 
         try {
-            // 실제 파일 저장 로직 (binaryContentStorage 사용)
-            binaryContentStorage.put(metadataId, biRequest.bytes());
+            binaryContentStorage.put(metadataId, file.getBytes());
             log.info("실제 파일 저장 완료. 저장소 ID: '{}' (메타데이터 ID와 동일)", metadataId);
+        } catch (IOException e) {
+            log.error("파일 바이트를 읽는 중 IOException 발생");
+            throw new FileProcessingCustomException("create-storage",
+                "파일 내용을 읽는 중 오류 발생: " + e.getMessage());
         } catch (FileProcessingCustomException e) {
-            log.error("실제 파일 저장 중 처리 오류: 메타데이터 ID '{}', 파일명 '{}'. 오류: {}", metadataId, fileName, e.getMessage(), e);
+            log.error("실제 파일 저장 중 처리 오류발생");
             throw e;
         } catch (Exception e) {
-            log.error("실제 파일 저장 중 예기치 않은 오류: 메타데이터 ID '{}', 파일명 '{}'", metadataId, fileName, e);
-            throw new FileProcessingCustomException("create-storage", fileName, "파일 저장 중 예상치 못한 오류 발생: " + e.getMessage());
+            log.error("실제 파일 저장 중 예기치 않은 오류");
+            throw new FileProcessingCustomException("create-storage", fileName,
+                "파일 저장 중 예상치 못한 오류 발생: " + e.getMessage());
         }
 
         return binaryContentMapper.toDto(savedMetadata);
@@ -73,9 +82,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> {
                 log.warn("파일 메타데이터 조회 실패 (찾을 수 없음): ID '{}'", binaryContentId);
-                return new FileNotFoundCustomException(binaryContentId.toString(), "파일 메타데이터를 찾을 수 없습니다.");
+                return new FileNotFoundCustomException(binaryContentId.toString(),
+                    "파일 메타데이터를 찾을 수 없습니다.");
             });
-        log.info("파일 메타데이터 조회 성공. ID: '{}', 파일명: '{}'", binaryContentId, binaryContent.getFileName());
+        log.info("파일 메타데이터 조회 성공. ID: '{}', 파일명: '{}'", binaryContentId,
+            binaryContent.getFileName());
         return binaryContent;
     }
 
@@ -98,7 +109,8 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(() -> {
                 log.warn("파일 메타데이터 삭제 실패 (찾을 수 없음): ID '{}'", binaryContentId);
-                return new FileNotFoundCustomException(binaryContentId.toString(), "삭제할 파일 메타데이터를 찾을 수 없습니다.");
+                return new FileNotFoundCustomException(binaryContentId.toString(),
+                    "삭제할 파일 메타데이터를 찾을 수 없습니다.");
             });
 
         // 실제 파일 삭제
@@ -106,16 +118,13 @@ public class BasicBinaryContentService implements BinaryContentService {
             binaryContentStorage.delete(binaryContentId);
             log.info("실제 파일 삭제 완료 (저장소). 저장소 ID: '{}'", binaryContentId);
         } catch (FileNotFoundCustomException e) {
-            log.warn("실제 파일 삭제 중 파일 없음 (저장소): ID '{}', 파일명 '{}'. 상세: {}. 메타데이터 삭제는 계속 진행.",
-                binaryContentId, binaryContent.getFileName(), e.getMessage());
+            log.warn("실제 파일 삭제 중 파일 없음 (삭제는 진행)");
         } catch (FileProcessingCustomException e) {
-            log.error("실제 파일 삭제 중 처리 오류 (저장소): ID '{}', 파일명 '{}'. 상세: {}. 메타데이터 삭제는 계속 진행.",
-                binaryContentId, binaryContent.getFileName(), e.getMessage(), e);
-        } catch (Exception e) { 
-            log.error("실제 파일 삭제 중 예기치 않은 오류 (저장소): ID '{}', 파일명 '{}'. 메타데이터 삭제는 계속 진행.",
-                binaryContentId, binaryContent.getFileName(), e);
+            log.error("실제 파일 삭제 중 예기치 않은 오류 (삭제는 진행)");
+        } catch (Exception e) {
+            log.error("실제 파일 삭제 중 예기치 않은 오류");
         }
-        
+
         // 메타데이터 삭제
         binaryContentRepository.deleteById(binaryContentId);
         log.info("파일 메타데이터 DB 삭제 완료. ID: '{}'", binaryContentId);
