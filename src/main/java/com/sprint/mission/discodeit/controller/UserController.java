@@ -7,10 +7,15 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentResolveException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -125,7 +130,14 @@ public class UserController implements UserApi {
         );
         return Optional.of(binaryContentCreateRequest);
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        log.error("프로필 파일 처리중 오류 발생: {}", e.getMessage());
+        Map<String, Object> details = new HashMap<>();
+        details.put("filename", profileFile.getOriginalFilename());
+        throw new BinaryContentResolveException(
+            Instant.now(),
+            ErrorCode.BINARYCONTENT_PROCESS_FAILD,
+            details
+        );
       }
     }
   }
