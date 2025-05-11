@@ -14,7 +14,7 @@ public enum ResultCode implements Code {
 
   // Channel
   CHANNEL_NOT_FOUND(404, "Channel not found"),
-  FORBIDDEN_PRIVATE_CHANNEL(403, "Private channel is forbidden"),
+  FORBIDDEN_PRIVATE_CHANNEL(403, "Private channel update is forbidden"),
 
   // Message
   MESSAGE_NOT_FOUND(404, "Message not found"),
