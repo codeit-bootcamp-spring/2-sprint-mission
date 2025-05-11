@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusComma
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -16,8 +16,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +37,6 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
   private final ChannelMapper channelMapper;
   private final UserMapper userMapper;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   @Transactional
@@ -63,8 +60,8 @@ public class BasicChannelService implements ChannelService {
 
     return channelMapper.toCreatePrivateChannelResult(channel,
         findMessageLatestTimeInChannel(channel.getId()),
-        createPrivateChannelCommand.participantIds().stream()
-            .map(this::findUserById)
+        userRepository.findAllByIdIn(createPrivateChannelCommand.participantIds())
+            .stream()
             .map(userMapper::toFindUserResult)
             .toList());
   }
@@ -73,11 +70,11 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   @Cacheable(value = "channel", key = "#p0")
   public FindChannelResult find(UUID channelId) {
-    Channel channel = findChannelById(channelId);
+    Channel channel = findChannelById(channelId, "find");
     Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
     List<UUID> userIds = getUserIdsFromChannel(channel);
-    List<FindUserResult> findUserResultList = userIds.stream()
-        .map(this::findUserById)
+    List<FindUserResult> findUserResultList = userRepository.findAllByIdIn(userIds)
+        .stream()
         .map(userMapper::toFindUserResult)
         .toList();
     return channelMapper.toFindChannelResult(channel, latestMessageTime, findUserResultList);
@@ -94,8 +91,7 @@ public class BasicChannelService implements ChannelService {
             ch -> ch.getType() == ChannelType.PUBLIC || getUserIdsFromChannel(ch).contains(userId))
         .map(ch -> channelMapper.toFindChannelResult(ch,
             findMessageLatestTimeInChannel(ch.getId()),
-            getUserIdsFromChannel(ch).stream()
-                .map(this::findUserById)
+            userRepository.findAllByIdIn(getUserIdsFromChannel(ch)).stream()
                 .map(userMapper::toFindUserResult)
                 .toList()))
         .toList();
@@ -106,11 +102,11 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @CachePut(value = "channel", key = "#p0")
   @CacheEvict(value = "allChannels", allEntries = true)
-  public UpdateChannelResult update(UUID id, UpdateChannelCommand updateChannelCommand) {
-    Channel channel = findChannelById(id);
+  public UpdateChannelResult update(UUID channelId, UpdateChannelCommand updateChannelCommand) {
+    Channel channel = findChannelById(channelId, "update");
     if (channel.getType() == ChannelType.PRIVATE) {
-      logger.error("채널 수정 실패 - ID: {}, Type: {} (PRIVATE 채널은 수정 불가)", id, channel.getType());
-      throw RestExceptions.FORBIDDEN_PRIVATE_CHANNEL;
+      log.warn("Channel update failed: private channel cannot update (channelId: {})", channelId);
+      throw new PrivateChannelUpdateException(Map.of("channelId", channelId));
     }
     channel.update(updateChannelCommand.newName(), updateChannelCommand.newDescription());
     return channelMapper.toUpdateChannelResult(channel,
@@ -124,7 +120,7 @@ public class BasicChannelService implements ChannelService {
       @CacheEvict(value = "allChannels", allEntries = true)
   })
   public void delete(UUID channelId) {
-    // 연관관계 구조상 Cascade 사용 불가하여 명시적으로 삭제
+    findChannelById(channelId, "delete");
     readStatusService.deleteByChannelId(channelId);
     messageRepository.deleteByChannelId(channelId);
     channelRepository.deleteById(channelId);
@@ -163,11 +159,11 @@ public class BasicChannelService implements ChannelService {
         Collections.emptyList();
   }
 
-  private Channel findChannelById(UUID id) {
-    return channelRepository.findById(id)
+  private Channel findChannelById(UUID channelId, String method) {
+    return channelRepository.findById(channelId)
         .orElseThrow(() -> {
-          logger.error("채널 찾기 실패: {}", id);
-          return RestExceptions.CHANNEL_NOT_FOUND;
+          log.warn("Channel {} failed: channel not found (channelId: {})", method, channelId);
+          return new ChannelNotFoundException(Map.of("channelId", channelId, "method", method));
         });
   }
 
@@ -176,14 +172,4 @@ public class BasicChannelService implements ChannelService {
     return messageRepository.findLatestMessageTimeByChannelId(channelId)
         .orElse(null);
   }
-
-  private User findUserById(UUID id) {
-    return userRepository.findById(id)
-        .orElseThrow(() -> {
-          logger.error("유저 찾기 실패: {}", id);
-          return RestExceptions.USER_NOT_FOUND;
-        });
-  }
-
-
 }
