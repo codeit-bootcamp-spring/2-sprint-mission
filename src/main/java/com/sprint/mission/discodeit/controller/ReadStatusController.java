@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.swagger.ReadStatusApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/readStatuses")
 public class ReadStatusController implements ReadStatusApi {
 
@@ -31,6 +33,9 @@ public class ReadStatusController implements ReadStatusApi {
   @PostMapping
   public ResponseEntity<CreateReadStatusResponseDTO> createReadStatus(
       @RequestBody @Valid CreateReadStatusRequestDTO createReadStatusRequestDTO) {
+    log.info("ReadStatus create request (userId: {}, channelId: {}, lastReadAt: {})",
+        createReadStatusRequestDTO.userId(), createReadStatusRequestDTO.channelId(),
+        createReadStatusRequestDTO.lastReadAt());
     CreateReadStatusResult readStatusResult = readStatusService.create(
         readStatusMapper.toCreateReadStatusCommand(createReadStatusRequestDTO));
     CreateReadStatusResponseDTO createdReadStatus = readStatusMapper.toReadStatusResponseDTO(
@@ -44,6 +49,8 @@ public class ReadStatusController implements ReadStatusApi {
   public ResponseEntity<UpdateReadStatusResponseDTO> updateReadStatus(
       @PathVariable("readStatusId") UUID id,
       @RequestBody UpdateReadStatusRequestDTO request) {
+    log.info("ReadStatus create request (readStatusId: {}, lastReadAt: {})", id,
+        request.newLastReadAt());
     UpdateReadStatusResult updateReadStatusResult = readStatusService.update(
         id, readStatusMapper.toUpdateReadStatusCommand(request));
     UpdateReadStatusResponseDTO updatedReadStatus = readStatusMapper.toUpdateReadStatusResponseDTO(
