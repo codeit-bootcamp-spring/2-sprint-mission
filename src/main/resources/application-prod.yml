@@ -20,5 +20,5 @@ logging:
   level:
     org:
       hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE
+        SQL: INFO
+        orm.jdbc.bind: OFF
