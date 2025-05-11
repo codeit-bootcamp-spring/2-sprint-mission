@@ -31,13 +31,13 @@ public class ReadStatusController {
         return ResponseEntity.status(201).body(readStatusDto);
     }
 
-
     @Operation(summary = "읽음 상태 수정")
     @ApiResponse(
         responseCode = "200",
         description = "읽음 상태 수정 성공",
-        content = @Content(mediaType = "*/*") // 이것만 추가!
+        content = @Content(mediaType = "*/*")
     )
+
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatusDto> update(
         @PathVariable UUID readStatusId,

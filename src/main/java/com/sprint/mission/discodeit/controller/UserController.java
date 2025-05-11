@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -41,6 +43,10 @@ public class UserController {
         @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
 
+        log.info("사용자 생성 API 호출 - username: {}, email: {}",
+            request != null ? request.username() : "null",
+            request != null ? request.email() : "null");
+
         Optional<CreateBinaryContentRequest> profileOpt = Optional.ofNullable(profileFile)
             .filter(file -> !file.isEmpty())
             .map(file -> {
@@ -51,11 +57,13 @@ public class UserController {
                         file.getBytes()
                     );
                 } catch (IOException e) {
+                    log.error("프로필 이미지 변환 실패", e);
                     throw new RuntimeException("프로필 이미지 변환 실패", e);
                 }
             });
 
-        UserDto user = userService.createUser(request, profileOpt); // 변경됨
+        UserDto user = userService.createUser(request, profileOpt);
+        log.info("사용자 생성 완료 - userId: {}", user.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -75,6 +83,8 @@ public class UserController {
         @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
 
+        log.info("사용자 수정 API 호출 - userId: {}", userId);
+
         UpdateUserRequest realRequest = new UpdateUserRequest(
             userId,
             request.newUsername(),
@@ -92,11 +102,13 @@ public class UserController {
                         profileFile.getBytes()
                     );
                 } catch (IOException e) {
+                    log.error("프로필 이미지 변환 실패", e);
                     throw new RuntimeException("프로필 이미지 변환 실패", e);
                 }
             });
 
         userService.updateUser(realRequest, profileOpt);
+        log.info("사용자 수정 완료 - userId: {}", userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -104,7 +116,9 @@ public class UserController {
     @ApiResponse(responseCode = "204", description = "사용자 삭제 성공")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        log.info("사용자 삭제 API 호출 - userId: {}", userId);
         userService.deleteUser(userId);
+        log.info("사용자 삭제 완료 - userId: {}", userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -129,12 +143,9 @@ public class UserController {
         @PathVariable UUID userId,
         @RequestBody UpdateUserStatusRequest request
     ) {
-        UpdateUserStatusRequest fixedRequest = new UpdateUserStatusRequest(
-            userId,
-            request.newLastActiveAt()
-        );
-
-        userStatusService.update(fixedRequest);
+        log.info("사용자 상태 변경 API 호출 - userId: {}", userId);
+        userStatusService.update(new UpdateUserStatusRequest(userId, request.newLastActiveAt()));
+        log.info("사용자 상태 변경 완료 - userId: {}", userId);
         return ResponseEntity.ok().build();
     }
 }

@@ -66,7 +66,7 @@ CREATE TABLE read_statuses
     updated_at   TIMESTAMPTZ,
     user_id      UUID        NOT NULL,
     channel_id   UUID        NOT NULL,
-    last_read_at TIMESTAMPTZ,
+    last_read_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT fk_read_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_read_channel FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
     CONSTRAINT uk_read UNIQUE (user_id, channel_id)
