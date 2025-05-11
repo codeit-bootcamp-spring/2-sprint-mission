@@ -6,11 +6,15 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentResolveException;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +62,13 @@ public class MessageController implements MessageApi {
                 );
               } catch (IOException e) {
                 log.error("파일 업로드 실패 - 파일명:{}, 에러 메시지: {}", file.getOriginalFilename(), e.getMessage());
-                throw new RuntimeException(e);
+                Map<String, Object> details = new HashMap<>();
+                details.put("filename", file.getOriginalFilename());
+                throw new BinaryContentResolveException(
+                    Instant.now(),
+                    ErrorCode.BINARYCONTENT_PROCESS_FAILD,
+                    details
+                );
               }
             })
             .toList())

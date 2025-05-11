@@ -9,6 +9,10 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -18,8 +22,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -54,13 +59,17 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> {
               log.warn("메시지 생성 실패 - 존재하지않는 채널 ID: {}", channelId);
-              return new NoSuchElementException("Channel with id " + channelId + " does not exist");
+              Map<String, Object> details = new HashMap<>();
+              details.put("channelId", channelId);
+              throw new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, details);
             });
     User author = userRepository.findById(authorId)
         .orElseThrow(
             () -> {
               log.warn("메시지 생성 실패 - 존재하지않는 유저 ID: {}", authorId);
-              return new NoSuchElementException("Author with id " + authorId + " does not exist");
+              Map<String, Object> details = new HashMap<>();
+              details.put("userId", authorId);
+              return new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, details);
             }
         );
 
@@ -98,7 +107,12 @@ public class BasicMessageService implements MessageService {
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
         .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+            () -> {
+              log.warn("메시지 찾기 실패 - 메시지 ID: {}", messageId);
+              Map<String, Object> details = new HashMap<>();
+              details.put("messageId", messageId);
+              return new MessageNotFoundException(Instant.now(), ErrorCode.MEESAGE_NOT_FOUND, details);
+            });
   }
 
   @Transactional(readOnly = true)
@@ -127,7 +141,9 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> {
               log.warn("메시지 수정 실패 - 존재하지않는 메시지 ID: {}", messageId);
-              return new NoSuchElementException("Message with id " + messageId + " not found");
+              Map<String, Object> details = new HashMap<>();
+              details.put("messageId", messageId);
+              return new MessageNotFoundException(Instant.now(), ErrorCode.MEESAGE_NOT_FOUND, details);
             });
     message.update(newContent);
     return messageMapper.toDto(message);
@@ -138,7 +154,9 @@ public class BasicMessageService implements MessageService {
   public void delete(UUID messageId) {
     if (!messageRepository.existsById(messageId)) {
       log.warn("메시지 삭제 실패 - 존재하지않는 메시지 ID: {}", messageId);
-      throw new NoSuchElementException("Message with id " + messageId + " not found");
+      Map<String, Object> details = new HashMap<>();
+      details.put("messageId", messageId);
+      throw new MessageNotFoundException(Instant.now(), ErrorCode.MEESAGE_NOT_FOUND, details);
     }
 
     messageRepository.deleteById(messageId);
