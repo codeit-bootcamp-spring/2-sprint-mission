@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -136,4 +140,81 @@ public class UserServiceTest {
 
         assertThrows(EmailAlreadyExistException.class, () -> userService.create(request, profile));
     }
+
+    @Test
+    @DisplayName("정상적인 User update 테스트")
+    void updateUser_WithValidInput_Success() {
+        User user = new User("user1", "user1@gmail.com", "1234", null);
+        ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
+        UserUpdateRequest request = new UserUpdateRequest("user00","user00@gmail.com","4321");
+
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+        given(userRepository.existsByUsername(user.getUsername())).willReturn(false);
+        given(userRepository.existsByEmail(user.getEmail())).willReturn(false);
+
+        userService.update(user.getId(),request,Optional.empty());
+
+        assertEquals("user00", user.getUsername());
+        assertEquals("user00@gmail.com", user.getEmail());
+        assertEquals("4321", user.getPassword());
+    }
+    @Test
+    @DisplayName("정상적인 User 프로필 update 테스트")
+    void updateUser_Profile_WithValidInput_Success(){
+        User user = new User("user1","user1@gmail.com","1234", null);
+        ReflectionTestUtils.setField(user,"id",UUID.randomUUID());
+        UserUpdateRequest request = new UserUpdateRequest("","","");
+
+        Optional<BinaryContentCreateRequest> profile = Optional.of(new BinaryContentCreateRequest("profile.png", "image/png", "ImageData".getBytes()));
+
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+        given(userRepository.existsByUsername(user.getUsername())).willReturn(false);
+        given(userRepository.existsByEmail(user.getEmail())).willReturn(false);
+
+        userService.update(user.getId(),request,profile);
+
+        assertEquals("profile.png", user.getProfile().getFileName());
+        assertEquals("image/png", user.getProfile().getContentType());
+        assertEquals("ImageData".getBytes().length, user.getProfile().getSize());
+
+        verify(binaryContentRepository).save(any());
+        verify(binaryContentStorage).put(any(), any());
+    }
+    @Test
+    @DisplayName("존재하지 않는 userId로 업데이트 시 예외 발생 테스트")
+    void updateUser_WithInvalidUserId_ThrowException(){
+        UUID noExistId = UUID.randomUUID();
+        UserUpdateRequest request = new UserUpdateRequest("user1","user1@gmail.com","0000");
+
+        given(userRepository.findById(noExistId)).willReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class,()->userService.update(noExistId,request,Optional.empty()));
+    }
+    @Test
+    @DisplayName("이미 존재하는 Username로 User update 시 예외 발생 테스트")
+    void updateUser_WithDuplicateUsername_ThrowException() {
+        User user = new User("user1","user1@gmail.com","1234", null);
+        ReflectionTestUtils.setField(user,"id",UUID.randomUUID());
+        UserUpdateRequest request = new UserUpdateRequest("user10", "", "");
+        Optional<BinaryContentCreateRequest> profile = Optional.empty();
+
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+        given(userRepository.existsByUsername(request.newUsername())).willReturn(true);
+
+        assertThrows(UserAlreadyExistException.class, () -> userService.update(user.getId(),request, profile));
+    }
+    @Test
+    @DisplayName("이미 존재하는 email로 User update 시 예외 발생 테스트")
+    void updateUser_WithDuplicateEmail_ThrowException(){
+        User user = new User("user1","user1@gmail.com","1234", null);
+        ReflectionTestUtils.setField(user,"id",UUID.randomUUID());
+        UserUpdateRequest request = new UserUpdateRequest("", "user10@gmail.com", "");
+        Optional<BinaryContentCreateRequest> profile = Optional.empty();
+
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+        given(userRepository.existsByEmail(request.newEmail())).willReturn(true);
+
+        assertThrows(EmailAlreadyExistException.class, () -> userService.update(user.getId(),request, profile));
+    }
+
 }
