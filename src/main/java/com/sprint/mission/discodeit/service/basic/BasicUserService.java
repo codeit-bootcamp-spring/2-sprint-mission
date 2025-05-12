@@ -136,11 +136,9 @@ public class BasicUserService implements UserService {
             "filename", multipartFile.getOriginalFilename()));
       }
       findUser.updateProfile(binaryContent);
-    } else { // 기본 프로필로 변경할 때
-      binaryContentService.delete(findUser.getProfile().getId());
-      findUser.updateProfileDefault();
     }
-    // 변경감지로 User는 save() 안해줘도 commit 시점에 자동으로 save()됨
+    // multipartFile이 없다면 기본 프로필로 유지
+
     return userMapper.toUpdateUserResult(findUser);
   }
 
