@@ -140,11 +140,15 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
 
-    Optional.ofNullable(user.getProfile().getId())
-        .ifPresent(binaryContentService::delete);
+    UUID id = user.getId();
+    BinaryContent profile = user.getProfile();
 
-    userStatusService.delete(user.getId());
-    userRepository.deleteById(user.getId());
+    if (profile != null && profile.getId() != null) {
+      binaryContentService.delete(profile.getId());
+    }
+
+    userStatusService.delete(id);
+    userRepository.deleteById(id);
 
     log.info("[UserService] User deleted {}", userId);
   }
