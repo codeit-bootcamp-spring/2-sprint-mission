@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentExcepti
 import com.sprint.mission.discodeit.exception.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.message.MessageException;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusException;
+import com.sprint.mission.discodeit.exception.storage.StorageException;
 import com.sprint.mission.discodeit.exception.user.UserException;
 import com.sprint.mission.discodeit.exception.userStatus.UserStatusException;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ public class GlobalExceptionHandler {
       ChannelException.class,
       MessageException.class,
       ReadStatusException.class,
+      StorageException.class,
       UserException.class,
       UserStatusException.class
   })
