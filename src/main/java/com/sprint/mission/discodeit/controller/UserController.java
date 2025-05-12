@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,8 @@ public class UserController {
   private final UserStatusMapper userStatusMapper;
 
   @GetMapping("/{userId}")
-  public ResponseEntity<UserResponse> find(@PathVariable UUID userId) {
+  public ResponseEntity<UserResponse> find(
+      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId) {
     log.debug("GET /api/users/{} - 사용자 조회 요청", userId);
     UserResponse response = userService.find(userId);
     return ResponseEntity.ok(response);
@@ -51,7 +54,7 @@ public class UserController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
 
     log.info("POST /api/users - 사용자 생성 요청: username={}, email={}", userCreateRequest.username(),
@@ -70,8 +73,9 @@ public class UserController {
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserResponse> update(@PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+  public ResponseEntity<UserResponse> update(
+      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
     log.info("PATCH /api/users/{} - 사용자 수정 요청", userId);
 
@@ -89,8 +93,9 @@ public class UserController {
   }
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusResponse> updateStatus(@PathVariable UUID userId,
-      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+  public ResponseEntity<UserStatusResponse> updateStatus(
+      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId,
+      @Valid @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
     log.debug("PATCH /api/users/{}/userStatus - 상태 업데이트 요청", userId);
 
     UserStatus updatedStatus = userStatusService.updateByUserId(userId,
@@ -101,7 +106,8 @@ public class UserController {
   }
 
   @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId) {
     log.info("DELETE /api/users/{} - 유저 삭제 요청", userId);
     userService.delete(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

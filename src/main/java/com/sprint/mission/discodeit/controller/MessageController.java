@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class MessageController {
 
   @GetMapping
   public ResponseEntity<PageResponse<MessageResponse>> findAllByChannelId(
-      @RequestParam("channelId") UUID channelId,
+      @RequestParam("channelId") @NotNull(message = "채널 ID는 필수입니다.") UUID channelId,
       @RequestParam(value = "cursor", required = false) Instant cursor,
       @PageableDefault(
           size = 50,
@@ -52,7 +54,7 @@ public class MessageController {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageResponse> create(
-      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachmentFiles) {
     log.info("POST /api/messages - 메시지 생성 요청: authorId={}, channelId={}",
         messageCreateRequest.authorId(), messageCreateRequest.channelId());
@@ -80,8 +82,8 @@ public class MessageController {
 
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageResponse> update(
-      @PathVariable UUID messageId,
-      @RequestBody MessageUpdateRequest messageUpdateRequest) {
+      @PathVariable @NotNull(message = "메시지 ID는 필수입니다.") UUID messageId,
+      @Valid @RequestBody MessageUpdateRequest messageUpdateRequest) {
     log.info("PATCH /api/messages/{} - 메시지 수정 요청: newContent={}",
         messageId, messageUpdateRequest.newContent());
 
@@ -90,9 +92,10 @@ public class MessageController {
   }
 
   @DeleteMapping("/{messageId}")
-  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+  public ResponseEntity<Void> delete(
+      @PathVariable @NotNull(message = "메시지 ID는 필수입니다.") UUID messageId) {
     log.info("DELETE /api/messages/{} - 메시지 삭제 요청", messageId);
-    
+
     messageService.delete(messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
