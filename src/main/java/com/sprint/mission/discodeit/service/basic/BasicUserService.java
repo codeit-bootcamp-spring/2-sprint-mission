@@ -93,7 +93,7 @@ public class BasicUserService implements UserService {
     @Transactional
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         MultipartFile profile) {
-        log.info("사용자 수정 진행: userId={}", userId);
+        log.info("사용자 수정 진행: userId = {}", userId);
 
         User user = userRepository.findById(userId).
             orElseThrow(() -> {
@@ -132,7 +132,6 @@ public class BasicUserService implements UserService {
         log.info("사용자 수정 완료: userId = {}", user.getId());
 
         if (updatedUser.getProfile() != null) {
-            System.out.println(updatedUser.getProfile().getId());
             log.info("프로필 이미지 파일 저장: profileId = {}", updatedUser.getProfile().getId());
             try {
                 binaryContentStorage.put(updatedUser.getProfile().getId(), profile.getBytes());
