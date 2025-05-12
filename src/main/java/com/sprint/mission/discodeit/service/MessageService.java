@@ -21,7 +21,7 @@ public interface MessageService {
 
     PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size);
 
-    void updateMessage(UpdateMessageRequest request);
+    MessageDto updateMessage(UUID messageId, UpdateMessageRequest request);
 
     void deleteMessage(UUID messageId);
 }

@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.DuplicateUserException;
+import com.sprint.mission.discodeit.exception.user.ProfileUploadFailedException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -16,6 +18,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -51,14 +54,15 @@ public class BasicUserService implements UserService {
                 .equals(request.email())
         )) {
             log.warn("이미 존재하는 사용자 - username: {}, email: {}", request.username(), request.email());
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
+            throw new DuplicateUserException(
+                Map.of("username", request.username(), "email", request.email()));
         }
 
         BinaryContent profile = profileOpt.map(p -> {
             log.debug("프로필 이미지 저장 시작");
             BinaryContentDto dto = binaryContentService.create(p);
             return binaryContentRepository.findById(dto.id())
-                .orElseThrow(() -> new IllegalStateException("프로필 저장 후 조회 실패"));
+                .orElseThrow(() -> new ProfileUploadFailedException(Map.of("파일이름", p.fileName())));
         }).orElse(null);
 
         User user = new User(
@@ -113,7 +117,8 @@ public class BasicUserService implements UserService {
 
                 BinaryContentDto dto = binaryContentService.create(profile);
                 return binaryContentRepository.findById(dto.id())
-                    .orElseThrow(() -> new IllegalStateException("프로필 저장 후 조회 실패"));
+                    .orElseThrow(
+                        () -> new ProfileUploadFailedException(Map.of("파일이름", profile.fileName())));
             }).orElse(user.getProfile());
 
             user.update(

@@ -10,7 +10,13 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.handler.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.AttachmentSaveFailedException;
+import com.sprint.mission.discodeit.exception.message.InvalidMessageAuthorException;
+import com.sprint.mission.discodeit.exception.message.InvalidMessageChannelException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -19,6 +25,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -51,23 +58,23 @@ public class BasicMessageService implements MessageService {
 
         if (request.authorId() == null) {
             log.warn("메시지 생성 실패 - 사용자 ID가 null");
-            throw new IllegalArgumentException("사용자 ID는 null일 수 없습니다.");
+            throw new InvalidMessageAuthorException();
         }
         if (request.channelId() == null) {
             log.warn("메시지 생성 실패 - 채널 ID가 null");
-            throw new IllegalArgumentException("채널 ID는 null일 수 없습니다.");
+            throw new InvalidMessageChannelException();
         }
 
         User author = userRepository.findById(request.authorId())
             .orElseThrow(() -> {
                 log.warn("존재하지 않는 사용자 - userId: {}", request.authorId());
-                return new IllegalArgumentException("존재하지 않는 사용자입니다: " + request.authorId());
+                return new UserNotFoundException(Map.of("userId", request.authorId()));
             });
 
         Channel channel = channelRepository.findById(request.channelId())
             .orElseThrow(() -> {
                 log.warn("존재하지 않는 채널 - channelId: {}", request.channelId());
-                return new IllegalArgumentException("존재하지 않는 채널입니다: " + request.channelId());
+                return new ChannelNotFoundException(Map.of("channelId", request.channelId()));
             });
 
         List<BinaryContent> attachmentIds = new ArrayList<>();
@@ -91,7 +98,8 @@ public class BasicMessageService implements MessageService {
 
                 } catch (Exception e) {
                     log.error("첨부파일 저장 실패 - fileName: {}", file.getOriginalFilename(), e);
-                    throw new RuntimeException("첨부 파일 저장 실패", e);
+                    throw new AttachmentSaveFailedException(
+                        Map.of("fileName", file.getOriginalFilename()));
                 }
             }
         }
@@ -107,7 +115,7 @@ public class BasicMessageService implements MessageService {
         log.info("단일 메시지 조회 요청 - messageId: {}", messageId);
         return messageRepository.findById(messageId)
             .map(messageMapper::toDto)
-            .orElseThrow(() -> new MessageNotFoundException(messageId.toString()));
+            .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
     }
 
     @Override
@@ -118,7 +126,7 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {
                 log.warn("존재하지 않는 채널 - channelId: {}", channelId);
-                return new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId);
+                return new ChannelNotFoundException(Map.of("channelId", channelId));
             });
 
         PageRequest pageRequest = PageRequest.of(0, size + 1); // +1로 hasNext 판단
@@ -155,14 +163,16 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public void updateMessage(UpdateMessageRequest request) {
-        log.info("메시지 수정 요청 - messageId: {}", request.messageId());
+    public MessageDto updateMessage(UUID messageId, UpdateMessageRequest request) {
+        log.info("메시지 수정 요청 - messageId: {}", messageId);
 
-        messageRepository.findById(request.messageId()).ifPresent(message -> {
-            message.update(request.newContent(), message.getAttachments());
-            messageRepository.save(message);
-            log.info("메시지 수정 완료 - messageId: {}", message.getId());
-        });
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
+
+        message.update(request.newContent(), message.getAttachments());
+        log.info("메시지 수정 완료 - messageId: {}", message.getId());
+
+        return messageMapper.toDto(message);
     }
 
     @Override
@@ -170,14 +180,15 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID messageId) {
         log.info("메시지 삭제 요청 - messageId: {}", messageId);
 
-        messageRepository.findById(messageId).ifPresent(message -> {
-            message.getAttachments().forEach(file -> {
-                binaryContentRepository.delete(file);
-                log.debug("첨부파일 삭제 - fileId: {}", file.getId());
-            });
-            
-            messageRepository.deleteById(messageId);
-            log.info("메시지 삭제 완료 - messageId: {}", messageId);
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
+
+        message.getAttachments().forEach(file -> {
+            binaryContentRepository.delete(file);
+            log.debug("첨부파일 삭제 - fileId: {}", file.getId());
         });
+
+        messageRepository.deleteById(messageId);
+        log.info("메시지 삭제 완료 - messageId: {}", messageId);
     }
 }

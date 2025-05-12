@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.dto.status.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -14,6 +17,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,10 +44,10 @@ public class BasicReadStatusService implements ReadStatusService {
         Instant lastReadAt = request.lastReadAt();
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다: " + userId));
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
         Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다: " + channelId));
+            .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", channelId)));
 
         Optional<ReadStatus> opt = readStatusRepository.findByUserIdAndChannelId(userId, channelId);
         if (opt.isPresent()) {
@@ -78,8 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto update(UUID readStatusId, UpdateReadStatusRequest request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(
-                () -> new IllegalArgumentException(
-                    "해당 ID의 ReadStatus를 찾을 수 없습니다: " + readStatusId));
+                () -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId)));
 
         readStatus.update(request.newLastReadAt());
 //        readStatusRepository.save(readStatus);
@@ -90,7 +93,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public void deleteById(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
-            throw new IllegalArgumentException("해당 ID의 ReadStatus를 찾을 수 없습니다: " + readStatusId);
+            throw new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId));
         }
         readStatusRepository.deleteById(readStatusId);
     }

@@ -51,20 +51,16 @@ public class MessageController {
         content = @Content(mediaType = "*/*")
     )
     @PatchMapping("/{messageId}")
-    public ResponseEntity<Void> updateMessage(
+    public ResponseEntity<MessageDto> updateMessage(
         @PathVariable UUID messageId,
         @RequestBody UpdateMessageRequest request
     ) {
-        log.info("메시지 수정 API 호출 - pathId: {}, requestId: {}", messageId, request.messageId());
+        log.info("메시지 수정 API 호출 - messageId: {}", messageId);
 
-        if (!messageId.equals(request.messageId())) {
-            log.warn("메시지 ID 불일치 - pathId: {}, requestId: {}", messageId, request.messageId());
-            return ResponseEntity.badRequest().build();
-        }
-
-        messageService.updateMessage(request);
+        MessageDto updatedMessage = messageService.updateMessage(messageId, request);
         log.info("메시지 수정 완료 - messageId: {}", messageId);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok(updatedMessage);
     }
 
     @Operation(summary = "메시지 삭제")

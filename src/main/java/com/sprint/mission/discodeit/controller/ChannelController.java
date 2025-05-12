@@ -32,12 +32,10 @@ public class ChannelController {
 
         log.info("공개 채널 생성 요청 - name: {}", request.name());
 
-        UUID channelId = channelService.createPublicChannel(request).getId();
-        log.info("공개 채널 생성 완료 - channelId: {}", channelId);
+        ChannelDto createdChannel = channelService.createPublicChannel(request);
+        log.info("공개 채널 생성 완료 - channelId: {}", createdChannel.id());
 
-        return channelService.getChannelById(channelId)
-            .map(response -> ResponseEntity.status(201).body(response))
-            .orElse(ResponseEntity.badRequest().build());
+        return ResponseEntity.status(201).body(createdChannel);
     }
 
     @Operation(summary = "비공개 채널 생성")
@@ -48,12 +46,10 @@ public class ChannelController {
 
         log.info("비공개 채널 생성 API 호출 - 참여자 수: {}", request.participantIds().size());
 
-        UUID channelId = channelService.createPrivateChannel(request).getId();
-        log.info("비공개 채널 생성 완료 - channelId: {}", channelId);
+        ChannelDto createdChannel = channelService.createPrivateChannel(request);
+        log.info("비공개 채널 생성 완료 - channelId: {}", createdChannel.id());
 
-        return channelService.getChannelById(channelId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.badRequest().build());
+        return ResponseEntity.status(201).body(createdChannel);
     }
 
 
@@ -68,18 +64,12 @@ public class ChannelController {
         @PathVariable UUID channelId,
         @RequestBody UpdateChannelRequest request) {
 
-        log.info("채널 수정 API 호출 - pathId: {}, requestId: {}", channelId, request.channelId());
+        log.info("채널 수정 API 호출 - channelId: {}", channelId);
 
-        if (!channelId.equals(request.channelId())) {
-            log.warn("채널 ID 불일치 - pathId: {}, requestId: {}", channelId, request.channelId());
-            return ResponseEntity.badRequest().build();
-        }
-        channelService.updateChannel(request);
+        ChannelDto updatedChannel = channelService.updateChannel(channelId, request);
         log.info("채널 수정 완료 - channelId: {}", channelId);
 
-        return channelService.getChannelById(channelId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.noContent().build());
+        return ResponseEntity.ok(updatedChannel);
     }
 
     @Operation(summary = "채널 삭제")
