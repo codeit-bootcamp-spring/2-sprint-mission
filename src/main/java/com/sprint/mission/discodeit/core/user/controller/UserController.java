@@ -76,7 +76,7 @@ public class UserController {
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserDto> updateUser(
+  public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file) {

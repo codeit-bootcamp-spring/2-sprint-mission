@@ -24,8 +24,9 @@ public class GlobalExceptionAdvice {
 
   private final MessageSource messageSource;
 
-  private ErrorResponse createResponse(DiscodeitException ex, ErrorCode errorCode, Object[] args,
+  private ErrorResponse createResponse(DiscodeitException ex, Object[] args,
       Locale locale) {
+    ErrorCode errorCode = ex.getErrorCode();
     String message = messageSource.getMessage(errorCode.getMessage(), args, locale);
     ErrorResponse response = ErrorResponse.of(ex.getTimestamp(), errorCode, message, ex.toString());
     log.error(message);
@@ -35,59 +36,52 @@ public class GlobalExceptionAdvice {
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleNotFoundException(UserNotFoundException ex,
       Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<ErrorResponse> handleAlreadyExistsException(UserAlreadyExistsException ex,
       Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
   @ExceptionHandler(UserLoginFailedException.class)
   public ResponseEntity<ErrorResponse> handleLoginFailedException(UserLoginFailedException ex,
       Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
   @ExceptionHandler(UserInvalidRequestException.class)
   public ResponseEntity<ErrorResponse> handleUserInvalidRequestException(
       UserInvalidRequestException ex,
       Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
   @ExceptionHandler(ChannelUnmodifiableException.class)
   public ResponseEntity<ErrorResponse> handleUnmodifiableException(ChannelUnmodifiableException ex,
       Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
   @ExceptionHandler(ChannelInvalidRequestException.class)
   public ResponseEntity<ErrorResponse> handleMessageInvalidRequestException(
       ChannelInvalidRequestException ex, Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
 
   @ExceptionHandler(MessageInvalidRequestException.class)
   public ResponseEntity<ErrorResponse> handleMessageInvalidRequestException(
       MessageInvalidRequestException ex, Locale locale) {
-    ErrorCode errorCode = ex.getErrorCode();
-    ErrorResponse response = createResponse(ex, errorCode, ex.getArgs(), locale);
-    return ResponseEntity.status(errorCode.getHttpStatus()).body(response);
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -54,7 +54,6 @@ public class BasicUserService implements UserService {
 
     UserStatusCreateCommand statusCommand = new UserStatusCreateCommand(user, Instant.now());
     UserStatus userStatus = userStatusService.create(statusCommand);
-
     user.setUserStatus(userStatus);
 
     return UserDto.create(user, true);
@@ -113,9 +112,9 @@ public class BasicUserService implements UserService {
   @Transactional
   public UserDto update(UserUpdateCommand command,
       Optional<BinaryContentCreateCommand> binaryContentDTO) {
-    User user = userRepository.findById(command.requestUserId())
+    User user = userRepository.findById(command.id())
         .orElseThrow(
-            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.requestUserId()));
+            () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.id()));
 
     BinaryContent profile = user.getProfile();
     if (profile != null && binaryContentDTO.isPresent()) {
