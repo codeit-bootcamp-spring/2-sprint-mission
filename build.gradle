@@ -1,4 +1,5 @@
 plugins {
+    id 'jacoco'
     id 'java'
     id 'org.springframework.boot' version '3.3.1'
     id 'io.spring.dependency-management' version '1.1.5'
@@ -7,6 +8,25 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
+
+jacoco {
+    toolVersion = "0.8.10" // 최신 버전 기준, 필요 시 생략 가능
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
 
 openApiGenerate {
     generatorName = "spring" // 사용할 generator 이름
