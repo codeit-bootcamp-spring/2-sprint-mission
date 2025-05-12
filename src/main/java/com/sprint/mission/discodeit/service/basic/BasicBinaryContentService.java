@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -41,7 +41,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public BinaryContent find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
+        .orElseThrow(() -> new BinaryContentNotFoundException());
   }
 
   @Override
@@ -52,7 +52,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public void delete(BinaryContent binaryContent) {
     BinaryContent found = binaryContentRepository.findById(binaryContent.getId())
-        .orElseThrow(() -> new ResourceNotFoundException("해당 BinaryContent 없음"));
+        .orElseThrow(() -> new BinaryContentNotFoundException());
 
     binaryContentStorage.delete(found.getId());
     binaryContentRepository.delete(found);
@@ -62,7 +62,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   public ResponseEntity<?> download(UUID binaryContentId) {
     BinaryContent binaryContent = find(binaryContentId);
     if (binaryContent == null) {
-      throw new ResourceNotFoundException("없다");
+      throw new BinaryContentNotFoundException();
     }
 
     BinaryContentResponse binaryContentResponse = binaryContentMapper.toDto(binaryContent);

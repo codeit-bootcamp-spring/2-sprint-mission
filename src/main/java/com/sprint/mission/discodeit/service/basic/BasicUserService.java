@@ -5,8 +5,9 @@ import com.sprint.mission.discodeit.dto.user.*;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.exception.DuplicateResourceException;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -36,11 +37,11 @@ public class BasicUserService implements UserService {
       BinaryContentCreateRequest profileCreateRequest) {
     userRepository.findByUsername(userCreateRequest.username())
         .ifPresent(u -> {
-          throw new DuplicateResourceException("username 중복");
+          throw new DuplicateUsernameException();
         });
     userRepository.findByEmail(userCreateRequest.email())
         .ifPresent(u -> {
-          throw new DuplicateResourceException("이메일 중복");
+          throw new DuplicateEmailException();
         });
 
     BinaryContent profile = (profileCreateRequest != null)
@@ -105,19 +106,19 @@ public class BasicUserService implements UserService {
 
   private User getUserBy(UUID userId) {
     return userRepository.findById(userId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 유저 없음"));
+        .orElseThrow(() -> new UserNotFoundException());
   }
 
 
   private void validateEmailDuplicate(String email) {
     if (userRepository.existsByEmail(email)) {
-      throw new DuplicateResourceException("동일 newEmail 이미 존재함");
+      throw new DuplicateEmailException();
     }
   }
 
   private void validateUsernameDuplicate(String username) {
     if (userRepository.existsByUsername(username)) {
-      throw new DuplicateResourceException("동일 newUsername 이미 존재함");
+      throw new DuplicateUsernameException();
     }
   }
 

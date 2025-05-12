@@ -9,7 +9,8 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.BinaryContent;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -63,7 +64,7 @@ public class BasicMessageService implements MessageService {
   public MessageResponse find(UUID messageId) {
     return messageMapper.toResponse(messageRepository.findById(messageId)
         .orElseThrow(
-            () -> new ResourceNotFoundException("Message with id " + messageId + " not found")));
+            () -> new MessageNotFoundException()));
   }
 
   @Transactional(readOnly = true)
@@ -105,13 +106,13 @@ public class BasicMessageService implements MessageService {
 
   private Message getMessage(UUID messageId) {
     return messageRepository.findById(messageId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 메세지 없음"));
+        .orElseThrow(() -> new MessageNotFoundException());
   }
 
 
   private void validateChannelExistence(UUID channelId) {
     if (!channelRepository.existsById(channelId)) {
-      throw new ResourceNotFoundException("해당 채널 없음");
+      throw new ChannelNotFoundException();
     }
   }
 }

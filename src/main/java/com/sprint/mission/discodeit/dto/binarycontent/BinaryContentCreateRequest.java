@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.binarycontent;
 
-import com.sprint.mission.discodeit.exception.FileLoadException;
+import com.sprint.mission.discodeit.exception.binarycontent.FileLoadException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,7 +19,7 @@ public record BinaryContentCreateRequest(
           file.getBytes()
       );
     } catch (IOException e) {
-      throw new FileLoadException("파일 읽기 실패");
+      throw new FileLoadException();
     }
 
   }

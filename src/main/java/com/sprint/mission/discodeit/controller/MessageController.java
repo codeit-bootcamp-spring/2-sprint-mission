@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Sort.Direction;
@@ -25,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MessageController {
 
+  private static final Logger log = LoggerFactory.getLogger(MessageController.class);
+
   private final MessageService messageService;
 
   @GetMapping
@@ -37,6 +41,8 @@ public class MessageController {
           sort = "createdAt",
           direction = Direction.DESC
       ) Pageable pageable) {
+    log.debug("GET /api/messages - 메시지 목록 조회 요청: channelId={}, cursor={}", channelId, cursor);
+
     PageResponse<MessageResponse> messages = messageService.findAllByChannelId(channelId, cursor,
         pageable);
     return ResponseEntity
@@ -48,6 +54,17 @@ public class MessageController {
   public ResponseEntity<MessageResponse> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachmentFiles) {
+    log.info("POST /api/messages - 메시지 생성 요청: authorId={}, channelId={}",
+        messageCreateRequest.authorId(), messageCreateRequest.channelId());
+    if (attachmentFiles != null && !attachmentFiles.isEmpty()) {
+      log.info("첨부 파일 개수: {}", attachmentFiles.size());
+      attachmentFiles.stream()
+          .filter(file -> !file.isEmpty())
+          .limit(3)
+          .forEach(file ->
+              log.debug("첨부 파일: filename={}, size={} bytes",
+                  file.getOriginalFilename(), file.getSize()));
+    }
 
     List<BinaryContentCreateRequest> attachmentsCreateRequest = null;
     if (attachmentFiles != null) {
@@ -65,12 +82,17 @@ public class MessageController {
   public ResponseEntity<MessageResponse> update(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
+    log.info("PATCH /api/messages/{} - 메시지 수정 요청: newContent={}",
+        messageId, messageUpdateRequest.newContent());
+
     MessageResponse updatedMessage = messageService.update(messageId, messageUpdateRequest);
     return ResponseEntity.ok(updatedMessage);
   }
 
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+    log.info("DELETE /api/messages/{} - 메시지 삭제 요청", messageId);
+    
     messageService.delete(messageId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }

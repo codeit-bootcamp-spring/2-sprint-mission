@@ -10,7 +10,8 @@ import com.sprint.mission.discodeit.entity.channel.ChannelType;
 import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.entity.common.ReadStatus;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -52,7 +53,7 @@ public class BasicChannelService implements ChannelService {
     List<User> participants = userRepository.findAllById(request.participantIds());
 
     if (participants.size() != request.participantIds().size()) {
-      throw new ResourceNotFoundException("존재하지 않는 유저 ID가 있습니다");
+      throw new UserNotFoundException();
     }
 
     Channel channel = new Channel(ChannelType.PRIVATE);
@@ -84,7 +85,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelResponse update(UUID channelId, PublicChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
+        .orElseThrow(() -> new ChannelNotFoundException());
 
     if (channel.getType() == ChannelType.PRIVATE) {
       throw new IllegalArgumentException("PRIVATE 채널 수정 불가");
@@ -99,7 +100,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void delete(UUID channelId) {
     if (channelRepository.existsById(channelId) == false) {
-      throw new ResourceNotFoundException("Channel with id " + channelId + " not found");
+      throw new ChannelNotFoundException();
     }
 
     messageRepository.deleteByChannel_Id(channelId);
@@ -123,13 +124,13 @@ public class BasicChannelService implements ChannelService {
 
   private void validateUserExistence(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new ResourceNotFoundException("해당 유저 없음");
+      throw new UserNotFoundException();
     }
   }
 
   private Channel getChannel(UUID channelId) {
     return channelRepository.findById(channelId)
-        .orElseThrow(() -> new ResourceNotFoundException("해당 채널 없음"));
+        .orElseThrow(() -> new ChannelNotFoundException());
   }
 
   private void createParticipantReadStatuses(List<User> participants, Channel channel) {

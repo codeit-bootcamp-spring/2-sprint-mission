@@ -11,6 +11,8 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserController {
 
+  private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
   private final UserService userService;
   private final UserStatusService userStatusService;
   private final ChannelService channelService;
@@ -33,12 +37,14 @@ public class UserController {
 
   @GetMapping("/{userId}")
   public ResponseEntity<UserResponse> find(@PathVariable UUID userId) {
+    log.debug("GET /api/users/{} - 사용자 조회 요청", userId);
     UserResponse response = userService.find(userId);
     return ResponseEntity.ok(response);
   }
 
   @GetMapping
   public ResponseEntity<List<UserResponse>> findAll() {
+    log.debug("GET /api/users - 모든 사용자 조회 요청");
     List<UserResponse> response = userService.findAll();
     return ResponseEntity.ok(response);
   }
@@ -48,9 +54,15 @@ public class UserController {
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
 
+    log.info("POST /api/users - 사용자 생성 요청: username={}, email={}", userCreateRequest.username(),
+        userCreateRequest.email());
+    if (profileRequest != null && !profileRequest.isEmpty()) {
+      log.info("프로필 이미지 업로드 요청: filename={}, size={} bytes", profileRequest.getOriginalFilename(),
+          profileRequest.getSize());
+    }
+
     BinaryContentCreateRequest profileCreateRequest =
-        (profileRequest == null || profileRequest.isEmpty())
-            ? null
+        (profileRequest == null || profileRequest.isEmpty()) ? null
             : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
     UserResponse response = userService.create(userCreateRequest, profileCreateRequest);
@@ -58,24 +70,29 @@ public class UserController {
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserResponse> update(
-      @PathVariable UUID userId,
+  public ResponseEntity<UserResponse> update(@PathVariable UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profileRequest
-  ) {
+      @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
+    log.info("PATCH /api/users/{} - 사용자 수정 요청", userId);
+
+    if (profileRequest != null && !profileRequest.isEmpty()) {
+      log.info("프로필 이미지 수정 업로드 요청: filename={}, size={} bytes",
+          profileRequest.getOriginalFilename(), profileRequest.getSize());
+    }
+
     BinaryContentCreateRequest profileCreateRequest =
-        (profileRequest == null || profileRequest.isEmpty())
-            ? null
+        (profileRequest == null || profileRequest.isEmpty()) ? null
             : BinaryContentCreateRequest.fromMultipartFile(profileRequest);
 
-    UserResponse response = userService.update(userId, userUpdateRequest,
-        profileCreateRequest);
+    UserResponse response = userService.update(userId, userUpdateRequest, profileCreateRequest);
     return ResponseEntity.ok(response);
   }
 
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusResponse> updateStatus(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+    log.debug("PATCH /api/users/{}/userStatus - 상태 업데이트 요청", userId);
+
     UserStatus updatedStatus = userStatusService.updateByUserId(userId,
         userStatusUpdateRequest.newLastActiveAt());
 
@@ -85,6 +102,7 @@ public class UserController {
 
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    log.info("DELETE /api/users/{} - 유저 삭제 요청", userId);
     userService.delete(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
