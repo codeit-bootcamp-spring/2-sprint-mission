@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- 콘솔 출력 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger - %msg%n"/>
+
+    <!-- 로그 파일 저장 위치 -->
+    <property name="LOG_PATH" value=".logs"/>
+    <property name="LOG_FILE_NAME" value="discodeit"/>
+
+    <!-- 콘솔 Appender -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 파일 Appender (날짜별 롤링) -->
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+
+        <!-- 날짜별 롤링 정책 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 롤링 파일 이름: 예) discodeit.2025-05-08.log -->
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- 로그 파일 보관 기간 -->
+            <maxHistory>30</maxHistory>
+
+            <!-- 현재 로그 파일을 지정한 크기 이상 분할하지 않음 -->
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 모든 로그에 대해 콘솔 + 파일 출력 -->
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="RollingFile"/>
+    </root>
+
+    <!-- 우리가 작성한 패키지의 로그 레벨을 별도 지정 (프로파일에 따라 오버라이드 가능) -->
+    <logger name="com.sprint.mission.discodeit" level="DEBUG"/>
+
+</configuration>

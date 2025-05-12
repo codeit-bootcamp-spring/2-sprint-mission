@@ -1,42 +1,18 @@
 spring:
+  profiles:
+    active: dev
+
   application:
     name: discodeit
+
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
 
-  jpa:
-    hibernate:
-      ddl-auto: none # none | update | create | create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-
-  logging:
-    level:
-      org:
-        hibernate:
-          SQL: debug
-          orm.jdbc.bind: trace
-        springframework:
-          data: debug
-      com:
-        example:
-          discodeit: debug
-
+logging:
+  level:
+    root: info
 
 discodeit:
   storage:
