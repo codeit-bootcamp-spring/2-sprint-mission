@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.auth.JwtAuthInterceptor;
+import com.sprint.mission.discodeit.auth.JwtUtil;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.message.controller.MessageController;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
@@ -42,6 +44,12 @@ public class MessageControllerTest {
 
   @MockitoBean
   private MessageService messageService;
+
+  @MockitoBean
+  JwtUtil jwtUtil;
+
+  @MockitoBean
+  JwtAuthInterceptor intercept;
 
   @Autowired
   private ObjectMapper objectMapper;

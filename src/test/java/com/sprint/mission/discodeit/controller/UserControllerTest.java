@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.auth.JwtAuthInterceptor;
+import com.sprint.mission.discodeit.auth.JwtUtil;
 import com.sprint.mission.discodeit.core.user.controller.UserController;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
@@ -40,6 +42,12 @@ public class UserControllerTest {
 
   @MockitoBean
   private UserService userService;
+
+  @MockitoBean
+  JwtUtil jwtUtil;
+
+  @MockitoBean
+  JwtAuthInterceptor intercept;
 
   @Autowired
   private ObjectMapper objectMapper;
