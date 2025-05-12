@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -32,6 +34,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
+        log.info("Creating private channel: {}", channelCreatePrivateDto);
 
         Channel newChannel = Channel.createPrivate();
         channelRepository.save(newChannel);
@@ -40,21 +43,27 @@ public class BasicChannelService implements ChannelService {
             ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(userId, newChannel.getId(),
                     newChannel.getCreatedAt());
             readStatusService.create(readStatusCreateDto);
+            log.debug("ReadStatus created for userId {} in channelId {}", userId, newChannel.getId());
         });
 
+        log.info("Private channel created successfully: channelId={}", newChannel.getId());
         return channelMapper.toDto(newChannel);
     }
 
     @Transactional
     @Override
     public ChannelDto createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
+        log.info("Creating public channel: {}", channelCreatePublicDto);
+
         if (channelRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
+            log.warn("Public channel name {} already exists", channelCreatePublicDto.name());
             throw new LogicException(ErrorCode.CHANNEL_ALREADY_EXISTS);
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
         channelRepository.save(newChannel);
 
+        log.info("Public channel created successfully: channelId={}", newChannel.getId());
         return channelMapper.toDto(newChannel);
     }
 
@@ -95,24 +104,33 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
+        log.info("Updating channel: channelId={}", channelId);
+
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new LogicException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("Channel not found: channelId={}", channelId);
+                    return new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
+                });
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
+            log.warn("Private channel update not supported: channelId={}", channelId);
             throw new LogicException(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_SUPPORTED);
         }
 
         channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());
 
+        log.info("Channel updated successfully: channelId={}", channelId);
         return channelMapper.toDto(channel);
     }
 
     @Transactional
     @Override
     public void delete(UUID channelId) {
+        log.info("Deleting channel: channelId={}", channelId);
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new LogicException(ErrorCode.CHANNEL_NOT_FOUND));
 
         channelRepository.delete(channel);
+        log.info("Channel deleted successfully: channelId={}", channelId);
     }
 }

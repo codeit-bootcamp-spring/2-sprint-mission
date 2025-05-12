@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/channels")
@@ -33,7 +35,9 @@ public class ChannelController {
     @Operation(summary = "Public Channel 생성")
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> createPublic(@RequestBody ChannelCreatePublicDto channelCreatePublicDto) {
+        log.info("Received public channel create request: {}", channelCreatePublicDto);
         ChannelDto channelDto = channelService.createPublic(channelCreatePublicDto);
+        log.info("Public channel created successfully: channelId={}", channelDto.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
     }
@@ -41,7 +45,10 @@ public class ChannelController {
     @Operation(summary = "Private Channel 생성")
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> createPrivate(@RequestBody ChannelCreatePrivateDto channelCreatePrivateDto) {
+        log.info("Received private channel create request: {}", channelCreatePrivateDto);
         ChannelDto channelDto = channelService.createPrivate(channelCreatePrivateDto);
+        log.info("Private channel created successfully: channelId={}", channelDto.id());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
     }
 
@@ -49,14 +56,20 @@ public class ChannelController {
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
                                                     @RequestBody ChannelUpdateDto channelUpdateDto) {
+        log.info("Received channel update request: channelId={}, updateDto={}", channelId, channelUpdateDto);
         ChannelDto channelDto = channelService.update(channelId, channelUpdateDto);
+        log.info("Channel updated successfully: channelId={}", channelDto.id());
+
         return ResponseEntity.ok(channelDto);
     }
 
     @Operation(summary = "Channel 삭제")
     @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+        log.info("Received channel delete request: channelId={}", channelId);
         channelService.delete(channelId);
+        log.info("Channel deleted successfully: channelId={}", channelId);
+
         return ResponseEntity.noContent().build();
     }
 
