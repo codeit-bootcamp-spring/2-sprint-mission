@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+#application-dev.yaml
+
 ### STS ###
 .apt_generated
 .classpath
@@ -22,6 +24,7 @@ bin/
 *.iws
 *.iml
 *.ipr
+logs/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
