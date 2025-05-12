@@ -242,3 +242,65 @@ Caused by: java.lang.ClassNotFoundException: org.springframework.boot.http.clien
 	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
 	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
 	... 37 common frames omitted
+25-05-12 11:08:02.281 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 25348 (C:\Users\dlwns\2-sprint-mission\build\classes\java\main started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:08:02.288 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - The following 1 profile is active: "dev"
+25-05-12 11:08:04.591 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-12 11:08:04.738 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Finished Spring Data repository scanning in 132 ms. Found 6 JPA repository interfaces.
+25-05-12 11:08:06.311 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer    
+        [ |  | ] - Tomcat initialized with port 8080 (http)
+25-05-12 11:08:06.329 [main] INFO  o.a.coyote.http11.Http11NioProtocol 
+        [ |  | ] - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-12 11:08:06.334 [main] INFO  o.a.catalina.core.StandardService   
+        [ |  | ] - Starting service [Tomcat]
+25-05-12 11:08:06.334 [main] INFO  o.a.catalina.core.StandardEngine    
+        [ |  | ] - Starting Servlet engine: [Apache Tomcat/10.1.25]
+25-05-12 11:08:06.501 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]  
+        [ |  | ] - Initializing Spring embedded WebApplicationContext
+25-05-12 11:08:06.502 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext
+        [ |  | ] - Root WebApplicationContext: initialization completed in 4090 ms
+25-05-12 11:08:06.942 [main] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-1 - Starting...
+25-05-12 11:08:07.512 [main] INFO  com.zaxxer.hikari.pool.HikariPool   
+        [ |  | ] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2f6e92ca
+25-05-12 11:08:07.515 [main] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-1 - Start completed.
+25-05-12 11:08:07.668 [main] INFO  o.h.jpa.internal.util.LogHelper     
+        [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-12 11:08:07.811 [main] INFO  org.hibernate.Version               
+        [ |  | ] - HHH000412: Hibernate ORM core version 6.5.2.Final
+25-05-12 11:08:07.888 [main] INFO  o.h.c.i.RegionFactoryInitiator      
+        [ |  | ] - HHH000026: Second-level cache disabled
+25-05-12 11:08:08.456 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo 
+        [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-12 11:08:10.199 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator  
+        [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-12 11:08:10.311 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:08:10.747 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory
+        [ |  | ] - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-12 11:08:11.990 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping
+        [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-05-12 11:08:12.542 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration
+        [ |  | ] - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+25-05-12 11:08:13.396 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver 
+        [ |  | ] - Exposing 4 endpoints beneath base path '/actuator'
+25-05-12 11:08:13.508 [main] INFO  o.a.coyote.http11.Http11NioProtocol 
+        [ |  | ] - Starting ProtocolHandler ["http-nio-8080"]
+25-05-12 11:08:13.550 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer    
+        [ |  | ] - Tomcat started on port 8080 (http) with context path '/'
+25-05-12 11:08:13.568 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - Started DiscodeitApplication in 13.668 seconds (process running for 16.041)
+25-05-12 11:08:13.728 [registrationTask1] WARN  d.c.b.a.c.r.ApplicationRegistrator  
+        [ |  | ] - Failed to register application as Application(name=discodeit, managementUrl=http://host.docker.internal:8080/actuator, healthUrl=http://host.docker.internal:8080/actuator/health, serviceUrl=http://host.docker.internal:8080/) at spring-boot-admin ([http://localhost:9090/instances]): I/O error on POST request for "http://localhost:9090/instances": Connection refused: getsockopt. Further attempts are logged on DEBUG level
+25-05-12 11:08:13.945 [RMI TCP Connection(2)-192.168.35.89] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]  
+        [ |  | ] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-05-12 11:08:13.946 [RMI TCP Connection(2)-192.168.35.89] INFO  o.s.web.servlet.DispatcherServlet   
+        [ |  | ] - Initializing Servlet 'dispatcherServlet'
+25-05-12 11:08:13.951 [RMI TCP Connection(2)-192.168.35.89] INFO  o.s.web.servlet.DispatcherServlet   
+        [ |  | ] - Completed initialization in 4 ms
+25-05-12 11:13:44.622 [registrationTask1] INFO  d.c.b.a.c.r.ApplicationRegistrator  
+        [ |  | ] - Application registered itself as 34fecff80a31
