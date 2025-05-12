@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,16 @@ public class Channel extends BaseUpdatableEntity {
     }
     if (newDescription != null && !newDescription.equals(this.description)) {
       this.description = newDescription;
+    }
+  }
+
+  public void setIdForTest(UUID id) {
+    try {
+      var field = getClass().getSuperclass().getDeclaredField("id");
+      field.setAccessible(true);
+      field.set(this, id);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to set ID via reflection", e);
     }
   }
 }

@@ -17,8 +17,6 @@ management:
     env:
       enabled: true
 
-
-
 info:
   app:
     name: Discodeit
