@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class UserController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createUser(
-        @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest request,
+        @RequestPart(value = "userCreateRequest", required = false) @Valid CreateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
 
         log.info("사용자 생성 API 호출 - username: {}, email: {}",
@@ -80,7 +81,7 @@ public class UserController {
     @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateUser(
         @PathVariable UUID userId,
-        @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest request,
+        @RequestPart(value = "userUpdateRequest", required = false) @Valid UpdateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
 
         log.info("사용자 수정 API 호출 - userId: {}", userId);
@@ -141,7 +142,7 @@ public class UserController {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<Void> updateOnlineStatus(
         @PathVariable UUID userId,
-        @RequestBody UpdateUserStatusRequest request
+        @RequestBody @Valid UpdateUserStatusRequest request
     ) {
         log.info("사용자 상태 변경 API 호출 - userId: {}", userId);
         userStatusService.update(new UpdateUserStatusRequest(userId, request.newLastActiveAt()));

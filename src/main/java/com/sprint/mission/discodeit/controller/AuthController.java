@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class AuthController {
 
     @Operation(summary = "사용자 로그인")
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest request) {
         UserDto userResponse = authService.login(request);
         return ResponseEntity.ok(userResponse);
     }

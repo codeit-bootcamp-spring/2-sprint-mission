@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ChannelController {
     @PostMapping("/public")
     @ApiResponse(responseCode = "201", description = "공개 채널 생성 성공")
     public ResponseEntity<ChannelDto> createPublicChannel(
-        @RequestBody PublicChannelCreateRequest request) {
+        @RequestBody @Valid PublicChannelCreateRequest request) {
 
         log.info("공개 채널 생성 요청 - name: {}", request.name());
 
@@ -42,7 +43,7 @@ public class ChannelController {
     @PostMapping("/private")
     @ApiResponse(responseCode = "201", description = "비공개 채널 생성 성공")
     public ResponseEntity<ChannelDto> createPrivateChannel(
-        @RequestBody PrivateChannelCreateRequest request) {
+        @RequestBody @Valid PrivateChannelCreateRequest request) {
 
         log.info("비공개 채널 생성 API 호출 - 참여자 수: {}", request.participantIds().size());
 
@@ -62,7 +63,7 @@ public class ChannelController {
     @PatchMapping(path = "/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(
         @PathVariable UUID channelId,
-        @RequestBody UpdateChannelRequest request) {
+        @RequestBody @Valid UpdateChannelRequest request) {
 
         log.info("채널 수정 API 호출 - channelId: {}", channelId);
 

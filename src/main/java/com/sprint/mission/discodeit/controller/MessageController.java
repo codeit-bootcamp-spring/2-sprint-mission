@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class MessageController {
     @ApiResponse(responseCode = "201", description = "메시지 생성 성공")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(
-        @RequestPart("messageCreateRequest") CreateMessageRequest request,
+        @RequestPart("messageCreateRequest") @Valid CreateMessageRequest request,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
         log.info("메시지 생성 API 호출 - authorId: {}, channelId: {}", request.authorId(),
@@ -53,7 +54,7 @@ public class MessageController {
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> updateMessage(
         @PathVariable UUID messageId,
-        @RequestBody UpdateMessageRequest request
+        @RequestBody @Valid UpdateMessageRequest request
     ) {
         log.info("메시지 수정 API 호출 - messageId: {}", messageId);
 
