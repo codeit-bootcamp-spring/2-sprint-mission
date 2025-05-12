@@ -12,22 +12,22 @@ import com.sprint.mission.discodeit.exception.LogicException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final UserMapper userMapper;
@@ -35,11 +35,15 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public UserDto create(UserCreateDto userCreateDto, BinaryContentCreateDto binaryContentCreateDto) {
+        log.info("Creating user: {}", userCreateDto);
+
         if (userRepository.existsByEmail(userCreateDto.email())) {
+            log.warn("User email {} already exists", userCreateDto.email());
             throw new LogicException(ErrorCode.USER_EMAIL_EXISTS);
         }
 
         if (userRepository.existsByUsername(userCreateDto.username())) {
+            log.warn("User username {} already exists", userCreateDto.username());
             throw new LogicException(ErrorCode.USER_NAME_EXISTS);
         }
 
@@ -52,6 +56,7 @@ public class BasicUserService implements UserService {
             nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
             binaryContentRepository.save(nullableProfile);
             binaryContentStorage.put(nullableProfile.getId(), bytes);
+            log.debug("Profile created: {}", nullableProfile);
         }
 
         User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
@@ -59,6 +64,7 @@ public class BasicUserService implements UserService {
         UserStatus status = new UserStatus(newUser, Instant.now());
         userRepository.save(newUser);
 
+        log.info("User saved successfully: {}", newUser);
         return userMapper.toDto(newUser);
     }
 
@@ -83,14 +89,21 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto update(UUID userId, UserUpdateDto userUpdateDto,
                           BinaryContentCreateDto binaryContentCreateDto) {
+        log.info("Updating user: userId={}", userId);
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("User ID {} not found", userId);
+                    return new LogicException(ErrorCode.USER_NOT_FOUND);
+                });
 
         if (userRepository.existsByEmail(userUpdateDto.newEmail())) {
+            log.warn("User email {} already exists", userUpdateDto.newEmail());
             throw new LogicException(ErrorCode.USER_EMAIL_EXISTS);
         }
 
         if (userRepository.existsByUsername(userUpdateDto.newUsername())) {
+            log.warn("User username {} already exists", userUpdateDto.newUsername());
             throw new LogicException(ErrorCode.USER_NAME_EXISTS);
         }
 
@@ -103,20 +116,25 @@ public class BasicUserService implements UserService {
             nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
             binaryContentRepository.save(nullableProfile);
             binaryContentStorage.put(nullableProfile.getId(), bytes);
+            log.debug("Profile updated: {}", nullableProfile);
         }
 
         user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
                 nullableProfile);
 
+        log.info("User updated successfully: {}", user);
         return userMapper.toDto(user);
     }
 
     @Transactional
     @Override
     public void delete(UUID userId) {
+        log.info("Deleting user: userId={}", userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
 
         userRepository.delete(user);
+        log.info("User deleted successfully: userId={}", userId);
     }
 }
