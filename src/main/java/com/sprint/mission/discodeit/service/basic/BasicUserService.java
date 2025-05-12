@@ -132,7 +132,7 @@ public class BasicUserService implements UserService {
         }
         if (userRepository.existsByUsername(newUsername)) {
             log.warn("사용자 수정 실패 (username 중복): newUsername={}", newUsername);
-            throw new UserNotFoundException(Map.of("userName", newUsername));
+            throw new DuplicateUserUserName(Map.of("userName", newUsername));
         }
 
         BinaryContent profile = optionalProfileCreateRequest
