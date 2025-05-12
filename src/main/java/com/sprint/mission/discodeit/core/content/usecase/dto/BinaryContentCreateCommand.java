@@ -5,14 +5,14 @@ import lombok.Builder;
 import org.springframework.web.multipart.MultipartFile;
 
 @Builder
-public record CreateBinaryContentCommand(
+public record BinaryContentCreateCommand(
     String fileName,
     String contentType,
     byte[] bytes
 ) {
 
-  public static CreateBinaryContentCommand create(MultipartFile file) throws IOException {
-    return CreateBinaryContentCommand.builder()
+  public static BinaryContentCreateCommand create(MultipartFile file) throws IOException {
+    return BinaryContentCreateCommand.builder()
         .fileName(file.getOriginalFilename())
         .contentType(file.getContentType())
         .bytes(file.getBytes())

@@ -13,14 +13,14 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundExcept
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.usecase.BasicMessageService;
-import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
@@ -52,7 +52,7 @@ public class MessageServiceUnitTest {
 
   User user;
   Channel channel;
-  CreateBinaryContentCommand binaryCommand;
+  BinaryContentCreateCommand binaryCommand;
 
   @BeforeEach
   void setUp() {
@@ -66,10 +66,10 @@ public class MessageServiceUnitTest {
     // given
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
-    CreateMessageCommand command = new CreateMessageCommand(userId, channelId, "test");
+    MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
 
     BinaryContent dummyContent = mock(BinaryContent.class);
-    binaryCommand = mock(CreateBinaryContentCommand.class);
+    binaryCommand = mock(BinaryContentCreateCommand.class);
     when(dummyContent.getId()).thenReturn(UUID.randomUUID());
     when(binaryContentService.create(binaryCommand)).thenReturn(dummyContent);
 
@@ -87,8 +87,8 @@ public class MessageServiceUnitTest {
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
 
-    CreateMessageCommand command = new CreateMessageCommand(userId, channelId, "test");
-    CreateBinaryContentCommand binaryCommand = mock(CreateBinaryContentCommand.class);
+    MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
+    BinaryContentCreateCommand binaryCommand = mock(BinaryContentCreateCommand.class);
 
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     // when & then
@@ -105,8 +105,8 @@ public class MessageServiceUnitTest {
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
 
-    CreateMessageCommand command = new CreateMessageCommand(userId, channelId, "test");
-    CreateBinaryContentCommand binaryCommand = mock(CreateBinaryContentCommand.class);
+    MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
+    BinaryContentCreateCommand binaryCommand = mock(BinaryContentCreateCommand.class);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(channelRepository.findById(channelId)).thenReturn(Optional.empty());
@@ -123,7 +123,7 @@ public class MessageServiceUnitTest {
     // given
     UUID messageId = UUID.randomUUID();
     Message message = Message.create(user, channel, "test", List.of());
-    UpdateMessageCommand command = new UpdateMessageCommand(messageId, "abcdefg");
+    MessageUpdateCommand command = new MessageUpdateCommand(messageId, "abcdefg");
 
     when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
     // when
@@ -136,7 +136,7 @@ public class MessageServiceUnitTest {
   void MessageUpdate_WithoutMessage_ShouldThrowException() {
     // given
     UUID messageId = UUID.randomUUID();
-    UpdateMessageCommand command = new UpdateMessageCommand(messageId, "abcdefg");
+    MessageUpdateCommand command = new MessageUpdateCommand(messageId, "abcdefg");
 
     when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
     // when & then

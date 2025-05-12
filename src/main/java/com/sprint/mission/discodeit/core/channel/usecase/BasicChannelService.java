@@ -7,9 +7,9 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundExcept
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
@@ -39,7 +39,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public ChannelDto create(CreatePublicChannelCommand command) {
+  public ChannelDto create(PublicChannelCreateCommand command) {
 
     Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public ChannelDto create(CreatePrivateChannelCommand command) {
+  public ChannelDto create(PrivateChannelCreateCommand command) {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
@@ -90,7 +90,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public ChannelDto update(UpdateChannelCommand command) {
+  public ChannelDto update(ChannelUpdateCommand command) {
     Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
         () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );

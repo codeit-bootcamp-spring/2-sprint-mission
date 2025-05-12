@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.user.entity.User;
@@ -24,9 +24,9 @@ import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.BasicUserService;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import java.time.Instant;
 import java.util.Optional;
@@ -66,7 +66,7 @@ public class UserServiceUnitTest {
 
   @Test
   void UserCreateTestSuccess() {
-    CreateUserCommand command = new CreateUserCommand("test", "test@test.com", "test");
+    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
     // given
     UserDto result = userService.create(command, Optional.empty());
     // when & then
@@ -79,7 +79,7 @@ public class UserServiceUnitTest {
   @Test
   void CreateUser_WithSameNameAndEmail_ShouldThrowException() {
     // given
-    CreateUserCommand command = new CreateUserCommand("test", "test@test.com", "test");
+    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
     // when
     when(userRepository.existsByName(command.username())).thenReturn(true);
     // then
@@ -91,7 +91,7 @@ public class UserServiceUnitTest {
   @Test
   void CreateUser_WithoutName_ShouldThrowException() {
     // given
-    CreateUserCommand noNameCommand = new CreateUserCommand(null, "test@test.com", "test");
+    UserCreateCommand noNameCommand = new UserCreateCommand(null, "test@test.com", "test");
     // when & then
     assertThrows(UserInvalidRequestException.class, () -> {
       userService.create(noNameCommand, Optional.empty());
@@ -101,7 +101,7 @@ public class UserServiceUnitTest {
   @Test
   void CreateUser_WithoutEmail_ShouldThrowException() {
     // given
-    CreateUserCommand noEmailCommand = new CreateUserCommand("test", null, "test");
+    UserCreateCommand noEmailCommand = new UserCreateCommand("test", null, "test");
     // when & then
     assertThrows(UserInvalidRequestException.class, () -> {
       userService.create(noEmailCommand, Optional.empty());
@@ -112,8 +112,8 @@ public class UserServiceUnitTest {
   void UserUpdateTest() {
     // given
     UUID userId = UUID.randomUUID();
-    UpdateUserCommand command = new UpdateUserCommand(userId, "newName", "newEmail", "newPassword");
-    CreateBinaryContentCommand contentCommand = new CreateBinaryContentCommand(null, null, null);
+    UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
+    BinaryContentCreateCommand contentCommand = new BinaryContentCreateCommand(null, null, null);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(binaryContentService.create(contentCommand)).thenReturn(null);
@@ -131,10 +131,10 @@ public class UserServiceUnitTest {
   @Test
   void UserLoginTestSuccess() {
     // given
-    LoginUserCommand loginUserCommand = new LoginUserCommand("a", "a");
+    UserLoginCommand userLoginCommand = new UserLoginCommand("a", "a");
     when(userRepository.findByName("a")).thenReturn(Optional.of(user));
     // when
-    UserDto result = userService.login(loginUserCommand);
+    UserDto result = userService.login(userLoginCommand);
     // then
     assertThat(result.username()).isEqualTo("a");
   }
@@ -142,21 +142,21 @@ public class UserServiceUnitTest {
   @Test
   void UserLogin_WithWrongName_ShouldThrowException() {
     // given
-    LoginUserCommand loginUserCommand = new LoginUserCommand("b", "a");
+    UserLoginCommand userLoginCommand = new UserLoginCommand("b", "a");
     // when & then
     assertThrows(UserNotFoundException.class, () -> {
-      userService.login(loginUserCommand);
+      userService.login(userLoginCommand);
     });
   }
 
   @Test
   void UserLogin_WithWrongPassword_ShouldThrowException() {
     // given
-    LoginUserCommand loginUserCommand = new LoginUserCommand("a", "b");
+    UserLoginCommand userLoginCommand = new UserLoginCommand("a", "b");
     when(userRepository.findByName("a")).thenReturn(Optional.of(user));
     // when & then
     assertThrows(UserLoginFailedException.class, () -> {
-      userService.login(loginUserCommand);
+      userService.login(userLoginCommand);
     });
   }
 

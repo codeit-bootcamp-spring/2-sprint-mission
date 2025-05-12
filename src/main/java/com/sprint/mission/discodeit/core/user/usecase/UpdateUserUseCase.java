@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ public interface UpdateUserUseCase {
    * @param binaryContentDTO 바꿀 이미지
    * @return 아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부
    */
-  UserDto update(UpdateUserCommand command,
-      Optional<CreateBinaryContentCommand> binaryContentDTO);
+  UserDto update(UserUpdateCommand command,
+      Optional<BinaryContentCreateCommand> binaryContentDTO);
 
 }

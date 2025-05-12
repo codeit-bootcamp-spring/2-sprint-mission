@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.core.user.controller.UserController;
 import com.sprint.mission.discodeit.core.user.usecase.BasicUserService;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -16,5 +17,13 @@ public class UserControllerTest {
   @Mock
   private BasicUserService userService;
 
+  @Test
+  void CreateUser_Success() {
+    // given
 
+    // when
+
+    // then
+
+  }
 }

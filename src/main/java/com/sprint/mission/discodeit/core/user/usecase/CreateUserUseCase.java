@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ public interface CreateUserUseCase {
    * @param binaryContentDTO 파일 이름, 파일 타입, 바이트
    * @return 아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부
    */
-  UserDto create(CreateUserCommand command,
-      Optional<CreateBinaryContentCommand> binaryContentDTO);
+  UserDto create(UserCreateCommand command,
+      Optional<BinaryContentCreateCommand> binaryContentDTO);
 
 }

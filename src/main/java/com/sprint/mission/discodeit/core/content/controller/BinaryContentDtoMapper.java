@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.core.content.controller;
 
 import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
 
 public final class BinaryContentDtoMapper {
 
@@ -15,9 +14,5 @@ public final class BinaryContentDtoMapper {
         binaryContent.getSize(), binaryContent.getContentType());
   }
 
-  public static BinaryContentDto toCreateResponse(BinaryContentResult result) {
-    return new BinaryContentDto(result.id(), result.fileName(), result.size(),
-        result.contentType());
-  }
 
 }

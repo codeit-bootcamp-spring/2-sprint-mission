@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.core.channel.controller;
 import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.core.channel.controller.dto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.controller.dto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import java.util.UUID;
 
 public final class ChannelDtoMapper {
@@ -14,18 +14,18 @@ public final class ChannelDtoMapper {
 
   }
 
-  public static CreatePublicChannelCommand toCreatePublicChannelCommand(
+  public static PublicChannelCreateCommand toCreatePublicChannelCommand(
       PublicChannelCreateRequest requestBody) {
-    return new CreatePublicChannelCommand(requestBody.name(), requestBody.description());
+    return new PublicChannelCreateCommand(requestBody.name(), requestBody.description());
   }
 
-  public static CreatePrivateChannelCommand toCreatePrivateChannelCommand(
+  public static PrivateChannelCreateCommand toCreatePrivateChannelCommand(
       PrivateChannelCreateRequest requestBody) {
-    return new CreatePrivateChannelCommand(requestBody.participantIds());
+    return new PrivateChannelCreateCommand(requestBody.participantIds());
   }
 
-  public static UpdateChannelCommand toUpdateChannelCommand(UUID channelId,
+  public static ChannelUpdateCommand toUpdateChannelCommand(UUID channelId,
       ChannelUpdateRequest requestBody) {
-    return new UpdateChannelCommand(channelId, requestBody.newName(), requestBody.newDescription());
+    return new ChannelUpdateCommand(channelId, requestBody.newName(), requestBody.newDescription());
   }
 }

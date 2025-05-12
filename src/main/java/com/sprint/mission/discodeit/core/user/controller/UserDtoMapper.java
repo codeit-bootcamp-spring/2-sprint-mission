@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.core.user.controller;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserLoginRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import java.util.UUID;
 
 public final class UserDtoMapper {
@@ -13,17 +13,17 @@ public final class UserDtoMapper {
   private UserDtoMapper() {
   }
 
-  public static CreateUserCommand toCreateUserCommand(UserCreateRequest requestBody) {
-    return new CreateUserCommand(requestBody.username(), requestBody.email(),
+  public static UserCreateCommand toCreateUserCommand(UserCreateRequest requestBody) {
+    return new UserCreateCommand(requestBody.username(), requestBody.email(),
         requestBody.password());
   }
 
-  public static LoginUserCommand toLoginUserCommand(UserLoginRequest requestBody) {
-    return new LoginUserCommand(requestBody.username(), requestBody.password());
+  public static UserLoginCommand toLoginUserCommand(UserLoginRequest requestBody) {
+    return new UserLoginCommand(requestBody.username(), requestBody.password());
   }
 
-  public static UpdateUserCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody) {
-    return new UpdateUserCommand(userId, requestBody.newUsername(), requestBody.newEmail(),
+  public static UserUpdateCommand toUpdateUserCommand(UUID userId, UserUpdateRequest requestBody) {
+    return new UserUpdateCommand(userId, requestBody.newUsername(), requestBody.newEmail(),
         requestBody.newPassword());
   }
 

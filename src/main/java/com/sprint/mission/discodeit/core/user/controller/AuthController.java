@@ -5,7 +5,7 @@ import static com.sprint.mission.discodeit.core.user.controller.UserDtoMapper.to
 
 import com.sprint.mission.discodeit.core.user.controller.dto.UserLoginRequest;
 import com.sprint.mission.discodeit.core.user.usecase.UserLoginUseCase;
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class AuthController {
 
   @PostMapping("/login")
   public ResponseEntity<UserDto> login(@RequestBody UserLoginRequest requestBody) {
-    LoginUserCommand command = toLoginUserCommand(requestBody);
+    UserLoginCommand command = toLoginUserCommand(requestBody);
     UserDto result = loginUseCase.login(command);
     return ResponseEntity.status(HttpStatus.OK).body(result);
   }

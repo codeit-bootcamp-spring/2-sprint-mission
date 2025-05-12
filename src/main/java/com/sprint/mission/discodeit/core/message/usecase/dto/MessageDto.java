@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.message.usecase.dto;
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentResult;
+import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
@@ -17,7 +17,7 @@ public record MessageDto(
     String content,
     UUID channelId,
     UserDto author,
-    List<BinaryContentResult> attachments
+    List<BinaryContentDto> attachments
 ) {
 
   public static MessageDto create(Message message, User user) {
@@ -29,7 +29,7 @@ public record MessageDto(
         .channelId(message.getChannel().getId())
         .author(UserDto.create(user, user.getUserStatus().isOnline()))
         .attachments(
-            message.getAttachment().stream().map(BinaryContentResult::create).toList())
+            message.getAttachment().stream().map(BinaryContentDto::create).toList())
         .build();
   }
 }

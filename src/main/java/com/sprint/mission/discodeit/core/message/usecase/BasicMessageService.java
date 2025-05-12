@@ -5,13 +5,13 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundExcept
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
-import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
@@ -39,8 +39,8 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageDto create(CreateMessageCommand command,
-      List<CreateBinaryContentCommand> binaryContentCommands) {
+  public MessageDto create(MessageCreateCommand command,
+      List<BinaryContentCreateCommand> binaryContentCommands) {
     User user = userRepository.findById(command.authorId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.authorId())
     );
@@ -86,7 +86,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageDto update(UpdateMessageCommand command) {
+  public MessageDto update(MessageUpdateCommand command) {
     Message message = messageRepository.findById(command.messageId())
         .orElseThrow(
             () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, command.messageId()));

@@ -16,9 +16,9 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableEx
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.BasicChannelService;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
@@ -65,7 +65,7 @@ public class ChannelServiceUnitTest {
   @Test
   void PublicChannelCreate() {
     // given
-    CreatePublicChannelCommand command = new CreatePublicChannelCommand("abc", "abc");
+    PublicChannelCreateCommand command = new PublicChannelCreateCommand("abc", "abc");
     // when
     ChannelDto channelDto = channelService.create(command);
     // then
@@ -82,7 +82,7 @@ public class ChannelServiceUnitTest {
     User user = User.create("a", "a@email.com", "a", oldProfile);
     user.setUserStatus(UserStatus.create(user, Instant.now()));
 
-    CreatePrivateChannelCommand command = new CreatePrivateChannelCommand(
+    PrivateChannelCreateCommand command = new PrivateChannelCreateCommand(
         List.of(userId));
     when(userRepository.findAllById(List.of(userId))).thenReturn(List.of(user));
     // when
@@ -98,10 +98,10 @@ public class ChannelServiceUnitTest {
     // given
     Channel channel = Channel.create("test", "test", ChannelType.PUBLIC);
     UUID channelUUID = UUID.randomUUID();
-    UpdateChannelCommand updateChannelCommand = new UpdateChannelCommand(channelUUID, "aaa", "aaa");
+    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(channelUUID, "aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.of(channel));
     // when
-    ChannelDto update = channelService.update(updateChannelCommand);
+    ChannelDto update = channelService.update(channelUpdateCommand);
     // then
     assertThat(update.name()).isEqualTo("aaa");
     assertThat(update.description()).isEqualTo("aaa");
@@ -112,11 +112,11 @@ public class ChannelServiceUnitTest {
   void ChannelUpdate_WithoutChannel_ShouldThrowException() {
     // given
     UUID channelUUID = UUID.randomUUID();
-    UpdateChannelCommand updateChannelCommand = new UpdateChannelCommand(channelUUID, "aaa", "aaa");
+    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(channelUUID, "aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.empty());
     // when & then
     assertThrows(ChannelNotFoundException.class, () -> {
-      channelService.update(updateChannelCommand);
+      channelService.update(channelUpdateCommand);
     });
   }
 
@@ -125,11 +125,11 @@ public class ChannelServiceUnitTest {
     // given
     Channel channel = Channel.create("test", "test", ChannelType.PRIVATE);
     UUID channelUUID = UUID.randomUUID();
-    UpdateChannelCommand updateChannelCommand = new UpdateChannelCommand(channelUUID, "aaa", "aaa");
+    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(channelUUID, "aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.of(channel));
     // when & then
     assertThrows(ChannelUnmodifiableException.class, () -> {
-      channelService.update(updateChannelCommand);
+      channelService.update(channelUpdateCommand);
     });
   }
 

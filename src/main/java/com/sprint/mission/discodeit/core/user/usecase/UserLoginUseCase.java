@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 
 
@@ -13,5 +13,5 @@ public interface UserLoginUseCase {
    * @param command 유저 이름, 패스워드
    * @return 아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부
    */
-  UserDto login(LoginUserCommand command);
+  UserDto login(UserLoginCommand command);
 }

@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.core.status.usecase.user;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaUserStatusRepository;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.UpdateUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusUpdateCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
@@ -24,7 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Transactional
   @Override
-  public UserStatus create(CreateUserStatusCommand command) {
+  public UserStatus create(UserStatusCreateCommand command) {
     User user = command.user();
     if (userStatusRepository.findByUser_Id(user.getId()).isPresent()) {
       log.warn("[UserStatusService] User Status is already Existed : user Id {}", user.getId());
@@ -43,7 +43,7 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   @Transactional
-  public UserStatus update(UpdateUserStatusCommand command) {
+  public UserStatus update(UserStatusUpdateCommand command) {
     UserStatus userStatus;
     if (command.userId() != null) {
       userStatus = userStatusRepository.findByUser_Id(command.userId()).orElseThrow(

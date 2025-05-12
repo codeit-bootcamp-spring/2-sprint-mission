@@ -6,9 +6,9 @@ import com.sprint.mission.discodeit.core.channel.controller.dto.PublicChannelCre
 import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelDeleteResponse;
 import com.sprint.mission.discodeit.core.channel.usecase.ChannelService;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -38,7 +38,7 @@ public class ChannelController {
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> create(
       @RequestBody @Valid PublicChannelCreateRequest requestBody) {
-    CreatePublicChannelCommand command = ChannelDtoMapper.toCreatePublicChannelCommand(
+    PublicChannelCreateCommand command = ChannelDtoMapper.toCreatePublicChannelCommand(
         requestBody);
     ChannelDto result = channelService.create(command);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
@@ -47,7 +47,7 @@ public class ChannelController {
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> create(
       @RequestBody @Valid PrivateChannelCreateRequest requestBody) {
-    CreatePrivateChannelCommand command = ChannelDtoMapper.toCreatePrivateChannelCommand(
+    PrivateChannelCreateCommand command = ChannelDtoMapper.toCreatePrivateChannelCommand(
         requestBody);
     ChannelDto result = channelService.create(command);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
@@ -62,7 +62,7 @@ public class ChannelController {
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @RequestBody @Valid ChannelUpdateRequest requestBody) {
-    UpdateChannelCommand command = ChannelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
+    ChannelUpdateCommand command = ChannelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
     ChannelDto result = channelService.update(command);
     return ResponseEntity.ok(result);
   }

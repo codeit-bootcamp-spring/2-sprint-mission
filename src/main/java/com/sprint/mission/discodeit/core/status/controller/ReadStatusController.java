@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.core.status.controller;
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusCreateCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusUpdateCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +32,7 @@ public class ReadStatusController {
   @PostMapping
   public ResponseEntity<ReadStatusDto> createReadStatus(
       @RequestBody ReadStatusCreateRequest requestBody) {
-    CreateReadStatusCommand command = ReadStatusDtoMapper.toCreateReadStatusCommand(requestBody);
+    ReadStatusCreateCommand command = ReadStatusDtoMapper.toCreateReadStatusCommand(requestBody);
     ReadStatusDto result = readStatusService.create(command);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
@@ -42,7 +42,7 @@ public class ReadStatusController {
   public ResponseEntity<ReadStatusDto> updateReadStatus(
       @PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest requestBody) {
-    UpdateReadStatusCommand command = ReadStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
+    ReadStatusUpdateCommand command = ReadStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
         requestBody);
     ReadStatusDto result = readStatusService.update(command);
     return ResponseEntity.ok(result);

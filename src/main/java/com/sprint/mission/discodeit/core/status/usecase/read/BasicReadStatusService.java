@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusCreateCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusUpdateCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
@@ -30,7 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Transactional
   @Override
-  public ReadStatusDto create(CreateReadStatusCommand command) {
+  public ReadStatusDto create(ReadStatusCreateCommand command) {
     User user = userRepository.findById(command.userId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
     );
@@ -82,7 +82,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
-  public ReadStatusDto update(UpdateReadStatusCommand command) {
+  public ReadStatusDto update(ReadStatusUpdateCommand command) {
     ReadStatus status = readStatusRepository.findById(command.readStatusId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, command.readStatusId())
     );

@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageDeleteResponse;
 import com.sprint.mission.discodeit.core.message.controller.dto.PageResponse;
 import com.sprint.mission.discodeit.core.message.usecase.MessageService;
-import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -51,11 +51,11 @@ public class MessageController {
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
       throws IOException {
 
-    List<CreateBinaryContentCommand> attachmentRequests = Optional.ofNullable(attachments)
+    List<BinaryContentCreateCommand> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
               try {
-                return CreateBinaryContentCommand.create(file);
+                return BinaryContentCreateCommand.create(file);
               } catch (IOException e) {
                 throw new RuntimeException(e);
               }
@@ -63,7 +63,7 @@ public class MessageController {
             .toList())
         .orElse(new ArrayList<>());
 
-    CreateMessageCommand command = MessageDtoMapper.toCreateMessageCommand(requestBody);
+    MessageCreateCommand command = MessageDtoMapper.toCreateMessageCommand(requestBody);
 
     MessageDto result = messageService.create(command, attachmentRequests);
 
@@ -88,7 +88,7 @@ public class MessageController {
   public ResponseEntity<MessageDto> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
-    UpdateMessageCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
+    MessageUpdateCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
     MessageDto result = messageService.update(command);
     return ResponseEntity.ok(result);
   }

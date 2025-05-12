@@ -3,20 +3,20 @@ package com.sprint.mission.discodeit.core.user.usecase;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusOnlineCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
@@ -39,8 +39,8 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserDto create(CreateUserCommand command,
-      Optional<CreateBinaryContentCommand> binaryContentDTO) {
+  public UserDto create(UserCreateCommand command,
+      Optional<BinaryContentCreateCommand> binaryContentDTO) {
     BinaryContent profile = null;
     validateUser(command.username(), command.email());
 
@@ -52,7 +52,7 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     log.info("[UserService] User registered: id {}, name {}", user.getId(), user.getName());
 
-    CreateUserStatusCommand statusCommand = new CreateUserStatusCommand(user, Instant.now());
+    UserStatusCreateCommand statusCommand = new UserStatusCreateCommand(user, Instant.now());
     UserStatus userStatus = userStatusService.create(statusCommand);
 
     user.setUserStatus(userStatus);
@@ -62,7 +62,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserDto login(LoginUserCommand command) {
+  public UserDto login(UserLoginCommand command) {
     User user = userRepository.findByName(command.username()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
     );
@@ -111,8 +111,8 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserDto update(UpdateUserCommand command,
-      Optional<CreateBinaryContentCommand> binaryContentDTO) {
+  public UserDto update(UserUpdateCommand command,
+      Optional<BinaryContentCreateCommand> binaryContentDTO) {
     User user = userRepository.findById(command.requestUserId())
         .orElseThrow(
             () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.requestUserId()));
@@ -156,7 +156,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserStatusDto online(OnlineUserStatusCommand command) {
+  public UserStatusDto online(UserStatusOnlineCommand command) {
     User user = userRepository.findById(command.userId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
     );

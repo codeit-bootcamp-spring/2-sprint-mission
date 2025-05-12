@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.core.user.controller;
 
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusOnlineCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserDeleteResponse;
 import com.sprint.mission.discodeit.core.user.usecase.UserService;
-import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -45,21 +45,21 @@ public class UserController {
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) {
 
-    Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
+    Optional<BinaryContentCreateCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
 
-    CreateUserCommand command = UserDtoMapper.toCreateUserCommand(requestBody);
+    UserCreateCommand command = UserDtoMapper.toCreateUserCommand(requestBody);
     UserDto result = userService.create(command, binaryContentRequest);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
-  private Optional<CreateBinaryContentCommand> resolveProfileRequest(MultipartFile profileFile) {
+  private Optional<BinaryContentCreateCommand> resolveProfileRequest(MultipartFile profileFile) {
     if (profileFile.isEmpty()) {
       return Optional.empty();
     } else {
       try {
-        CreateBinaryContentCommand binaryContentCreateRequest = CreateBinaryContentCommand.create(
+        BinaryContentCreateCommand binaryContentCreateRequest = BinaryContentCreateCommand.create(
             profileFile);
         return Optional.of(binaryContentCreateRequest);
       } catch (IOException e) {
@@ -81,9 +81,9 @@ public class UserController {
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file) {
 
-    Optional<CreateBinaryContentCommand> binaryContentRequest = Optional.ofNullable(file)
+    Optional<BinaryContentCreateCommand> binaryContentRequest = Optional.ofNullable(file)
         .flatMap(this::resolveProfileRequest);
-    UpdateUserCommand command = UserDtoMapper.toUpdateUserCommand(userId, requestBody);
+    UserUpdateCommand command = UserDtoMapper.toUpdateUserCommand(userId, requestBody);
 
     UserDto result = userService.update(command, binaryContentRequest);
     return ResponseEntity.ok(result);
@@ -99,7 +99,7 @@ public class UserController {
   public ResponseEntity<UserStatusDto> online(@PathVariable UUID userId,
       @RequestBody UserStatusRequest requestBody) {
 
-    OnlineUserStatusCommand command = OnlineUserStatusCommand.create(userId,
+    UserStatusOnlineCommand command = UserStatusOnlineCommand.create(userId,
         requestBody);
 
     UserStatusDto result = userService.online(command);

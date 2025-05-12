@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.core.content.usecase;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.repository.JpaBinaryContentRepository;
 import com.sprint.mission.discodeit.core.content.repository.LocalBinaryContentStorage;
-import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
@@ -23,7 +23,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional
-  public BinaryContent create(CreateBinaryContentCommand command) {
+  public BinaryContent create(BinaryContentCreateCommand command) {
     if (command != null) {
       BinaryContent binaryContent = BinaryContent.create(command.fileName(),
           (long) command.bytes().length, command.contentType());

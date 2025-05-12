@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.core.status.controller;
 
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusUpdateCommand;
 import java.util.UUID;
 
 public final class ReadStatusDtoMapper {
@@ -12,15 +12,15 @@ public final class ReadStatusDtoMapper {
 
   }
 
-  public static CreateReadStatusCommand toCreateReadStatusCommand(
+  public static ReadStatusCreateCommand toCreateReadStatusCommand(
       ReadStatusCreateRequest requestBody) {
-    return new CreateReadStatusCommand(requestBody.userId(), requestBody.channelId(),
+    return new ReadStatusCreateCommand(requestBody.userId(), requestBody.channelId(),
         requestBody.lastReadAt());
   }
 
-  public static UpdateReadStatusCommand toUpdateReadStatusCommand(UUID readStatusId,
+  public static ReadStatusUpdateCommand toUpdateReadStatusCommand(UUID readStatusId,
       ReadStatusUpdateRequest requestBody) {
-    return new UpdateReadStatusCommand(readStatusId, requestBody.newLastReadAt());
+    return new ReadStatusUpdateCommand(readStatusId, requestBody.newLastReadAt());
   }
 
 }
