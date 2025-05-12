@@ -79,7 +79,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    log.debug("사용자 채널 목록 조회 요청: userId={}", userId);
+    log.debug("사용자 채널 목록 조회 요청: userId={}",  userId);
 
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatus::getChannel)

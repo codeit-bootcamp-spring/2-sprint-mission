@@ -14,10 +14,6 @@ public class GlobalExceptionHandler {
       DiscodeitException e, HttpServletRequest request) {
 
     ErrorCode errorCode = e.getErrorCode();
-    HttpStatus status = switch (errorCode) {
-      case USER_NOT_FOUND, CHANNEL_NOT_FOUND -> HttpStatus.NOT_FOUND;
-      case DUPLICATE_USER, PRIVATE_CHANNEL_UPDATE, WRONG_PASSWORD -> HttpStatus.BAD_REQUEST;
-    };
 
     ErrorResponse response = ErrorResponse.builder()
         .timestamp(e.getTimestamp())
@@ -25,9 +21,9 @@ public class GlobalExceptionHandler {
         .message(errorCode.getMessage())
         .details(e.getDetails())
         .exceptionType(e.getClass().getSimpleName())
-        .status(status.value())
+        .status(errorCode.getStatus().value())
         .build();
 
-    return ResponseEntity.status(status).body(response);
+    return ResponseEntity.status(errorCode.getStatus()).body(response);
   }
 }
