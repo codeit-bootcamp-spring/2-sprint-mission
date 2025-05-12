@@ -7,3 +7,9 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
   config: classpath:logback-spring.xml
+
+management:
+  endpoint:
+    web:
+      exposure:
+        include: health, info, metrics, loggers

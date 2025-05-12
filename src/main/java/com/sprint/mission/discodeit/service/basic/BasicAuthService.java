@@ -3,9 +3,12 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.WrongPasswordException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +34,12 @@ public class BasicAuthService implements AuthService {
     User user = userRepository.findByUsername(username)
         .orElseThrow(() -> {
             log.warn("로그인 실패 = 존재하지 않는 사용자: username={}", username);
-            return new NoSuchElementException("User with username " + username + " not found");
+            return new UserNotFoundException(username);
         });
 
     if (!user.getPassword().equals(password)) {
       log.warn("로그인 실패 - 잘못된 비밀번호: username={}", username);
-      throw new IllegalArgumentException("Wrong password");
+      throw new WrongPasswordException(Map.of("username", username));
     }
 
     log.info("로그인 성공: username={}, userId={}", username, user.getId());
