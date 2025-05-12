@@ -8,10 +8,8 @@ import java.util.UUID;
 @Schema(description = "사용자 응답 DTO")
 public record UserDto(
         UUID id,
-        Instant createdAt,
-        Instant updatedAt,
         String username,
         String email,
-        BinaryContentDto profileId,
+        BinaryContentDto profile,
         Boolean online
 ) {}
