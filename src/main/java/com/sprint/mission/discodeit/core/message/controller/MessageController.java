@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
-import com.sprint.mission.discodeit.core.message.controller.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.core.message.controller.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.core.message.controller.response.MessageDeleteResponse;
-import com.sprint.mission.discodeit.core.message.controller.response.MessageResponse;
-import com.sprint.mission.discodeit.core.message.controller.response.PageResponse;
 import com.sprint.mission.discodeit.core.content.usecase.dto.CreateBinaryContentCommand;
+import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.core.message.controller.dto.MessageDeleteResponse;
+import com.sprint.mission.discodeit.core.message.controller.dto.PageResponse;
 import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,7 +46,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<MessageResponse> create(
+  public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest requestBody,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
       throws IOException {
@@ -66,32 +65,32 @@ public class MessageController {
 
     CreateMessageCommand command = MessageDtoMapper.toCreateMessageCommand(requestBody);
 
-    MessageResult result = messageService.create(command, attachmentRequests);
+    MessageDto result = messageService.create(command, attachmentRequests);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(MessageDtoMapper.toCreateResponse(result));
+        .body(result);
   }
 
   @GetMapping
-  public ResponseEntity<PageResponse<MessageResult>> findAll(@RequestParam UUID channelId,
+  public ResponseEntity<PageResponse<MessageDto>> findAll(@RequestParam UUID channelId,
       @RequestParam(required = false) Instant cursor,
       @PageableDefault(
           size = 50, sort = "createdAt", direction = Direction.DESC
       ) Pageable pageable) {
-    Slice<MessageResult> results = messageService.findAllByChannelId(channelId, cursor,
+    Slice<MessageDto> results = messageService.findAllByChannelId(channelId, cursor,
         pageable);
-    PageResponse<MessageResult> pageResponse = PageResponseMapper.fromSlice(results,
-        MessageResult::createdAt);
+    PageResponse<MessageDto> pageResponse = PageResponseMapper.fromSlice(results,
+        MessageDto::createdAt);
     return ResponseEntity.ok(pageResponse);
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageResponse> updateMessage(
+  public ResponseEntity<MessageDto> updateMessage(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
     UpdateMessageCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
-    MessageResult result = messageService.update(command);
-    return ResponseEntity.ok(MessageDtoMapper.toCreateResponse(result));
+    MessageDto result = messageService.update(command);
+    return ResponseEntity.ok(result);
   }
 
   @DeleteMapping("/{messageId}")

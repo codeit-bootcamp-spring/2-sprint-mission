@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
@@ -30,7 +30,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Transactional
   @Override
-  public ReadStatusResult create(CreateReadStatusCommand command) {
+  public ReadStatusDto create(CreateReadStatusCommand command) {
     User user = userRepository.findById(command.userId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
     );
@@ -52,37 +52,37 @@ public class BasicReadStatusService implements ReadStatusService {
         "[ReadStatusService] ReadStatus Created: id: {}, user id: {}, channel id: {}, last Read At : {} ",
         status.getId(), user.getId(), channel.getId(), status.getLastReadAt());
 
-    return ReadStatusResult.create(status);
+    return ReadStatusDto.create(status);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public ReadStatusResult findByReadStatusId(UUID readStatusId) {
+  public ReadStatusDto findByReadStatusId(UUID readStatusId) {
     ReadStatus status = readStatusRepository.findById(readStatusId)
         .orElseThrow(
             () -> new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId));
-    return ReadStatusResult.create(status);
+    return ReadStatusDto.create(status);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public ReadStatusResult findByUserId(UUID userId) {
+  public ReadStatusDto findByUserId(UUID userId) {
     ReadStatus status = readStatusRepository.findByUser_Id(userId);
-    return ReadStatusResult.create(status);
+    return ReadStatusDto.create(status);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<ReadStatusResult> findAllByUserId(UUID userId) {
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUser_Id(userId).stream().map(
-        ReadStatusResult::create
+        ReadStatusDto::create
     ).toList();
   }
 
 
   @Override
   @Transactional
-  public ReadStatusResult update(UpdateReadStatusCommand command) {
+  public ReadStatusDto update(UpdateReadStatusCommand command) {
     ReadStatus status = readStatusRepository.findById(command.readStatusId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.READ_STATUS_NOT_FOUND, command.readStatusId())
     );
@@ -90,7 +90,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     log.info("[ReadStatusService] Read Status updated : id {}, last Read At {}", status.getId(),
         status.getLastReadAt());
-    return ReadStatusResult.create(status);
+    return ReadStatusDto.create(status);
   }
 
   @Override

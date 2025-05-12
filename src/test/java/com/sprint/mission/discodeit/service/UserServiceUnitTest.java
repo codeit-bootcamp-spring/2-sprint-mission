@@ -27,7 +27,7 @@ import com.sprint.mission.discodeit.core.user.usecase.BasicUserService;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -68,7 +68,7 @@ public class UserServiceUnitTest {
   void UserCreateTestSuccess() {
     CreateUserCommand command = new CreateUserCommand("test", "test@test.com", "test");
     // given
-    UserResult result = userService.create(command, Optional.empty());
+    UserDto result = userService.create(command, Optional.empty());
     // when & then
     assertThat(result.username()).isEqualTo("test");
     assertThat(result.email()).isEqualTo("test@test.com");
@@ -120,7 +120,7 @@ public class UserServiceUnitTest {
     when(userRepository.save(user)).thenReturn(user);
 
     // when
-    UserResult result = userService.update(command, Optional.of(contentCommand));
+    UserDto result = userService.update(command, Optional.of(contentCommand));
 
     // then
     assertThat(result.username()).isEqualTo("newName");
@@ -134,7 +134,7 @@ public class UserServiceUnitTest {
     LoginUserCommand loginUserCommand = new LoginUserCommand("a", "a");
     when(userRepository.findByName("a")).thenReturn(Optional.of(user));
     // when
-    UserResult result = userService.login(loginUserCommand);
+    UserDto result = userService.login(loginUserCommand);
     // then
     assertThat(result.username()).isEqualTo("a");
   }

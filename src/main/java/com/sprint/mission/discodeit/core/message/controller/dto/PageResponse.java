@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.message.controller.response;
+package com.sprint.mission.discodeit.core.message.controller.dto;
 
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import java.util.List;

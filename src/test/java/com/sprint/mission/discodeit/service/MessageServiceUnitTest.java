@@ -19,7 +19,7 @@ import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundExcept
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.usecase.BasicMessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
@@ -76,7 +76,7 @@ public class MessageServiceUnitTest {
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
     // when
-    MessageResult result = messageService.create(command, List.of(binaryCommand));
+    MessageDto result = messageService.create(command, List.of(binaryCommand));
     // then
     assertThat(result.content()).isEqualTo("test");
   }
@@ -127,7 +127,7 @@ public class MessageServiceUnitTest {
 
     when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
     // when
-    MessageResult update = messageService.update(command);
+    MessageDto update = messageService.update(command);
     // then
     assertThat(update.content()).isEqualTo("abcdefg");
   }
@@ -179,7 +179,7 @@ public class MessageServiceUnitTest {
 
     when(messageRepository.findByChannel_Id(channelId)).thenReturn(List.of(message1, message2));
     // when
-    List<MessageResult> results = messageService.findByChannelId(channelId);
+    List<MessageDto> results = messageService.findByChannelId(channelId);
     // then
     assertThat(results.size()).isEqualTo(2);
     assertThat(results.get(0).content()).isEqualTo("hello");

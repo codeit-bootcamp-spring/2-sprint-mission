@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
-import com.sprint.mission.discodeit.core.message.controller.response.PageResponse;
+import com.sprint.mission.discodeit.core.message.controller.dto.PageResponse;
 import java.util.function.Function;
 import org.springframework.data.domain.Slice;
 

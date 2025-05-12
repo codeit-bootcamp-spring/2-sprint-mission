@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
@@ -17,7 +17,7 @@ import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.dto.CreateUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UpdateUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.List;
@@ -39,7 +39,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserResult create(CreateUserCommand command,
+  public UserDto create(CreateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
     BinaryContent profile = null;
     validateUser(command.username(), command.email());
@@ -57,12 +57,12 @@ public class BasicUserService implements UserService {
 
     user.setUserStatus(userStatus);
 
-    return UserResult.create(user, true);
+    return UserDto.create(user, true);
   }
 
   @Override
   @Transactional
-  public UserResult login(LoginUserCommand command) {
+  public UserDto login(LoginUserCommand command) {
     User user = userRepository.findByName(command.username()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
     );
@@ -77,7 +77,7 @@ public class BasicUserService implements UserService {
         user.getName(),
         user.getPassword());
 
-    return UserResult.create(user, user.getUserStatus().isOnline());
+    return UserDto.create(user, user.getUserStatus().isOnline());
   }
 
   private void validateUser(String name, String email) {
@@ -92,18 +92,18 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserResult findById(UUID userId) {
+  public UserDto findById(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
-    return UserResult.create(user, user.getUserStatus().isOnline());
+    return UserDto.create(user, user.getUserStatus().isOnline());
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<UserResult> findAll() {
+  public List<UserDto> findAll() {
     List<User> userList = userRepository.findAllWithProfileAndStatus();
 
-    return userList.stream().map(user -> UserResult.create(
+    return userList.stream().map(user -> UserDto.create(
         user,
         user.getUserStatus().isOnline())
     ).toList();
@@ -111,7 +111,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public UserResult update(UpdateUserCommand command,
+  public UserDto update(UpdateUserCommand command,
       Optional<CreateBinaryContentCommand> binaryContentDTO) {
     User user = userRepository.findById(command.requestUserId())
         .orElseThrow(
@@ -131,7 +131,7 @@ public class BasicUserService implements UserService {
         user.getEmail(),
         user.getPassword());
     boolean online = user.getUserStatus().isOnline();
-    return UserResult.create(user, online);
+    return UserDto.create(user, online);
   }
 
 
@@ -156,12 +156,12 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserStatusResult online(OnlineUserStatusCommand command) {
+  public UserStatusDto online(OnlineUserStatusCommand command) {
     User user = userRepository.findById(command.userId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
     );
     UserStatus userStatus = user.getUserStatus();
     userStatus.update(command.lastActiveAt());
-    return UserStatusResult.create(userStatus);
+    return UserStatusDto.create(userStatus);
   }
 }

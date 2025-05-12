@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.channel.controller.request;
+package com.sprint.mission.discodeit.core.channel.controller.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

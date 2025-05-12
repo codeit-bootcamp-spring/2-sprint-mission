@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.status.usecase.user.dto;
 
-import com.sprint.mission.discodeit.core.user.controller.request.UserStatusRequest;
+import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.UUID;

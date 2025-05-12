@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.status.controller.request;
+package com.sprint.mission.discodeit.core.status.controller.dto;
 
 import java.time.Instant;
 

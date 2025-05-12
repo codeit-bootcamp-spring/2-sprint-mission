@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.core.user.controller;
 
 import static com.sprint.mission.discodeit.core.user.controller.UserDtoMapper.toLoginUserCommand;
 
-import com.sprint.mission.discodeit.core.user.controller.request.UserLoginRequest;
-import com.sprint.mission.discodeit.core.user.controller.response.UserResponse;
+import com.sprint.mission.discodeit.core.user.controller.dto.UserLoginRequest;
 import com.sprint.mission.discodeit.core.user.usecase.UserLoginUseCase;
 import com.sprint.mission.discodeit.core.user.usecase.dto.LoginUserCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,9 +25,9 @@ public class AuthController {
   private final UserLoginUseCase loginUseCase;
 
   @PostMapping("/login")
-  public ResponseEntity<UserResponse> login(@RequestBody UserLoginRequest requestBody) {
+  public ResponseEntity<UserDto> login(@RequestBody UserLoginRequest requestBody) {
     LoginUserCommand command = toLoginUserCommand(requestBody);
-    UserResult result = loginUseCase.login(command);
-    return ResponseEntity.status(HttpStatus.OK).body(UserDtoMapper.toCreateResponse(result));
+    UserDto result = loginUseCase.login(command);
+    return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 }

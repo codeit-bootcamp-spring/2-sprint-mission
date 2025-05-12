@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundExcept
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.BasicChannelService;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
@@ -67,11 +67,11 @@ public class ChannelServiceUnitTest {
     // given
     CreatePublicChannelCommand command = new CreatePublicChannelCommand("abc", "abc");
     // when
-    ChannelResult channelResult = channelService.create(command);
+    ChannelDto channelDto = channelService.create(command);
     // then
-    assertThat(channelResult.name()).isEqualTo("abc");
-    assertThat(channelResult.description()).isEqualTo("abc");
-    assertThat(channelResult.type()).isEqualTo(ChannelType.PUBLIC);
+    assertThat(channelDto.name()).isEqualTo("abc");
+    assertThat(channelDto.description()).isEqualTo("abc");
+    assertThat(channelDto.type()).isEqualTo(ChannelType.PUBLIC);
   }
 
   @Test
@@ -86,11 +86,11 @@ public class ChannelServiceUnitTest {
         List.of(userId));
     when(userRepository.findAllById(List.of(userId))).thenReturn(List.of(user));
     // when
-    ChannelResult channelResult = channelService.create(command);
+    ChannelDto channelDto = channelService.create(command);
     // then
-    assertThat(channelResult.name()).isNull();
-    assertThat(channelResult.description()).isNull();
-    assertThat(channelResult.type()).isEqualTo(ChannelType.PRIVATE);
+    assertThat(channelDto.name()).isNull();
+    assertThat(channelDto.description()).isNull();
+    assertThat(channelDto.type()).isEqualTo(ChannelType.PRIVATE);
   }
 
   @Test
@@ -101,7 +101,7 @@ public class ChannelServiceUnitTest {
     UpdateChannelCommand updateChannelCommand = new UpdateChannelCommand(channelUUID, "aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.of(channel));
     // when
-    ChannelResult update = channelService.update(updateChannelCommand);
+    ChannelDto update = channelService.update(updateChannelCommand);
     // then
     assertThat(update.name()).isEqualTo("aaa");
     assertThat(update.description()).isEqualTo("aaa");
@@ -182,7 +182,7 @@ public class ChannelServiceUnitTest {
     when(channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, channelIds))
         .thenReturn(accessibleChannels);
     // when
-    List<ChannelResult> results = channelService.findAllByUserId(userId);
+    List<ChannelDto> results = channelService.findAllByUserId(userId);
     // then
     assertThat(results.size()).isEqualTo(2);
     verify(readStatusRepository).findAllByUser_Id(userId);

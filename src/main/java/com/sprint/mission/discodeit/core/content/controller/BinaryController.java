@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.core.content.controller;
 
 import static com.sprint.mission.discodeit.core.content.controller.BinaryContentDtoMapper.toCreateResponse;
 
-import com.sprint.mission.discodeit.core.content.controller.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
@@ -27,7 +27,7 @@ public class BinaryController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping
-  public ResponseEntity<List<BinaryContentResponse>> findAllBinaryContent(
+  public ResponseEntity<List<BinaryContentDto>> findAllBinaryContent(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
     List<BinaryContent> allByIdIn = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity.ok(allByIdIn.stream()
@@ -35,7 +35,7 @@ public class BinaryController {
   }
 
   @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentResponse> findBinaryContent(
+  public ResponseEntity<BinaryContentDto> findBinaryContent(
       @PathVariable UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
     return ResponseEntity.ok(toCreateResponse(binaryContent));
@@ -44,7 +44,7 @@ public class BinaryController {
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-    BinaryContentResponse response = toCreateResponse(binaryContent);
+    BinaryContentDto response = toCreateResponse(binaryContent);
     return binaryContentStorage.download(response);
   }
 }

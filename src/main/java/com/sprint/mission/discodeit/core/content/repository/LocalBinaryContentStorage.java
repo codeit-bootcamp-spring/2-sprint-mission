@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.content.repository;
 
-import com.sprint.mission.discodeit.core.content.controller.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
@@ -87,17 +87,17 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
   }
 
   @Override
-  public ResponseEntity<Resource> download(BinaryContentResponse binaryContentResponse) {
-    InputStream inputStream = get(binaryContentResponse.id());
+  public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
+    InputStream inputStream = get(binaryContentDto.id());
 
     InputStreamResource resource = new InputStreamResource(inputStream);
 
     HttpHeaders headers = new HttpHeaders();
 
     headers.add(HttpHeaders.CONTENT_DISPOSITION,
-        "attachments; filename=\"" + binaryContentResponse.fileName() + "\"");
-    headers.setContentType(MediaType.parseMediaType(binaryContentResponse.contentType()));
-    headers.setContentLength(binaryContentResponse.size());
+        "attachments; filename=\"" + binaryContentDto.fileName() + "\"");
+    headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
+    headers.setContentLength(binaryContentDto.size());
     log.info("[LocalBinaryContentStorage] Image Download successfully");
     return ResponseEntity.ok().headers(headers).body(resource);
   }

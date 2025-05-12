@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.content.port;
 
-import com.sprint.mission.discodeit.core.content.controller.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
 import java.io.InputStream;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
@@ -11,5 +11,5 @@ public interface BinaryContentStoragePort {
 
   InputStream get(UUID id);
 
-  ResponseEntity<?> download(BinaryContentResponse binaryContentResponse);
+  ResponseEntity<?> download(BinaryContentDto binaryContentDto);
 }

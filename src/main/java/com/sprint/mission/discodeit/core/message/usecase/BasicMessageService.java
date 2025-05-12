@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.usecase.dto.CreateMessageCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
@@ -39,7 +39,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageResult create(CreateMessageCommand command,
+  public MessageDto create(CreateMessageCommand command,
       List<CreateBinaryContentCommand> binaryContentCommands) {
     User user = userRepository.findById(command.authorId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.authorId())
@@ -62,31 +62,31 @@ public class BasicMessageService implements MessageService {
         message.getId(), channel.getId(), user.getId(), message.getContent(),
         message.getAttachment());
 
-    return MessageResult.create(message, user);
+    return MessageDto.create(message, user);
   }
 
   @Override
-  public List<MessageResult> findByChannelId(UUID channelId) {
+  public List<MessageDto> findByChannelId(UUID channelId) {
     List<Message> messages = messageRepository.findByChannel_Id(channelId);
-    return messages.stream().map(message -> MessageResult.create(message, message.getAuthor()))
+    return messages.stream().map(message -> MessageDto.create(message, message.getAuthor()))
         .toList();
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Slice<MessageResult> findAllByChannelId(UUID channelId, Instant cursor,
+  public Slice<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
       Pageable pageable) {
-    Slice<MessageResult> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+    Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
             Optional.ofNullable(cursor).orElse(Instant.now()),
             pageable)
-        .map(message -> MessageResult.create(message, message.getAuthor()));
+        .map(message -> MessageDto.create(message, message.getAuthor()));
 
     return slice;
   }
 
   @Override
   @Transactional
-  public MessageResult update(UpdateMessageCommand command) {
+  public MessageDto update(UpdateMessageCommand command) {
     Message message = messageRepository.findById(command.messageId())
         .orElseThrow(
             () -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND, command.messageId()));
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
     messageRepository.save(message);
     log.info("[MessageService] Message Updated: Message Id {}, New Text {}", command.messageId(),
         command.newText());
-    return MessageResult.create(message, message.getAuthor());
+    return MessageDto.create(message, message.getAuthor());
   }
 
   @Override

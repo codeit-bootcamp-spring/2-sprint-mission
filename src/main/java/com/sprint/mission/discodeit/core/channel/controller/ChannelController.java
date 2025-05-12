@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.core.channel.controller;
 
-import com.sprint.mission.discodeit.core.channel.controller.request.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.request.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.response.ChannelDeleteResponse;
-import com.sprint.mission.discodeit.core.channel.controller.response.ChannelResponse;
+import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.core.channel.controller.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.controller.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelDeleteResponse;
 import com.sprint.mission.discodeit.core.channel.usecase.ChannelService;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
@@ -15,6 +14,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,36 +36,35 @@ public class ChannelController {
 
 
   @PostMapping("/public")
-  public ResponseEntity<ChannelResponse> create(
+  public ResponseEntity<ChannelDto> create(
       @RequestBody @Valid PublicChannelCreateRequest requestBody) {
     CreatePublicChannelCommand command = ChannelDtoMapper.toCreatePublicChannelCommand(
         requestBody);
-    ChannelResult result = channelService.create(command);
-    ChannelResponse response = ChannelDtoMapper.toCreateResponse(result);
-    return ResponseEntity.ok(response);
+    ChannelDto result = channelService.create(command);
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @PostMapping("/private")
-  public ResponseEntity<ChannelResponse> create(
+  public ResponseEntity<ChannelDto> create(
       @RequestBody @Valid PrivateChannelCreateRequest requestBody) {
     CreatePrivateChannelCommand command = ChannelDtoMapper.toCreatePrivateChannelCommand(
         requestBody);
-    ChannelResult result = channelService.create(command);
-    return ResponseEntity.ok(ChannelDtoMapper.toCreateResponse(result));
+    ChannelDto result = channelService.create(command);
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @GetMapping
-  public ResponseEntity<List<ChannelResult>> findAll(@RequestParam("userId") UUID userId) {
-    List<ChannelResult> result = channelService.findAllByUserId(userId);
+  public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+    List<ChannelDto> result = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(result);
   }
 
   @PatchMapping("/{channelId}")
-  public ResponseEntity<ChannelResponse> update(@PathVariable UUID channelId,
+  public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
       @RequestBody @Valid ChannelUpdateRequest requestBody) {
     UpdateChannelCommand command = ChannelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
-    ChannelResult result = channelService.update(command);
-    return ResponseEntity.ok(ChannelDtoMapper.toCreateResponse(result));
+    ChannelDto result = channelService.update(command);
+    return ResponseEntity.ok(result);
   }
 
   @DeleteMapping("/{channelId}")

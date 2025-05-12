@@ -6,14 +6,14 @@ import java.util.UUID;
 import lombok.Builder;
 
 @Builder
-public record UserStatusResult(
+public record UserStatusDto(
     UUID id,
     UUID userId,
     Instant lastActiveAt
 ) {
 
-  public static UserStatusResult create(UserStatus status) {
-    return UserStatusResult.builder()
+  public static UserStatusDto create(UserStatus status) {
+    return UserStatusDto.builder()
         .id(status.getId())
         .userId(status.getUser().getId())
         .lastActiveAt(status.getLastActiveAt()).build();

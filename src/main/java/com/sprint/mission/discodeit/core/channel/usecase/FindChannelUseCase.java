@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.core.channel.usecase;
 
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import java.util.List;
 import java.util.UUID;
 
 public interface FindChannelUseCase {
 
-  ChannelResult findByChannelId(UUID channelId);
+  ChannelDto findByChannelId(UUID channelId);
 
-  List<ChannelResult> findAllByUserId(UUID userId);
+  List<ChannelDto> findAllByUserId(UUID userId);
 
 }

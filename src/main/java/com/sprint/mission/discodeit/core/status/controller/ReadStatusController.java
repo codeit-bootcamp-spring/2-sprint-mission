@@ -1,17 +1,16 @@
 package com.sprint.mission.discodeit.core.status.controller;
 
-import com.sprint.mission.discodeit.core.status.controller.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.core.status.controller.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.core.status.controller.response.ReadStatusResponse;
+import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.UpdateReadStatusCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,35 +30,30 @@ public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatusResponse> createReadStatus(
+  public ResponseEntity<ReadStatusDto> createReadStatus(
       @RequestBody ReadStatusCreateRequest requestBody) {
     CreateReadStatusCommand command = ReadStatusDtoMapper.toCreateReadStatusCommand(requestBody);
-    ReadStatusResult result = readStatusService.create(command);
+    ReadStatusDto result = readStatusService.create(command);
 
-    return ResponseEntity.ok(ReadStatusDtoMapper.toCreateResponse(result));
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusResponse> updateReadStatus(
+  public ResponseEntity<ReadStatusDto> updateReadStatus(
       @PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest requestBody) {
     UpdateReadStatusCommand command = ReadStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,
         requestBody);
-    ReadStatusResult result = readStatusService.update(command);
-    return ResponseEntity.ok(ReadStatusDtoMapper.toCreateResponse(result));
+    ReadStatusDto result = readStatusService.update(command);
+    return ResponseEntity.ok(result);
   }
 
   @GetMapping
-  public ResponseEntity<List<ReadStatusResponse>> findAllByUserId(
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
       @RequestParam("userId") UUID userId) {
-    List<ReadStatusResult> readStatuses = readStatusService.findAllByUserId(userId);
-    List<ReadStatusResponse> list = new ArrayList<>();
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
 
-    for (ReadStatusResult readStatus : readStatuses) {
-      list.add(ReadStatusDtoMapper.toCreateResponse(readStatus));
-    }
-
-    return ResponseEntity.ok(list);
+    return ResponseEntity.ok(readStatuses);
   }
 
 }

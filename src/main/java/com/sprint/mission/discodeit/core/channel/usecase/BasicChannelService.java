@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelResult;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.UpdateChannelCommand;
@@ -16,7 +16,7 @@ import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusReposito
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public ChannelResult create(CreatePublicChannelCommand command) {
+  public ChannelDto create(CreatePublicChannelCommand command) {
 
     Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public ChannelResult create(CreatePrivateChannelCommand command) {
+  public ChannelDto create(CreatePrivateChannelCommand command) {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
@@ -66,7 +66,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional(readOnly = true)
-  public ChannelResult findByChannelId(UUID channelId) {
+  public ChannelDto findByChannelId(UUID channelId) {
     Channel channel = channelRepository.findById(channelId).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
     );
@@ -75,7 +75,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<ChannelResult> findAllByUserId(UUID userId) {
+  public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
         .map(ReadStatus::getChannel)
         .map(Channel::getId)
@@ -90,7 +90,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
-  public ChannelResult update(UpdateChannelCommand command) {
+  public ChannelDto update(UpdateChannelCommand command) {
     Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
         () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
@@ -107,18 +107,18 @@ public class BasicChannelService implements ChannelService {
     return toChannelResult(channel);
   }
 
-  private ChannelResult toChannelResult(Channel channel) {
+  private ChannelDto toChannelResult(Channel channel) {
     Instant lastMessageAt = findLastMessageAt(channel);
 
-    List<UserResult> userIdList = new ArrayList<>();
+    List<UserDto> userIdList = new ArrayList<>();
     readStatusRepository.findAllByChannel_Id(channel.getId())
         .stream().map(readStatus -> {
           User user = readStatus.getUser();
-          return UserResult.create(user, user.getUserStatus().isOnline());
+          return UserDto.create(user, user.getUserStatus().isOnline());
         })
         .forEach(userIdList::add);
 
-    return ChannelResult.create(channel, userIdList, lastMessageAt);
+    return ChannelDto.create(channel, userIdList, lastMessageAt);
   }
 
   private Instant findLastMessageAt(Channel channel) {

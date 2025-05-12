@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.core.status.usecase.read;
 
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.CreateReadStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusResult;
+import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
 
 public interface CreateReadStatusUseCase {
 
-  ReadStatusResult create(CreateReadStatusCommand command);
+  ReadStatusDto create(CreateReadStatusCommand command);
 
 
 }

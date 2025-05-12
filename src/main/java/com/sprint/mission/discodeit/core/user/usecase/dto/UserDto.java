@@ -8,7 +8,7 @@ import lombok.Builder;
 
 @Builder
 @Schema(description = "User Item")
-public record UserResult(
+public record UserDto(
     @Schema(description = "User Id", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
     UUID id,
 
@@ -25,15 +25,15 @@ public record UserResult(
     boolean online
 ) {
 
-  public static UserResult create(User user, boolean online) {
+  public static UserDto create(User user, boolean online) {
     if (user.getProfile() == null) {
-      return UserResult.builder()
+      return UserDto.builder()
           .id(user.getId())
           .username(user.getName())
           .email(user.getEmail())
           .online(online).build();
     } else {
-      return UserResult.builder()
+      return UserDto.builder()
           .id(user.getId())
           .username(user.getName())
           .email(user.getEmail())
