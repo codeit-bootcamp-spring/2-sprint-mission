@@ -38,8 +38,10 @@ public enum ErrorCode {
 
   // UserStatus
   DUPLICATE_USERSTATUS("이미 존재하는 userStatus 입니다.", HttpStatus.CONFLICT),
-  USERSTATUS_NOTFOUND("userStatus를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+  USERSTATUS_NOTFOUND("userStatus를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
+  // @Valid
+  NOT_VALID("유효하지 않은 입력값입니다.", HttpStatus.BAD_REQUEST),;
 
   private final String message;
   private final HttpStatus httpStatus;
