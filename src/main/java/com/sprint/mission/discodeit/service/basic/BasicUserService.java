@@ -139,6 +139,8 @@ public class BasicUserService implements UserService {
     }
     // multipartFile이 없다면 기본 프로필로 유지
 
+    userRepository.save(findUser);
+
     return userMapper.toUpdateUserResult(findUser);
   }
 
