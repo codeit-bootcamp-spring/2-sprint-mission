@@ -229,11 +229,20 @@ public class BasicMessageServiceTest {
     // 엔티티의 id를 reflection으로 세팅하는 유틸리티
     private void setId(Object entity, UUID id) {
         try {
-            Field idField = entity.getClass().getSuperclass().getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(entity, id);
+            Class<?> clazz = entity.getClass();
+            while (clazz != null) { // 모든 상위 클래스 탐색
+                try {
+                    Field idField = clazz.getDeclaredField("id");
+                    idField.setAccessible(true);
+                    idField.set(entity, id);
+                    return;
+                } catch (NoSuchFieldException e) {
+                    clazz = clazz.getSuperclass(); // 상위 클래스로 이동
+                }
+            }
+            throw new NoSuchFieldException("id 필드를 찾을 수 없음");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to set id", e);
+            throw new RuntimeException("ID 설정 실패", e);
         }
     }
 }
