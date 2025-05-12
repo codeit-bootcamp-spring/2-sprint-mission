@@ -1,32 +1,244 @@
-25-05-09 10:33:39.594 [Test worker] INFO  c.s.m.d.c.MessageControllerTest      - Starting MessageControllerTest using Java 17.0.14 with PID 24724 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
-25-05-09 10:33:39.603 [Test worker] INFO  c.s.m.d.c.MessageControllerTest      - The following 1 profile is active: "test"
-25-05-09 10:33:42.443 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-25-05-09 10:33:42.968 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-25-05-09 10:33:43.031 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
-25-05-09 10:33:43.032 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Initializing Servlet ''
-25-05-09 10:33:43.036 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Completed initialization in 2 ms
-25-05-09 10:33:43.085 [Test worker] INFO  c.s.m.d.c.MessageControllerTest      - Started MessageControllerTest in 4.388 seconds (process running for 6.571)
-25-05-09 10:34:14.476 [Test worker] INFO  c.s.m.d.c.MessageControllerTest      - Starting MessageControllerTest using Java 17.0.14 with PID 22288 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
-25-05-09 10:34:14.478 [Test worker] INFO  c.s.m.d.c.MessageControllerTest      - The following 1 profile is active: "test"
-25-05-09 10:34:17.163 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-25-05-09 10:34:17.794 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-25-05-09 10:34:17.865 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
-25-05-09 10:34:17.866 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Initializing Servlet ''
-25-05-09 10:34:17.871 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Completed initialization in 2 ms
-25-05-09 10:34:17.924 [Test worker] INFO  c.s.m.d.c.MessageControllerTest      - Started MessageControllerTest in 4.485 seconds (process running for 6.391)
-25-05-09 10:36:47.250 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest      - Starting ChannelControllerTest using Java 17.0.14 with PID 23844 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
-25-05-09 10:36:47.253 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest      - The following 1 profile is active: "test"
-25-05-09 10:36:50.155 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-25-05-09 10:36:50.688 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-25-05-09 10:36:50.757 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
-25-05-09 10:36:50.758 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Initializing Servlet ''
-25-05-09 10:36:50.763 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Completed initialization in 2 ms
-25-05-09 10:36:50.811 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest      - Started ChannelControllerTest in 4.49 seconds (process running for 6.963)
-25-05-09 10:38:28.489 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest      - Starting ChannelControllerTest using Java 17.0.14 with PID 24328 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
-25-05-09 10:38:28.494 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest      - The following 1 profile is active: "test"
-25-05-09 10:38:32.009 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
-25-05-09 10:38:33.196 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-25-05-09 10:38:33.355 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
-25-05-09 10:38:33.356 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Initializing Servlet ''
-25-05-09 10:38:33.367 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet      - Completed initialization in 4 ms
-25-05-09 10:38:33.453 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest      - Started ChannelControllerTest in 6.072 seconds (process running for 8.703)
+25-05-12 11:03:11.169 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 23504 (C:\Users\dlwns\2-sprint-mission\build\classes\java\main started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:03:11.193 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - The following 1 profile is active: "dev"
+25-05-12 11:03:18.510 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext
+        [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+25-05-12 11:03:18.560 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger
+        [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-12 11:03:18.741 [main] ERROR o.s.boot.SpringApplication          
+        [ |  | ] - Application run failed
+java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$TrackedConditionEvaluator.shouldSkip(ConfigurationClassBeanDefinitionReader.java:470)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForConfigurationClass(ConfigurationClassBeanDefinitionReader.java:131)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(ConfigurationClassBeanDefinitionReader.java:120)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:429)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:788)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:606)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig] from ClassLoader [jdk.internal.loader.ClassLoaders$AppClassLoader@60e53b93]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483)
+	at org.springframework.util.ReflectionUtils.doWithMethods(ReflectionUtils.java:360)
+	at org.springframework.util.ReflectionUtils.getUniqueDeclaredMethods(ReflectionUtils.java:417)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.lambda$getTypeForFactoryMethod$1(AbstractAutowireCapableBeanFactory.java:750)
+	at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1740)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getTypeForFactoryMethod(AbstractAutowireCapableBeanFactory.java:749)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineTargetType(AbstractAutowireCapableBeanFactory.java:682)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.predictBeanType(AbstractAutowireCapableBeanFactory.java:653)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.isFactoryBean(AbstractBeanFactory.java:1687)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:534)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.collectBeanNamesForType(OnBeanCondition.java:247)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:240)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:230)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchingBeans(OnBeanCondition.java:183)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchOutcome(OnBeanCondition.java:120)
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:47)
+	... 17 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: org/springframework/boot/http/client/ClientHttpRequestFactoryBuilder
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method)
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3402)
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2504)
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465)
+	... 33 common frames omitted
+Caused by: java.lang.ClassNotFoundException: org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	... 37 common frames omitted
+25-05-12 11:04:38.857 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 20816 (C:\Users\dlwns\2-sprint-mission\build\classes\java\main started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:04:38.860 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - The following 1 profile is active: "dev"
+25-05-12 11:04:40.677 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext
+        [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+25-05-12 11:04:40.698 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger
+        [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-12 11:04:40.746 [main] ERROR o.s.boot.SpringApplication          
+        [ |  | ] - Application run failed
+java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$TrackedConditionEvaluator.shouldSkip(ConfigurationClassBeanDefinitionReader.java:470)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForConfigurationClass(ConfigurationClassBeanDefinitionReader.java:131)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(ConfigurationClassBeanDefinitionReader.java:120)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:429)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:788)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:606)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig] from ClassLoader [jdk.internal.loader.ClassLoaders$AppClassLoader@60e53b93]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483)
+	at org.springframework.util.ReflectionUtils.doWithMethods(ReflectionUtils.java:360)
+	at org.springframework.util.ReflectionUtils.getUniqueDeclaredMethods(ReflectionUtils.java:417)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.lambda$getTypeForFactoryMethod$1(AbstractAutowireCapableBeanFactory.java:750)
+	at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1740)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getTypeForFactoryMethod(AbstractAutowireCapableBeanFactory.java:749)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineTargetType(AbstractAutowireCapableBeanFactory.java:682)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.predictBeanType(AbstractAutowireCapableBeanFactory.java:653)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.isFactoryBean(AbstractBeanFactory.java:1687)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:534)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.collectBeanNamesForType(OnBeanCondition.java:247)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:240)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:230)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchingBeans(OnBeanCondition.java:183)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchOutcome(OnBeanCondition.java:120)
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:47)
+	... 17 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: org/springframework/boot/http/client/ClientHttpRequestFactoryBuilder
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method)
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3402)
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2504)
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465)
+	... 33 common frames omitted
+Caused by: java.lang.ClassNotFoundException: org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	... 37 common frames omitted
+25-05-12 11:07:08.827 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 25304 (C:\Users\dlwns\2-sprint-mission\build\classes\java\main started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:07:08.830 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - The following 1 profile is active: "dev"
+25-05-12 11:07:10.535 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext
+        [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+25-05-12 11:07:10.553 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger
+        [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-12 11:07:10.593 [main] ERROR o.s.boot.SpringApplication          
+        [ |  | ] - Application run failed
+java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$TrackedConditionEvaluator.shouldSkip(ConfigurationClassBeanDefinitionReader.java:470)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForConfigurationClass(ConfigurationClassBeanDefinitionReader.java:131)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(ConfigurationClassBeanDefinitionReader.java:120)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:429)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:788)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:606)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig] from ClassLoader [jdk.internal.loader.ClassLoaders$AppClassLoader@60e53b93]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483)
+	at org.springframework.util.ReflectionUtils.doWithMethods(ReflectionUtils.java:360)
+	at org.springframework.util.ReflectionUtils.getUniqueDeclaredMethods(ReflectionUtils.java:417)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.lambda$getTypeForFactoryMethod$1(AbstractAutowireCapableBeanFactory.java:750)
+	at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1740)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getTypeForFactoryMethod(AbstractAutowireCapableBeanFactory.java:749)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineTargetType(AbstractAutowireCapableBeanFactory.java:682)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.predictBeanType(AbstractAutowireCapableBeanFactory.java:653)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.isFactoryBean(AbstractBeanFactory.java:1687)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:534)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.collectBeanNamesForType(OnBeanCondition.java:247)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:240)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:230)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchingBeans(OnBeanCondition.java:183)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchOutcome(OnBeanCondition.java:120)
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:47)
+	... 17 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: org/springframework/boot/http/client/ClientHttpRequestFactoryBuilder
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method)
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3402)
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2504)
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465)
+	... 33 common frames omitted
+Caused by: java.lang.ClassNotFoundException: org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	... 37 common frames omitted
+25-05-12 11:07:19.038 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - Starting DiscodeitApplication using Java 17.0.14 with PID 25928 (C:\Users\dlwns\2-sprint-mission\build\classes\java\main started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:07:19.041 [main] INFO  c.s.m.discodeit.DiscodeitApplication
+        [ |  | ] - The following 1 profile is active: "dev"
+25-05-12 11:07:20.328 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext
+        [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+25-05-12 11:07:20.340 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger
+        [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-12 11:07:20.367 [main] ERROR o.s.boot.SpringApplication          
+        [ |  | ] - Application run failed
+java.lang.IllegalStateException: Error processing condition on de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$BlockingRegistrationClientConfig
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:60)
+	at org.springframework.context.annotation.ConditionEvaluator.shouldSkip(ConditionEvaluator.java:108)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader$TrackedConditionEvaluator.shouldSkip(ConfigurationClassBeanDefinitionReader.java:470)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitionsForConfigurationClass(ConfigurationClassBeanDefinitionReader.java:131)
+	at org.springframework.context.annotation.ConfigurationClassBeanDefinitionReader.loadBeanDefinitions(ConfigurationClassBeanDefinitionReader.java:120)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.processConfigBeanDefinitions(ConfigurationClassPostProcessor.java:429)
+	at org.springframework.context.annotation.ConfigurationClassPostProcessor.postProcessBeanDefinitionRegistry(ConfigurationClassPostProcessor.java:290)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanDefinitionRegistryPostProcessors(PostProcessorRegistrationDelegate.java:349)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors(PostProcessorRegistrationDelegate.java:118)
+	at org.springframework.context.support.AbstractApplicationContext.invokeBeanFactoryPostProcessors(AbstractApplicationContext.java:788)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:606)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:10)
+Caused by: java.lang.IllegalStateException: Failed to introspect Class [de.codecentric.boot.admin.client.config.SpringBootAdminClientAutoConfiguration$RestClientRegistrationClientConfig] from ClassLoader [jdk.internal.loader.ClassLoaders$AppClassLoader@60e53b93]
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:483)
+	at org.springframework.util.ReflectionUtils.doWithMethods(ReflectionUtils.java:360)
+	at org.springframework.util.ReflectionUtils.getUniqueDeclaredMethods(ReflectionUtils.java:417)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.lambda$getTypeForFactoryMethod$1(AbstractAutowireCapableBeanFactory.java:750)
+	at java.base/java.util.concurrent.ConcurrentHashMap.computeIfAbsent(ConcurrentHashMap.java:1740)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.getTypeForFactoryMethod(AbstractAutowireCapableBeanFactory.java:749)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.determineTargetType(AbstractAutowireCapableBeanFactory.java:682)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.predictBeanType(AbstractAutowireCapableBeanFactory.java:653)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.isFactoryBean(AbstractBeanFactory.java:1687)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doGetBeanNamesForType(DefaultListableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.getBeanNamesForType(DefaultListableBeanFactory.java:534)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.collectBeanNamesForType(OnBeanCondition.java:247)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:240)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getBeanNamesForType(OnBeanCondition.java:230)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchingBeans(OnBeanCondition.java:183)
+	at org.springframework.boot.autoconfigure.condition.OnBeanCondition.getMatchOutcome(OnBeanCondition.java:120)
+	at org.springframework.boot.autoconfigure.condition.SpringBootCondition.matches(SpringBootCondition.java:47)
+	... 17 common frames omitted
+Caused by: java.lang.NoClassDefFoundError: org/springframework/boot/http/client/ClientHttpRequestFactoryBuilder
+	at java.base/java.lang.Class.getDeclaredMethods0(Native Method)
+	at java.base/java.lang.Class.privateGetDeclaredMethods(Class.java:3402)
+	at java.base/java.lang.Class.getDeclaredMethods(Class.java:2504)
+	at org.springframework.util.ReflectionUtils.getDeclaredMethods(ReflectionUtils.java:465)
+	... 33 common frames omitted
+Caused by: java.lang.ClassNotFoundException: org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder
+	at java.base/jdk.internal.loader.BuiltinClassLoader.loadClass(BuiltinClassLoader.java:641)
+	at java.base/jdk.internal.loader.ClassLoaders$AppClassLoader.loadClass(ClassLoaders.java:188)
+	at java.base/java.lang.ClassLoader.loadClass(ClassLoader.java:525)
+	... 37 common frames omitted
