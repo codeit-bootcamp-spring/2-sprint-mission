@@ -4,9 +4,9 @@ import java.time.Instant;
 import java.util.Map;
 import lombok.Getter;
 
+@Getter
 public class DiscodeitException extends RuntimeException {
-
-    @Getter
+    
     private final Instant timestamp;
     private final ErrorCode errorCode;
     private final Map<String, Object> details;
