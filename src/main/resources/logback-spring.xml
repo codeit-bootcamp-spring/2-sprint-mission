@@ -5,7 +5,10 @@
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n</pattern>
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36}
+        [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n
+      </pattern>
+
     </encoder>
   </appender>
 
@@ -16,7 +19,10 @@
       <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n</pattern>
+      <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36}
+        [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n
+      </pattern>
+
     </encoder>
   </appender>
 
