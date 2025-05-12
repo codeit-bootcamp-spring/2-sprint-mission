@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.core.channel.exception.ChannelInvalidRequestException;
+import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.message.exception.MessageInvalidRequestException;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
@@ -57,6 +58,13 @@ public class GlobalExceptionAdvice {
   @ExceptionHandler(UserInvalidRequestException.class)
   public ResponseEntity<ErrorResponse> handleUserInvalidRequestException(
       UserInvalidRequestException ex,
+      Locale locale) {
+    ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
+    return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
+  }
+
+  @ExceptionHandler(ChannelNotFoundException.class)
+  public ResponseEntity<ErrorResponse> handleNotFoundException(ChannelNotFoundException ex,
       Locale locale) {
     ErrorResponse response = createResponse(ex, ex.getArgs(), locale);
     return ResponseEntity.status(ex.getErrorCode().getHttpStatus()).body(response);
