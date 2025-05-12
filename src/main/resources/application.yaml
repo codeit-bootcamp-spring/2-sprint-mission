@@ -9,7 +9,21 @@ logging:
   config: classpath:logback-spring.xml
 
 management:
-  endpoint:
+  endpoints:
     web:
       exposure:
         include: health, info, metrics, loggers
+  info:
+    env:
+      enabled: true
+
+
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
