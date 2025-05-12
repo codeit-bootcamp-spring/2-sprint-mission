@@ -142,8 +142,6 @@ public class BasicChannelService implements ChannelService {
   public void deleteChannel(UUID channelId) {
     log.warn("Delete channel Id: {}", channelId);
     validateChannelExists(channelId);
-    readStatusRepository.deleteAllByChannelId(channelId);
-    messageRepository.deleteAllByChannelId(channelId);
     channelRepository.deleteById(channelId);
     log.info("Delete channel successfully: {}", channelId);
   }
