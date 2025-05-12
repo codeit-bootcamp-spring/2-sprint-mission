@@ -7,8 +7,9 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.LogicException;
+import com.sprint.mission.discodeit.exception.user.UserEmailExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNameExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -39,12 +40,12 @@ public class BasicUserService implements UserService {
 
         if (userRepository.existsByEmail(userCreateDto.email())) {
             log.warn("User email {} already exists", userCreateDto.email());
-            throw new LogicException(ErrorCode.USER_EMAIL_EXISTS);
+            throw new UserEmailExistsException(userCreateDto.email());
         }
 
         if (userRepository.existsByUsername(userCreateDto.username())) {
             log.warn("User username {} already exists", userCreateDto.username());
-            throw new LogicException(ErrorCode.USER_NAME_EXISTS);
+            throw new UserNameExistsException(userCreateDto.username());
         }
 
         BinaryContent nullableProfile = null;
@@ -72,7 +73,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserDto findById(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         return userMapper.toDto(user);
     }
@@ -94,17 +95,17 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("User ID {} not found", userId);
-                    return new LogicException(ErrorCode.USER_NOT_FOUND);
+                    return new UserNotFoundException(userId);
                 });
 
         if (userRepository.existsByEmail(userUpdateDto.newEmail())) {
             log.warn("User email {} already exists", userUpdateDto.newEmail());
-            throw new LogicException(ErrorCode.USER_EMAIL_EXISTS);
+            throw new UserEmailExistsException(userUpdateDto.newEmail());
         }
 
         if (userRepository.existsByUsername(userUpdateDto.newUsername())) {
             log.warn("User username {} already exists", userUpdateDto.newUsername());
-            throw new LogicException(ErrorCode.USER_NAME_EXISTS);
+            throw new UserNameExistsException(userUpdateDto.newUsername());
         }
 
         BinaryContent nullableProfile = null;
@@ -132,7 +133,7 @@ public class BasicUserService implements UserService {
         log.info("Deleting user: userId={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         userRepository.delete(user);
         log.info("User deleted successfully: userId={}", userId);

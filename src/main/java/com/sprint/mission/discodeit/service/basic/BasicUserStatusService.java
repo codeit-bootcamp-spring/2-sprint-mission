@@ -6,8 +6,9 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.LogicException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusExistsException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -30,12 +31,11 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto create(UserStatusCreateDto userStatusCreateDto) {
 
-        // userService에서 create하면서 이 메서드를 호출하는데 굳이 다시 findById로 user를 찾아야할까,,? user를 넘겨줘도 되지 않을까,,? 지금이 더 안전하긴한데,,
         User user = userRepository.findById(userStatusCreateDto.userId())
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFoundException(userStatusCreateDto.userId()));
 
         if (userStatusRepository.findByUserId(userStatusCreateDto.userId()).isPresent()) {
-            throw new LogicException(ErrorCode.USER_STATUS_ALREADY_EXISTS);
+            throw new UserStatusExistsException(userStatusCreateDto.userId());
         }
 
         UserStatus newUserStatus = new UserStatus(user, userStatusCreateDto.lastActiveAt());
@@ -48,7 +48,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto findById(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id)
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> UserStatusNotFoundException.fromUserStatusId(id));
 
         return userStatusMapper.toDto(userStatus);
     }
@@ -65,7 +65,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto update(UUID userStatusId, UserStatusUpdateDto userStatusUpdateDto) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> UserStatusNotFoundException.fromUserStatusId(userStatusId));
 
         userStatus.update(userStatusUpdateDto.newLastActiveAt());
 
@@ -76,7 +76,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_STATUS_NOT_FOUND));
+                .orElseThrow(() -> UserStatusNotFoundException.fromUserId(userId));
         userStatus.update(userStatusUpdateByUserIdDto.newLastActiveAt());
 
         return userStatusMapper.toDto(userStatus);

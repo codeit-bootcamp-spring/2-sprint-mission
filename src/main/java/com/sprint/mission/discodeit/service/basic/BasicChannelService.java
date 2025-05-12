@@ -8,8 +8,9 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.LogicException;
+import com.sprint.mission.discodeit.exception.channel.ChannelExistsException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateNotSupportedException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -57,7 +58,7 @@ public class BasicChannelService implements ChannelService {
 
         if (channelRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
             log.warn("Public channel name {} already exists", channelCreatePublicDto.name());
-            throw new LogicException(ErrorCode.CHANNEL_ALREADY_EXISTS);
+            throw new ChannelExistsException(channelCreatePublicDto.name());
         }
 
         Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
@@ -71,7 +72,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto findById(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new LogicException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         return channelMapper.toDto(channel);
     }
@@ -109,12 +110,12 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("Channel not found: channelId={}", channelId);
-                    return new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
+                    return new ChannelNotFoundException(channelId);
                 });
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             log.warn("Private channel update not supported: channelId={}", channelId);
-            throw new LogicException(ErrorCode.PRIVATE_CHANNEL_UPDATE_NOT_SUPPORTED);
+            throw new PrivateChannelUpdateNotSupportedException(channelId);
         }
 
         channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());
@@ -128,7 +129,7 @@ public class BasicChannelService implements ChannelService {
     public void delete(UUID channelId) {
         log.info("Deleting channel: channelId={}", channelId);
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new LogicException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
         channelRepository.delete(channel);
         log.info("Channel deleted successfully: channelId={}", channelId);

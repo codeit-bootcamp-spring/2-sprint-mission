@@ -9,8 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.LogicException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -51,13 +52,13 @@ public class BasicMessageService implements MessageService {
         User user = userRepository.findById(messageCreateDto.authorId())
                 .orElseThrow(() -> {
                     log.warn("User not found: userId={}", messageCreateDto.authorId());
-                    return new LogicException(ErrorCode.USER_NOT_FOUND);
+                    return new UserNotFoundException(messageCreateDto.authorId());
                 });
 
         Channel channel = channelRepository.findById(messageCreateDto.channelId())
                 .orElseThrow(() -> {
                     log.warn("Channel not found: channelId={}", messageCreateDto.channelId());
-                    return new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
+                    return new ChannelNotFoundException(messageCreateDto.channelId());
                 });
 
         List<BinaryContent> attachments = new ArrayList<>();
@@ -83,7 +84,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto findById(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new LogicException(ErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         return messageMapper.toDto(message);
     }
@@ -111,7 +112,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> {
                     log.warn("Message not found: messageId={}", messageId);
-                    return new LogicException(ErrorCode.MESSAGE_NOT_FOUND);
+                    return new MessageNotFoundException(messageId);
                 });
         message.update(messageUpdateDto.newContent());
         log.info("Message updated successfully: messageId={}", messageId);
@@ -124,7 +125,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID messageId) {
         log.info("Deleting message: messageId={}", messageId);
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new LogicException(ErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         messageRepository.delete(message);
         log.info("Message deleted successfully: messageId={}", messageId);
