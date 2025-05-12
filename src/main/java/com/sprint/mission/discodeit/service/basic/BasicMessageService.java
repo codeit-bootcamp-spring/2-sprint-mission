@@ -25,11 +25,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -45,11 +47,18 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public MessageDto create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtos) {
+        log.info("Creating message: {}", messageCreateDto);
         User user = userRepository.findById(messageCreateDto.authorId())
-                .orElseThrow(() -> new LogicException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("User not found: userId={}", messageCreateDto.authorId());
+                    return new LogicException(ErrorCode.USER_NOT_FOUND);
+                });
 
         Channel channel = channelRepository.findById(messageCreateDto.channelId())
-                .orElseThrow(() -> new LogicException(ErrorCode.CHANNEL_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("Channel not found: channelId={}", messageCreateDto.channelId());
+                    return new LogicException(ErrorCode.CHANNEL_NOT_FOUND);
+                });
 
         List<BinaryContent> attachments = new ArrayList<>();
 
@@ -59,11 +68,13 @@ public class BasicMessageService implements MessageService {
             binaryContentRepository.save(binaryContent);
             binaryContentStorage.put(binaryContent.getId(), dto.bytes());
             attachments.add(binaryContent);
+            log.debug("Attachment created: {}", binaryContent);
         }
 
         Message newMessage = new Message(user, channel,
                 messageCreateDto.content(), attachments);
         messageRepository.save(newMessage);
+        log.info("Message created successfully: messageId={}", newMessage.getId());
 
         return messageMapper.toDto(newMessage);
     }
@@ -95,9 +106,15 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public MessageDto update(UUID messageId, MessageUpdateDto messageUpdateDto) {
+        log.info("Updating message: messageId={}, updateDto={}", messageId, messageUpdateDto);
+
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new LogicException(ErrorCode.MESSAGE_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("Message not found: messageId={}", messageId);
+                    return new LogicException(ErrorCode.MESSAGE_NOT_FOUND);
+                });
         message.update(messageUpdateDto.newContent());
+        log.info("Message updated successfully: messageId={}", messageId);
 
         return messageMapper.toDto(message);
     }
@@ -105,9 +122,11 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public void delete(UUID messageId) {
+        log.info("Deleting message: messageId={}", messageId);
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new LogicException(ErrorCode.MESSAGE_NOT_FOUND));
 
         messageRepository.delete(message);
+        log.info("Message deleted successfully: messageId={}", messageId);
     }
 }
