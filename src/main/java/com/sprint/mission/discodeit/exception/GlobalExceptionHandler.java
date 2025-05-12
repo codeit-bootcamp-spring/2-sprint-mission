@@ -9,7 +9,10 @@ import com.sprint.mission.discodeit.exception.readStatus.ReadStatusException;
 import com.sprint.mission.discodeit.exception.storage.StorageException;
 import com.sprint.mission.discodeit.exception.user.UserException;
 import com.sprint.mission.discodeit.exception.userStatus.UserStatusException;
+import java.time.Instant;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.View;
@@ -44,6 +47,23 @@ public class GlobalExceptionHandler {
     );
     return ResponseEntity
         .status(e.getErrorCode().getHttpStatus())
+        .body(errorResponse);
+  }
+
+  @ExceptionHandler({
+      MethodArgumentNotValidException.class
+  })
+  public ResponseEntity<ErrorResponse> handleNotValidException(MethodArgumentNotValidException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        ErrorCode.NOT_VALID.name(),
+        e.getMessage(),
+        Map.of(),
+        ErrorCode.NOT_VALID.getHttpStatus().name(),
+        ErrorCode.NOT_VALID.getHttpStatus().value()
+    );
+    return ResponseEntity
+        .status(ErrorCode.NOT_VALID.getHttpStatus())
         .body(errorResponse);
   }
 }
