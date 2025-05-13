@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.service.channel.*;
 import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -72,7 +74,9 @@ public class BasicChannelService implements ChannelService {
   public FindChannelResult find(UUID channelId) {
     Channel channel = findChannelById(channelId, "find");
     Instant latestMessageTime = findMessageLatestTimeInChannel(channelId);
-    List<UUID> userIds = getUserIdsFromChannel(channel);
+    List<UUID> userIds = readStatusService.findAllByChannelId(channelId).stream()
+        .map(FindReadStatusResult::userId)
+        .toList();
     List<FindUserResult> findUserResultList = userRepository.findAllByIdIn(userIds)
         .stream()
         .map(userMapper::toFindUserResult)
@@ -85,15 +89,36 @@ public class BasicChannelService implements ChannelService {
   @Transactional(readOnly = true)
   @Cacheable(value = "allChannels", key = "#p0")
   public List<FindChannelResult> findAllByUserId(UUID userId) {
-    List<Channel> channels = channelRepository.findAll();
-    return channels.stream()
-        .filter(
-            ch -> ch.getType() == ChannelType.PUBLIC || getUserIdsFromChannel(ch).contains(userId))
-        .map(ch -> channelMapper.toFindChannelResult(ch,
-            findMessageLatestTimeInChannel(ch.getId()),
-            userRepository.findAllByIdIn(getUserIdsFromChannel(ch)).stream()
-                .map(userMapper::toFindUserResult)
-                .toList()))
+    List<FindReadStatusResult> readStatusResultListByUserId = readStatusService.findAllByUserId(
+        userId);
+
+    List<UUID> channelIds = readStatusResultListByUserId.stream()
+        .map(FindReadStatusResult::channelId)
+        .toList();
+
+    List<Channel> channelList = channelRepository.findAllByIdIn(channelIds);
+
+    return channelList.stream()
+        .map(ch -> {
+          List<FindReadStatusResult> readStatusResultListByChannelId = readStatusService.findAllByChannelId(
+              ch.getId());
+
+          List<UUID> participantIds = readStatusResultListByChannelId.stream()
+              .map(FindReadStatusResult::userId)
+              .distinct()
+              .toList();
+
+          List<User> users = userRepository.findAllByIdIn(participantIds);
+          List<FindUserResult> participants = users.stream()
+              .map(userMapper::toFindUserResult)
+              .toList();
+
+          return channelMapper.toFindChannelResult(
+              ch,
+              findMessageLatestTimeInChannel(ch.getId()),
+              participants
+          );
+        })
         .toList();
   }
 
@@ -146,17 +171,6 @@ public class BasicChannelService implements ChannelService {
         .toList();
     // DTO를 이용해 readStatus 생성
     createReadStatusParams.forEach(readStatusService::create);
-  }
-
-  // PRIVATE 채널일때만 userId 가져오고 아닐떈 빈리스트 반환
-  // 요구사항에선 Channel이 userId를 가지지 않으므로, channelId로 ReadStatus를 조회하고,
-  // ReadStatus에서 userId를 뽑아내어 사용
-  private List<UUID> getUserIdsFromChannel(Channel channel) {
-    return channel.getType() == ChannelType.PRIVATE ?
-        readStatusService.findAllByChannelId(channel.getId())
-            .stream().map(rs -> rs.userId())
-            .toList() :
-        Collections.emptyList();
   }
 
   private Channel findChannelById(UUID channelId, String method) {
