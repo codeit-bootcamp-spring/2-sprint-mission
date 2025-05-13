@@ -215,4 +215,30 @@ public class MessageServiceTest {
 
         verify(messageRepository).findById(noExistId);
     }
+    @Test
+    @DisplayName("정상적인 Message delete 테스트")
+    void deleteMessage_WithValidInput_Success(){
+        User user = new User("user1", "user1@gmail.com", "1234", null);
+        Channel channel = new Channel(ChannelType.PUBLIC, "공지", "공지 채널");
+        Message message = new Message("삭제할 메시지", channel, user, List.of());
+        ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
+
+        given(messageRepository.findById(message.getId())).willReturn(Optional.of(message));
+
+        messageService.deleteMessage(message.getId());
+
+        verify(messageRepository).findById(message.getId());
+        verify(messageRepository).delete(message);
+    }
+    @Test
+    @DisplayName("존재하지 않는 messageId로 삭제 시 예외 발생 테스트")
+    void deleteMessage_WithInvalidMessageId_ThrowException(){
+        UUID noExistId = UUID.randomUUID();
+
+        given(messageRepository.findById(noExistId)).willReturn(Optional.empty());
+
+        assertThrows(MessageNotFoundException.class, () ->messageService.deleteMessage(noExistId));
+
+        verify(messageRepository).findById(noExistId);
+    }
 }
