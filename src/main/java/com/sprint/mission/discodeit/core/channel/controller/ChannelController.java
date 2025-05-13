@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
+import com.sprint.mission.discodeit.swagger.ChannelApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
-public class ChannelController {
+public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
 

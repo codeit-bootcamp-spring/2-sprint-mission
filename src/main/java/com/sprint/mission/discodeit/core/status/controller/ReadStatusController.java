@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusCreateCommand;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusUpdateCommand;
+import com.sprint.mission.discodeit.swagger.ReadStatusApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -25,12 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatuses")
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatusDto> createReadStatus(
+  public ResponseEntity<ReadStatusDto> create(
       @RequestBody ReadStatusCreateRequest requestBody) {
     ReadStatusCreateCommand command = ReadStatusDtoMapper.toCreateReadStatusCommand(requestBody);
     ReadStatusDto result = readStatusService.create(command);
@@ -39,7 +40,7 @@ public class ReadStatusController {
   }
 
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatusDto> updateReadStatus(
+  public ResponseEntity<ReadStatusDto> update(
       @PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest requestBody) {
     ReadStatusUpdateCommand command = ReadStatusDtoMapper.toUpdateReadStatusCommand(readStatusId,

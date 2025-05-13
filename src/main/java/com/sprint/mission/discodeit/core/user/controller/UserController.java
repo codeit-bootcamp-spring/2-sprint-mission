@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.core.user.usecase.UserService;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
+import com.sprint.mission.discodeit.swagger.UserApi;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -35,12 +36,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController implements UserApi {
 
   private final UserService userService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<UserDto> register(
+  public ResponseEntity<UserDto> create(
       @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
       @RequestPart(value = "profile", required = false) MultipartFile file
   ) {
@@ -90,13 +91,13 @@ public class UserController {
   }
 
   @DeleteMapping("/{userId}")
-  public ResponseEntity<UserDeleteResponse> deleteUser(@PathVariable UUID userId) {
+  public ResponseEntity<UserDeleteResponse> delete(@PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.ok(new UserDeleteResponse(true));
   }
 
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> online(@PathVariable UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusRequest requestBody) {
 
     UserStatusOnlineCommand command = UserStatusOnlineCommand.create(userId,

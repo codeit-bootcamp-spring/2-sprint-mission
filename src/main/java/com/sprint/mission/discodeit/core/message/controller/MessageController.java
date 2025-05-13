@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
+import com.sprint.mission.discodeit.swagger.MessageApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -41,15 +42,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
-public class MessageController {
+public class MessageController implements MessageApi {
 
   private final MessageService messageService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest requestBody,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments)
-      throws IOException {
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     List<BinaryContentCreateCommand> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
@@ -72,7 +72,7 @@ public class MessageController {
   }
 
   @GetMapping
-  public ResponseEntity<PageResponse<MessageDto>> findAll(@RequestParam UUID channelId,
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(@RequestParam UUID channelId,
       @RequestParam(required = false) Instant cursor,
       @PageableDefault(
           size = 50, sort = "createdAt", direction = Direction.DESC
@@ -85,7 +85,7 @@ public class MessageController {
   }
 
   @PatchMapping("/{messageId}")
-  public ResponseEntity<MessageDto> updateMessage(
+  public ResponseEntity<MessageDto> update(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest requestBody) {
     MessageUpdateCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
@@ -94,7 +94,7 @@ public class MessageController {
   }
 
   @DeleteMapping("/{messageId}")
-  public ResponseEntity<MessageDeleteResponse> deleteMessage(@PathVariable UUID messageId) {
+  public ResponseEntity<MessageDeleteResponse> delete(@PathVariable UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity.ok(new MessageDeleteResponse(true));
   }
