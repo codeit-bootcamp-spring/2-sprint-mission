@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.StorageException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDeleteFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDownloadFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentLoadFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentSaveFailedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -52,7 +54,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             return binaryContentId;
         } catch (IOException e) {
             log.error("Failed to save binary content: {}", e.getMessage());
-            throw new StorageException(ErrorCode.BINARY_CONTENT_SAVE_FAILED);
+            throw new BinaryContentSaveFailedException(binaryContentId);
         }
     }
 
@@ -65,7 +67,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             return binaryContentId;
         } catch (IOException e) {
             log.error("Failed to delete binary content: {}", e.getMessage());
-            throw new StorageException(ErrorCode.BINARY_CONTENT_DELETE_FAILED);
+            throw new BinaryContentDeleteFailedException(binaryContentId);
         }
     }
 
@@ -77,7 +79,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             return Files.newInputStream(filePath);
         } catch (IOException e) {
             log.error("Failed to load binary content: {}", e.getMessage());
-            throw new StorageException(ErrorCode.BINARY_CONTENT_LOAD_FAILED);
+            throw new BinaryContentLoadFailedException(binaryContentId);
         }
     }
 
@@ -94,7 +96,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
                     .body(resource);
         } catch (IOException e) {
             log.error("Failed to download binary content: {}", e.getMessage());
-            throw new StorageException(ErrorCode.BINARY_CONTENT_DOWNLOAD_FAILED);
+            throw new BinaryContentDownloadFailedException(binaryContentDto.id());
         }
     }
 
