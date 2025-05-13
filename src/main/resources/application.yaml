@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: discodeit
   servlet:
@@ -11,9 +13,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     #        default_batch_fetch_size: 100
     open-in-view: false
-
+    show-sql: true
+  sql:
+    init:
+      mode: embedded
 
 logging:
   level:
@@ -26,3 +32,34 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always    # health 정보 자세히 보기
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring:
+    boot:
+      version: 3.4.0
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    ddl-auto: validate
+  storage:
+    type: local
+    path: .discodeit/storage
+  multipart:
+    max-file-size: 10MB
+    max-request-size: 50MB
