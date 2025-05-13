@@ -106,6 +106,6 @@ public class BasicChannelService implements ChannelService {
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
     channelRepository.deleteById(channelId);
-    log.debug("채널 삭제 완료: id={}", channelId);
+    log.info("채널 삭제 완료: id={}", channelId);
   }
 }

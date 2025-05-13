@@ -59,7 +59,7 @@ public class BasicMessageService implements MessageService {
 
     Message message = new Message(createRequest.content(), channel, author, attachmentList);
     messageRepository.save(message);
-
+    log.info("메시지 생성 완료: id={}", message.getId());
     return messageMapper.toDto(message);
   }
 
@@ -71,15 +71,17 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable) {
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
+      Pageable pageable) {
     Slice<MessageDto> messageDtoSlice = messageRepository
         .findAllByChannelIdWithAuthor(
             channelId, Optional.ofNullable(cursor).orElse(Instant.now()), pageable)
         .map(messageMapper::toDto);
 
     Instant nextCursor = null;
-    if(!messageDtoSlice.isEmpty()){
-      nextCursor = messageDtoSlice.getContent().get(messageDtoSlice.getContent().size() - 1).createdAt();
+    if (!messageDtoSlice.isEmpty()) {
+      nextCursor = messageDtoSlice.getContent().get(messageDtoSlice.getContent().size() - 1)
+          .createdAt();
     }
 
     return pageResponseMapper.fromSlice(messageDtoSlice, nextCursor);
@@ -88,19 +90,22 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto update(UUID id, MessageUpdateRequest updateRequest) {
+    log.debug("메시지 수정 시작: id={}, {}", id, updateRequest);
     Message message = messageRepository.findByIdWithAuthorAndAttachments(id)
         .orElseThrow(() -> new MessageNotFoundException().notFoundWithId(id));
     message.update(updateRequest.newContent());
-
+    log.info("메시지 수정 완료: id={}", message.getId());
     return messageMapper.toDto(message);
   }
 
   @Override
   @Transactional
   public void delete(UUID messageId) {
+    log.debug("메시지 삭제 시작: id={}", messageId);
     if (!messageRepository.existsById(messageId)) {
       throw new MessageNotFoundException().notFoundWithId(messageId);
     }
     messageRepository.deleteById(messageId);
+    log.info("메시지 삭제 완료: id={}", messageId);
   }
 }
