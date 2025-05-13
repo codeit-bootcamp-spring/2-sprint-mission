@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
@@ -20,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -189,5 +191,113 @@ public class ChannelServiceTest {
         given(channelRepository.findById(noExistId)).willReturn(Optional.empty());
 
         assertThrows(ChannelNotFoundException.class, () -> channelService.deleteChannel(noExistId));
+    }
+
+    @Test
+    @DisplayName("UserId로 구독한 채널 리스트 찾기 성공 테스트")
+    void findAllChannels_ByUserId_WithValidInput_Success() {
+        Channel publicChannel = new Channel(ChannelType.PUBLIC, "전체 공지", "전체 공지 채널입니다.");
+        ReflectionTestUtils.setField(publicChannel, "id", UUID.randomUUID());
+
+        Channel privateChannel = new Channel(ChannelType.PRIVATE, "스터디 그룹", "스터디를 위한 채널입니다.");
+        ReflectionTestUtils.setField(privateChannel, "id", UUID.randomUUID());
+
+        User user = new User("김이름", "erum@gmail.com", "1234", null);
+        ReadStatus readStatus = new ReadStatus(user, privateChannel, Instant.now());
+
+        ChannelDto publicDto = new ChannelDto(
+                publicChannel.getId(),
+                publicChannel.getType(),
+                publicChannel.getName(),
+                publicChannel.getDescription(),
+                null,
+                null
+        );
+        ChannelDto privateDto = new ChannelDto(
+                privateChannel.getId(),
+                privateChannel.getType(),
+                null,
+                null,
+                null,
+                null
+        );
+        given(readStatusRepository.findAllByUser_Id(user.getId())).willReturn(List.of(readStatus));
+        given(channelRepository.findAll()).willReturn(List.of(publicChannel, privateChannel));
+        given(channelMapper.toDto(publicChannel)).willReturn(publicDto);
+        given(channelMapper.toDto(privateChannel)).willReturn(privateDto);
+
+        List<ChannelDto> channelDtos = channelService.findAllChannelsByUserId(user.getId());
+
+        assertEquals(2, channelDtos.size());
+        assertTrue(channelDtos.contains(publicDto));
+        assertTrue(channelDtos.contains(privateDto));
+
+        verify(readStatusRepository).findAllByUser_Id(user.getId());
+        verify(channelRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("구독한 채널이 없을 때 Public 채널만 반환되는 테스트")
+    void findAllChannels_UserNotSubscribed_ReturnsPublicOnly() {
+        UUID userId = UUID.randomUUID();
+        Channel publicChannel = new Channel(ChannelType.PUBLIC, "공지", "전체 공지");
+        ReflectionTestUtils.setField(publicChannel, "id", UUID.randomUUID());
+
+        Channel privateChannel = new Channel(ChannelType.PRIVATE, null, null);
+        ReflectionTestUtils.setField(privateChannel, "id", UUID.randomUUID());
+
+        ChannelDto publicDto = new ChannelDto(
+                publicChannel.getId(),
+                publicChannel.getType(),
+                publicChannel.getName(),
+                publicChannel.getDescription(),
+                null,
+                null
+        );
+
+        given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of());
+        given(channelRepository.findAll()).willReturn(List.of(publicChannel, privateChannel));
+        given(channelMapper.toDto(publicChannel)).willReturn(publicDto);
+
+        List<ChannelDto> channelDtos = channelService.findAllChannelsByUserId(userId);
+
+        assertEquals(1, channelDtos.size());
+        assertEquals(publicDto, channelDtos.get(0));
+
+        verify(readStatusRepository).findAllByUser_Id(userId);
+        verify(channelRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("Public 채널이 없고 구독한 Private 채널만 반환되는 테스트")
+    void findAllChannels_OnlyPrivateSubscribed_ReturnsSubscribedPrivateOnly() {
+        UUID userId = UUID.randomUUID();
+
+        Channel privateChannel = new Channel(ChannelType.PRIVATE, "비공개", "스터디 채널");
+        ReflectionTestUtils.setField(privateChannel, "id", UUID.randomUUID());
+
+        User user = new User("user1", "user@email.com", "1234", null);
+        ReadStatus readStatus = new ReadStatus(user, privateChannel, Instant.now());
+
+        ChannelDto privateDto = new ChannelDto(
+                privateChannel.getId(),
+                privateChannel.getType(),
+                privateChannel.getName(),
+                privateChannel.getDescription(),
+                null,
+                null
+        );
+
+        given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of(readStatus));
+        given(channelRepository.findAll()).willReturn(List.of(privateChannel));
+        given(channelMapper.toDto(privateChannel)).willReturn(privateDto);
+
+        List<ChannelDto> result = channelService.findAllChannelsByUserId(userId);
+
+        assertEquals(1, result.size());
+        assertEquals(privateDto, result.get(0));
+
+        verify(readStatusRepository).findAllByUser_Id(userId);
+        verify(channelRepository).findAll();
     }
 }
