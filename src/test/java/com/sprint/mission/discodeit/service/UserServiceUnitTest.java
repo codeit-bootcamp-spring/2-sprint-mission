@@ -63,11 +63,9 @@ public class UserServiceUnitTest {
 
   @BeforeEach
   void setUp() {
-    userService = new BasicUserService(userRepository, userStatusService, binaryContentService);
     BinaryContent oldProfile = BinaryContent.create("old.png", 0L, "image/png");
     user = User.create("a", "a@email.com", "a", oldProfile);
     user.setUserStatus(UserStatus.create(user, Instant.now()));
-    userRepository.save(user);
   }
 
   @Test

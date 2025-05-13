@@ -47,9 +47,6 @@ public class ChannelControllerTest {
   private BasicChannelService channelService;
 
   @MockitoBean
-  JwtUtil jwtUtil;
-
-  @MockitoBean
   JwtAuthInterceptor intercept;
 
   @Autowired

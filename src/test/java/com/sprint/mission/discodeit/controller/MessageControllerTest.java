@@ -46,9 +46,6 @@ public class MessageControllerTest {
   private MessageService messageService;
 
   @MockitoBean
-  JwtUtil jwtUtil;
-
-  @MockitoBean
   JwtAuthInterceptor intercept;
 
   @Autowired

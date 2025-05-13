@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -43,9 +44,6 @@ public class UserControllerTest {
 
   @MockitoBean
   private UserService userService;
-
-  @MockitoBean
-  JwtUtil jwtUtil;
 
   @MockitoBean
   JwtAuthInterceptor intercept;

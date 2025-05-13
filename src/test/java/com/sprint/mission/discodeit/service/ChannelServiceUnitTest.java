@@ -16,9 +16,9 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableEx
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.BasicChannelService;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
+import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
@@ -30,7 +30,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -54,13 +53,6 @@ public class ChannelServiceUnitTest {
 
   @InjectMocks
   private BasicChannelService channelService;
-
-
-  @BeforeEach
-  void setUp() {
-    channelService = new BasicChannelService(userRepository, channelRepository, messageRepository,
-        readStatusRepository);
-  }
 
   @Test
   void PublicChannelCreate() {
@@ -187,8 +179,5 @@ public class ChannelServiceUnitTest {
     assertThat(results.size()).isEqualTo(2);
     verify(readStatusRepository).findAllByUser_Id(userId);
     verify(channelRepository).findAllByTypeOrIdIn(ChannelType.PUBLIC, channelIds);
-
   }
-
-
 }
