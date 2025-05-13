@@ -1,267 +1,249 @@
-//package Service;
-//
-//import com.sprint.mission.discodeit.dto.service.user.CreateUserParam;
-//import com.sprint.mission.discodeit.dto.service.user.UpdateUserParam;
-//import com.sprint.mission.discodeit.dto.service.user.UserDTO;
-//import com.sprint.mission.discodeit.entity.User;
-//import com.sprint.mission.discodeit.entity.UserStatus;
-//import com.sprint.mission.discodeit.exception.RestException;
-//import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-//import com.sprint.mission.discodeit.repository.UserRepository;
-//import com.sprint.mission.discodeit.repository.UserStatusRepository;
-//import com.sprint.mission.discodeit.service.basic.BasicUserService;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.web.multipart.MultipartFile;
-//
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.UUID;
-//
-//import static org.mockito.Mockito.*;
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.assertj.core.api.Assertions.*;
-//
-//
-//@ExtendWith(MockitoExtension.class)
-//public class BasicUserServiceTest {
-//
-//    @Mock
-//    UserRepository userRepository;
-//
-//    @Mock
-//    UserStatusRepository userStatusRepository;
-//
-//    @Mock
-//    BinaryContentRepository binaryContentRepository;
-//
-//    @Mock
-//    MultipartFile multipartFile;
-//
-//    @InjectMocks
-//    BasicUserService basicUserService;
-//
-//    private static final UUID DEFAULT_PROFILE_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-//
-//    private CreateUserParam createUserParam;
-//    private User mockUser;
-//    private UserStatus mockUserStatus;
-//
-//    @BeforeEach
-//    void setUp() {
-//        createUserParam = new CreateUserParam("test", "test@test.com", "1234");
-//
-//        mockUser = User.builder()
-//                .username(createUserParam.username())
-//                .password(createUserParam.password())
-//                .email(createUserParam.email())
-//                .profileId(DEFAULT_PROFILE_ID)
-//                .build();
-//
-//        mockUserStatus = UserStatus.builder()
-//                .userId(mockUser.getId())
-//                .build();
-//    }
-//
-//
-//    @Test
-//    void 유저생성_성공() {
-//        // 가짜 객체기 때문에 어떤 기능이 실행됐을 때, 어떤걸 반환해야할지 모름 -> Mock 설정 필요
-//        // Repository의 메서드가 실행되면 DB대신 미리 만들어둔 객체나 결과값 반환
-//        when(userRepository.save(any(User.class))).thenReturn(mockUser);
-//        when(userStatusRepository.save(any(UserStatus.class))).thenReturn(mockUserStatus);
-//        when(userRepository.existsByUsername(createUserParam.username())).thenReturn(false);
-//        when(userRepository.existsByEmail(createUserParam.email())).thenReturn(false);
-//
-//        UserDTO userDTO = basicUserService.create(createUserParam, );
-//
-//        assertEquals(createUserParam.username(), userDTO.username());
-//        assertEquals(createUserParam.email(), userDTO.email());
-//        assertEquals(createUserParam.profileId(), userDTO.profileId());
-//        assertEquals(true, userDTO.isLogin());
-//
-//        // create 1번에 1번만 실행됐는지 확인
-//        verify(userRepository, times(1)).save(any(User.class));
-//        verify(userStatusRepository, times(1)).save(any(UserStatus.class));
-//    }
-//
-//    @Test
-//    void 유저생성_중복이름_실패() {
-//        when(userRepository.existsByUsername(createUserParam.username())).thenReturn(true);
-//        // 중복이름을 먼저 검사하고 email을 검사하기 아래의 코드가 있다면 UnnecessaryStubbingException 발생
-//        //when(userRepository.existsByEmail(createUserParam.email())).thenReturn(false);
-//
-//        assertThatThrownBy(() -> basicUserService.create(createUserParam))
-//                .isInstanceOf(RestException.class)
-//                .hasMessageContaining("Username exists already");
-//
-//        verify(userRepository, times(1)).existsByUsername(createUserParam.username());
-//        verify(userRepository, never()).save(any(User.class));
-//    }
-//
-//    @Test
-//    void 유저생성_중복이메일_실패() {
-//        when(userRepository.existsByUsername(createUserParam.username())).thenReturn(false);
-//        when(userRepository.existsByEmail(createUserParam.email())).thenReturn(true);
-//
-//        assertThatThrownBy(() -> basicUserService.create(createUserParam))
-//                .isInstanceOf(RestException.class)
-//                .hasMessageContaining("Email exists already");
-//
-//        verify(userRepository, times(1)).existsByEmail(createUserParam.email());
-//        verify(userRepository, never()).save(any(User.class));
-//    }
-//
-//
-//    @Test
-//    void 유저하나찾기_성공() {
-//        when(userRepository.findById(mockUser.getId())).thenReturn(Optional.ofNullable(mockUser));
-//        when(userStatusRepository.findByUserId(mockUser.getId())).thenReturn(Optional.ofNullable(mockUserStatus));
-//
-//        UserDTO userDTO = basicUserService.find(mockUser.getId());
-//
-//        assertEquals(userDTO.username(), mockUser.getUsername());
-//        assertEquals(userDTO.email(), mockUser.getEmail());
-//        assertEquals(userDTO.profileId(), mockUser.getProfileId());
-//        assertEquals(true, userDTO.isLogin());
-//
-//        verify(userRepository, times(1)).findById(mockUser.getId());
-//        verify(userStatusRepository, times(1)).findByUserId(mockUser.getId());
-//    }
-//
-//    @Test
-//    void 유저하나찾기_유저_못찾음() {
-//        // 검색 결과가 Optional.empty()를 반환한다고 가정
-//        when(userRepository.findById(mockUser.getId())).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(() -> basicUserService.find(mockUser.getId()))
-//                .isInstanceOf(RestException.class)
-//                .hasMessageContaining("User not found");
-//
-//        verify(userRepository, times(1)).findById(mockUser.getId());
-//    }
-//
-//    @Test
-//    void 유저하나찾기_유저상태_못찾음() {
-//        when(userRepository.findById(mockUser.getId())).thenReturn(Optional.ofNullable(mockUser));
-//        when(userStatusRepository.findByUserId(mockUser.getId())).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(() -> basicUserService.find(mockUser.getId()))
-//                .isInstanceOf(RestException.class)
-//                .hasMessageContaining("UserStatus not found");
-//
-//        verify(userStatusRepository, times(1)).findByUserId(mockUser.getId());
-//    }
-//
-//
-//    List<User> mockUserList;
-//    List<UserStatus> mockUserStatusList;
-//
-//    @Test
-//    void 유저전체찾기_성공() {
-//        mockUserList = List.of(
-//                new User("test2", "test2@test.com", "1234", DEFAULT_PROFILE_ID),
-//                new User("test3", "test3@test.com", "1234", DEFAULT_PROFILE_ID)
-//        );
-//
-//        mockUserStatusList = List.of(
-//                new UserStatus(mockUserList.get(0).getId()),
-//                new UserStatus(mockUserList.get(1).getId())
-//        );
-//
-//        when(userRepository.findAll()).thenReturn(mockUserList);
-//        when(userStatusRepository.findAll()).thenReturn(mockUserStatusList);
-//
-//        List<UserDTO> userDTOList = basicUserService.findAll();
-//
-//        assertEquals(2, userDTOList.size());
-//        assertEquals(mockUserList.get(0).getUsername(), userDTOList.get(0).username());
-//        assertEquals(mockUserList.get(1).getUsername(), userDTOList.get(1).username());
-//
-//        verify(userRepository, times(1)).findAll();
-//        verify(userStatusRepository, times(1)).findAll();
-//    }
-//
-//    @Test
-//    void 유저전체찾기_빈리스트_성공() {
-//        when(userRepository.findAll()).thenReturn(List.of());
-//        when(userStatusRepository.findAll()).thenReturn(List.of());
-//
-//        List<UserDTO> userDTOList = basicUserService.findAll();
-//
-//        assertTrue(userDTOList.isEmpty());
-//
-//        verify(userRepository, times(1)).findAll();
-//        verify(userStatusRepository, times(1)).findAll();
-//   }
-//    UpdateUserParam updateUserParam = new UpdateUserParam("updateTest", "updateTest@test.com", "update1234", DEFAULT_PROFILE_ID);
-//
-//    @Test
-//    void 유저수정_성공() {
-//        UUID userId = mockUser.getId();
-//
-//        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(mockUser));
-//        when(userRepository.save(any(User.class))).thenReturn(mockUser);
-//
-//        UUID id = basicUserService.update(userId, updateUserParam);
-//
-//        assertEquals(id, userId);
-//
-//        assertEquals(mockUser.getUsername(), updateUserParam.username());
-//        assertEquals(mockUser.getEmail(), updateUserParam.email());
-//        assertEquals(mockUser.getPassword(), updateUserParam.password());
-//        assertEquals(mockUser.getProfileId(), updateUserParam.profileId());
-//
-//        verify(userRepository, times(1)).findById(userId);
-//        verify(userRepository, times(1)).save(mockUser);
-//    }
-//
-//    @Test
-//    void 유저수정_유저없음_실패() {
-//        UUID userId = mockUser.getId();
-//
-//        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(() -> basicUserService.update(userId, updateUserParam))
-//                .isInstanceOf(RestException.class)
-//                .hasMessageContaining("User not found");
-//
-//        verify(userRepository, times(1)).findById(userId);
-//        verify(userRepository, never()).save(mockUser);
-//    }
-//
-//    @Test
-//    void 유저삭제_성공() {
-//        UUID userId = mockUser.getId();
-//
-//        when(userRepository.findById(userId)).thenReturn(Optional.ofNullable(mockUser));
-//
-//        basicUserService.delete(userId);
-//
-//        verify(userRepository, times(1)).deleteById(userId);
-//        verify(binaryContentRepository, times(1)).deleteById(mockUser.getProfileId());
-//        verify(userStatusRepository, times(1)).deleteByUserId(userId);
-//    }
-//
-//    @Test
-//    void 유저삭제_유저없음_실패() {
-//        UUID userId = mockUser.getId();
-//
-//        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(() -> basicUserService.delete(userId))
-//                .isInstanceOf(RestException.class)
-//                .hasMessageContaining("User not found");
-//
-//        verify(userRepository, never()).deleteById(userId);
-//        verify(binaryContentRepository, never()).deleteById(mockUser.getProfileId());
-//        verify(userStatusRepository, never()).deleteByUserId(userId);
-//    }
-//}
-//
-//
-//
+package Service;
+
+import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
+import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.mapper.UserMapperImpl;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
+import com.sprint.mission.discodeit.mapper.UserStatusMapperImpl;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.UUID;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+
+@ExtendWith(MockitoExtension.class)
+public class BasicUserServiceTest {
+
+  // 공유 의존성 -> 테스트 대역(Mock)으로 교체
+  @Mock
+  UserRepository userRepository;
+  @Mock
+  UserStatusService userStatusService;
+  @Mock
+  BinaryContentService binaryContentService;
+  @Mock
+  BinaryContentStorage binaryContentStorage;
+
+  // DB 접근(프로세스 외부 의존성?)도 아닌, 단순 Mapper이므로 Spy 객체 사용
+  // -> 공유 의존성이 없으므로 Spy 객체나 실제 객체를 사용해도 단위 테스트의 조건을 깨뜨리지 않는다. (고전파)
+  @Spy
+  UserMapper userMapper = new UserMapperImpl();
+  @Spy
+  UserStatusMapper userStatusMapper = new UserStatusMapperImpl();
+
+  @InjectMocks
+  BasicUserService basicUserService;
+
+  // 고전파 - 공유 의존성이 없는 비공개 의존성의 경우 실제 객체 사용
+  private CreateUserCommand createUserCommand;
+  private User user;
+  private UserStatus userStatus;
+  private CreateBinaryContentResult createBinaryContentResult;
+  private BinaryContent profile;
+  private MultipartFile mockFile;
+
+  // 테스트 메서드 실행 전마다 새로운 객체 생성 -> 공유 의존성 방지
+  @BeforeEach
+  void setUp() {
+    createBinaryContentResult = new CreateBinaryContentResult(UUID.randomUUID(), "test.png", 9,
+        "image/png");
+
+    profile = BinaryContent.builder()
+        .contentType(createBinaryContentResult.contentType())
+        .filename(createBinaryContentResult.filename())
+        .size(createBinaryContentResult.size())
+        .build();
+
+    createUserCommand = new CreateUserCommand("test", "test@test.com", "1234");
+
+    user = User.builder()
+        .username(createUserCommand.username())
+        .password(createUserCommand.password())
+        .email(createUserCommand.email())
+        .profile(profile)
+        .build();
+    ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
+
+    userStatus = new UserStatus(user, Instant.now());
+
+    user.updateUserStatus(userStatus);
+
+    mockFile = new MockMultipartFile(
+        "testProfile",
+        "test.png",
+        "image/png",
+        "test data".getBytes());
+  }
+
+
+  @Test
+  @DisplayName("유저 생성 성공")
+  void createUser_success() {
+    // given (BDDMockito 사용)
+    given(userRepository.save(any(User.class))).willReturn(user);
+    given(userRepository.existsByUsername(createUserCommand.username())).willReturn(false);
+    given(userRepository.existsByEmail(createUserCommand.email())).willReturn(false);
+    given(binaryContentService.create(any())).willReturn(createBinaryContentResult);
+    given(binaryContentStorage.put(any(), any())).willReturn(createBinaryContentResult.id());
+
+    // when
+    CreateUserResult createUserResult = basicUserService.create(createUserCommand, mockFile);
+
+    // then
+    assertThat(createUserCommand.username()).isEqualTo(createUserResult.username());
+    assertThat(createUserCommand.email()).isEqualTo(createUserResult.email());
+    assertThat(mockFile.getOriginalFilename()).isEqualTo(createUserResult.profile().filename());
+    assertThat(mockFile.getSize()).isEqualTo(createUserResult.profile().size());
+    assertThat(createUserResult.online()).isTrue();
+
+    then(userRepository).should(times(1)).save(any(User.class));
+    then(binaryContentService).should(times(1)).create(any());
+    then(binaryContentStorage).should(times(1)).put(any(), any());
+    then(userStatusService).should(times(1)).create(any());
+  }
+
+  @Test
+  @DisplayName("유저 생성할 때, username 중복으로 인한 실패")
+  void createUser_duplicateUsername_failed() {
+    // given
+    given(userRepository.existsByUsername(createUserCommand.username())).willReturn(true);
+
+    // when + then
+    assertThatThrownBy(() -> basicUserService.create(createUserCommand, mockFile))
+        .isInstanceOf(DuplicateUsernameException.class)
+        .hasMessageContaining("Username exists already");
+
+    then(userRepository).should(times(1)).existsByUsername(createUserCommand.username());
+    then(userRepository).should(never()).save(any(User.class));
+  }
+
+  @Test
+  @DisplayName("유저 생성할 때, email 중복으로 인한 실패")
+  void createUser_duplicateEmail_failed() {
+    // given
+    given(userRepository.existsByUsername(createUserCommand.username())).willReturn(false);
+    given(userRepository.existsByEmail(createUserCommand.email())).willReturn(true);
+
+    // when + then
+    assertThatThrownBy(() -> basicUserService.create(createUserCommand, mockFile))
+        .isInstanceOf(DuplicateEmailException.class)
+        .hasMessageContaining("Email exists already");
+
+    then(userRepository).should(times(1)).existsByEmail(createUserCommand.email());
+    then(userRepository).should((never())).save(any(User.class));
+  }
+
+  @Test
+  @DisplayName("유저 수정 성공")
+  void updateUser_success() {
+    // given
+    UpdateUserCommand updateUserCommand = new UpdateUserCommand("updateTest", "updateTest@test.com",
+        "update1234");
+
+    given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
+    given(binaryContentService.create(any())).willReturn(createBinaryContentResult);
+    given(binaryContentStorage.put(any(), any())).willReturn(createBinaryContentResult.id());
+
+    // when
+    UpdateUserResult updateUserResult = basicUserService.update(user.getId(),
+        updateUserCommand,
+        mockFile);
+
+    // then
+    assertThat(updateUserCommand.newEmail()).isEqualTo(updateUserResult.email());
+    assertThat(updateUserCommand.newUsername()).isEqualTo(updateUserResult.username());
+    assertThat(mockFile.getOriginalFilename()).isEqualTo(updateUserResult.profile().filename());
+    assertThat(mockFile.getSize()).isEqualTo(updateUserResult.profile().size());
+
+    then(userRepository).should(times(1)).findById(user.getId());
+    then(userRepository).should(times(1)).save(any(User.class));
+    then(binaryContentService).should(times(1)).create(any());
+    then(binaryContentStorage).should(times(1)).put(any(), any());
+  }
+
+  @Test
+  @DisplayName("유저 수정할 때, 해당 유저를 찾지 못해 실패")
+  void updateUser_userNotFound_failed() {
+    // given
+    UUID userId = user.getId();
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
+    UpdateUserCommand updateUserCommand = new UpdateUserCommand("updateTest", "updateTest@test.com",
+        "update1234");
+
+    // when + then
+    assertThatThrownBy(
+        () -> basicUserService.update(userId, updateUserCommand, mockFile))
+        .isInstanceOf(UserNotFoundException.class)
+        .hasMessageContaining("User not found");
+
+    then(userRepository).should(times(1)).findById(userId);
+    then(userRepository).should(never()).save(any(User.class));
+  }
+
+  @Test
+  @DisplayName("유저 삭제 성공")
+  void deleteUser_success() {
+    // given
+    given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
+
+    // when
+    basicUserService.delete(user.getId());
+
+    // then
+    then(userRepository).should(times(1)).deleteById(user.getId());
+    then(binaryContentService).should(times(1)).delete(user.getProfile().getId());
+    then(binaryContentStorage).should(times(1)).delete(user.getProfile().getId());
+    then(userStatusService).should(times(1)).deleteByUserId(user.getId());
+  }
+
+  @Test
+  @DisplayName("유저 삭제할 때, 해당 유저를 찾지 못해 실패")
+  void deleteUser_userNotFound_failed() {
+    // given
+    UUID userId = user.getId();
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+    // when + then
+    assertThatThrownBy(() -> basicUserService.delete(userId))
+        .isInstanceOf(UserNotFoundException.class)
+        .hasMessageContaining("User not found");
+
+    then(userRepository).should(never()).deleteById(userId);
+    then(binaryContentService).should(never()).delete(any(UUID.class));
+    then(binaryContentStorage).should(never()).delete(any(UUID.class));
+    then(userStatusService).should(never()).deleteByUserId(userId);
+  }
+}
+
+
+
