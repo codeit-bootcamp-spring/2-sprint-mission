@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -19,7 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
@@ -27,11 +33,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 
@@ -49,6 +55,9 @@ public class MessageServiceTest {
     private MessageRepository messageRepository;
     @Mock
     private MessageMapper messageMapper;
+
+    @Spy
+    private PageResponseMapper pageResponseMapper = Mockito.mock(PageResponseMapper.class, Mockito.CALLS_REAL_METHODS);
 
     @InjectMocks
     private MessageService messageService;
@@ -241,4 +250,62 @@ public class MessageServiceTest {
 
         verify(messageRepository).findById(noExistId);
     }
+
+    @Test
+    @DisplayName("채널 ID로 메세지 목록 조회 성공 테스트 - 메세지가 존재하는 경우")
+    void findAllByChannelId_WithMessages_Success(){
+        UUID channelId = UUID.randomUUID();
+        Pageable pageable = mock(Pageable.class);
+
+        Message msg1 = new Message("안녕하세요", null, null, List.of());
+        Message msg2 = new Message("감사합니다", null, null, List.of());
+
+        Instant lastCreatedAt = Instant.now();
+        ReflectionTestUtils.setField(msg2, "createdAt", lastCreatedAt);
+
+        List<Message> messages = List.of(msg1, msg2);
+
+        @SuppressWarnings("unchecked")
+        Slice<Message> slice = mock(Slice.class);
+        given(slice.getContent()).willReturn(messages);
+        given(slice.hasNext()).willReturn(true);
+        given(slice.getSize()).willReturn(2);
+
+        MessageDto dto1 = new MessageDto(null, Instant.now(), null, "안녕하세요", channelId, null, List.of());
+        MessageDto dto2 = new MessageDto(null, lastCreatedAt, null, "반갑습니다", channelId, null, List.of());
+
+        given(messageMapper.toDto(msg1)).willReturn(dto1);
+        given(messageMapper.toDto(msg2)).willReturn(dto2);
+
+        given(messageRepository.findAllByChannelIdWithAuthor(eq(channelId), any(), eq(pageable)))
+                .willReturn(slice);
+
+        PageResponse<MessageDto> result = messageService.findAllByChannelId(channelId, null, pageable);
+
+        assertEquals(2, result.content().size());
+        assertTrue(result.hasNext());
+        assertEquals(lastCreatedAt, result.nextCursor());
+    }
+    @Test
+    @DisplayName("채널 ID로 메세지 목록 조회 테스트 - 메세지가 없는 경우")
+    void findAllByChannelId_EmptyResult(){
+        UUID channelId = UUID.randomUUID();
+        Pageable pageable = mock(Pageable.class);
+
+        @SuppressWarnings("unchecked")
+        Slice<Message> emptySlice = mock(Slice.class);
+        given(emptySlice.getContent()).willReturn(List.of());
+        given(emptySlice.hasNext()).willReturn(false);
+        given(emptySlice.getSize()).willReturn(0);
+
+        given(messageRepository.findAllByChannelIdWithAuthor(eq(channelId), any(), eq(pageable)))
+                .willReturn(emptySlice);
+
+        PageResponse<MessageDto> result = messageService.findAllByChannelId(channelId, null, pageable);
+
+        assertEquals(0, result.content().size());
+        assertFalse(result.hasNext());
+        assertNull(result.nextCursor());
+    }
+
 }
