@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.exception;
 
+import com.sprint.mission.discodeit.dto.response.ErrorResponse;
+import com.sprint.mission.discodeit.exception.user.UserException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -8,27 +10,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(LogicException.class)
-    public ResponseEntity<String> handleLogicException(LogicException e) {
-        ErrorCode errorCode = e.getErrorCode();
-        return ResponseEntity
-                .status(errorCode.getHttpStatus())
-                .body(errorCode.getMessage());
-    }
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> handleUserException(UserException e) {
 
-    @ExceptionHandler(StorageException.class)
-    public ResponseEntity<String> handleLogicException(StorageException e) {
-        ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
-                .body(errorCode.getMessage());
+                .status(e.getErrorCode().getHttpStatus())
+                .body(new ErrorResponse(e));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
         e.printStackTrace();
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
+                .body(new ErrorResponse(e, ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }
