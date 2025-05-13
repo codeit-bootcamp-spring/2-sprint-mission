@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.unit;
 
 import com.sprint.mission.discodeit.Mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;

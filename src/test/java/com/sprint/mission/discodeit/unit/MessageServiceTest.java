@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.unit;
 
 import com.sprint.mission.discodeit.Mapper.MessageMapper;
 import com.sprint.mission.discodeit.Mapper.PageResponseMapper;
@@ -8,14 +8,12 @@ import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFound;
-import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdate;
 import com.sprint.mission.discodeit.exception.message.MessageNotFound;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.springjpa.SpringDataMessageAttachmentRepository;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;

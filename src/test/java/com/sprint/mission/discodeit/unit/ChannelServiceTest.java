@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.unit;
 
 import com.sprint.mission.discodeit.Mapper.ChannelMapper;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
@@ -10,8 +10,6 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFound;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdate;
-import com.sprint.mission.discodeit.exception.user.DuplicateUserUserName;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;

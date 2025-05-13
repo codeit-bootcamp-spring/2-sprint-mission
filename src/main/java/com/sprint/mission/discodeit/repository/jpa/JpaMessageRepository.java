@@ -18,7 +18,6 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class JpaMessageRepository implements MessageRepository {
-
     private final SpringDataMessageRepository messageRepository;
 
     @Override
