@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -167,5 +169,50 @@ public class MessageServiceTest {
         assertThrows(ChannelNotFoundException.class, () -> messageService.create(request, List.of()));
 
         verify(channelRepository).findById(noExistId);
+    }
+
+    @Test
+    @DisplayName("정상적인 메세지 update 테스트")
+    void updateMessage_WithValidInput_Success() {
+        User user = new User("user1", "user1@gmail.com", "1234", null);
+        Channel channel = new Channel(ChannelType.PUBLIC, "인사 채널", "인사하는 채널");
+        Message message = new Message("안녕하세요", channel, user, List.of());
+        ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
+
+        String newContent = "안녕하세요, 반갑습니다.";
+        MessageUpdateRequest request = new MessageUpdateRequest(newContent);
+
+        given(messageRepository.findById(message.getId())).willReturn(Optional.of(message));
+
+        MessageDto expectedDto = new MessageDto(
+                message.getId(),
+                message.getCreatedAt(),
+                null,
+                newContent,
+                channel.getId(),
+                null,
+                List.of()
+        );
+        given(messageMapper.toDto(any())).willReturn(expectedDto);
+
+        MessageDto messageDto = messageService.updateMessage(message.getId(), request);
+
+        assertEquals(newContent, messageDto.content());
+        verify(messageRepository).findById(message.getId());
+        verify(messageMapper).toDto(message);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 messageId로 업데이트 시 예외 발생 테스트")
+    void updateMessage_WithInvalidMessageId_ThrowException() {
+        UUID noExistId = UUID.randomUUID();
+        MessageUpdateRequest request = new MessageUpdateRequest("수정된 내용");
+
+        given(messageRepository.findById(noExistId)).willReturn(Optional.empty());
+
+        assertThrows(MessageNotFoundException.class, () ->
+                messageService.updateMessage(noExistId, request));
+
+        verify(messageRepository).findById(noExistId);
     }
 }
