@@ -36,4 +36,15 @@ public record ErrorResponse(
                 errorCode.getHttpStatus()
         );
     }
+
+    public ErrorResponse(Exception e, ErrorCode errorCode, Map<String, Object> details) {
+        this(
+                Instant.now(),
+                errorCode.getCode(),
+                errorCode.getMessage(),
+                details,
+                e.getClass().getSimpleName(),
+                errorCode.getHttpStatus()
+        );
+    }
 }

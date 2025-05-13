@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class MessageController {
     @Operation(summary = "Message 생성")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(
-            @RequestPart("messageCreateRequest") MessageCreateDto messageCreateDto,
+            @RequestPart("messageCreateRequest") @Valid MessageCreateDto messageCreateDto,
             @RequestPart(name = "attachments", required = false) List<MultipartFile> files) {
         log.info("Received message create request: {}", messageCreateDto);
         List<BinaryContentCreateDto> binaryDtos = MultipartToBinaryConverter.toBinaryContentCreateDtos(files);
@@ -57,7 +58,7 @@ public class MessageController {
     @Operation(summary = "Message 내용 수정")
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
-                                                    @RequestBody MessageUpdateDto messageUpdateDto) {
+                                                    @RequestBody @Valid MessageUpdateDto messageUpdateDto) {
         log.info("Received message update request: messageId={}, updateDto={}", messageId, messageUpdateDto);
         MessageDto messageDto = messageService.update(messageId, messageUpdateDto);
         log.info("Message updated successfully: messageId={}", messageDto.id());

@@ -39,7 +39,11 @@ public enum ErrorCode {
     BINARY_CONTENT_DELETE_FAILED(500, "B005", "BinaryContent delete failed."),
 
     // Server
-    INTERNAL_SERVER_ERROR(500, "S001", "내부 서버 오류입니다.");
+    INTERNAL_SERVER_ERROR(500, "S001", "Internal server error."),
+
+    // Validation
+    INVALID_INPUT_VALUE(400, "S002", "Invalid input value.");
+
 
     private final int httpStatus;
     private final String code;
