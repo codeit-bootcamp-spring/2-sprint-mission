@@ -141,26 +141,53 @@ public class ChannelServiceTest {
 
         verify(channelMapper).toDto(channel);
     }
+
     @Test
     @DisplayName("존재하지 않는 channelId로 업데이트 시 예외 발생 테스트")
     void updateChannel_WithInvalidChannelId_ThrowException() {
         UUID noExistId = UUID.randomUUID();
-        PublicChannelUpdateRequest request = new PublicChannelUpdateRequest("전체 공지","전체 공지 채널입니다.");
+        PublicChannelUpdateRequest request = new PublicChannelUpdateRequest("전체 공지", "전체 공지 채널입니다.");
 
         given(channelRepository.findById(noExistId)).willReturn(Optional.empty());
 
         assertThrows(ChannelNotFoundException.class, () -> channelService.updateChannel(noExistId, request));
     }
+
     @Test
     @DisplayName("Private 채널을 수정하려 할 때 예외 발생 테스트")
     void update_PrivateChannel_ThrowException() {
         Channel privateChannel = new Channel(ChannelType.PRIVATE, null, null);
         ReflectionTestUtils.setField(privateChannel, "id", UUID.randomUUID());
 
-        PublicChannelUpdateRequest request = new PublicChannelUpdateRequest("개인 채널","개인 채널입니다.");
+        PublicChannelUpdateRequest request = new PublicChannelUpdateRequest("개인 채널", "개인 채널입니다.");
 
         given(channelRepository.findById(privateChannel.getId())).willReturn(Optional.of(privateChannel));
 
         assertThrows(PrivateChannelUpdateException.class, () -> channelService.updateChannel(privateChannel.getId(), request));
+    }
+
+    @Test
+    @DisplayName("정상적인 Channel delete 테스트")
+    void deleteChannel_WithValidInput_Success() {
+        Channel channel = new Channel(ChannelType.PUBLIC, "일상", "일상 채널입니다.");
+        ReflectionTestUtils.setField(channel, "id", UUID.randomUUID());
+
+        given(channelRepository.findById(channel.getId())).willReturn(Optional.of(channel));
+
+        channelService.deleteChannel(channel.getId());
+
+        verify(messageRepository).deleteAllByChannelId(channel.getId());
+        verify(readStatusRepository).deleteAllByChannelId(channel.getId());
+        verify(channelRepository).delete(channel);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 channelId로 삭제 시 예외 발생 테스트")
+    void deleteChannel_WithInvalidChannelId_ThrowException() {
+        UUID noExistId = UUID.randomUUID();
+
+        given(channelRepository.findById(noExistId)).willReturn(Optional.empty());
+
+        assertThrows(ChannelNotFoundException.class, () -> channelService.deleteChannel(noExistId));
     }
 }
