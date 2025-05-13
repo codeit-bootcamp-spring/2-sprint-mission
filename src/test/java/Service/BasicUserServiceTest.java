@@ -65,31 +65,24 @@ public class BasicUserServiceTest {
   BasicUserService basicUserService;
 
   // 고전파 - 공유 의존성이 없는 비공개 의존성의 경우 실제 객체 사용
-  private CreateUserCommand createUserCommand;
   private User user;
   private UserStatus userStatus;
-  private CreateBinaryContentResult createBinaryContentResult;
   private BinaryContent profile;
   private MultipartFile mockFile;
 
   // 테스트 메서드 실행 전마다 새로운 객체 생성 -> 공유 의존성 방지
   @BeforeEach
   void setUp() {
-    createBinaryContentResult = new CreateBinaryContentResult(UUID.randomUUID(), "test.png", 9,
-        "image/png");
-
     profile = BinaryContent.builder()
-        .contentType(createBinaryContentResult.contentType())
-        .filename(createBinaryContentResult.filename())
-        .size(createBinaryContentResult.size())
+        .contentType("image/png")
+        .filename("test.png")
+        .size(9)
         .build();
 
-    createUserCommand = new CreateUserCommand("test", "test@test.com", "1234");
-
     user = User.builder()
-        .username(createUserCommand.username())
-        .password(createUserCommand.password())
-        .email(createUserCommand.email())
+        .username("test")
+        .password("1234")
+        .email("test@test.com")
         .profile(profile)
         .build();
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
@@ -110,11 +103,14 @@ public class BasicUserServiceTest {
   @DisplayName("유저 생성 성공")
   void createUser_success() {
     // given (BDDMockito 사용)
-    given(userRepository.save(any(User.class))).willReturn(user);
+    CreateUserCommand createUserCommand = new CreateUserCommand("test", "test@test.com", "1234");
+    CreateBinaryContentResult createBinaryContentResult = new CreateBinaryContentResult(
+        UUID.randomUUID(), "test.png", 9,
+        "image/png");
+
     given(userRepository.existsByUsername(createUserCommand.username())).willReturn(false);
     given(userRepository.existsByEmail(createUserCommand.email())).willReturn(false);
     given(binaryContentService.create(any())).willReturn(createBinaryContentResult);
-    given(binaryContentStorage.put(any(), any())).willReturn(createBinaryContentResult.id());
 
     // when
     CreateUserResult createUserResult = basicUserService.create(createUserCommand, mockFile);
@@ -122,6 +118,9 @@ public class BasicUserServiceTest {
     // then
     assertThat(createUserCommand.username()).isEqualTo(createUserResult.username());
     assertThat(createUserCommand.email()).isEqualTo(createUserResult.email());
+    // 어떤 mockFile이 들어오든, binaryContentService나 binaryContentStorage는 createBinaryContentResult를 반환하는데,
+    // 과연 mockFile과 createUserResult.profile을 비교하는 것이 의미가 있을까?
+    // userService 단위테스트에서는 binaryContentService, Storage와는 상관없이 작동해야하기 때문에, mockFile이 createUserResult.profile에 잘 저장되는지 정도만 확인하면 될 것 같음
     assertThat(mockFile.getOriginalFilename()).isEqualTo(createUserResult.profile().filename());
     assertThat(mockFile.getSize()).isEqualTo(createUserResult.profile().size());
     assertThat(createUserResult.online()).isTrue();
@@ -136,6 +135,7 @@ public class BasicUserServiceTest {
   @DisplayName("유저 생성할 때, username 중복으로 인한 실패")
   void createUser_duplicateUsername_failed() {
     // given
+    CreateUserCommand createUserCommand = new CreateUserCommand("test", "test@test.com", "1234");
     given(userRepository.existsByUsername(createUserCommand.username())).willReturn(true);
 
     // when + then
@@ -151,6 +151,7 @@ public class BasicUserServiceTest {
   @DisplayName("유저 생성할 때, email 중복으로 인한 실패")
   void createUser_duplicateEmail_failed() {
     // given
+    CreateUserCommand createUserCommand = new CreateUserCommand("test", "test@test.com", "1234");
     given(userRepository.existsByUsername(createUserCommand.username())).willReturn(false);
     given(userRepository.existsByEmail(createUserCommand.email())).willReturn(true);
 
@@ -169,10 +170,12 @@ public class BasicUserServiceTest {
     // given
     UpdateUserCommand updateUserCommand = new UpdateUserCommand("updateTest", "updateTest@test.com",
         "update1234");
+    CreateBinaryContentResult createBinaryContentResult = new CreateBinaryContentResult(
+        UUID.randomUUID(), "test.png", 9,
+        "image/png");
 
     given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
     given(binaryContentService.create(any())).willReturn(createBinaryContentResult);
-    given(binaryContentStorage.put(any(), any())).willReturn(createBinaryContentResult.id());
 
     // when
     UpdateUserResult updateUserResult = basicUserService.update(user.getId(),
