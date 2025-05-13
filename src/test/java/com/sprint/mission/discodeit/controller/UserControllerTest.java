@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.auth.JwtUtil;
 import com.sprint.mission.discodeit.core.user.controller.UserController;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.usecase.UserService;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
@@ -84,6 +85,54 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.id").value(userId.toString()))
         .andExpect(jsonPath("$.username").value(givenName))
         .andExpect(jsonPath("$.email").value(givenEmail));
+  }
+
+  @Test
+  void CreateUser_AlreadyUserName_Exists() throws Exception {
+    // given
+    UserCreateRequest request = new UserCreateRequest(
+        "test", "test@test.com", "test");
+
+    MockMultipartFile jsonPart = new MockMultipartFile(
+        "userCreateRequest",
+        null,
+        "application/json",
+        objectMapper.writeValueAsBytes(request)
+    );
+
+    doThrow(new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, "test"))
+        .when(userService).create(any(UserCreateCommand.class), eq(Optional.empty()));
+
+    // when & then
+    mockMvc.perform(multipart("/api/users")
+            .file(jsonPart)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value(ErrorCode.USER_NAME_ALREADY_EXISTS.getCode()));
+  }
+
+  @Test
+  void CreateUser_AlreadyUserEmail_Exists() throws Exception {
+    // given
+    UserCreateRequest request = new UserCreateRequest(
+        "test", "test@test.com", "test");
+
+    MockMultipartFile jsonPart = new MockMultipartFile(
+        "userCreateRequest",
+        null,
+        "application/json",
+        objectMapper.writeValueAsBytes(request)
+    );
+
+    doThrow(new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, "test@test.com"))
+        .when(userService).create(any(UserCreateCommand.class), eq(Optional.empty()));
+
+    // when & then
+    mockMvc.perform(multipart("/api/users")
+            .file(jsonPart)
+            .contentType(MediaType.MULTIPART_FORM_DATA))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value(ErrorCode.USER_EMAIL_ALREADY_EXISTS.getCode()));
   }
 
   @Test

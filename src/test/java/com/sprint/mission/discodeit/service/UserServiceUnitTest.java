@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.BDDAssertions.within;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,6 +19,8 @@ import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusDto;
+import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusOnlineCommand;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
@@ -25,10 +29,11 @@ import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.BasicUserService;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,14 +67,16 @@ public class UserServiceUnitTest {
     BinaryContent oldProfile = BinaryContent.create("old.png", 0L, "image/png");
     user = User.create("a", "a@email.com", "a", oldProfile);
     user.setUserStatus(UserStatus.create(user, Instant.now()));
+    userRepository.save(user);
   }
 
   @Test
-  void UserCreateTestSuccess() {
-    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
+  void UserCreate_WithNoProfile_Success() {
     // given
+    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
+    // when
     UserDto result = userService.create(command, Optional.empty());
-    // when & then
+    // then
     assertThat(result.username()).isEqualTo("test");
     assertThat(result.email()).isEqualTo("test@test.com");
     assertNull(result.profile());
@@ -77,11 +84,40 @@ public class UserServiceUnitTest {
   }
 
   @Test
-  void CreateUser_WithSameNameAndEmail_ShouldThrowException() {
+  void UserCreate_WithProfile_Success() {
+    // given
+    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
+    BinaryContentCreateCommand binaryContentCreateCommand = new BinaryContentCreateCommand(
+        "a.png", "image/png", new byte[0]);
+    when(binaryContentService.create(binaryContentCreateCommand)).thenReturn(
+        BinaryContent.create("a.png", 0L, "image/png"));
+    // when
+    UserDto userDto = userService.create(command, Optional.of(binaryContentCreateCommand));
+    // then
+    assertThat(userDto.username()).isEqualTo("test");
+    assertThat(userDto.email()).isEqualTo("test@test.com");
+    assertNotNull(userDto.profile());
+    assertTrue(userDto.online());
+  }
+
+  @Test
+  void CreateUser_WithSameName_ShouldThrowException() {
     // given
     UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
     // when
     when(userRepository.existsByName(command.username())).thenReturn(true);
+    // then
+    assertThrows(UserAlreadyExistsException.class, () -> {
+      userService.create(command, Optional.empty());
+    });
+  }
+
+  @Test
+  void CreateUser_WithSameEmail_ShouldThrowException() {
+    // given
+    UserCreateCommand command = new UserCreateCommand("b", "a@a.com", "test");
+    // when
+    when(userRepository.existsByEmail(command.email())).thenReturn(true);
     // then
     assertThrows(UserAlreadyExistsException.class, () -> {
       userService.create(command, Optional.empty());
@@ -109,23 +145,61 @@ public class UserServiceUnitTest {
   }
 
   @Test
-  void UserUpdateTest() {
+  void UserUpdate_WithImage_Success() {
     // given
     UUID userId = UUID.randomUUID();
     UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
-    BinaryContentCreateCommand contentCommand = new BinaryContentCreateCommand(null, null, null);
+    BinaryContentCreateCommand contentCommand = new BinaryContentCreateCommand("a.png",
+        "image/png", new byte[0]);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(binaryContentService.create(contentCommand)).thenReturn(null);
+    when(binaryContentService.create(contentCommand)).thenReturn(
+        BinaryContent.create("a.png", 0L, "image/png"));
     when(userRepository.save(user)).thenReturn(user);
 
     // when
     UserDto result = userService.update(command, Optional.of(contentCommand));
 
     // then
+    assertNotNull(result.profile());
+
     assertThat(result.username()).isEqualTo("newName");
+    assertThat(result.email()).isEqualTo("newEmail");
+    assertThat(result.profile().fileName()).isEqualTo("a.png");
+    assertThat(result.profile().fileName()).isNotEqualTo("old.png");
     then(binaryContentService).should().delete(any());
-    then(userRepository).should().save(user);
+  }
+
+  @Test
+  void UserUpdate_WithoutImage_Success() {
+    // given
+    UUID userId = UUID.randomUUID();
+    UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    when(userRepository.save(user)).thenReturn(user);
+
+    // when
+    UserDto result = userService.update(command, Optional.empty());
+
+    // then
+    assertThat(result.username()).isEqualTo("newName");
+    assertThat(result.email()).isEqualTo("newEmail");
+    assertThat(result.profile().fileName()).isEqualTo("old.png");
+  }
+
+  @Test
+  void UserUpdate_WithoutUser_ShouldThrowException() {
+    // given
+    UUID userId = UUID.randomUUID();
+    UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
+
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+    // when & then
+    assertThrows(UserNotFoundException.class, () -> {
+      userService.update(command, Optional.empty());
+    });
   }
 
   @Test
@@ -185,4 +259,31 @@ public class UserServiceUnitTest {
 
     verify(userRepository, never()).deleteById(any());
   }
+
+  @Test
+  void UserStatusOnline_Success() {
+    // given
+    Instant now = Instant.now();
+    UserStatusOnlineCommand userStatusOnlineCommand = new UserStatusOnlineCommand(userId,
+        now);
+    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    // when
+    UserStatusDto online = userService.online(userStatusOnlineCommand);
+    // then
+    assertThat(online.lastActiveAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
+  }
+
+  @Test
+  void UserStatusOnline_WithoutUser_ShouldThrowException() {
+    // given
+    Instant now = Instant.now();
+    UserStatusOnlineCommand userStatusOnlineCommand = new UserStatusOnlineCommand(userId,
+        now);
+    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    // when & then
+    assertThrows(UserNotFoundException.class, () -> {
+      userService.online(userStatusOnlineCommand);
+    });
+  }
+
 }
