@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserException;
 import com.sprint.mission.discodeit.exception.user.ProfileUploadFailedException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -105,31 +106,46 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(UpdateUserRequest request,
+    public UserDto updateUser(UpdateUserRequest request,
         Optional<CreateBinaryContentRequest> profileOpt) {
 
-        log.info("사용자 수정 요청 - userId: {}", request.userId());
+        UUID userId = request.userId();
+        log.info("사용자 수정 요청 - userId: {}", userId);
 
-        userRepository.findById(request.userId()).ifPresent(user -> {
-            BinaryContent newProfile = profileOpt.map(profile -> {
-                log.debug("기존 프로필 삭제 및 새로운 프로필 저장");
-                Optional.ofNullable(user.getProfile()).ifPresent(binaryContentRepository::delete);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
-                BinaryContentDto dto = binaryContentService.create(profile);
-                return binaryContentRepository.findById(dto.id())
-                    .orElseThrow(
-                        () -> new ProfileUploadFailedException(Map.of("파일이름", profile.fileName())));
-            }).orElse(user.getProfile());
+        String newUsername = request.newUsername();
+        String newEmail = request.newEmail();
 
-            user.update(
-                request.newUsername(),
-                request.newPassword(),
-                request.newEmail(),
-                newProfile
-            );
-            entityManager.flush();
-            log.info("사용자 수정 완료 - userId: {}", user.getId());
-        });
+        if (newUsername != null &&
+            !newUsername.equals(user.getUsername()) &&
+            userRepository.existsByUsername(newUsername)) {
+            throw new DuplicateUserException(Map.of("username", newUsername));
+        }
+
+        if (newEmail != null &&
+            !newEmail.equals(user.getEmail()) &&
+            userRepository.existsByEmail(newEmail)) {
+            throw new DuplicateUserException(Map.of("email", newEmail));
+        }
+
+        BinaryContent newProfile = profileOpt.map(profile -> {
+            log.debug("기존 프로필 삭제 및 새로운 프로필 저장");
+
+            Optional.ofNullable(user.getProfile())
+                .ifPresent(binaryContentRepository::delete);
+
+            BinaryContentDto dto = binaryContentService.create(profile);
+            return binaryContentRepository.findById(dto.id())
+                .orElseThrow(
+                    () -> new ProfileUploadFailedException(Map.of("파일이름", profile.fileName())));
+        }).orElse(user.getProfile());
+
+        user.update(newUsername, request.newPassword(), newEmail, newProfile);
+
+        log.info("사용자 수정 완료 - userId: {}", userId);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -138,13 +154,15 @@ public class BasicUserService implements UserService {
 
         log.info("사용자 삭제 요청 - userId: {}", userId);
 
-        userRepository.findById(userId).ifPresent(user -> {
-            if (user.getProfile() != null) {
-                binaryContentRepository.delete(user.getProfile());
-                log.debug("사용자 프로필 삭제 완료 - userId: {}", userId);
-            }
-            userRepository.delete(user);
-            log.info("사용자 삭제 완료 - userId: {}", userId);
-        });
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+
+        if (user.getProfile() != null) {
+            binaryContentRepository.delete(user.getProfile());
+            log.debug("사용자 프로필 삭제 완료 - userId: {}", userId);
+        }
+        userRepository.delete(user);
+        log.info("사용자 삭제 완료 - userId: {}", userId);
+
     }
 }

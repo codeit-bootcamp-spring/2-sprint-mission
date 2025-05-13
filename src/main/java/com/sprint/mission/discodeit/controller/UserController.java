@@ -79,7 +79,7 @@ public class UserController {
         }
     )
     @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateUser(
+    public ResponseEntity<UserDto> updateUser(
         @PathVariable UUID userId,
         @RequestPart(value = "userUpdateRequest", required = false) @Valid UpdateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
@@ -108,9 +108,9 @@ public class UserController {
                 }
             });
 
-        userService.updateUser(realRequest, profileOpt);
+        UserDto updatedUser = userService.updateUser(realRequest, profileOpt);
         log.info("사용자 수정 완료 - userId: {}", userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(updatedUser);
     }
 
     @Operation(summary = "사용자 삭제")

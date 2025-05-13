@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserResponse;
-import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +19,7 @@ public interface UserService {
 
     List<UserDto> getAllUsers();
 
-    void updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> profileOpt);
+    UserDto updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> profileOpt);
 
     void deleteUser(UUID userId);
 }
