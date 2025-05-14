@@ -134,6 +134,7 @@ public class BasicChannelService implements ChannelService {
       throw new PrivateChannelUpdateException(Map.of("channelId", channelId));
     }
     channel.update(updateChannelCommand.newName(), updateChannelCommand.newDescription());
+    channelRepository.save(channel);
     return channelMapper.toUpdateChannelResult(channel,
         findMessageLatestTimeInChannel(channel.getId()));
   }
