@@ -134,9 +134,11 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
 
         logger.debug("[Message][delete] Calling matchingMessage.getAttachments()");
-        matchingMessage.getAttachments().stream()
-                .map(BinaryContent::getId)
-                .forEach(binaryContentService::delete);
+        if (matchingMessage.getAttachments() != null) {
+            matchingMessage.getAttachments().stream()
+                    .map(BinaryContent::getId)
+                    .forEach(binaryContentService::delete);
+        }
 
         logger.debug("[Message][delete] Calling messageJpaRepository.delete(): messageId={}", messageId);
         messageJpaRepository.delete(matchingMessage);

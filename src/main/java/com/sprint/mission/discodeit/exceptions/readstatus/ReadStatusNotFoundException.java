@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.exceptions.readstatus;
 
-import com.sprint.mission.discodeit.exceptions.DiscodeitException;
 import com.sprint.mission.discodeit.exceptions.ErrorCode;
 
 import java.time.Instant;

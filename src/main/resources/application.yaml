@@ -17,7 +17,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-
     defer-datasource-initialization: true
     show-sql: false
     properties:
@@ -50,3 +49,33 @@ discodeit:
     type: local
     local:
       root-path: .discodeit
+
+# Actuator 설정
+management:
+  info:
+    env:
+      enabled: true # info 세부정보를 표시하기위해 해당 설정 필요
+  endpoints:
+    web:
+      exposure:
+        # include: "*" // 모든 endpoint 노출
+        # 또는 특정 엔드포인트만 활성화
+        include: health, info, metrics, loggers
+info: # Actuator info 설정
+  app:
+    name: "Discodeit"
+    version: "1.7.0"
+    java_version: "17"
+    spring_boot_version: "3.4.0"
+    setting_info:
+      datasource:
+        url: "${spring.datasource.url}"
+        driver-class-name: "${spring.datasource.driver-class-name}"
+      jpa:
+        ddl-auto: "${spring.jpa.hibernate.ddl-auto}"
+      storage:
+        type: "${discodeit.storage.type}"
+        path: "${discodeit.storage.local.root-path}"
+      multipart:
+        max-file-size: "${spring.servlet.multipart.max-file-size}"
+        max-request-size: "${spring.servlet.multipart.max-request-size}"

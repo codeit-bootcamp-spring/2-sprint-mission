@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
 import com.sprint.mission.discodeit.repository.BinaryContentJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
+import com.sprint.mission.discodeit.repository.UserStatusJPARepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.request.userdto.UserCreateDto;
@@ -32,6 +33,7 @@ public class BasicUserService implements UserService {
 
     private final UserJPARepository userJpaRepository;
     private final BinaryContentJPARepository binaryContentJpaRepository;
+    private final UserStatusJPARepository userStatusJpaRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final ResponseMapStruct responseMapStruct;
 
@@ -50,7 +52,7 @@ public class BasicUserService implements UserService {
 
         logger.debug("[User][create] Entity constructed: username={}, email={}", userCreateDto.username(), userCreateDto.email());
         User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfile);
-        new UserStatus(user, Instant.now());
+        UserStatus userStatus = new UserStatus(user, Instant.now());
         logger.debug("[User][create] Calling userJpaRepository.save()");
         User createdUser = userJpaRepository.save(user);
         logger.info("[User][create] Created successfully: userId={}", createdUser.getId());

@@ -52,7 +52,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         Path path = resolvePath(id);
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                BufferedOutputStream bos = new BufferedOutputStream(fos)
         ) {
             bos.write(bytes);
         } catch (IOException e) {

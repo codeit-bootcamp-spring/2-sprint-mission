@@ -8,8 +8,8 @@ import java.util.UUID;
 public record MessageCreateDto(
         @Length(max = 1000)
         String content,
-        @NotBlank UUID channelId,
-        @NotBlank UUID authorId
+        UUID channelId,
+        UUID authorId
 
 ) {
 

@@ -26,6 +26,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator' // Actuator
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // mapStruct
@@ -38,6 +39,15 @@ dependencies {
 	// mapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+	// test H2
+	testImplementation 'com.h2database:h2'
+
+
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ["-Xlint:-removal"]
 }
 
 tasks.named('test') {
