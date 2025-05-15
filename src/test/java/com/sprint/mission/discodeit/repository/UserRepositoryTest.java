@@ -55,4 +55,21 @@ public class UserRepositoryTest {
         boolean result = userRepository.existsByEmail("notfound@email.com");
         assertThat(result).isFalse();
     }
+
+    @Test
+    @DisplayName("존재하는 username으로 existsByUsername 호출 시 true 반환")
+    void existsByUsername_true() {
+        User user = new User("existingUser", "user@email.com", "password", null);
+        userRepository.save(user);
+
+        boolean result = userRepository.existsByUsername("existingUser");
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 username으로 existsByUsername 호출 시 false 반환")
+    void existsByUsername_false() {
+        boolean result = userRepository.existsByUsername("notFoundUser");
+        assertThat(result).isFalse();
+    }
 }
