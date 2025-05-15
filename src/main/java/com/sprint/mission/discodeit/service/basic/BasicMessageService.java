@@ -104,7 +104,7 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   @Cacheable(value = "allMessages", key = "#p0")
   public Slice<FindMessageResult> findAllByChannelIdInitial(UUID channelId, int limit) {
-    Pageable pageable = PageRequest.of(0, 20);
+    Pageable pageable = PageRequest.of(0, limit);
     Slice<Message> messages = messageRepository.findAllByChannelIdInitial(channelId, pageable);
     return messages.map(messageMapper::toFindMessageResult);
   }
@@ -116,7 +116,7 @@ public class BasicMessageService implements MessageService {
   // 프론트엔드 웹소켓 기반 실시간 통신이라 그런지 조회 쿼리가 시간마다 반복적으로 호출됨 -> 캐싱을 통해 해결
   public Slice<FindMessageResult> findAllByChannelIdAfterCursor(UUID channelId, Instant cursor,
       int limit) {
-    Pageable pageable = PageRequest.of(0, 20); // Cursor 페이징을 JPQL로 하기 위함
+    Pageable pageable = PageRequest.of(0, limit); // Cursor 페이징을 JPQL로 하기 위함
     Slice<Message> messages = messageRepository.findAllByChannelIdAfterCursor(channelId, cursor,
         pageable);
     return messages.map(messageMapper::toFindMessageResult);
@@ -131,6 +131,7 @@ public class BasicMessageService implements MessageService {
     Message message = findMessageById(messageId, "update");
     message.updateMessageInfo(updateMessageCommand.newContent());
     replaceAttachments(message, multipartFiles);
+    messageRepository.save(message);
     return messageMapper.toUpdateMessageResult(message);
   }
 
