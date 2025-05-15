@@ -97,4 +97,31 @@ public class MessageRepositoryTest {
 
         assertThat(result).isEmpty();
     }
+    @Test
+    @DisplayName("채널 ID 기준으로 모든 메시지 삭제 성공")
+    void deleteAllByChannelId_success() {
+        User user = new User("user1", "user@email.com", "1234", null);
+        UserStatus status = new UserStatus(user, Instant.now());
+
+        Channel channel = new Channel(ChannelType.PUBLIC, "삭제용 채널", "desc");
+        entityManager.persist(user);
+        entityManager.persist(status);
+        entityManager.persist(channel);
+
+        for (int i = 0; i < 5; i++) {
+            Message msg = new Message("삭제될 메시지 " + i, channel, user, List.of());
+            entityManager.persist(msg);
+        }
+
+        entityManager.flush();
+        entityManager.clear();
+
+        messageRepository.deleteAllByChannelId(channel.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        Slice<Message> result = messageRepository.findAllByChannelIdWithAuthor(
+                channel.getId(), Instant.now(), Pageable.ofSize(10));
+        assertThat(result).isEmpty();
+    }
 }
