@@ -39,7 +39,7 @@ public class MessageController implements MessageApi {
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
     log.info("Message create request (authorId: {}, channelId: {}, fileCount: {})",
         createMessageRequestDTO.authorId(), createMessageRequestDTO.channelId(),
-        multipartFileList.size());
+        multipartFileList != null ? multipartFileList.size() : 0);
     CreateMessageResult createMessageResult = messageService.create(
         messageMapper.toCreateMessageCommand(createMessageRequestDTO), multipartFileList);
     CreateMessageResponseDTO createdMessage = messageMapper.toCreateMessageResponseDTO(
