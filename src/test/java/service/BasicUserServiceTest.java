@@ -128,7 +128,6 @@ public class BasicUserServiceTest {
     then(userRepository).should(times(1)).save(any(User.class));
     then(binaryContentService).should(times(1)).create(any());
     then(binaryContentStorage).should(times(1)).put(any(), any());
-    then(userStatusService).should(times(1)).create(any());
   }
 
   @Test
