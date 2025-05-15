@@ -48,7 +48,6 @@ public class BasicUserService implements UserService {
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
-  private final UserStatusMapper userStatusMapper;
   private final BinaryContentStorage binaryContentStorage;
 
 
@@ -82,7 +81,7 @@ public class BasicUserService implements UserService {
     // GenerationType.UUID의 경우, save()만 해줘도 User의 id를 DB가 아닌 자바에서 직접 생성
     // IDENTITY와 다르게 flush()를 안해줘도 user.getId()로 접근이 가능하다.
     UserStatus userStatus = new UserStatus(user, Instant.now());
-    userStatusService.create(userStatusMapper.toCreateUserStatusCommand(userStatus));
+    user.updateUserStatus(userStatus);
 
     return userMapper.toCreateUserResult(user);
   }
