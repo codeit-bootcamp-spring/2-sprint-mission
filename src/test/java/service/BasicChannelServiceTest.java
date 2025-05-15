@@ -172,7 +172,8 @@ public class BasicChannelServiceTest {
     given(readStatusService.findAllByUserId(userId)).willReturn(
         List.of(readStatusResult1, readStatusResult2));
     given(readStatusService.findAllByChannelId(channelId)).willReturn(List.of(readStatusResult1));
-    given(channelRepository.findAllByIdIn(List.of(channelId, privateChannelId))).willReturn(
+    given(channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        List.of(channelId, privateChannelId))).willReturn(
         List.of(publicChannel, privateChannel));
     given(userRepository.findAllByIdIn(List.of(userId))).willReturn(
         List.of(user));
@@ -187,7 +188,8 @@ public class BasicChannelServiceTest {
             .map(FindChannelResult::id).toList());
 
     then(readStatusService).should(times(1)).findAllByUserId(any(UUID.class));
-    then(channelRepository).should(times(1)).findAllByIdIn(any(List.class));
+    then(channelRepository).should(times(1))
+        .findAllByTypeOrIdIn(any(), any(List.class));
     then(readStatusService).should(times(2)).findAllByChannelId(any(UUID.class));
     then(userRepository).should(times(2)).findAllByIdIn(any(List.class));
   }
