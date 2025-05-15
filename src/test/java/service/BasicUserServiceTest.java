@@ -1,4 +1,4 @@
-package Service;
+package service;
 
 import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
