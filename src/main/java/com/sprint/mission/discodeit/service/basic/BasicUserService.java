@@ -84,8 +84,6 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = new UserStatus(user, Instant.now());
     userStatusService.create(userStatusMapper.toCreateUserStatusCommand(userStatus));
 
-    user.updateUserStatus(userStatus);
-
     return userMapper.toCreateUserResult(user);
   }
 
