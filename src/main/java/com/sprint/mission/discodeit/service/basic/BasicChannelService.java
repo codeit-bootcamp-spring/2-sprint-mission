@@ -6,9 +6,7 @@ import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -18,7 +16,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -50,16 +47,6 @@ public class BasicChannelService implements ChannelService {
       CreatePublicChannelCommand createPublicChannelCommand) {
     Channel channel = createPublicChannelEntity(createPublicChannelCommand);
     channelRepository.save(channel);
-    // publicChannel을 만들때, ReadStatus가 만들어지지 않아 조회가 안되는 문제 발생
-    // 현재는 publicChannel의 경우, 채널에 참여한 userList가 따로 없고 전체 유저가 참여되는 형식
-    // 이렇게 하면 유저가 많아질수록 성능 부하가 심하지겠지만, 일단은 이렇게라도 해결.. -> 추후 리팩토링
-    List<User> allUsers = userRepository.findAll();
-    List<UUID> userIds = allUsers.stream()
-        .map(BaseEntity::getId)
-        .toList();
-    userIds
-        .forEach(id -> readStatusService.create(
-            new CreateReadStatusCommand(id, channel.getId(), Instant.now())));
     return channelMapper.toCreatePublicChannelResult(channel);
   }
 
@@ -109,7 +96,8 @@ public class BasicChannelService implements ChannelService {
         .map(FindReadStatusResult::channelId)
         .toList();
 
-    List<Channel> channelList = channelRepository.findAllByIdIn(channelIds);
+    List<Channel> channelList = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        channelIds);
 
     return channelList.stream()
         .map(ch -> {
