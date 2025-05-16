@@ -22,7 +22,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   @Query("select m from Message m"
       + " where m.channel.id = :channelId"
       + " and m.createdAt < :cursor" // 첫 요청의 경우 cursor가 없음
-      + " order by m.createdAt DESC")
+      + " order by m.createdAt DESC, m.id DESC")
   Slice<Message> findAllByChannelIdAfterCursor(@Param("channelId") UUID channelId,
       @Param("cursor") Instant cursor, Pageable pageable);
   // Cursor 기반 정렬을 하기 위해선 channelId + createdAt ASC 기반 복합 인덱스 필요
