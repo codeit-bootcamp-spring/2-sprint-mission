@@ -72,7 +72,7 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = new Channel(request.name(), request.description(), ChannelType.PUBLIC);
         channelRepository.save(channel);
-        
+
         log.info("공개 채널 생성 완료 - channelId: {}", channel.getId());
         return channelMapper.toDto(channel);
     }
@@ -160,7 +160,7 @@ public class BasicChannelService implements ChannelService {
 
         if (channel.isPrivate()) {
             log.warn("PRIVATE 채널은 수정 불가 - channelId: {}", channel.getId());
-            throw new PrivateChannelUpdateException(Map.of("channelId", channel.getId()));
+            throw new PrivateChannelUpdateException(Map.of("channelId", channelId));
         }
 
         channel.update(request.newName(), request.newDescription());
@@ -174,24 +174,18 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         log.info("채널 삭제 요청 - channelId: {}", channelId);
 
-        Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", channelId)));
+        if (!channelRepository.existsById(channelId)) {
+            log.warn("채널 조회 실패 - 존재하지 않는 채널 ID: {}", channelId);
+            throw new ChannelNotFoundException(Map.of("channelId", channelId));
+        }
 
-        messageRepository.findAll().stream()
-            .filter(message -> message.getChannel().getId().equals(channelId))
-            .forEach(message -> {
-                messageRepository.deleteById(message.getId());
-                log.debug("메시지 삭제 - messageId: {}", message.getId());
-            });
+        messageRepository.deleteAllByChannelId(channelId);
+        log.debug("메시지 전체 삭제 완료 - channelId: {}", channelId);
 
-        readStatusRepository.findAll().stream()
-            .filter(status -> status.getChannel().getId().equals(channelId))
-            .forEach(status -> {
-                readStatusRepository.deleteById(status.getId());
-                log.debug("참여자 상태 삭제 - statusId: {}", status.getId());
-            });
+        readStatusRepository.deleteAllByChannelId(channelId);
+        log.debug("참여자 상태 전체 삭제 완료 - channelId: {}", channelId);
 
-        channelRepository.delete(channel);
+        channelRepository.deleteById(channelId);
         log.info("채널 삭제 완료 - channelId: {}", channelId);
     }
 }
