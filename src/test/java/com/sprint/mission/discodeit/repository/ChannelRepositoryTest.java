@@ -93,7 +93,7 @@ public class ChannelRepositoryTest {
     @DisplayName("조회 조건에 해당하는 채널이 없을 경우 빈 리스트 반환")
     void findAllByTypeOrIdIn_noMatch_returnsEmptyList() {
         Channel channel1 = new Channel(ChannelType.PUBLIC, "채널1", "desc");
-        Channel channel2 = new Channel(ChannelType.PRIVATE, "채널2", "desc");
+        Channel channel2 = new Channel(ChannelType.PUBLIC, "채널2", "desc");
 
         entityManager.persist(channel1);
         entityManager.persist(channel2);
@@ -101,11 +101,10 @@ public class ChannelRepositoryTest {
         entityManager.clear();
 
         List<Channel> result = channelRepository.findAllByTypeOrIdIn(
-                ChannelType.valueOf("PRIVATE"),
+                ChannelType.PRIVATE,
                 List.of(UUID.randomUUID(), UUID.randomUUID())
         );
 
-        // then
         assertThat(result).isEmpty();
     }
 }
