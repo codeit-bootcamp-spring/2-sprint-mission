@@ -13,6 +13,10 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 10MB
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
   cache:
     type: simple
   datasource:
@@ -55,11 +59,10 @@ management:
   endpoints:
     web:
       exposure:
-        include:
-          - health
-          - info
-          - metrics
-          - loggers
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
   info:
     env:
       enabled: true
