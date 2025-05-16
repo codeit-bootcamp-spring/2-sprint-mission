@@ -1,6 +1,11 @@
 spring:
   application:
     name: discodeit
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
   profiles:
     active: dev # dev:9090 or prod:8080
   servlet:

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.dto.request.messagedto;
 
-import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.UUID;

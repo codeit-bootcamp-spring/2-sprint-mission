@@ -237,6 +237,8 @@ public class MessageServiceUnitTest {
                 () -> basicMessageService.delete(messageId));
 
         then(messageJpaRepository).should(never()).delete(any(Message.class));
+
+        assertEquals(ErrorCode.MESSAGE_NOT_FOUND, exception.getErrorCode());
     }
 
 

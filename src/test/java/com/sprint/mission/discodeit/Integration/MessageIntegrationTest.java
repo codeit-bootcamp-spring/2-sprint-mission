@@ -16,7 +16,6 @@ import com.sprint.mission.discodeit.service.dto.response.ChannelResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
-import org.h2.engine.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,10 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
+
+
 
 group = 'com.sprint.mission'
 version = '0.0.1-SNAPSHOT'
@@ -43,7 +46,8 @@ dependencies {
 	// test H2
 	testImplementation 'com.h2database:h2'
 
-
+	// admin client
+	implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -53,3 +57,16 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+test {
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
