@@ -1,11 +1,9 @@
-package repository;
+package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.DiscodeitApplication;
-import com.sprint.mission.discodeit.config.JpaAuditingConfig;
+import com.sprint.mission.discodeit.config.testAuditingConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -14,18 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 
 import static org.assertj.core.api.Assertions.*;
 
-@Import(JpaAuditingConfig.class)
 @DataJpaTest
-@ContextConfiguration(classes = DiscodeitApplication.class)
+@Import(testAuditingConfig.class)
 @ActiveProfiles("test")
 public class JpaChannelRepositoryTest {
 
   @Autowired
   private ChannelRepository channelRepository;
+
 
   @Test
   @DisplayName("channelId List에 해당하는 Channel 찾기 성공")
