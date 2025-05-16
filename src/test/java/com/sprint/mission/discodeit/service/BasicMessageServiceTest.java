@@ -1,4 +1,4 @@
-package service;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.service.message.CreateMessageCommand;
 import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
