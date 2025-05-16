@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -36,6 +37,7 @@ public class Message extends BaseUpdatableEntity implements Serializable, Identi
   private List<BinaryContent> attachments;
 
   @Lob
+  @Column(columnDefinition = "TEXT")
   private String content;
 
   @ManyToOne
