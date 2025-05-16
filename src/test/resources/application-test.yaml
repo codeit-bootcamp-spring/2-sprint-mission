@@ -7,6 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     properties:
       hibernate:
@@ -14,8 +15,7 @@ spring:
     defer-datasource-initialization: true
   sql:
     init:
-      mode: always
-      schema-locations: classpath:schema.sql
+      mode: never
 logging:
   level:
     org.hibernate.SQL: debug
