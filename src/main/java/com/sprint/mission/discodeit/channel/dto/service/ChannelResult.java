@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.channel.dto.service;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.user.dto.UserResult;
+import com.sprint.mission.discodeit.user.entity.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,7 +17,6 @@ public record ChannelResult(UUID id,
                             List<UserResult> participants) {
 
     public static ChannelResult fromPrivate(Channel channel, Instant lastMessageCreatedAt, List<UserResult> participants) {
-
         return new ChannelResult(channel.getId(),
                 channel.getType(),
                 null,
@@ -28,4 +28,5 @@ public record ChannelResult(UUID id,
     public static ChannelResult fromPublic(Channel channel, Instant lastMessageCreatedAt) {
         return new ChannelResult(channel.getId(), channel.getType(), channel.getName(), channel.getDescription(), lastMessageCreatedAt, null);
     }
+
 }

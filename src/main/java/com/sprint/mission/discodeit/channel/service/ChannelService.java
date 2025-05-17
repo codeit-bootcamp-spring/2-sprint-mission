@@ -13,8 +13,6 @@ public interface ChannelService {
 
     ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest);
 
-    ChannelResult addPrivateMember(UUID channelId, UUID friendId);
-
     ChannelResult getById(UUID id);
 
     List<ChannelResult> getAllByUserId(UUID userId);

@@ -16,19 +16,17 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "read_statues")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ReadStatus extends BaseUpdatableEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class ReadStatus extends BaseUpdatableEntity {
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "channel_id")
+    @JoinColumn(name = "channel_id", nullable = false)
     private Channel channel;
 
-    @Column(name = "last_read_at")
+    @Column(name = "last_read_at", nullable = false)
     private Instant lastReadTime;
 
     public ReadStatus(User user, Channel channel) {

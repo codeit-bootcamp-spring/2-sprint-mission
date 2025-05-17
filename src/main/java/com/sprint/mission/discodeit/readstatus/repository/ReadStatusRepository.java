@@ -16,4 +16,6 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
     List<ReadStatus> findByChannel_Id(UUID channelId);
 
     List<ReadStatus> findByUser_Id(UUID userId);
+
+    void deleteAllByChannel_Id(UUID channelId);
 }

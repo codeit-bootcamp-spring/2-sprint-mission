@@ -6,15 +6,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Getter
 @Entity
 @Table(name = "channels")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Channel extends BaseUpdatableEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Channel extends BaseUpdatableEntity {
 
     @Column(name = "name")
     private String name;
@@ -33,7 +29,7 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
 
     public void update(String name, String description) {
         if (this.type == ChannelType.PRIVATE) {
-            throw new IllegalArgumentException("Private 파일은 수정할 수 없습니다.");
+            throw new IllegalStateException("Private 파일은 수정할 수 없습니다.");
         }
 
         if (description != null && !description.equals(this.description)) {
@@ -43,6 +39,10 @@ public class Channel extends BaseUpdatableEntity implements Serializable {
         if (name != null && !name.equals(this.name)) {
             this.name = name;
         }
+    }
+
+    public boolean isPrivate() {
+        return this.type.equals(ChannelType.PRIVATE);
     }
 
 }

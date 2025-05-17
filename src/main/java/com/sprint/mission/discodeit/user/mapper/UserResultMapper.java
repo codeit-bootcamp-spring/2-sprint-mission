@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -21,6 +23,12 @@ public class UserResultMapper {
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
 
         return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
+    }
+
+    public List<UserResult> convertToUsersResult(List<User> users) {
+        return users.stream()
+                .map(user -> UserResult.fromEntity(user, user.getUserStatus().isOnline(Instant.now())))
+                .toList();
     }
 
 }
