@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.core.status.controller;
 
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusCreateCommand;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusUpdateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusUpdateCommand;
 import java.util.UUID;
 
 public final class ReadStatusDtoMapper {

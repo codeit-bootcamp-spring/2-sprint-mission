@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.status.usecase.read;
 
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusDto;
 import java.util.List;
 import java.util.UUID;
 

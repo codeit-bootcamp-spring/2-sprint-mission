@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.swagger;
 
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusDto;
+import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserDeleteResponse;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;

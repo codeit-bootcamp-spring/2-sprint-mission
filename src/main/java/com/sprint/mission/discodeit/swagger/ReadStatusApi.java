@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.swagger;
 
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.core.status.controller.dto.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

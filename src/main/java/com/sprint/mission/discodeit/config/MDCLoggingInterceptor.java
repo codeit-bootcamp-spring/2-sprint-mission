@@ -20,12 +20,10 @@ public class MDCLoggingInterceptor extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     try {
-      // 요청 ID 생성 또는 헤더에서 가져오기
       String requestId = request.getHeader("X-Request-ID");
       if (requestId == null) {
         requestId = UUID.randomUUID().toString();
       }
-      // MDC에 요청 ID 저장
       MDC.put("requestId", requestId);
 
       String requestURI = request.getRequestURI();
@@ -34,10 +32,8 @@ public class MDCLoggingInterceptor extends OncePerRequestFilter {
       MDC.put("method", method);
 
       response.setHeader(HEADER, requestId);
-      // 다음 필터 실행
       filterChain.doFilter(request, response);
     } finally {
-      // MDC 정리
       MDC.clear();
     }
   }

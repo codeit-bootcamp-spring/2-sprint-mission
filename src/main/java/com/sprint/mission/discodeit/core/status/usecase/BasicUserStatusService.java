@@ -1,9 +1,10 @@
-package com.sprint.mission.discodeit.core.status.usecase.user;
+package com.sprint.mission.discodeit.core.status.usecase;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaUserStatusRepository;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusCreateCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusUpdateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusUpdateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;

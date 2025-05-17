@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.status.usecase.read.dto;
+package com.sprint.mission.discodeit.core.status.usecase.dto;
 
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import java.time.Instant;

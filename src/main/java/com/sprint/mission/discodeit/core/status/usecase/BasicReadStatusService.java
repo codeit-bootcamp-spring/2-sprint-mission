@@ -1,12 +1,13 @@
-package com.sprint.mission.discodeit.core.status.usecase.read;
+package com.sprint.mission.discodeit.core.status.usecase;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusCreateCommand;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusDto;
-import com.sprint.mission.discodeit.core.status.usecase.read.dto.ReadStatusUpdateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusCreateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.core.status.usecase.dto.ReadStatusUpdateCommand;
+import com.sprint.mission.discodeit.core.status.usecase.read.ReadStatusService;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;

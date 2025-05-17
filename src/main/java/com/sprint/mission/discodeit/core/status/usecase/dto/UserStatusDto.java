@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.status.usecase.user.dto;
+package com.sprint.mission.discodeit.core.status.usecase.dto;
 
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import java.time.Instant;

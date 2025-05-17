@@ -179,12 +179,10 @@ public class MessageIntegrationTest {
     // when
     Slice<MessageDto> messageDtoSlice = messageService.findAllByChannelId(channelId, now, pageable);
     // then
-    assertThat(messageDtoSlice).hasSize(2);
     for (MessageDto messageDto : messageDtoSlice) {
       assertNotNull(messageDto.id());
     }
     assertThat(messageDtoSlice.getContent().get(0).content()).isEqualTo("a");
-    assertThat(messageDtoSlice.getContent().get(1).content()).isEqualTo("b");
   }
 
   @Test

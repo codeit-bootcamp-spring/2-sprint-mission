@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.status.usecase.user.dto;
+package com.sprint.mission.discodeit.core.status.usecase.dto;
 
 import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
