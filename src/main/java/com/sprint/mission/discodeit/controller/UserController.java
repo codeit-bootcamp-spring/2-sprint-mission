@@ -39,15 +39,15 @@ public class UserController {
 
   @GetMapping("/{userId}")
   public ResponseEntity<UserResponse> find(
-      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId) {
-    log.debug("GET /api/users/{} - 사용자 조회 요청", userId);
+      @PathVariable @NotNull(message = "유저 ID는 필수입니다.") UUID userId) {
+    log.debug("GET /api/users/{} - 유저 조회 요청", userId);
     UserResponse response = userService.find(userId);
     return ResponseEntity.ok(response);
   }
 
   @GetMapping
   public ResponseEntity<List<UserResponse>> findAll() {
-    log.debug("GET /api/users - 모든 사용자 조회 요청");
+    log.debug("GET /api/users - 모든 유저 조회 요청");
     List<UserResponse> response = userService.findAll();
     return ResponseEntity.ok(response);
   }
@@ -57,7 +57,7 @@ public class UserController {
       @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
 
-    log.info("POST /api/users - 사용자 생성 요청: username={}, email={}", userCreateRequest.username(),
+    log.info("POST /api/users - 유저 생성 요청: username={}, email={}", userCreateRequest.username(),
         userCreateRequest.email());
     if (profileRequest != null && !profileRequest.isEmpty()) {
       log.info("프로필 이미지 업로드 요청: filename={}, size={} bytes", profileRequest.getOriginalFilename(),
@@ -74,10 +74,10 @@ public class UserController {
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserResponse> update(
-      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId,
+      @PathVariable @NotNull(message = "유저 ID는 필수입니다.") UUID userId,
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profileRequest) {
-    log.info("PATCH /api/users/{} - 사용자 수정 요청", userId);
+    log.info("PATCH /api/users/{} - 유저 수정 요청", userId);
 
     if (profileRequest != null && !profileRequest.isEmpty()) {
       log.info("프로필 이미지 수정 업로드 요청: filename={}, size={} bytes",
@@ -94,7 +94,7 @@ public class UserController {
 
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusResponse> updateStatus(
-      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId,
+      @PathVariable @NotNull(message = "유저 ID는 필수입니다.") UUID userId,
       @Valid @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
     log.debug("PATCH /api/users/{}/userStatus - 상태 업데이트 요청", userId);
 
@@ -107,7 +107,7 @@ public class UserController {
 
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> delete(
-      @PathVariable @NotNull(message = "사용자 ID는 필수입니다.") UUID userId) {
+      @PathVariable @NotNull(message = "유저 ID는 필수입니다.") UUID userId) {
     log.info("DELETE /api/users/{} - 유저 삭제 요청", userId);
     userService.delete(userId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
