@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserStatusResult(UUID id, Instant createdAt, Instant updatedAt, UUID userId, Instant lastLoginAt,
+public record UserStatusResult(UUID id, Instant createdAt, Instant updatedAt, UUID userId, Instant lastActiveAt,
                                boolean online) {
     public static UserStatusResult fromEntity(UserStatus userStatus, boolean online) {
         return new UserStatusResult(userStatus.getId(),

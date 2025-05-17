@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.user.controller;
+package com.sprint.mission.discodeit.auth.controller;
 
 import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.user.dto.auth.LoginRequest;
-import com.sprint.mission.discodeit.user.service.AuthService;
+import com.sprint.mission.discodeit.auth.dto.auth.LoginRequest;
+import com.sprint.mission.discodeit.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
