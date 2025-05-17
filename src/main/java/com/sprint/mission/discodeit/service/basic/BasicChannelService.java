@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.ChannelException;
+import com.sprint.mission.discodeit.exception.UserException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -53,6 +54,11 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
     log.info("Attempting to create private channel for participants: {}", request.participantIds());
+
+    if (request.participantIds().isEmpty()) {
+      log.error("Participant list is empty: {}", request.participantIds());
+      throw UserException.invalidUserList(Map.of("participantIds", request.participantIds()));
+    }
 
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
@@ -111,6 +117,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     channel.update(newName, newDescription);
+
+    channelRepository.save(channel);
 
     log.info("Channel with id {} successfully updated", channelId);
     return channelMapper.toDto(channel);

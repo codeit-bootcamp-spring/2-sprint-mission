@@ -7,6 +7,7 @@ public enum ErrorCode {
 
   // 401 Unauthorized
   INVALID_USER_PASSWORD("사용자 비밀번호가 틀렸습니다."),
+  INVALID_USER_LIST("사용자 리스트가 비어있습니다."),
 
   // 403 Forbidden
   PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED("비공개 채널은 업데이트할 수 없습니다."),

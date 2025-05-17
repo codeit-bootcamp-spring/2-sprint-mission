@@ -1,0 +1,42 @@
+<configuration>
+
+  <!-- 콘솔 로깅 설정 -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 로깅 설정 -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>./.logs/.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>./.logs/.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger{36} - %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <!-- 콘솔에서는 INFO 이상만 출력 -->
+  <logger name="com.sprint.mission.discodeit" level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+
+  <!-- 파일에서는 DEBUG 이상만 출력 -->
+  <logger name="com.sprint.mission.discodeit" level="DEBUG">
+    <appender-ref ref="FILE"/>
+  </logger>
+
+  <!-- 루트 로깅 설정 -->
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="FILE"/>
+  </root>
+
+</configuration>

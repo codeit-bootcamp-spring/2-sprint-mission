@@ -25,4 +25,8 @@ public class UserException extends DiscodeitException {
   public static UserException emailAlreadyExist(Map<String, Object> details) {
     return new UserException(ErrorCode.EMAIL_ALREADY_EXISTS, details);
   }
+
+  public static UserException invalidUserList(Map<String, Object> details) {
+    return new UserException(ErrorCode.INVALID_USER_LIST, details);
+  }
 }

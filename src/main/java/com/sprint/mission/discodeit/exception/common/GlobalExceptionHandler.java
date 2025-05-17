@@ -123,6 +123,15 @@ public class GlobalExceptionHandler {
           HttpStatus.CONFLICT.value()
       );
       return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    } else if (e.getErrorCode() == ErrorCode.INVALID_USER_LIST) {
+      response = new ErrorResponse(
+          e.getErrorCode().name(),
+          e.getErrorCode().getMessage(),
+          details,
+          e.getClass().getSimpleName(),
+          HttpStatus.BAD_REQUEST.value()
+      );
+      return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
     throw e;
   }
