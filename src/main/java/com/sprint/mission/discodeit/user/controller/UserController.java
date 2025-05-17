@@ -85,7 +85,7 @@ public class UserController {
     })
     @GetMapping
     public ResponseEntity<List<UserResult>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+        return ResponseEntity.ok(userService.getAllIn());
     }
 
     @Operation(

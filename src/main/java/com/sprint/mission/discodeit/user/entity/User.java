@@ -2,14 +2,19 @@ package com.sprint.mission.discodeit.user.entity;
 
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Getter
 @Entity
 @Table(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,14 +32,15 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @JoinColumn(name = "profile_id")
     private BinaryContent binaryContent;
 
-    protected User() {
-    }
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private UserStatus userStatus;
 
     public User(String name, String email, String password, BinaryContent binaryContent) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.binaryContent = binaryContent;
+        this.userStatus = new UserStatus(this, Instant.now());
     }
 
     public void update(String newUsername, String newEmail, String newPassword, BinaryContent binaryContent) {
@@ -47,7 +53,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
         }
-        if (binaryContent.getId() != null && !binaryContent.getId().equals(this.binaryContent.getId())) {
+        if (binaryContent != null && !binaryContent.getId().equals(this.binaryContent.getId())) {
             this.binaryContent = binaryContent;
         }
     }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic.user;
+package com.sprint.mission.discodeit.user;
 
 public enum UserInfo {
     LOGIN_USER("황지환", "hwang@naver.com", "12345"),

@@ -18,6 +18,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private final Path rootPath;
 
+    // 이게 의미가 있을까?, test랑 prod랑 다른 Valus가지게 하면 되는데
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path rootPath) {
         this.rootPath = rootPath;
         initDirectory(rootPath);

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.message;
 
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;

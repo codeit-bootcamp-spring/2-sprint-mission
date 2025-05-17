@@ -16,7 +16,7 @@ public interface UserService {
 
     UserResult getByName(String name);
 
-    List<UserResult> getAll();
+    List<UserResult> getAllIn();
 
     UserResult getByEmail(String email);
 

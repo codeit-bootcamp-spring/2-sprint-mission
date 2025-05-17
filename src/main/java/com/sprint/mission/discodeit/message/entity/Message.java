@@ -31,7 +31,7 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     @Column(name = "content", nullable = false)
     private String context;
 
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL) // 이게 맞는가?, 한쪽에만 ManyToMany 걸수도 있진않낟>
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),
