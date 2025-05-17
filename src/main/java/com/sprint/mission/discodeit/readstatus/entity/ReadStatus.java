@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -13,6 +15,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Entity
 @Table(name = "read_statues")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,9 +30,6 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
     @Column(name = "last_read_at")
     private Instant lastReadTime;
-
-    protected ReadStatus() {
-    }
 
     public ReadStatus(User user, Channel channel) {
         this.user = user;

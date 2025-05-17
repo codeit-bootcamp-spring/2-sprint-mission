@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -15,9 +16,8 @@ import java.time.Instant;
 @Entity
 @Table(name = "user_statuses")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserStatus extends BaseUpdatableEntity implements Serializable {
+public class UserStatus extends BaseUpdatableEntity {
 
-    private static final long serialVersionUID = 1L;
     private static final int DEFAULT_DURATION = 5 * 60 * 1000;
 
     @OneToOne(fetch = FetchType.LAZY)

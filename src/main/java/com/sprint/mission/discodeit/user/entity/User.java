@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,9 +16,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseUpdatableEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class User extends BaseUpdatableEntity {
 
     @Column(name = "username")
     private String name;

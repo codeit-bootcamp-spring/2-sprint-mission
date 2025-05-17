@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
-import com.sprint.mission.discodeit.message.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;

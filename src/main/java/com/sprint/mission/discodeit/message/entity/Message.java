@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,9 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "messages")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Message extends BaseUpdatableEntity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Message extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "channel_id", columnDefinition = "uuid")

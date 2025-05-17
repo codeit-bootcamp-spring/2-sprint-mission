@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.message.service.basic;
+package com.sprint.mission.discodeit.message.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
@@ -6,11 +6,11 @@ import com.sprint.mission.discodeit.binarycontent.service.BinaryContentStorageSe
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
-import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
-import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.message.entity.Message;
+import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.MessageService;
 import com.sprint.mission.discodeit.user.entity.User;

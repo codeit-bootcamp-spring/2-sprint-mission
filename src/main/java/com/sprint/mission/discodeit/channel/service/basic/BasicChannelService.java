@@ -85,8 +85,7 @@ public class BasicChannelService implements ChannelService {
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent()));
 
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(
-                        channel.getId())
-                .orElse(null);
+                        channel.getId()).orElse(null);
 
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             Instant now = Instant.now();
