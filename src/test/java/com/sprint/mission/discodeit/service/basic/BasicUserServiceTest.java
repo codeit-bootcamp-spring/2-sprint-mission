@@ -134,6 +134,7 @@ public class BasicUserServiceTest {
   @DisplayName("유저 업데이트 테스트 - 성공 (profile 포함)")
   void update_success() {
     // given
+    UUID userId = UUID.randomUUID();
     User user = new User("user1", "user1@email.com", "password", null);
     given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(user));
 
@@ -150,11 +151,11 @@ public class BasicUserServiceTest {
     given(binaryContentStorage.put(any(), any(byte[].class))).willReturn(UUID.randomUUID());  // 테스트 코드에서 생성된 profileImage는 id값을 가지지 않아서 any() 로 받았음... 이거 괜찮나요?
 
     BinaryContentDto updateProfileDto = new BinaryContentDto(UUID.randomUUID(), updateProfileImage.getFileName(), updateProfileImage.getSize(), updateProfileImage.getContentType());
-    UserDto updateUserDto = new UserDto(UUID.randomUUID(), "user1", "user1@email.com", updateProfileDto, true);
+    UserDto updateUserDto = new UserDto(userId, "user1", "user1@email.com", updateProfileDto, true);
     when(userMapper.toDto(any(User.class))).thenReturn(updateUserDto);
 
     // when
-    UserDto result = userService.update(UUID.randomUUID(), userUpdateRequest, Optional.of(updateBinaryContentCreateRequest));
+    UserDto result = userService.update(userId, userUpdateRequest, Optional.of(updateBinaryContentCreateRequest));
 
     // then
     verify(userRepository, times(1)).findById(any(UUID.class));
