@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.readstatus.service.basic;
+package com.sprint.mission.discodeit.readstatus.service;
 
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;

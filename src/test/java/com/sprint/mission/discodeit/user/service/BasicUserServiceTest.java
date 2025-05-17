@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.user.service.basic;
+package com.sprint.mission.discodeit.user.service;
 
 import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.dto.user.UserCreateRequest;

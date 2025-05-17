@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.userstatus.service.basic;
+package com.sprint.mission.discodeit.userstatus.service;
 
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
