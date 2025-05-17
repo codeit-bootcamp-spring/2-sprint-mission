@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.message.service;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
-import com.sprint.mission.discodeit.message.dto.request.MessageByChannelRequest;
+import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 
 import java.util.List;
@@ -15,7 +15,7 @@ public interface MessageService {
 
     MessageResult getById(UUID id);
 
-    PageResponse<MessageResult> getAllByChannelId(MessageByChannelRequest messageByChannelRequest);
+    PageResponse<MessageResult> getAllByChannelId(ChannelMessagePageRequest messageByChannelRequest);
 
     MessageResult updateContext(UUID id, String context);
 

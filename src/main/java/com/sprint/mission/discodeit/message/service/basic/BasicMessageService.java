@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
-import com.sprint.mission.discodeit.message.dto.request.MessageByChannelRequest;
+import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.MessageService;
@@ -59,11 +59,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public PageResponse<MessageResult> getAllByChannelId(MessageByChannelRequest messageByChannelRequest) {
-        Pageable page = Pageable.ofSize(messageByChannelRequest.size());
-
-        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(
-                messageByChannelRequest.channelId(), page);
+    public PageResponse<MessageResult> getAllByChannelId(ChannelMessagePageRequest channelMessagePageRequest) {
+        Pageable page = Pageable.ofSize(channelMessagePageRequest.size());
+        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelMessagePageRequest.channelId(), page);
 
         return PageResponse.of(messages, message ->
                 messageResultMapper.convertToMessageResult(message, message.getUser())

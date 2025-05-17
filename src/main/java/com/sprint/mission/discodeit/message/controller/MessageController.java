@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.message.controller;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
-import com.sprint.mission.discodeit.message.dto.request.MessageByChannelRequest;
+import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.message.service.MessageService;
@@ -58,7 +58,7 @@ public class MessageController {
 
 
     @GetMapping
-    public ResponseEntity<PageResponse<MessageResult>> getAllByChannelId(@Valid MessageByChannelRequest messageByChannelRequest) {
+    public ResponseEntity<PageResponse<MessageResult>> getAllByChannelId(@Valid ChannelMessagePageRequest messageByChannelRequest) {
         return ResponseEntity.ok(messageService.getAllByChannelId(messageByChannelRequest));
     }
 

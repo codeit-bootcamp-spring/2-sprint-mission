@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,31 +15,29 @@ import java.util.List;
 @Getter
 @Entity
 @Table(name = "messages")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends BaseUpdatableEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ManyToOne
-    @JoinColumn(name = "channel_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", columnDefinition = "uuid")
     private Channel channel;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "author_id", columnDefinition = "uuid")
     private User user;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String context;
 
-    @ManyToMany
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL) // 이게 맞는가?, 한쪽에만 ManyToMany 걸수도 있진않낟>
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id")
     )
     private List<BinaryContent> attachments;
-
-    protected Message() {
-    }
 
     public Message(Channel channel, User user, String context, List<BinaryContent> attachments) {
         this.channel = channel;
