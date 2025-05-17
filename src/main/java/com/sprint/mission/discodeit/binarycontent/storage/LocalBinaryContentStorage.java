@@ -18,7 +18,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private final Path rootPath;
 
-    // 이게 의미가 있을까?, test랑 prod랑 다른 Valus가지게 하면 되는데
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path rootPath) {
         this.rootPath = rootPath;
         initDirectory(rootPath);
@@ -26,15 +25,45 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public UUID put(UUID binaryContentId, byte[] bytes) {
-        if (binaryContentId == null) {
-            throw new IllegalArgumentException("ID는 null일 수 없습니다.");
-        }
-        if (bytes == null) {
-            throw new IllegalArgumentException("content bytes는 null일 수 없습니다.");
-        }
+        validateBinaryContentId(binaryContentId);
+        validateBytes(bytes);
         saveBinaryContentFile(binaryContentId, bytes);
 
         return binaryContentId;
+    }
+
+    @Override
+    public InputStream get(UUID binaryContentId) {
+        Path filePath = resolvePath(binaryContentId);
+
+        return getFileInputStream(filePath);
+    }
+
+    @Override
+    public InputStreamResource download(BinaryContentResult binaryContentResult) {
+        InputStream inputStream = get(binaryContentResult.id());
+
+        return new InputStreamResource(inputStream);
+    }
+
+    private void validateBytes(byte[] bytes) {
+        if (bytes == null) {
+            throw new IllegalArgumentException("content bytes는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateBinaryContentId(UUID binaryContentId) {
+        if (binaryContentId == null) {
+            throw new IllegalArgumentException("ID는 null일 수 없습니다.");
+        }
+    }
+
+    private FileInputStream getFileInputStream(Path filePath) {
+        try {
+            return new FileInputStream(filePath.toFile());
+        } catch (IOException e) {
+            throw new UncheckedIOException("파일을 읽을 수 없습니다: " + filePath, e);
+        }
     }
 
     private void saveBinaryContentFile(UUID binaryContentId, byte[] bytes) {
@@ -44,24 +73,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         } catch (IOException e) {
             throw new UncheckedIOException("파일에 저장하는 작업을 실패했습니다.", e);
         }
-    }
-
-    @Override
-    public InputStream get(UUID binaryContentId) {
-        Path filePath = resolvePath(binaryContentId);
-
-        try {
-            return new FileInputStream(filePath.toFile());
-        } catch (IOException e) {
-            throw new UncheckedIOException("파일을 읽을 수 없습니다: " + filePath, e);
-        }
-    }
-
-    @Override
-    public ResponseEntity<?> download(BinaryContentResult binaryContentResult) {
-        InputStream inputStream = get(binaryContentResult.id());
-
-        return ResponseEntity.ok(new InputStreamResource(inputStream));
     }
 
     private Path resolvePath(UUID binaryContentId) {

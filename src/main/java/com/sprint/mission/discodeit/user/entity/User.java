@@ -26,7 +26,7 @@ public class User extends BaseUpdatableEntity {
     private String password;
 
     @OneToOne
-    @JoinColumn(name = "profile_id")
+    @JoinColumn(name = "profile_id", columnDefinition = "uuid")
     private BinaryContent binaryContent;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

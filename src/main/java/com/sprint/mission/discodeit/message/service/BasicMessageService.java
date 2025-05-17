@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.message.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.binarycontent.service.BinaryContentStorageService;
+import com.sprint.mission.discodeit.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
@@ -34,7 +34,7 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-    private final BinaryContentStorageService binaryContentStorageService;
+    private final BinaryContentCore binaryContentCore;
     private final MessageResultMapper messageResultMapper;
 
     @Override
@@ -44,7 +44,7 @@ public class BasicMessageService implements MessageService {
         User user = userRepository.findById(messageCreateRequest.authorId())
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        List<BinaryContent> attachments = binaryContentStorageService.createBinaryContents(files);
+        List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
         Message savedMessage = messageRepository.save(new Message(channel, user, messageCreateRequest.content(), attachments));
 
         return messageResultMapper.convertToMessageResult(savedMessage);
@@ -83,16 +83,11 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public void delete(UUID id) {
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
-
-        List<UUID> attachmentIds = message.getAttachments()
-                .stream()
-                .map(BinaryContent::getId)
-                .toList();
+        if (!messageRepository.existsById(id)) {
+            throw new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
+        }
 
         messageRepository.deleteById(id);
-//        binaryContentStorageService.deleteBinaryContentsBatch(attachmentIds);
     }
 
 }

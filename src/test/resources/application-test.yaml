@@ -2,7 +2,7 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: filestorage/binary-content-storage
+      root-path: filestorage/binary-content-storage/test
 
 spring:
   datasource:

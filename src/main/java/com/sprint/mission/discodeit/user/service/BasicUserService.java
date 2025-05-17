@@ -2,14 +2,13 @@ package com.sprint.mission.discodeit.user.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.binarycontent.service.BinaryContentStorageService;
+import com.sprint.mission.discodeit.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.user.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.mapper.UserResultMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,7 @@ import static com.sprint.mission.discodeit.common.constant.ErrorMessages.ERROR_U
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final BinaryContentStorageService binaryContentStorageService;
+    private final BinaryContentCore binaryContentService;
     private final UserResultMapper userResultMapper;
 
     @Transactional
@@ -39,7 +38,7 @@ public class BasicUserService implements UserService {
         validateDuplicateEmail(userRequest.email());
         validateDuplicateUserName(userRequest.username());
 
-        BinaryContent binaryContent = binaryContentStorageService.createBinaryContent(binaryContentRequest);
+        BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
         User savedUser = userRepository.save(new User(userRequest.username(), userRequest.email(), userRequest.password(), binaryContent));
 
         return UserResult.fromEntity(savedUser, savedUser.getUserStatus().isOnline(Instant.now()));
@@ -87,9 +86,11 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent()));
 
-        binaryContentStorageService.deleteBinaryContent(user);
-        BinaryContent binaryContent = binaryContentStorageService.createBinaryContent(binaryContentRequest);
+        if (user.getBinaryContent() != null) {
+            binaryContentService.delete(user.getBinaryContent().getId());
+        }
 
+        BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
         user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), binaryContent);
         User updatedUser = userRepository.save(user);
 

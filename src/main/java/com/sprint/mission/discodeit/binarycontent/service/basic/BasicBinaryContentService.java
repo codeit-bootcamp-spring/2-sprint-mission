@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentService;
-import com.sprint.mission.discodeit.binarycontent.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,22 +17,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
+    private final BinaryContentCore binaryContentCore;
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentStorage binaryContentStorage; // TODO: 5/7/25 서비스로 변경
 
     @Transactional
     @Override
-    public BinaryContentResult create(BinaryContentRequest binaryContentRequest) {
-        if (binaryContentRequest == null) {
-            return null;
-        }
-
-        BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType());
-
-        binaryContentStorage.put(binaryContent.getId(), binaryContentRequest.bytes());
-        BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-
-        return BinaryContentResult.fromEntity(savedBinaryContent);
+    public BinaryContentResult createBinaryContent(BinaryContentRequest binaryContentRequest) {
+        return BinaryContentResult.fromEntity(binaryContentCore.createBinaryContent(binaryContentRequest));
     }
 
     @Transactional(readOnly = true)
@@ -48,14 +38,15 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional(readOnly = true)
     @Override
     public List<BinaryContentResult> getByIdIn(List<UUID> ids) {
-        return ids.stream()
-                .map(this::getById)
+        return binaryContentRepository.findAllById(ids)
+                .stream()
+                .map(BinaryContentResult::fromEntity)
                 .toList();
     }
 
-    @Transactional
     @Override
     public void delete(UUID id) {
-        binaryContentRepository.deleteById(id);
+        binaryContentCore.delete(id);
     }
+
 }

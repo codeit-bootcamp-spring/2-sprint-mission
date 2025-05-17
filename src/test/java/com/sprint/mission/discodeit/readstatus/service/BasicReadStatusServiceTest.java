@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.readstatus.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.message.service;
 
-import com.sprint.mission.discodeit.binarycontent.service.BinaryContentStorageService;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
@@ -40,8 +39,6 @@ class BasicMessageServiceTest {
     private ChannelRepository channelRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private BinaryContentStorageService binaryContentStorageService;
     @Mock
     private MessageRepository messageRepository;
     @Mock
@@ -195,13 +192,12 @@ class BasicMessageServiceTest {
         User user = new User("", "", "", null);
         Message message = new Message(channel, user, "hello", List.of());
 
-        BDDMockito.given(messageRepository.findById(any())).willReturn(Optional.of(message));
+        BDDMockito.given(messageRepository.existsById(any())).willReturn(true);
 
         // when
         messageService.delete(UUID.randomUUID());
 
         // then
-        BDDMockito.verify(binaryContentStorageService).deleteBinaryContentsBatch(any());
         BDDMockito.verify(messageRepository).deleteById(any());
     }
 
@@ -209,7 +205,7 @@ class BasicMessageServiceTest {
     @Test
     void deleteTest_EntityNotFound() {
         // given
-        BDDMockito.given(messageRepository.findById(any())).willReturn(Optional.empty());
+        BDDMockito.given(messageRepository.existsById(any())).willReturn(false);
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.delete(UUID.randomUUID()))

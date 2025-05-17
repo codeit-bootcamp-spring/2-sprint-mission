@@ -8,11 +8,12 @@ import java.util.UUID;
 
 public interface BinaryContentService {
 
-    BinaryContentResult create(BinaryContentRequest binaryContentRequest);
+    BinaryContentResult createBinaryContent(BinaryContentRequest binaryContentRequest);
 
     BinaryContentResult getById(UUID id);
 
     List<BinaryContentResult> getByIdIn(List<UUID> ids);
 
     void delete(UUID id);
+
 }
