@@ -45,7 +45,6 @@ class BasicUserServiceTest {
         userRepository.deleteAllInBatch();
     }
 
-
     @DisplayName("유저 등록을 요청하면, 유저와 유저의 상태를 저장한다")
     @Test
     void register() {

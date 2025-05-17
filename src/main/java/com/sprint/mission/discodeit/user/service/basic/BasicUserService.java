@@ -107,20 +107,13 @@ public class BasicUserService implements UserService {
     }
 
     private void validateDuplicateUserName(String name) {
-        boolean isDuplicate = userRepository.findByName(name)
-                .isPresent();
-
-        if (isDuplicate) {
+        if (userRepository.existsUserByName(name)) {
             throw new IllegalArgumentException("이미 존재하는 이름 입니다");
         }
     }
 
-    private void validateDuplicateEmail(String requestEmail) { // TODO: 5/17/25 exist로 수정바람
-        boolean isDuplicate = userRepository.findAll()
-                .stream()
-                .anyMatch(existingUser -> existingUser.isSameEmail(requestEmail));
-
-        if (isDuplicate) {
+    private void validateDuplicateEmail(String email) {
+        if (userRepository.existsUserByEmail(email)) {
             throw new IllegalArgumentException("이미 존재하는 이메일 입니다");
         }
     }
