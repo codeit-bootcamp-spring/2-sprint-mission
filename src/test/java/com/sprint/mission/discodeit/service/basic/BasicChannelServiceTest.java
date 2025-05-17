@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
 
 import com.sprint.mission.discodeit.dto.service.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.service.channel.ChannelUpdateRequest;
@@ -54,7 +54,6 @@ public class BasicChannelServiceTest {
   private String name;
   private String description;
   private Channel channel;
-  private ChannelDto channelDto;
 
   @BeforeEach
   public void setUp() {
@@ -65,7 +64,6 @@ public class BasicChannelServiceTest {
 
     channel = new Channel(type, name, description);
     ReflectionTestUtils.setField(channel, "id", id);
-    channelDto = channelMapper.toDto(channel);
   }
 
   @Test
@@ -90,11 +88,11 @@ public class BasicChannelServiceTest {
 
     ChannelDto res = basicChannelService.create(request);
 
-    then(res).isEqualTo(dto);
-    verify(channelRepository).save(any(Channel.class));
-    verify(userRepository).findAllById(participants);
-    verify(readStatusRepository).saveAll(anyList());
-    verify(channelMapper).toDto(channel);
+    assertThat(res).isEqualTo(dto);
+    then(channelRepository).should().save(any(Channel.class));
+    then(userRepository).should().findAllById(participants);
+    then(readStatusRepository).should().saveAll(anyList());
+    then(channelMapper).should().toDto(channel);
   }
 
   @Test
@@ -108,9 +106,9 @@ public class BasicChannelServiceTest {
 
     ChannelDto res = basicChannelService.create(request);
 
-    then(res).isEqualTo(dto);
-    verify(channelRepository).save(any(Channel.class));
-    verify(channelMapper).toDto(channel);
+    assertThat(res).isEqualTo(dto);
+    then(channelRepository).should().save(any(Channel.class));
+    then(channelMapper).should().toDto(channel);
   }
 
   @Test
@@ -144,8 +142,8 @@ public class BasicChannelServiceTest {
     given(channelMapper.toDto(any(Channel.class))).willReturn(dto);
 
     ChannelDto res = basicChannelService.update(id, request);
-    then(res).isEqualTo(dto);
-    verify(channelRepository).findById(id);
+    assertThat(res).isEqualTo(dto);
+    then(channelRepository).should().findById(id);
   }
 
   @Test
@@ -162,10 +160,10 @@ public class BasicChannelServiceTest {
 
     basicChannelService.delete(id);
 
-    verify(channelRepository).existsById(id);
-    verify(messageRepository).deleteAllByChannelId(id);
-    verify(readStatusRepository).deleteAllByChannelId(id);
-    verify(channelRepository).deleteById(id);
+    then(channelRepository).should().existsById(id);
+    then(messageRepository).should().deleteAllByChannelId(id);
+    then(readStatusRepository).should().deleteAllByChannelId(id);
+    then(channelRepository).should().deleteById(id);
   }
 
   @Test
@@ -198,11 +196,11 @@ public class BasicChannelServiceTest {
 
     List<ChannelDto> result = basicChannelService.findAllByUserId(userId);
 
-    then(result).isEqualTo(expected);
+    assertThat(result).isEqualTo(expected);
 
-    verify(readStatusRepository).findAllChannelIdByUserId(userId);
-    verify(channelRepository).findAllByTypeOrIdIn(ChannelType.PUBLIC, joinedIds);
-    verify(channelMapper).toDtoList(channels);
+    then(readStatusRepository).should().findAllChannelIdByUserId(userId);
+    then(channelRepository).should().findAllByTypeOrIdIn(ChannelType.PUBLIC, joinedIds);
+    then(channelMapper).should().toDtoList(channels);
   }
 
 }

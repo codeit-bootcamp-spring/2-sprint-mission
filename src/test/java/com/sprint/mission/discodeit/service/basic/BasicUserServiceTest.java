@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.BDDAssertions.then;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
+
 
 import com.sprint.mission.discodeit.dto.service.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.service.user.UserDto;
@@ -28,6 +30,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class BasicUserServiceTest {
+
   @Mock
   private UserRepository userRepository;
   @Mock
@@ -80,9 +83,9 @@ public class BasicUserServiceTest {
     UserCreateRequest request = new UserCreateRequest(username, email, password);
 
     UserDto dto = basicUserService.create(request, null);
-    then(dto).isEqualTo(userDto);
-    verify(userRepository).save(any(User.class));
-    verify(userMapper).toDto(user);
+    assertThat(dto).isEqualTo(userDto);
+    then(userRepository).should().save(any(User.class));
+    then(userMapper).should().toDto(user);
   }
 
   @Test
@@ -101,7 +104,7 @@ public class BasicUserServiceTest {
     given(userRepository.existsByUsername(eq("newdiscord"))).willReturn(false);
 
     UserDto dto = basicUserService.update(id, request, null);
-    then(dto).isEqualTo(userDto);
+    assertThat(dto).isEqualTo(userDto);
   }
 
   @Test
@@ -117,6 +120,6 @@ public class BasicUserServiceTest {
     given(userRepository.existsById(id)).willReturn(true);
 
     basicUserService.delete(id);
-    verify(userRepository).deleteById(id);
+    then(userRepository).should().deleteById(id);
   }
 }

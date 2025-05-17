@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
 
 import com.sprint.mission.discodeit.dto.controller.PageResponse;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentCreateRequest;
@@ -102,7 +102,7 @@ public class BasicMessageServiceTest {
 
     assertThatThrownBy(() -> basicMessageService.create(request, null))
         .isInstanceOf(ChannelNotFoundException.class);
-    verify(channelRepository).findById(channelId);
+    then(channelRepository).should().findById(channelId);
   }
 
   @Test
@@ -114,8 +114,8 @@ public class BasicMessageServiceTest {
 
     assertThatThrownBy(() -> basicMessageService.create(request, null))
         .isInstanceOf(UserNotFoundException.class);
-    verify(channelRepository).findById(channelId);
-    verify(userRepository).findByIdWithProfileAndUserStatus(userId);
+    then(channelRepository).should().findById(channelId);
+    then(userRepository).should().findByIdWithProfileAndUserStatus(userId);
   }
 
   @Test
@@ -138,10 +138,10 @@ public class BasicMessageServiceTest {
 
     System.out.println("▶ after create(), res: " + res);
     System.out.println("▶ after create(), messageDto: " + messageDto);
-    then(res).isEqualTo(messageDto);
-    verify(channelRepository).findById(channelId);
-    verify(userRepository).findByIdWithProfileAndUserStatus(userId);
-    verify(messageRepository).save(any(Message.class));
+    assertThat(res).isEqualTo(messageDto);
+    then(channelRepository).should().findById(channelId);
+    then(userRepository).should().findByIdWithProfileAndUserStatus(userId);
+    then(messageRepository).should().save(any(Message.class));
   }
 
   @Test
@@ -167,8 +167,8 @@ public class BasicMessageServiceTest {
     given(messageMapper.toDto(any(Message.class))).willReturn(dto);
 
     MessageDto res = basicMessageService.update(id, request);
-    then(res).isEqualTo(dto);
-    verify(messageRepository).findByIdWithAuthorAndAttachments(id);
+    assertThat(res).isEqualTo(dto);
+    then(messageRepository).should().findByIdWithAuthorAndAttachments(id);
   }
 
   @Test
@@ -185,7 +185,7 @@ public class BasicMessageServiceTest {
 
     basicMessageService.delete(id);
 
-    verify(messageRepository).deleteById(id);
+    then(messageRepository).should().deleteById(id);
   }
 
   @Test
@@ -215,10 +215,10 @@ public class BasicMessageServiceTest {
     PageResponse<MessageDto> result =
         basicMessageService.findAllByChannelId(channelId, cursor, pageable);
 
-    then(result.content()).containsExactly(d1, d2);
-    then((Instant) result.nextCursor()).isEqualTo(ts2);
+    assertThat(result.content()).containsExactly(d1, d2);
+    assertThat((Instant) result.nextCursor()).isEqualTo(ts2);
 
-    verify(messageRepository)
+    then(messageRepository).should()
         .findAllByChannelIdWithAuthor(channelId, cursor, pageable);
   }
 }
