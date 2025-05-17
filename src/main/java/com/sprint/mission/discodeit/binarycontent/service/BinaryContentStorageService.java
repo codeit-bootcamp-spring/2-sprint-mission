@@ -54,7 +54,6 @@ public class BinaryContentStorageService {
         if (user.getBinaryContent() == null) {
             return;
         }
-
         binaryContentRepository.deleteById(user.getBinaryContent().getId());
     }
 

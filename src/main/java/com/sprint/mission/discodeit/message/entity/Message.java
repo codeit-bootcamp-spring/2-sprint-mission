@@ -8,9 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Getter
@@ -30,12 +28,7 @@ public class Message extends BaseUpdatableEntity {
     @Column(name = "content", nullable = false)
     private String context;
 
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "message_attachments",
-            joinColumns = @JoinColumn(name = "message_id"),
-            inverseJoinColumns = @JoinColumn(name = "attachment_id")
-    )
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BinaryContent> attachments;
 
     public Message(Channel channel, User user, String context, List<BinaryContent> attachments) {

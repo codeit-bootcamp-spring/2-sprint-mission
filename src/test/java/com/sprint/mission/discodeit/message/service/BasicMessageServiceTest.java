@@ -78,7 +78,7 @@ class BasicMessageServiceTest {
         BDDMockito.given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
         BDDMockito.given(userRepository.findById(userId)).willReturn(Optional.of(user));
         BDDMockito.given(messageRepository.save(any())).willReturn(savedMessage);
-        BDDMockito.given(messageResultMapper.convertToMessageResult(savedMessage, user)).willReturn(expectedResult);
+        BDDMockito.given(messageResultMapper.convertToMessageResult(savedMessage)).willReturn(expectedResult);
 
         // when
         MessageResult result = messageService.create(request, List.of());
@@ -130,7 +130,7 @@ class BasicMessageServiceTest {
 
         BDDMockito.given(messageRepository.findById(any()))
                 .willReturn(Optional.of(message));
-        BDDMockito.given(messageResultMapper.convertToMessageResult(any(), any()))
+        BDDMockito.given(messageResultMapper.convertToMessageResult(any()))
                 .willReturn(expectedResult);
 
         // when
@@ -166,7 +166,7 @@ class BasicMessageServiceTest {
                 .willReturn(Optional.of(message));
         BDDMockito.given(messageRepository.save(any()))
                 .willReturn(updatedMessage);
-        BDDMockito.given(messageResultMapper.convertToMessageResult(any(), any()))
+        BDDMockito.given(messageResultMapper.convertToMessageResult(any()))
                 .willReturn(expectedResult);
 
         // when

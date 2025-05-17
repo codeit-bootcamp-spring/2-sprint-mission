@@ -17,12 +17,7 @@ public record MessageResult(
         UUID channelId,
         List<BinaryContentResult> attachments
 ) {
-    public static MessageResult fromEntity(Message message, UserResult author) {
-        List<BinaryContentResult> attachments = message.getAttachments()
-                .stream()
-                .map(BinaryContentResult::fromEntity)
-                .toList();
-
+    public static MessageResult fromEntity(Message message, UserResult author, List<BinaryContentResult> attachments) {
         return new MessageResult(message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),

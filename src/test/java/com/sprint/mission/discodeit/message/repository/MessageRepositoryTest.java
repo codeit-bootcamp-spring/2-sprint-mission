@@ -32,7 +32,7 @@ class MessageRepositoryTest {
 
     @DisplayName("채널에 저장된 가장 최근 메세지의 생성시간을 반환합니다.")
     @Test
-    void test_123() {
+    void findLastMessageCreatedAtByChannelId() {
         // given
         User user = userRepository.save(new User("", "", "", null));
         Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));

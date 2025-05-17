@@ -7,9 +7,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
@@ -55,10 +53,6 @@ public class User extends BaseUpdatableEntity {
         if (binaryContent != null && !binaryContent.getId().equals(this.binaryContent.getId())) {
             this.binaryContent = binaryContent;
         }
-    }
-
-    public boolean isSameEmail(String email) {
-        return this.email.equals(email);
     }
 
     public boolean isSamePassword(String password) {

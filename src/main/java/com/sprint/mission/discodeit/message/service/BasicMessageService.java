@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
-import com.sprint.mission.discodeit.message.service.MessageService;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,27 +47,28 @@ public class BasicMessageService implements MessageService {
         List<BinaryContent> attachments = binaryContentStorageService.createBinaryContents(files);
         Message savedMessage = messageRepository.save(new Message(channel, user, messageCreateRequest.content(), attachments));
 
-        return messageResultMapper.convertToMessageResult(savedMessage, user);
+        return messageResultMapper.convertToMessageResult(savedMessage);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public MessageResult getById(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
-        return messageResultMapper.convertToMessageResult(message, message.getUser());
+        return messageResultMapper.convertToMessageResult(message);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public PageResponse<MessageResult> getAllByChannelId(ChannelMessagePageRequest channelMessagePageRequest) {
         Pageable page = Pageable.ofSize(channelMessagePageRequest.size());
         Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelMessagePageRequest.channelId(), page);
 
-        return PageResponse.of(messages, message ->
-                messageResultMapper.convertToMessageResult(message, message.getUser())
-        );
+        return PageResponse.of(messages, messageResultMapper::convertToMessageResult);
     }
 
+    @Transactional
     @Override
     public MessageResult updateContext(UUID id, String context) {
         Message message = messageRepository.findById(id)
@@ -76,9 +77,10 @@ public class BasicMessageService implements MessageService {
         message.updateContext(context);
         Message savedMessage = messageRepository.save(message);
 
-        return messageResultMapper.convertToMessageResult(message, savedMessage.getUser());
+        return messageResultMapper.convertToMessageResult(savedMessage);
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         Message message = messageRepository.findById(id)
@@ -89,8 +91,8 @@ public class BasicMessageService implements MessageService {
                 .map(BinaryContent::getId)
                 .toList();
 
-        binaryContentStorageService.deleteBinaryContentsBatch(attachmentIds);
         messageRepository.deleteById(id);
+//        binaryContentStorageService.deleteBinaryContentsBatch(attachmentIds);
     }
 
 }
