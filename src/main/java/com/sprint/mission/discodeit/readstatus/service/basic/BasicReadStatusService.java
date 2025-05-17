@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,12 +33,9 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new EntityNotFoundException("readStaus에 해당하는 채널이 없습니다."));
         User user = userRepository.findById(readStatusCreateRequest.userId())
                 .orElseThrow(() -> new EntityNotFoundException("readStatus에 해당하는 유저가 없습니다."));
-
-        readStatusRepository.findByChannelIdAndUserId(readStatusCreateRequest.channelId(),
-                        readStatusCreateRequest.userId())
-                .ifPresent(existingReadStatus -> {
-                    throw new IllegalArgumentException("해당 채널과 유저에 대한 읽기 상태가 이미 존재합니다.");
-                });
+        if (readStatusRepository.existsByChannel_IdAndUser_Id(channel.getId(), user.getId())) {
+            throw new IllegalArgumentException("해당 채널과 유저에 대한 읽기 상태가 이미 존재합니다.");
+        }
 
         ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel));
 
@@ -54,18 +52,23 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Transactional
     @Override
-    public ReadStatusResult updateLastReadTime(UUID readStatusId) {
+    public ReadStatusResult updateLastReadTime(UUID readStatusId, Instant time) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 Id의 객체가 없습니다."));
 
-        readStatus.updateLastReadTime();
+        readStatus.updateLastReadTime(time);
+        readStatusRepository.save(readStatus);
 
         return ReadStatusResult.fromEntity(readStatus);
     }
 
-    @Transactional
     @Override
     public void delete(UUID readStatusId) {
+        if (!readStatusRepository.existsById(readStatusId)) {
+            throw new EntityNotFoundException("해당 Id의 객체가 없습니다.");
+        }
+
         readStatusRepository.deleteById(readStatusId);
     }
+
 }

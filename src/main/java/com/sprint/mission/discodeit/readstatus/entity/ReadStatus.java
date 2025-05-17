@@ -35,8 +35,8 @@ public class ReadStatus extends BaseUpdatableEntity {
         this.lastReadTime = ZonedDateTime.now().toInstant();
     }
 
-    public void updateLastReadTime() {
-        this.lastReadTime = ZonedDateTime.now().toInstant();
+    public void updateLastReadTime(Instant time) {
+        this.lastReadTime = time;
     }
 
 }
