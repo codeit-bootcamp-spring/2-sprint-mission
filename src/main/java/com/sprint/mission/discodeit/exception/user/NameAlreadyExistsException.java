@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.exception.user;
 
-public class NameAlreadyExistsException extends IllegalArgumentException {
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.util.Map;
 
-  public NameAlreadyExistsException(String message) {
-    super(message);
+public class NameAlreadyExistsException extends UserException {
+
+  public NameAlreadyExistsException(String username) {
+    super(ErrorCode.USER_ALREADY_EXISTS, Map.of("username", username));
   }
 }

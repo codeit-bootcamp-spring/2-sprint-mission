@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.exception.channel;
 
-import java.util.NoSuchElementException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.util.Map;
+import java.util.UUID;
 
-public class ChannelNotFoundException extends NoSuchElementException {
+public class ChannelNotFoundException extends ChannelException {
 
-  public ChannelNotFoundException(String message) {
-    super(message);
+  public ChannelNotFoundException(UUID channelId) {
+    super(ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId));
   }
 }

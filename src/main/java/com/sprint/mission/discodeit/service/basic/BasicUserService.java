@@ -7,6 +7,9 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.NameAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -15,7 +18,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +44,12 @@ public class BasicUserService implements UserService {
     String email = userCreateRequest.email();
 
     if (userRepository.existsByEmail(email)) {
-      log.warn("중복된 이메일로 유저 생성 실패: userEmail={}", email);
-      throw new IllegalArgumentException("User with email " + email + " already exists");
+      log.warn("유저 생성 실패-이메일 중복: userEmail={}", email);
+      throw new EmailAlreadyExistsException(email);
     }
     if (userRepository.existsByUsername(username)) {
-      log.warn("중복된 이름으로 유저 생성 실패: username={}", username);
-      throw new IllegalArgumentException("User with username " + username + " already exists");
+      log.warn("유저 생성 실패-이름 중복: username={}", username);
+      throw new NameAlreadyExistsException(username);
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest.map(profileRequest -> {
@@ -74,18 +76,16 @@ public class BasicUserService implements UserService {
     log.debug("유저 조회: userId={}", userId);
     return userRepository.findById(userId).map(userMapper::toDto).orElseThrow(() -> {
       log.warn("유저 조회 실패: userId={}", userId);
-      return new NoSuchElementException("User with id " + userId + " not found");
+      return new UserNotFoundException(userId);
     });
   }
 
   @Override
   public List<UserDto> findAll() {
-    try {
-      return userRepository.findAllWithProfileAndStatus().stream().map(userMapper::toDto).toList();
-    } catch (Exception e) {
-      log.error("전체 유저 조회 실패", e);
-      throw new RuntimeException("사용자 목록을 가져오지 못했습니다.", e);  // 여기서 예외를 상위로 '전파'함
-    }
+    return userRepository.findAllWithProfileAndStatus()
+        .stream()
+        .map(userMapper::toDto)
+        .toList();
   }
 
   @Transactional
@@ -94,18 +94,18 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId).orElseThrow(() -> {
       log.warn("유저 조회 실패: userId={}", userId);
-      return new NoSuchElementException("User with id " + userId + " not found");
+      return new UserNotFoundException(userId);
     });
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
     if (userRepository.existsByEmail(newEmail)) {
-      log.warn("중복된 이메일로 유저 업데이트 실패: userEmail={}", newEmail);
-      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+      log.warn("유저 생성 실패-이메일 중복: userEmail={}", newEmail);
+      throw new EmailAlreadyExistsException(newEmail);
     }
     if (userRepository.existsByUsername(newUsername)) {
-      log.warn("중복된 이름으로 유저 업데이트 실패: username={}", newUsername);
-      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+      log.warn("유저 생성 실패-이름 중복: username={}", newUsername);
+      throw new NameAlreadyExistsException(newUsername);
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
@@ -131,7 +131,7 @@ public class BasicUserService implements UserService {
   public void delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
       log.warn("유저 조회 실패: userId={}", userId);
-      throw new NoSuchElementException("User with id " + userId + " not found");
+      throw new UserNotFoundException(userId);
     }
     userRepository.deleteById(userId);
   }
