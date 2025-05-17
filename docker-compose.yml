@@ -1,16 +1,36 @@
 version: '3'
 services:
   postgres-db:
-    image: postgres:15
+    image: postgres:17
+    networks:
+      - local_net
     container_name: discodeit
     environment:
-      POSTGRES_USER: discodeit_user
-      POSTGRES_PASSWORD: discodeit1234
-      POSTGRES_DB: discodeit
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
     volumes:
       - db_discodeit_data:/var/lib/postgresql/data
+      - ./init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+  application:
+    depends_on:
+      - postgres-db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - local_net
+    ports:
+      - "8080:80"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    volumes:
+      - ./storage:/app/storage
+
+networks:
+  local_net:
 
 volumes:
   db_discodeit_data:
