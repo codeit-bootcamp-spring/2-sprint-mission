@@ -92,6 +92,6 @@ public interface UserApi {
   })
   ResponseEntity<UserStatusDto> updateStatus(
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
-      @RequestBody UserStatusUpdateRequest request
+      @RequestBody @Valid UserStatusUpdateRequest request
   );
 }

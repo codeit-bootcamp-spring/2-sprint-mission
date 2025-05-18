@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.service.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.service.message.MessageDto;
 import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +44,7 @@ public class MessageController implements MessageApi {
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest request,
+      @RequestPart("messageCreateRequest") MessageCreateRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
     log.debug("메시지 생성 요청: {}", request);
     List<BinaryContentCreateRequest> binaryContentList = new ArrayList<>();
@@ -63,7 +62,7 @@ public class MessageController implements MessageApi {
   @Override
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> update(@PathVariable UUID messageId,
-      @RequestBody @Valid MessageUpdateRequest request) {
+      @RequestBody MessageUpdateRequest request) {
     log.debug("메시지 수정 요청: id={}, request={}", messageId, request);
     MessageDto response = messageService.update(messageId, request);
     log.info("메시지 수정 응답: {}", response);
@@ -89,9 +88,10 @@ public class MessageController implements MessageApi {
           size = 50,
           sort = "createdAt",
           direction = Direction.DESC
-      )Pageable pageable
+      ) Pageable pageable
   ) {
-    PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId, cursor, pageable);
+    PageResponse<MessageDto> response = messageService.findAllByChannelId(channelId, cursor,
+        pageable);
     return ResponseEntity.ok(response);
   }
 }

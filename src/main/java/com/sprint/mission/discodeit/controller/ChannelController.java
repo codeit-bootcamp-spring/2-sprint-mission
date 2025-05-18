@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ChannelApi;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.dto.service.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.service.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.service.channel.PrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.service.channel.PublicChannelRequest;
-import jakarta.validation.Valid;
+import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class ChannelController implements ChannelApi {
   @Override
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> createPublic(
-      @RequestBody @Valid PublicChannelRequest request) {
+      @RequestBody PublicChannelRequest request) {
     log.debug("공개 채널 생성 요청: {}", request);
     ChannelDto response = channelService.create(request);
     log.info("공개 채널 생성 응답: {}", response);
@@ -47,7 +46,7 @@ public class ChannelController implements ChannelApi {
   @Override
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createPrivate(
-      @RequestBody @Valid PrivateChannelRequest request) {
+      @RequestBody PrivateChannelRequest request) {
     log.debug("비공개 채널 생성 요청: {}", request);
     ChannelDto response = channelService.create(request);
     log.info("비공개 채널 생성 응답: {}", response);
@@ -67,7 +66,7 @@ public class ChannelController implements ChannelApi {
   @Override
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> updatePublic(@PathVariable UUID channelId,
-      @RequestBody @Valid ChannelUpdateRequest request) {
+      @RequestBody ChannelUpdateRequest request) {
     log.debug("채널 수정 요청: id={}, request={}", channelId, request);
     ChannelDto response = channelService.update(channelId, request);
     log.info("채널 수정 응답: id={}, request={}", channelId, response);

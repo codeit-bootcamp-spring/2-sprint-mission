@@ -59,7 +59,8 @@ public interface ChannelApi {
           }))
   })
   ResponseEntity<ChannelDto> updatePublic(
-      @Parameter(description = "수정할 Channel ID") UUID channelId, ChannelUpdateRequest request);
+      @Parameter(description = "수정할 Channel ID") UUID channelId,
+      @Valid ChannelUpdateRequest request);
 
   // 특정 사용자가 볼 수 있는 모든 채널 목록을 조회
   @Operation(summary = "User가 참여 중인 Channel 목록 조회")

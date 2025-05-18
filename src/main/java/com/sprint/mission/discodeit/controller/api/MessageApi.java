@@ -48,7 +48,7 @@ public interface MessageApi {
               @ExampleObject(value = "{messageId}에 해당하는 Message를 찾을 수 없음")
           }))
   })
-  ResponseEntity<MessageDto> update(UUID messageId, MessageUpdateRequest request);
+  ResponseEntity<MessageDto> update(UUID messageId, @Valid MessageUpdateRequest request);
 
   // 메시지 삭제
   @Operation(summary = "Message 삭제")
