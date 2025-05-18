@@ -43,7 +43,7 @@ class ChannelControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    UUID user1Id;
+    private UUID user1Id;
     private UUID publicChannelId;
     private UUID privateChannelId;
     private List<UUID> participantIds;
