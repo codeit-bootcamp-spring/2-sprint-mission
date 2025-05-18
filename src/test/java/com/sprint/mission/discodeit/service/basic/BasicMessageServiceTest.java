@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -26,6 +27,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,13 +72,16 @@ public class BasicMessageServiceTest {
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
         given(messageRepository.save(any(Message.class))).willReturn(message);
+        given(messageMapper.toDto(any(Message.class))).willReturn(
+            new MessageDto(UUID.randomUUID(), Instant.now(), Instant.now(),
+                "내용", channelId, mock(UserDto.class), List.of())
+        );
 
         // when
-        Message result = messageService.createMessage(request, null);
+        MessageDto result = messageService.createMessage(request, null);
 
         // then
-        assertThat(result.getContent()).isEqualTo("내용");
-        then(messageRepository).should().save(any(Message.class));
+        assertThat(result.content()).isEqualTo("내용");
     }
 
     @Test

@@ -52,7 +52,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public Message createMessage(CreateMessageRequest request, List<MultipartFile> attachments) {
+    public MessageDto createMessage(CreateMessageRequest request, List<MultipartFile> attachments) {
         log.info("메시지 생성 요청 - authorId: {}, channelId: {}", request.authorId(),
             request.channelId());
 
@@ -106,7 +106,8 @@ public class BasicMessageService implements MessageService {
 
         Message message = new Message(author, channel, request.content(), attachmentIds);
         log.info("메시지 생성 완료 - messageId: {}", message.getId());
-        return messageRepository.save(message);
+        messageRepository.save(message);
+        return messageMapper.toDto(message);
     }
 
     @Override

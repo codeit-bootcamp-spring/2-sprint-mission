@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
-    Message createMessage(CreateMessageRequest request, List<MultipartFile> attachments);
+    MessageDto createMessage(CreateMessageRequest request, List<MultipartFile> attachments);
 
     MessageDto getMessageById(UUID messageId);
 

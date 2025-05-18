@@ -53,7 +53,6 @@ public class ChannelController {
         return ResponseEntity.status(201).body(createdChannel);
     }
 
-
     @Operation(summary = "채널 수정")
     @ApiResponse(
         responseCode = "200",

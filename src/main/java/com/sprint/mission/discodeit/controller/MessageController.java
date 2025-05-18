@@ -38,10 +38,9 @@ public class MessageController {
         log.info("메시지 생성 API 호출 - authorId: {}, channelId: {}", request.authorId(),
             request.channelId());
 
-        UUID messageId = messageService.createMessage(request, attachments).getId();
-        MessageDto response = messageService.getMessageById(messageId);
+        MessageDto response = messageService.createMessage(request, attachments);
 
-        log.info("메시지 생성 완료 - messageId: {}", messageId);
+        log.info("메시지 생성 완료 - messageId: {}", response.id());
         return ResponseEntity.status(201).body(response);
     }
 
