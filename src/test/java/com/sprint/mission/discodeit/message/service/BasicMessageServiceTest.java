@@ -3,15 +3,18 @@ package com.sprint.mission.discodeit.message.service;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
+import com.sprint.mission.discodeit.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
@@ -103,7 +106,7 @@ class BasicMessageServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ChannelNotFoundException.class);
     }
 
     @DisplayName("등록되지않은 유저가 메세지를 입력하면, 예외를 반환합니다.")
@@ -118,7 +121,7 @@ class BasicMessageServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @DisplayName("메세지 아이디로 조회하면, 메세지를 반환한다.")
@@ -151,7 +154,7 @@ class BasicMessageServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.getById(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(MessageNotFoundException.class);
     }
 
     @DisplayName("메세지 내용 수정본을 받으면, 메세지 내용을 덮어쓴다.")
@@ -187,7 +190,7 @@ class BasicMessageServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.updateContext(UUID.randomUUID(), UPDATED_MESSAGE_CONTENT))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(MessageNotFoundException.class);
     }
 
     @DisplayName("메세지를 삭제하면, 메세지와 메세지에 등록된 첨부파일도 삭제한다.")
@@ -215,7 +218,7 @@ class BasicMessageServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.delete(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(MessageNotFoundException.class);
     }
 
 }
