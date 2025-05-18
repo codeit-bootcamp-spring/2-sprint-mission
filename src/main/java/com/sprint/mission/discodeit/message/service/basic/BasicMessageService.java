@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.util.UUID;
 import static com.sprint.mission.discodeit.common.constant.ErrorMessages.ERROR_MESSAGE_NOT_FOUND;
 import static com.sprint.mission.discodeit.common.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -40,6 +42,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResult create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> files) {
+        log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}", messageCreateRequest.channelId(), messageCreateRequest.authorId(), files != null ? files.size() : 0);
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 채널이 존재하지 않습니다."));
         User user = userRepository.findById(messageCreateRequest.authorId())
@@ -47,6 +50,7 @@ public class BasicMessageService implements MessageService {
 
         List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
         Message savedMessage = messageRepository.save(new Message(channel, user, messageCreateRequest.content(), attachments));
+        log.info("메시지 생성 성공: messageId={}", savedMessage.getId());
 
         return messageResultMapper.convertToMessageResult(savedMessage);
     }
@@ -54,17 +58,21 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     @Override
     public MessageResult getById(UUID id) {
+        log.debug("메시지 조회 요청: messageId={}", id);
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
+        log.info("메시지 조회 성공: messageId={}", id);
         return messageResultMapper.convertToMessageResult(message);
     }
 
     @Transactional(readOnly = true)
     @Override
     public PageResponse<MessageResult> getAllByChannelId(ChannelMessagePageRequest channelMessagePageRequest) {
+        log.debug("채널별 메시지 목록 조회 요청: channelId={}, size={}", channelMessagePageRequest.channelId(), channelMessagePageRequest.size());
         Pageable page = Pageable.ofSize(channelMessagePageRequest.size());
         Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelMessagePageRequest.channelId(), page);
+        log.info("채널별 메시지 목록 조회 성공: channelId={}, 조회 메시지 수={}", channelMessagePageRequest.channelId(), messages.getNumberOfElements());
 
         return PageResponse.of(messages, messageResultMapper::convertToMessageResult);
     }
@@ -72,11 +80,13 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public MessageResult updateContext(UUID id, String context) {
+        log.info("메시지 수정 요청: messageId={}, newContent={}", id, context);
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent()));
 
         message.updateContext(context);
         Message savedMessage = messageRepository.save(message);
+        log.info("메시지 수정 성공: messageId={}", id);
 
         return messageResultMapper.convertToMessageResult(savedMessage);
     }
@@ -84,11 +94,13 @@ public class BasicMessageService implements MessageService {
     @Transactional
     @Override
     public void delete(UUID id) {
+        log.warn("메시지 삭제 요청: messageId={}", id);
         if (!messageRepository.existsById(id)) {
             throw new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessageContent());
         }
 
         messageRepository.deleteById(id);
+        log.info("메시지 삭제 성공: messageId={}", id);
     }
 
 }

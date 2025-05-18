@@ -7,13 +7,10 @@ import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageReques
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.message.service.MessageService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,79 +19,49 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/messages")
-@Tag(name = "Message", description = "메세지 관련 API")
 @RequiredArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;
 
-    @Operation(
-            summary = "메세지 생성",
-            description = "첨부 파일을 포함한 메세지 생성"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메세지 생성 성공"),
-            @ApiResponse(responseCode = "400", description = "파라미터 오류")
-    })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageResult> create(
-            @Parameter(description = "메세지 생성 정보", required = true)
-            @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+    public ResponseEntity<MessageResult> create(@Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest, @NotNull @RequestPart(value = "attachments") List<MultipartFile> attachments) {
+        log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}", messageCreateRequest.channelId(), messageCreateRequest.authorId(), attachments != null ? attachments.size() : 0);
+        List<BinaryContentRequest> binaryContentRequests = attachments.stream()
+                .map(BinaryContentRequest::fromMultipartFile)
+                .toList();
+        MessageResult message = messageService.create(messageCreateRequest, binaryContentRequests);
+        log.info("메시지 생성 성공: messageId={}", message.id());
 
-            @Parameter(description = "메세지 첨부파일", required = true)
-            @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-
-        List<BinaryContentRequest> binaryContentRequests = List.of();
-        if (attachments != null) {
-            binaryContentRequests = attachments.stream()
-                    .map(BinaryContentRequest::fromMultipartFile)
-                    .toList();
-        }
-
-        return ResponseEntity.ok(messageService.create(messageCreateRequest, binaryContentRequests));
+        return ResponseEntity.ok(message);
     }
-
 
     @GetMapping
     public ResponseEntity<PageResponse<MessageResult>> getAllByChannelId(@Valid ChannelMessagePageRequest messageByChannelRequest) {
-        return ResponseEntity.ok(messageService.getAllByChannelId(messageByChannelRequest));
+        log.debug("채널별 메시지 목록 조회 요청: channelId={}, size={}", messageByChannelRequest.channelId(), messageByChannelRequest.size());
+        PageResponse<MessageResult> messages = messageService.getAllByChannelId(messageByChannelRequest);
+        log.info("채널별 메시지 목록 조회 성공: channelId={}, 메시지 수={}", messageByChannelRequest.channelId(), messages.content().size());
+
+        return ResponseEntity.ok(messages);
     }
 
-    @Operation(
-            summary = "메세지 수정",
-            description = "메세지 내용 수정"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메세지 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "파라미터 오류")
-    })
     @PatchMapping("/{messageId}")
-    public ResponseEntity<MessageResult> update(
-            @Parameter(description = "메세지 ID", required = true)
-            @PathVariable UUID messageId,
+    public ResponseEntity<MessageResult> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest messageUpdateRequest) {
+        log.info("메시지 수정 요청: messageId={}, newContent={}", messageId, messageUpdateRequest.newContent());
+        MessageResult message = messageService.updateContext(messageId, messageUpdateRequest.newContent());
+        log.info("메시지 수정 성공: messageId={}", messageId);
 
-            @Parameter(description = "메세지 수정 내용", required = true)
-            @RequestBody MessageUpdateRequest messageUpdateRequest) {
-
-        return ResponseEntity.ok(
-                messageService.updateContext(messageId, messageUpdateRequest.newContent()));
+        return ResponseEntity.ok(message);
     }
 
-    @Operation(
-            summary = "메세지 식제"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "메세지 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "파라미터 오류")
-    })
     @DeleteMapping("/{messageId}")
-    public ResponseEntity<Void> delete(
-            @Parameter(description = "메세지 ID", required = true)
-            @PathVariable UUID messageId) {
-
+    public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+        log.warn("메시지 삭제 요청: messageId={}", messageId);
         messageService.delete(messageId);
+        log.info("메시지 삭제 성공: messageId={}", messageId);
 
         return ResponseEntity.noContent().build();
     }
