@@ -121,19 +121,19 @@
       - 예시
         - 조회 시도한 사용자의 ID 정보
         - 업데이트 시도한 PRIVATE 채널의 ID 정보
-- [ ]  DiscodeitException을 상속하는 주요 도메인 별 메인 예외 클래스를 정의하세요.
+- [x]  DiscodeitException을 상속하는 주요 도메인 별 메인 예외 클래스를 정의하세요.
   - UserException, ChannelException 등
   - 실제로 활용되는 클래스라기보다는 예외 클래스의 계층 구조를 명확하게 하기 위한 클래스 입니다.
-- [ ]  도메인 메인 예외 클래스를 상속하는 구체적인 예외 클래스를 정의하세요.
+- [x]  도메인 메인 예외 클래스를 상속하는 구체적인 예외 클래스를 정의하세요.
   - UserNotFoundException, UserAlreadyExistException 등 필요한 예외를 정의하세요.
-- [ ]  기존에 구현했던 예외를 커스텀 예외로 대체하세요.
+- [x]  기존에 구현했던 예외를 커스텀 예외로 대체하세요.
     - NoSuchElementException
     - IllegalArgumentException...
-- [ ]  ErrorResponse를 통해 일관된 예외 응답을 정의하세요.
+- [x]  ErrorResponse를 통해 일관된 예외 응답을 정의하세요.
   - 클래스 다이어그램
     - int status: HTTP 상태코드
     - String exceptionType: 발생한 예외의 클래스 이름
-- [ ]  앞서 정의한 ErrorResponse와 @RestControllerAdvice를 활용해 예외를 처리하는 예외 핸들러를 구현하세요.
+- [x]  앞서 정의한 ErrorResponse와 @RestControllerAdvice를 활용해 예외를 처리하는 예외 핸들러를 구현하세요.
   - 모든 핸들러는 일관된 응답(ErrorResponse)을 가져야 합니다.
 
 

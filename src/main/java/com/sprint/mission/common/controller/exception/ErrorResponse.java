@@ -1,22 +1,54 @@
 package com.sprint.mission.common.controller.exception;
 
+import com.sprint.mission.common.exception.DiscodeitException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
-public record ErrorResponse(String error, String message, int status, String timestamp) {
+public record ErrorResponse(
+        Instant timestamp,
+        String code,
+        String message,
+        Map<String, Object> details,
+        String exceptionType,
+        int status
+) {
 
-    public static ErrorResponse of(String error, String message, int status) {
-        return new ErrorResponse(error, message, status, LocalDateTime.now().toString());
+    public static ErrorResponse ofCustomException(String error, DiscodeitException discodeitException, int status) {
+        return new ErrorResponse(
+                discodeitException.getTimestamp(),
+                error,
+                discodeitException.getMessage(),
+                discodeitException.getDetails(),
+                discodeitException.getClass().getTypeName(),
+                status
+        );
     }
 
-    public static List<ErrorResponse> of(List<FieldError> fieldErrors) {
+    public static ErrorResponse of(String error, Exception ex, int status) {
+        return new ErrorResponse(
+                Instant.now(),
+                error,
+                ex.getMessage(),
+                null,
+                ex.getClass().getTypeName(),
+                status
+        );
+    }
+
+    public static List<ErrorResponse> ofCustomException(List<FieldError> fieldErrors) {
         return fieldErrors.stream()
-                .map(fieldError -> new ErrorResponse(fieldError.getField(),
-                        fieldError.getDefaultMessage(), HttpStatus.BAD_REQUEST.value(),
-                        LocalDateTime.now().toString()))
+                .map(fieldError -> new ErrorResponse(
+                        Instant.now(),
+                        HttpStatus.BAD_REQUEST.toString(),
+                        fieldError.getDefaultMessage(),
+                        Map.of("field", fieldError.getField()),
+                        fieldError.getClass().getTypeName(),
+                        HttpStatus.BAD_REQUEST.value())
+                )
                 .toList();
     }
 }

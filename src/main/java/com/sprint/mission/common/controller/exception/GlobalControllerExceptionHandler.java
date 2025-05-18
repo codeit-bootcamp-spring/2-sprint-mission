@@ -1,5 +1,6 @@
 package com.sprint.mission.common.controller.exception;
 
+import com.sprint.mission.common.exception.DiscodeitException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,35 +16,28 @@ import java.util.List;
 public class GlobalControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<ErrorResponse>> handleValidationErrors(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<List<ErrorResponse>> handleValidationErrors(MethodArgumentNotValidException ex) {
         List<FieldError> fieldErrors = ex.getBindingResult()
                 .getFieldErrors();
 
         return ResponseEntity.badRequest()
-                .body(ErrorResponse.of(fieldErrors));
+                .body(ErrorResponse.ofCustomException(fieldErrors));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("Illegal argument: {}", ex.getMessage());
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException discodeitException) {
+        log.error("Illegal argument: {}", discodeitException.getMessage());
 
         return ResponseEntity.badRequest()
-                .body(ErrorResponse.of("Bad Request", ex.getMessage(), HttpStatus.BAD_REQUEST.value()));
+                .body(ErrorResponse.ofCustomException(HttpStatus.BAD_REQUEST.toString(), discodeitException, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleNotSpecificException(Exception ex) {
-        log.error("Not SpecificException: {}", ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleUnExpectedException(Exception unexpectedException) {
+        log.error("Not SpecificException: {}", unexpectedException.getMessage());
 
         return ResponseEntity.internalServerError()
-                .body(ErrorResponse.of("InterServerError", ex.getMessage(),
-                        HttpStatus.INTERNAL_SERVER_ERROR.value()));
+                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.toString(), unexpectedException, HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<String> handleNullPointerException(NullPointerException ex) {
-        log.error("NullPointerException 발생: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("입력값 중 null이 존재합니다.");
-    }
 }
