@@ -28,8 +28,12 @@ public class MessageController {
     private final MessageService messageService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageResult> create(@Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest, @NotNull @RequestPart(value = "attachments") List<MultipartFile> attachments) {
+    public ResponseEntity<MessageResult> create(
+            @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+            @RequestPart(value = "attachments") List<MultipartFile> attachments
+    ) {
         log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}", messageCreateRequest.channelId(), messageCreateRequest.authorId(), attachments != null ? attachments.size() : 0);
+        assert attachments != null;
         List<BinaryContentRequest> binaryContentRequests = attachments.stream()
                 .map(BinaryContentRequest::fromMultipartFile)
                 .toList();
@@ -40,7 +44,7 @@ public class MessageController {
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<MessageResult>> getAllByChannelId(@Valid ChannelMessagePageRequest messageByChannelRequest) {
+    public ResponseEntity<PageResponse<MessageResult>> getAllByChannelId(@Valid @RequestBody ChannelMessagePageRequest messageByChannelRequest) {
         log.debug("채널별 메시지 목록 조회 요청: channelId={}, size={}", messageByChannelRequest.channelId(), messageByChannelRequest.size());
         PageResponse<MessageResult> messages = messageService.getAllByChannelId(messageByChannelRequest);
         log.info("채널별 메시지 목록 조회 성공: channelId={}, 메시지 수={}", messageByChannelRequest.channelId(), messages.content().size());
@@ -49,7 +53,7 @@ public class MessageController {
     }
 
     @PatchMapping("/{messageId}")
-    public ResponseEntity<MessageResult> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest messageUpdateRequest) {
+    public ResponseEntity<MessageResult> update(@PathVariable UUID messageId, @Valid @RequestBody MessageUpdateRequest messageUpdateRequest) {
         log.info("메시지 수정 요청: messageId={}, newContent={}", messageId, messageUpdateRequest.newContent());
         MessageResult message = messageService.updateContext(messageId, messageUpdateRequest.newContent());
         log.info("메시지 수정 성공: messageId={}", messageId);
@@ -65,4 +69,5 @@ public class MessageController {
 
         return ResponseEntity.noContent().build();
     }
+
 }

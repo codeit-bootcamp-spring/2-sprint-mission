@@ -26,4 +26,5 @@ public record MessageResult(
                 message.getChannel().getId(),
                 attachments);
     }
+
 }

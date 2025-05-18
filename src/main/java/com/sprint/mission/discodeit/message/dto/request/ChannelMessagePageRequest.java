@@ -6,8 +6,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.UUID;
 
 public record ChannelMessagePageRequest(
-        @RequestParam @NotNull UUID channelId,
-        @RequestParam Integer size
+        @RequestParam
+        @NotNull
+        UUID channelId,
+        @RequestParam
+        Integer size
 ) {
 
     public ChannelMessagePageRequest {

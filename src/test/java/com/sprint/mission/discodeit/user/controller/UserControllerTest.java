@@ -53,13 +53,14 @@ class UserControllerTest {
         UserResult stubResult = UserResult.fromEntity(user, true);
         BDDMockito.given(userService.register(any(), any())).willReturn(stubResult);
         UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password);
+        MockMultipartFile multipartFile = new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE,
+                convertJsonRequest(userCreateRequest).getBytes());
 
         // when & then
         Assertions.assertThat(mockMvc.post()
                         .uri("/api/users")
                         .multipart()
-                        .file(new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE,
-                                convertJsonRequest(userCreateRequest).getBytes()))
+                        .file(multipartFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatusOk()
                 .bodyJson()
@@ -77,13 +78,13 @@ class UserControllerTest {
         UserResult stubResult = UserResult.fromEntity(user, true);
         BDDMockito.given(userService.register(any(), any())).willReturn(stubResult);
         UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password);
+        MockMultipartFile multipartFile = new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE, convertJsonRequest(userCreateRequest).getBytes());
 
         // when & then
         Assertions.assertThat(mockMvc.post()
                         .uri("/api/users")
                         .multipart()
-                        .file(new MockMultipartFile("userCreateRequest", null, MediaType.APPLICATION_JSON_VALUE,
-                                convertJsonRequest(userCreateRequest).getBytes()))
+                        .file(multipartFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .hasStatus4xxClientError();
     }
@@ -120,8 +121,7 @@ class UserControllerTest {
         BDDMockito.given(userService.getById(any())).willReturn(stubResult);
 
         // when & then
-        Assertions.assertThat(mockMvc.get()
-                        .uri("/api/users/{userId}", userId))
+        Assertions.assertThat(mockMvc.get().uri("/api/users/{userId}", userId))
                 .hasStatusOk()
                 .bodyJson()
                 .extractingPath("$.email")

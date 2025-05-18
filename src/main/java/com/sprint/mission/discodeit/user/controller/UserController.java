@@ -30,7 +30,10 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResult> register(@Valid @RequestPart UserCreateRequest userCreateRequest, @RequestPart(required = false) MultipartFile profileImage) {
+    public ResponseEntity<UserResult> register(
+            @Valid @RequestPart UserCreateRequest userCreateRequest,
+            @RequestPart(required = false) MultipartFile profileImage
+    ) {
         log.info("사용자 생성 요청: username={}, email={}", userCreateRequest.username(), userCreateRequest.email());
         BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profileImage);
         UserResult user = userService.register(userCreateRequest, binaryContentRequest);
