@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.integration.base;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -19,5 +20,8 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected EntityManager entityManager;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 
 }
