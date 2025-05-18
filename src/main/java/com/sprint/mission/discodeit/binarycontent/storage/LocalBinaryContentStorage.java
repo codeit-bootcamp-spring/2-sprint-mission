@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.util.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -20,11 +19,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") Path rootPath) {
         this.rootPath = rootPath;
-        initDirectory(rootPath);
     }
 
     @Override
     public UUID put(UUID binaryContentId, byte[] bytes) {
+        initDirectory(rootPath);
         validateBinaryContentId(binaryContentId);
         validateBytes(bytes);
         saveBinaryContentFile(binaryContentId, bytes);

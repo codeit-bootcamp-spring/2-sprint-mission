@@ -24,7 +24,6 @@ public class BinaryContentCore {
         if (binaryContentRequest == null) {
             return null;
         }
-
         BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType()));
         binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
 
@@ -34,8 +33,6 @@ public class BinaryContentCore {
     @Transactional
     public List<BinaryContent> createBinaryContents(List<BinaryContentRequest> binaryContentRequests) {
         List<BinaryContent> binaryContents = new ArrayList<>();
-
-        // TODO: 5/17/25 SaveAll로 수정바람
         for (BinaryContentRequest binaryContentRequest : binaryContentRequests) {
             BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType()));
             binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
@@ -46,6 +43,10 @@ public class BinaryContentCore {
     }
 
     public void delete(UUID id) {
+        if (!binaryContentRepository.existsById(id)) {
+            throw new IllegalArgumentException("해당 ID의 바이너리 컨텐츠가 없습니다.");
+        }
+
         binaryContentRepository.deleteById(id);
     }
 

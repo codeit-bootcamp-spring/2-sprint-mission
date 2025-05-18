@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.binarycontent.storage.LocalBinaryContentStorage;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
