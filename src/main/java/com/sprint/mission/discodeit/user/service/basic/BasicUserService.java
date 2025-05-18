@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.common.constant.ErrorMessages.ERROR_USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.common.constant.ErrorMessages.ERROR_USER_NOT_FOUND_BY_EMAIL;
+import static com.sprint.mission.common.constant.ErrorCode.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.common.constant.ErrorCode.ERROR_USER_NOT_FOUND_BY_EMAIL;
 
 @Slf4j
 @Service
@@ -54,7 +54,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("사용자 조회 실패: userId={} (존재하지 않음)", userId);
-                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent());
+                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessage());
                 });
 
         return userResultMapper.convertToUserResult(user);
@@ -67,7 +67,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByName(name)
                 .orElseThrow(() -> {
                     log.error("사용자 이름 조회 실패: name={} (존재하지 않음)", name);
-                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent());
+                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessage());
                 });
 
         return userResultMapper.convertToUserResult(user);
@@ -90,7 +90,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> {
                     log.error("사용자 이메일 조회 실패: email={} (존재하지 않음)", email);
-                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessageContent());
+                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND_BY_EMAIL.getMessage());
                 });
 
         return userResultMapper.convertToUserResult(user);
@@ -103,7 +103,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("사용자 수정 실패: userId={} (존재하지 않음)", userId);
-                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessageContent());
+                    return new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessage());
                 });
 
         if (user.getBinaryContent() != null) {

@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.common.constant.ErrorMessages.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.common.constant.ErrorCode.ERROR_CHANNEL_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -71,7 +71,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.error("채널 조회 실패: channelId={} (존재하지 않음)", channelId);
-                    return new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
+                    return new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessage());
                 });
 
         return channelMapper.convertToChannelResult(channel);
@@ -103,7 +103,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("공개 채널 수정 실패: channelId={} (존재하지 않음)", id);
-                    return new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
+                    return new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessage());
                 });
 
         channel.update(publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
@@ -119,7 +119,7 @@ public class BasicChannelService implements ChannelService {
         log.warn("채널 삭제 요청: channelId={}", channelId);
         if (!channelRepository.existsById(channelId)) {
             log.error("채널 삭제 실패: channelId={} (존재하지 않음)", channelId);
-            throw new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessageContent());
+            throw new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessage());
         }
 
         readStatusRepository.deleteAllByChannel_Id(channelId);

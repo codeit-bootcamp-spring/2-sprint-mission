@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.dto.response;
+package com.sprint.mission.common.dto.response;
 
 import org.springframework.data.domain.Slice;
 

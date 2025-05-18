@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.controller.exception;
+package com.sprint.mission.common.controller.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

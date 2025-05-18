@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.user.entity;
 
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.common.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.message.controller;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
-import com.sprint.mission.discodeit.common.dto.response.PageResponse;
+import com.sprint.mission.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.channel.entity;
 
-import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.common.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

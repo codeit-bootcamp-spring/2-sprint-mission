@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.controller.exception;
+package com.sprint.mission.common.controller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;

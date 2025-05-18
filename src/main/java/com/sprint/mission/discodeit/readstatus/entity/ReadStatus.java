@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.readstatus.entity;
 
 import com.sprint.mission.discodeit.channel.entity.Channel;
-import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.common.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
