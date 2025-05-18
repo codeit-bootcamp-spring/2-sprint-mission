@@ -3,14 +3,15 @@ package com.sprint.mission.discodeit.binarycontent.service;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -37,7 +38,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContentResult getById(UUID id) {
         log.debug("파일 메타데이터 단건 조회 요청: binaryContentId={}", id);
         BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID를 가진 컨텐츠가 없습니다."));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("binaryContentId", id)));
         log.info("파일 메타데이터 단건 조회 성공: binaryContentId={}", id);
 
         return BinaryContentResult.fromEntity(binaryContent);

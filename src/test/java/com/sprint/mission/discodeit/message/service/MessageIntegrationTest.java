@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
-import com.sprint.mission.discodeit.message.exception.MessageNotFoundByID;
+import com.sprint.mission.discodeit.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.user.entity.User;
@@ -125,7 +125,7 @@ public class MessageIntegrationTest {
     void getByIdTest_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.getById(UUID.randomUUID()))
-                .isInstanceOf(MessageNotFoundByID.class);
+                .isInstanceOf(MessageNotFoundException.class);
     }
 
     @DisplayName("채널 ID를 입력하면, 채널에 속한 메세지 전부를 반환합니다")
@@ -173,7 +173,7 @@ public class MessageIntegrationTest {
     void updateContextTest_EntityNotFoundException() {
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.updateContext(UUID.randomUUID(), ""))
-                .isInstanceOf(MessageNotFoundByID.class);
+                .isInstanceOf(MessageNotFoundException.class);
     }
 
     @DisplayName("메세지를 삭제하면, 메세지와 메세지와 연관된 첨부파일도 삭제한다.")
@@ -203,7 +203,7 @@ public class MessageIntegrationTest {
     void deleteTest_EntityNotFound() {
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.delete(UUID.randomUUID()))
-                .isInstanceOf(MessageNotFoundByID.class);
+                .isInstanceOf(MessageNotFoundException.class);
     }
 
 }

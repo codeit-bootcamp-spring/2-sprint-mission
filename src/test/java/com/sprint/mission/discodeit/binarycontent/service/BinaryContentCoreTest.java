@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.storage.BinaryContentStorage;
 import org.assertj.core.api.Assertions;
@@ -111,7 +112,7 @@ class BinaryContentCoreTest {
     void delete_NoException() {
         // when & then
         Assertions.assertThatThrownBy(() -> binaryContentCore.delete(UUID.randomUUID()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BinaryContentNotFoundException.class);
     }
 
     private byte[] getFileBytes(BinaryContent binaryContent) {

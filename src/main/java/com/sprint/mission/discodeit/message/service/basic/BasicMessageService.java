@@ -11,14 +11,13 @@ import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
-import com.sprint.mission.discodeit.message.exception.MessageNotFoundByID;
+import com.sprint.mission.discodeit.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.MessageService;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.exception.UserNotFoundByID;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -61,7 +60,7 @@ public class BasicMessageService implements MessageService {
     public MessageResult getById(UUID id) {
         log.debug("메시지 조회 요청: messageId={}", id);
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new MessageNotFoundByID(Map.of("messageId", id)));
+                .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", id)));
 
         log.info("메시지 조회 성공: messageId={}", id);
         return messageResultMapper.convertToMessageResult(message);
@@ -83,7 +82,7 @@ public class BasicMessageService implements MessageService {
     public MessageResult updateContext(UUID id, String context) {
         log.info("메시지 수정 요청: messageId={}, newContent={}", id, context);
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new MessageNotFoundByID(Map.of("messageId", id)));
+                .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", id)));
 
         message.updateContext(context);
         Message savedMessage = messageRepository.save(message);
@@ -97,7 +96,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID id) {
         log.warn("메시지 삭제 요청: messageId={}", id);
         if (!messageRepository.existsById(id)) {
-            throw new MessageNotFoundByID(Map.of("messageId", id));
+            throw new MessageNotFoundException(Map.of("messageId", id));
         }
 
         messageRepository.deleteById(id);

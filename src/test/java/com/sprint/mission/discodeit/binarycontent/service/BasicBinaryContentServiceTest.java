@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentService;
 import jakarta.persistence.EntityNotFoundException;
@@ -42,7 +43,7 @@ class BasicBinaryContentServiceTest {
     void getById_NoException() {
         // when & then
         Assertions.assertThatThrownBy(() -> binaryContentService.getById(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(BinaryContentNotFoundException.class);
     }
 
     @DisplayName("여러개의 ID로 조회하면, 해당 객체를 반환한다.")

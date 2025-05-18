@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.binarycontent.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.binarycontent.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -57,7 +59,7 @@ public class BinaryContentCore {
     public void delete(UUID id) {
         log.warn("바이너리 컨텐츠 삭제 요청: binaryContentId={}", id);
         if (!binaryContentRepository.existsById(id)) {
-            throw new IllegalArgumentException("해당 ID의 바이너리 컨텐츠가 없습니다.");
+            throw new BinaryContentNotFoundException(Map.of("userId", id));
         }
 
         binaryContentRepository.deleteById(id);
