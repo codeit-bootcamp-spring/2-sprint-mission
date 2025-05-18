@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.message.service.basic;
 
+import com.sprint.mission.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.MessageService;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundByID;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import static com.sprint.mission.common.constant.ErrorCode.ERROR_MESSAGE_NOT_FOUND;
-import static com.sprint.mission.common.constant.ErrorCode.ERROR_USER_NOT_FOUND;
+import static com.sprint.mission.common.exception.ErrorCode.ERROR_MESSAGE_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -46,7 +47,7 @@ public class BasicMessageService implements MessageService {
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 ID의 채널이 존재하지 않습니다."));
         User user = userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(() -> new EntityNotFoundException(ERROR_USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new UserNotFoundByID(Map.of("userId", messageCreateRequest.authorId())));
 
         List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
         Message savedMessage = messageRepository.save(new Message(channel, user, messageCreateRequest.content(), attachments));

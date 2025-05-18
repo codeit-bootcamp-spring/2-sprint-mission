@@ -112,10 +112,10 @@
     - [x] 파일 업로드/다운로드
 
 6. 예외 처리 고도화(중요)
-- [ ]  커스텀 예외를 설계하고 구현하세요.
+- [x]  커스텀 예외를 설계하고 구현하세요.
   - 패키지명: com.sprint.mission.discodeit.exception[.{도메인}]
-- [ ]  ErrorCode Enum 클래스를 통해 예외 코드명과 메시지를 정의하세요.
-- [ ]  모든 예외의 기본이 되는 DiscodeitException 클래스를 정의하세요.
+- [x]  ErrorCode Enum 클래스를 통해 예외 코드명과 메시지를 정의하세요.
+- [x]  모든 예외의 기본이 되는 DiscodeitException 클래스를 정의하세요.
   - 클래스 다이어그램
     - details는 예외 발생 상황에 대한 추가정보를 저장하기 위한 속성입니다.
       - 예시

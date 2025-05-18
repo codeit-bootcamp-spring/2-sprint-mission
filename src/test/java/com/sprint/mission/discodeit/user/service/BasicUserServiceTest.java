@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.user.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.*;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.service.UserService;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
@@ -72,11 +73,11 @@ class BasicUserServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> userService.register(userRequest, null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(UserAlreadyExistsName.class);
     }
 
 
-    @DisplayName("이미 등록된 유저 이름으로 등록 시도시, 예외를 반환한다")
+    @DisplayName("이미 등록된 유저 이메일로 등록 시도시, 예외를 반환한다")
     @Test
     void register_DuplicateEmailException() {
         // given
@@ -85,7 +86,7 @@ class BasicUserServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> userService.register(userRequest, null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(UserAlreadyExistsEmail.class);
     }
 
     @DisplayName("유저 ID로 조회하면, 해당 유저를 반환한다")
@@ -108,7 +109,7 @@ class BasicUserServiceTest {
     void getById_EntityNotFound() {
         // when & then
         Assertions.assertThatThrownBy(() -> userService.getById(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundByID.class);
     }
 
     @DisplayName("유저 이름으로 조회시, 해당 유저를 반환한다.")
@@ -121,8 +122,7 @@ class BasicUserServiceTest {
         UserResult user = userService.getByName(USER_NAME);
 
         // then
-        Assertions.assertThat(user.username())
-                .isEqualTo(USER_NAME);
+        Assertions.assertThat(user.username()).isEqualTo(USER_NAME);
     }
 
 
@@ -131,7 +131,7 @@ class BasicUserServiceTest {
     void getByName_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> userService.getByName(USER_NAME))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundByName.class);
     }
 
     @DisplayName("전체 유저를 반환한다.")
@@ -167,7 +167,7 @@ class BasicUserServiceTest {
     @Test
     void getByEmail_EntityNotFound() {
         Assertions.assertThatThrownBy(() -> userService.getByEmail("notfound@example.com"))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundByEmail.class);
     }
 
     @DisplayName("업데이트하면, 유저 정보가 수정된다")
@@ -188,14 +188,15 @@ class BasicUserServiceTest {
         Assertions.assertThat(updatedUser.email()).isEqualTo("newEmail@example.com");
     }
 
-    @DisplayName("업데이트하면, 유저 정보가 수정된다")
+    @DisplayName("등록되지 않은 유저 정보로 업데이트 시도시, 예외를 반환한다")
     @Test
     void updateUser_NoUserException() {
         // given
         UserUpdateRequest request = new UserUpdateRequest("newName", "newEmail@example.com", "newPassword");
 
         // when & then
-        Assertions.assertThatThrownBy(() -> userService.update(UUID.randomUUID(), request, null)).isInstanceOf(EntityNotFoundException.class);
+        Assertions.assertThatThrownBy(() -> userService.update(UUID.randomUUID(), request, null))
+                .isInstanceOf(UserNotFoundByID.class);
     }
 
     @DisplayName("삭제하면, 유저와 유저 상태가 제거된다")
@@ -219,7 +220,7 @@ class BasicUserServiceTest {
     void deleteUser_NotFound() {
         // when & then
         Assertions.assertThatThrownBy(() -> userService.delete(UUID.randomUUID()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(UserNotFoundByID.class);
     }
 
 }

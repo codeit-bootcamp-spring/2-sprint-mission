@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.common.constant.ErrorCode.ERROR_CHANNEL_NOT_FOUND;
+import static com.sprint.mission.common.exception.ErrorCode.ERROR_CHANNEL_NOT_FOUND;
 
 @Slf4j
 @Service
