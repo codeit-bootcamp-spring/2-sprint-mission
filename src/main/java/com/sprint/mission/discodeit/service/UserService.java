@@ -7,11 +7,12 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
   // CRUD(생성, 읽기, 모두 읽기, 수정, 삭제)
-  UserDto createUser(CreateUserRequest request); //유저 생성
+  UserDto createUser(CreateUserRequest request, MultipartFile profile); //유저 생성
 
   UserDto findUserById(UUID userId); //유저 조회(UUID)
 
@@ -23,9 +24,7 @@ public interface UserService {
 
   List<UserDto> getAllUsers();   //모든 유저 조회
 
-  UserDto updateProfile(UUID userId, BinaryContent binaryContent);
-
-  UserDto updateUser(UUID userId, UpdateUserRequest request);
+  UserDto updateUser(UUID userId, UpdateUserRequest request, MultipartFile profile);
 
   void deleteUser(UUID userId);   //유저 삭제 (UUID 기반)
 

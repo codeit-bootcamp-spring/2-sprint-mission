@@ -14,7 +14,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import java.time.Instant;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -35,6 +35,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BinaryContentService binaryContentService;
+  private final UserStatusService userStatusService;
 
   @Override
   @Transactional
@@ -57,18 +58,15 @@ public class BasicUserService implements UserService {
         .password(hashedPassword)
         .build();
 
-    UserStatus userStatus = UserStatus.builder()
-        .user(user)
-        .lastActiveAt(Instant.now())
-        .build();
-
     userRepository.save(user);
+
+    UserStatus userStatus = userStatusService.create(user);
     userStatusRepository.save(userStatus);
     user.setStatus(userStatus);
 
     if (profile != null && !profile.isEmpty()) {
       BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
-      updateProfile(user.getId(), binaryContent);
+      updateProfile(user, binaryContent);
     }
 
     log.info("User created successfully: {}", user.getUsername());
@@ -104,14 +102,10 @@ public class BasicUserService implements UserService {
     return findUserOrThrow(userId).getProfile();
   }
 
-  @Transactional
-  @Override
-  public UserDto updateProfile(UUID userId, BinaryContent binaryContent) {
-    log.info("Update profile by id: {}", userId);
-    User user = findUserOrThrow(userId);
+  private void updateProfile(User user, BinaryContent binaryContent) {
+    log.info("Update profile by id: {}", user.getId());
     user.updateProfile(binaryContent);
     log.info("User profile updated successfully: {}", user);
-    return userMapper.toDto(user);
   }
 
   @Transactional
@@ -140,7 +134,7 @@ public class BasicUserService implements UserService {
     }
     if (profile != null && !profile.isEmpty()) {
       BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
-      updateProfile(userId, binaryContent);
+      updateProfile(user, binaryContent);
     }
 
     log.info("User updated successfully: {}", userId);
@@ -164,7 +158,6 @@ public class BasicUserService implements UserService {
   }
 
   private User findUserOrThrow(UUID userId) {
-
     return userRepository.findWithDetailsById(userId)
         .orElseThrow(() -> new UserNotFoundException(userId));
   }

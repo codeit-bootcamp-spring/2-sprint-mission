@@ -29,11 +29,8 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Transactional
   @Override
-  public UserStatusDto create(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(userId));
-
-    if (userStatusRepository.findById(userId).isPresent()) {
+  public UserStatus create(User user) {
+    if (userStatusRepository.findById(user.getId()).isPresent()) {
       throw new DiscodeitException(ErrorCode.USER_STATUS_ALREADY_EXISTS);
     }
 
@@ -44,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     userStatusRepository.save(userStatus);
 
-    return userStatusMapper.toDto(userStatus);
+    return userStatus;
   }
 
   @Override
