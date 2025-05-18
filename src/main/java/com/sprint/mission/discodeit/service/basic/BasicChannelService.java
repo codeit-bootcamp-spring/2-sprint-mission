@@ -47,20 +47,19 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto create(PublicChannelCreateRequest request) {
-        log.info("공개 채널 생성 시작. 채널명: '{}'", request.name());
         validatePublicChannelRequest(request);
 
         String channelName = request.name();
         String description = request.description();
 
         if (!StringUtils.hasText(channelName)) {
-            log.warn("공개 채널 생성 실패: 채널명이 제공되지 않았습니다.");
+            log.warn("채널명 누락");
             throw new ChannelException(ErrorCode.INVALID_CHANNEL_INFORMATION,
                 Map.of("missingField", "channelName"));
         }
 
         if (channelRepository.existsByName(channelName)) {
-            log.warn("공개 채널 생성 실패: 채널명 '{}'이(가) 이미 존재합니다.", channelName);
+            log.warn("채널명 중복");
             throw new ChannelException(ErrorCode.CHANNEL_ALREADY_EXISTS,
                 Map.of("channelName", channelName));
         }
@@ -68,56 +67,46 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(ChannelType.PUBLIC, channelName, description);
 
         Channel savedChannel = channelRepository.save(channel);
-        log.info("공개 채널 생성 완료. 채널 ID: '{}', 채널명: '{}'", savedChannel.getId(),
-            savedChannel.getName());
+        log.info("공개 채널 생성 완료");
         return channelMapper.toDto(savedChannel);
     }
 
     @Transactional
     @Override
     public ChannelDto create(PrivateChannelCreateRequest request) {
-        log.info("비공개 채널 생성 시작. 요청된 참여자 수: {}", request.participantIds() != null ? request.participantIds().size() : 0);
         validatePrivateChannelRequest(request);
 
-        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+        Channel channel = new Channel(ChannelType.PRIVATE, request.channelName(), null);
         channelRepository.save(channel);
 
-        log.info("비공개 채널 기본 정보 저장 완료. 채널 ID: '{}'", channel.getId());
-
-        if (CollectionUtils.isEmpty(request.participantIds())) {
-            log.warn("비공개 채널 생성 요청에 참여자 ID가 없습니다. 채널 ID: {}", channel.getId());
-        }
+        log.info("비공개 채널 기본 정보 저장 완료");
 
         List<User> participants = userRepository.findAllById(request.participantIds());
-        if (participants.size() != request.participantIds().size()) {
-            log.warn("요청된 참여자 ID 중 일부를 찾을 수 없습니다. 요청된 ID 수: {}, 찾은 사용자 수: {}", request.participantIds().size(), participants.size());
-        }
-
+        
         List<ReadStatus> readStatuses = participants.stream()
             .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
             .collect(Collectors.toList());
         
         if (!readStatuses.isEmpty()) {
             readStatusRepository.saveAll(readStatuses);
-            log.info("{}개의 ReadStatus 저장 완료. 채널 ID: '{}'", readStatuses.size(), channel.getId());
+            log.info("ReadStatus 저장 완료");
         } else {
-            log.info("저장할 ReadStatus 없음. 채널 ID: '{}'", channel.getId());
+            log.info("ReadStatus 없음");
         }
 
-        log.info("비공개 채널 생성 및 ReadStatus 설정 완료. 채널 ID: '{}'", channel.getId());
+        log.info("비공개 채널 생성 완료");
         return channelMapper.toDto(channel);
     }
 
     @Transactional(readOnly = true)
     @Override
     public ChannelDto find(UUID channelId) {
-        log.info("채널 조회 시도. ID: '{}'", channelId);
         Channel channel = findChannelByIdOrThrow(channelId, "조회할");
-        log.info("채널 조회 성공. ID: '{}', 이름: '{}'", channel.getId(), channel.getName());
+        log.info("채널 조회 완료");
         try {
             return channelMapper.toDto(channel);
         } catch (Exception e) {
-            log.error("채널 ID '{}' DTO 변환 중 오류 발생", channelId, e);
+            log.error("채널 DTO 변환 오류", e);
             throw new RuntimeException("채널 정보 조회 중 오류 발생 (Mapper)", e);
         }
     }
@@ -125,9 +114,8 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        log.info("사용자 ID '{}'의 모든 채널 조회 시도 (ReadStatus 기반).", userId);
         if (!userRepository.existsById(userId)) {
-            log.warn("사용자 ID '{}'에 해당하는 사용자를 찾을 수 없어 채널 조회를 중단합니다.", userId);
+            log.warn("사용자 없음");
             throw new UserNotFoundException(userId.toString());
         }
 
@@ -136,12 +124,12 @@ public class BasicChannelService implements ChannelService {
             .map(Channel::getId)
             .distinct()
             .collect(Collectors.toList());
-        log.info("사용자 ID '{}'가 ReadStatus를 가진 채널 ID 목록: {}", userId, subscribedChannelIds);
+        log.info("사용자 채널 목록 확인 완료");
 
         List<Channel> channelList;
         if (subscribedChannelIds.isEmpty()) {
             channelList = channelRepository.findAllByType(ChannelType.PUBLIC);
-            log.info("사용자 ID '{}'는 구독한 채널이 없어 공개 채널만 조회. 공개 채널 수: {}", userId, channelList.size());
+            log.info("공개 채널 조회 완료");
         } else {
             List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
             List<Channel> subscribedPrivateChannels = channelRepository.findAllByIdInAndType(subscribedChannelIds, ChannelType.PRIVATE);
@@ -153,7 +141,7 @@ public class BasicChannelService implements ChannelService {
                 }
             });
 
-            log.info("사용자 ID '{}'의 공개 채널 및 구독 채널 조회. 총 {}개 후보.", userId, channelList.size());
+            log.info("채널 조회 완료");
         }
         
         return channelList.stream()
@@ -164,11 +152,10 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
-        log.info("채널 업데이트 시작. ID: '{}'", channelId);
         Channel channel = findChannelByIdOrThrow(channelId, "업데이트할");
 
         if (channel.isPrivate()) {
-            log.warn("채널 업데이트 실패: 비공개 채널(ID: '{}')은 수정할 수 없습니다.", channelId);
+            log.warn("비공개 채널 수정 불가");
             throw new ChannelException(ErrorCode.PRIVATE_CHANNEL_UPDATE_DENIED,
                 Map.of("channelId", channelId.toString()));
         }
@@ -180,12 +167,10 @@ public class BasicChannelService implements ChannelService {
 
         if (updated) {
             Channel updatedChannel = channelRepository.save(channel);
-            log.info("채널 업데이트 완료. ID: '{}'. 이전 이름: '{}', 새 이름: '{}'. 이전 설명: '{}', 새 설명: '{}'",
-                channelId, oldName, updatedChannel.getName(), oldDescription,
-                updatedChannel.getDescription());
+            log.info("채널 업데이트 완료");
             return channelMapper.toDto(updatedChannel);
         } else {
-            log.info("채널 업데이트 변경 사항 없음. ID: '{}'", channelId);
+            log.info("채널 변경 사항 없음");
             return channelMapper.toDto(channel);
         }
     }
@@ -193,40 +178,46 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     @Override
     public void delete(UUID channelId) {
-        log.info("채널 삭제 시작. ID: '{}'", channelId);
         if (!channelRepository.existsById(channelId)) {
-            log.warn("채널 삭제 실패: ID '{}'에 해당하는 채널을 찾을 수 없습니다.", channelId);
+            log.warn("채널 없음");
             throw new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
                 Map.of("channelId", channelId.toString()));
         }
 
-        log.info("채널 ID '{}' 관련 메시지 삭제 시작", channelId);
+        log.info("채널 메시지 삭제 완료");
         messageRepository.deleteAllByChannelId(channelId);
-        log.info("채널 ID '{}' 관련 메시지 삭제 완료", channelId);
         
-        log.info("채널 ID '{}' 관련 ReadStatus 삭제 시작", channelId);
+        log.info("채널 ReadStatus 삭제 완료");
         readStatusRepository.deleteAllByChannelId(channelId);
-        log.info("채널 ID '{}' 관련 ReadStatus 삭제 완료", channelId);
-
+        
         channelRepository.deleteById(channelId);
-        log.info("채널 삭제 완료. ID: '{}'", channelId);
+        log.info("채널 삭제 완료");
     }
 
     private User findUserByIdOrThrow(UUID userId, String userType) {
-        return userRepository.findById(userId)
-            .orElseThrow(() -> {
-                log.warn("{} ID '{}'에 해당하는 사용자를 찾을 수 없습니다.", userType, userId);
-                return new UserNotFoundException(userId.toString());
-            });
+        try {
+            return userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.warn("사용자 없음");
+                    return new UserNotFoundException(userId.toString());
+                });
+        } catch (NoSuchElementException e) {
+            throw new UserNotFoundException(userId.toString());
+        }
     }
 
     private Channel findChannelByIdOrThrow(UUID channelId, String actionType) {
-        return channelRepository.findById(channelId)
-            .orElseThrow(() -> {
-                log.warn("{} 채널 ID '{}'에 해당하는 채널을 찾을 수 없습니다.", actionType, channelId);
-                return new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
-                    Map.of("channelId", channelId.toString(), "actionType", actionType));
-            });
+        try {
+            return channelRepository.findById(channelId)
+                .orElseThrow(() -> {
+                    log.warn("채널 없음");
+                    return new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
+                        Map.of("channelId", channelId.toString()));
+                });
+        } catch (NoSuchElementException e) {
+            throw new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
+                Map.of("channelId", channelId.toString()));
+        }
     }
 
     private void validatePublicChannelRequest(PublicChannelCreateRequest request) {
@@ -256,6 +247,22 @@ public class BasicChannelService implements ChannelService {
             throw new ChannelException(ErrorCode.CHANNEL_OPERATION_NOT_PERMITTED,
                 Map.of("reason", "Private channels must have exactly two participants.",
                     "actualParticipantCount", String.valueOf(request.participantIds().size())));
+        }
+        
+        // Verify all participants exist
+        List<User> participants = userRepository.findAllById(request.participantIds());
+        if (participants.size() != request.participantIds().size()) {
+            List<UUID> foundUserIds = participants.stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+            
+            List<UUID> notFoundUserIds = request.participantIds().stream()
+                .filter(id -> !foundUserIds.contains(id))
+                .collect(Collectors.toList());
+                
+            log.warn("비공개 채널 생성 실패: 존재하지 않는 사용자 ID가 포함되어 있습니다: {}", notFoundUserIds);
+            throw new UserNotFoundException(
+                Map.of("notFoundUserIds", notFoundUserIds.toString()));
         }
     }
 
