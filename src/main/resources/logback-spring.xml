@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+  <!-- 로그 저장 경로 -->
+  <property name="LOG_HOME" value=".logs"/>
+
+  <!-- 로그 패턴: yy-MM-dd HH:mm:ss.SSS [thread] LEVEL logger - message -->
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n"/>
+
+  <!-- 콘솔 로그 출력 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 로그 출력 + 롤링 설정 -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- 현재 로그 파일 -->
+    <file>${LOG_HOME}/application.log</file>
+
+    <!-- 롤링 정책: 날짜별로 로그 파일 생성 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 로그 파일 이름 예: application.25-05-07.log -->
+      <fileNamePattern>${LOG_HOME}/application.%d{yy-MM-dd}.log</fileNamePattern>
+
+      <!-- 로그 보관 기간: 30일 -->
+      <maxHistory>30</maxHistory>
+
+      <!-- 시작 시 이전 로그 정리 -->
+      <cleanHistoryOnStart>true</cleanHistoryOnStart>
+    </rollingPolicy>
+
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!--  <root level="OFF"/>-->
+  <!--  <root level="ERROR">-->
+  <!--    <appender-ref ref="CONSOLE"/>-->
+  <!--    <appender-ref ref="FILE"/>-->
+  <!--  </root>-->
+
+  <!-- 내 프로젝트 패키지에는 DEBUG 적용 -->
+  <logger name="com.sprint.mission" level="DEBUG" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </logger>
+
+  <!--  &lt;!&ndash; 개발 환경: DEBUG &ndash;&gt;-->
+  <!--  <springProfile name="dev">-->
+  <!--    <root level="DEBUG">-->
+  <!--      <appender-ref ref="CONSOLE"/>-->
+  <!--      <appender-ref ref="FILE"/>-->
+  <!--    </root>-->
+  <!--  </springProfile>-->
+
+  <!--  &lt;!&ndash; 운영 환경: INFO &ndash;&gt;-->
+  <!--  <springProfile name="prod">-->
+  <!--    <root level="INFO">-->
+  <!--      <appender-ref ref="CONSOLE"/>-->
+  <!--      <appender-ref ref="FILE"/>-->
+  <!--    </root>-->
+  <!--  </springProfile>-->
+
+</configuration>
