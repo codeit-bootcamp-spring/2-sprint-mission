@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.user.service.UserService;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResult;
 import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -57,7 +58,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId, @RequestPart UserUpdateRequest userUpdateRequest, @RequestPart(required = false) MultipartFile profileImage) {
+    public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId, @Valid @RequestPart UserUpdateRequest userUpdateRequest, @RequestPart(required = false) MultipartFile profileImage) {
         log.info("사용자 수정 요청: userId={}, newUsername={}, newEmail={}", userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
         BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profileImage);
         UserResult updatedUser = userService.update(userId, userUpdateRequest, binaryContentRequest);

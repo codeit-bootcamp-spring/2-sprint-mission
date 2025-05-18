@@ -1,11 +1,18 @@
 package com.sprint.mission.discodeit.user.dto.user;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-@Schema(description = "사용자 수정 요청")
 public record UserUpdateRequest(
-        @NotBlank String newUsername,
-        @NotBlank String newEmail,
-        @NotBlank String newPassword) {
+        @NotBlank(message = "아이디는 필수입니다.")
+        @Size(min = 2, max = 20, message = "이름은 2~20자 이내여야 합니다.")
+        String newUsername,
+        @NotBlank(message = "아이디는 필수입니다.")
+        @Email
+        String newEmail,
+        @NotBlank(message = "아이디는 필수입니다.")
+        @Size(min = 8, max = 30, message = "비밀번호는 8~30자 이내여야 합니다.")
+        String newPassword
+) {
 }
