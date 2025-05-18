@@ -39,3 +39,4 @@ out/
 ### fileStorage
 filestore/
 *.ser
+.logs

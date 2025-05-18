@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.binarycontent.service.basic;
+package com.sprint.mission.discodeit.binarycontent.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
@@ -24,7 +24,7 @@ public class BinaryContentCore {
         if (binaryContentRequest == null) {
             return null;
         }
-        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType()));
+        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType(), binaryContentRequest.size()));
         binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
 
         return savedBinaryContent;
@@ -34,7 +34,7 @@ public class BinaryContentCore {
     public List<BinaryContent> createBinaryContents(List<BinaryContentRequest> binaryContentRequests) {
         List<BinaryContent> binaryContents = new ArrayList<>();
         for (BinaryContentRequest binaryContentRequest : binaryContentRequests) {
-            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType()));
+            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType(), binaryContentRequest.size()));
             binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
             binaryContents.add(savedBinaryContent);
         }

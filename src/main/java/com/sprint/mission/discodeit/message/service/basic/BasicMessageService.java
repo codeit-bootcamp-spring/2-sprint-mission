@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.message.service.basic;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.binarycontent.service.basic.BinaryContentCore;
+import com.sprint.mission.discodeit.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;

@@ -24,14 +24,7 @@ spring:
 logging:
   level:
     org:
-      hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE
-      springframework:
-        data: DEBUG
-    com:
-      sprint:
-        mission:
-          discodeit: DEBUG
-
-
+      hibernate.SQL: DEBUG
+      orm.jdbc.bind: TRACE
+      springframework.data: DEBUG
+    com.sprint.mission.discodeit: info

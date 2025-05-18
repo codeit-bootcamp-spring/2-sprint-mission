@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.binarycontent.service.basic;
+package com.sprint.mission.discodeit.binarycontent.service;
 
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;

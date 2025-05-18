@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.message.service;
 
-import com.sprint.mission.discodeit.binarycontent.service.basic.BinaryContentCore;
+import com.sprint.mission.discodeit.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;

@@ -11,3 +11,10 @@ spring:
 
 server:
   port: 8080
+
+
+logging:
+  level:
+    com.sprint.mission.discodeit: debug
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
