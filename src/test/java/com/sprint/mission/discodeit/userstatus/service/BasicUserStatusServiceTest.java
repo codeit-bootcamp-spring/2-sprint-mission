@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.userstatus.service;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResult;
+import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,15 @@ class BasicUserStatusServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserStatusRepository userStatusRepository;
+    @Autowired
     private UserStatusService userStatusService;
+
+    @AfterEach
+    void tearDown() {
+        userStatusRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+    }
 
     @DisplayName("유저의 마지막 활동시간을 업데이트합니다.")
     @Test
@@ -46,7 +56,7 @@ class BasicUserStatusServiceTest {
         Instant instant = Instant.parse("2025-05-17T14:00:00Z");
 
         // when & then
-        Assertions.assertThat(userStatusService.updateByUserId(UUID.randomUUID(), instant))
+        Assertions.assertThatThrownBy(() -> userStatusService.updateByUserId(UUID.randomUUID(), instant))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 

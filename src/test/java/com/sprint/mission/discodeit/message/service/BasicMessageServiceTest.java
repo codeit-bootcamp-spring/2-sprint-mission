@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.message.service;
 
+import com.sprint.mission.discodeit.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
@@ -44,6 +45,9 @@ class BasicMessageServiceTest {
     private MessageRepository messageRepository;
     @Mock
     private MessageResultMapper messageResultMapper;
+    @Mock
+    private BinaryContentCore binaryContentCore;
+
     @InjectMocks
     private BasicMessageService messageService;
 
@@ -76,6 +80,7 @@ class BasicMessageServiceTest {
         BDDMockito.given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
         BDDMockito.given(userRepository.findById(userId)).willReturn(Optional.of(user));
         BDDMockito.given(messageRepository.save(any())).willReturn(savedMessage);
+        BDDMockito.given(binaryContentCore.createBinaryContents(any())).willReturn(List.of());
         BDDMockito.given(messageResultMapper.convertToMessageResult(savedMessage)).willReturn(expectedResult);
 
         // when
