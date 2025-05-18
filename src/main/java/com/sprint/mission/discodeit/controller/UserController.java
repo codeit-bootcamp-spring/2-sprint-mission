@@ -145,7 +145,7 @@ public class UserController {
         @RequestBody @Valid UpdateUserStatusRequest request
     ) {
         log.info("사용자 상태 변경 API 호출 - userId: {}", userId);
-        userStatusService.update(new UpdateUserStatusRequest(userId, request.newLastActiveAt()));
+        userStatusService.update(userId, request);
         log.info("사용자 상태 변경 완료 - userId: {}", userId);
         return ResponseEntity.ok().build();
     }

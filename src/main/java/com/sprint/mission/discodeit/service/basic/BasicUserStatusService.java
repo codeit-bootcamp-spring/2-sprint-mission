@@ -59,12 +59,11 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public void update(UpdateUserStatusRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
+    public void update(UUID userId, UpdateUserStatusRequest request) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
             .orElseGet(() -> {
-                User user = userRepository.findById(request.userId())
-                    .orElseThrow(
-                        () -> new UserNotFoundException(Map.of("userId", request.userId())));
+                User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
                 return userStatusRepository.save(new UserStatus(user));
             });
 
