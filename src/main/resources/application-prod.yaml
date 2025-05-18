@@ -1,0 +1,15 @@
+# 아직 사용은 안해서 일단 만들어 놓았습니다.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db-server:5432/discodeit
+    username: prod_user
+    password: prod_pass_1234
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      idle-timeout: 60000
+
+server:
+  port: 80
