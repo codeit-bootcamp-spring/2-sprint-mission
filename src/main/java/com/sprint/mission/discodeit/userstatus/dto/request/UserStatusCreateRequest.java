@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.userstatus.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Schema(description = "유저 상태 생성 요청")
 public record UserStatusCreateRequest(
+        @NotNull
         UUID userId,
+        @NotNull
         Instant lastActiveAt
 ) {
 }

@@ -9,12 +9,12 @@
 - [x] git push를 통해 내 레포지토리 상태 동기화
 
 ### 2. 기본 요구사항
-- [ ] 로그 관리
-- [ ] 커스텀 예외 설계[도메인별]
-- [ ] 유효성 검사
-- [ ] Actuator를 활용한 모니터링
-- [ ] 단위 테스트
-- [ ] 슬라이스 테스트
+- [x] 로그 관리
+- [x] 커스텀 예외 설계[도메인별]
+- [x] 유효성 검사
+- [x] Actuator를 활용한 모니터링
+- [x] 단위 테스트
+- [x] 슬라이스 테스트
 - [ ] 통합 테스트
 
 #### 3. 기본 요구사항 체크 리스트
@@ -63,8 +63,7 @@
   - [x]  서비스 레이어를 모의(mock)하여 컨트롤러 로직만 테스트하세요.
   - [x]  JSON 응답을 검증하는 테스트를 포함하세요.
 
-
-
+  
 4. 통합 테스트
 - [ ] 통합 테스트 환경을 구성하세요.
   - [ ] @SpringBootTest를 활용해 Spring 애플리케이션 컨텍스트를 로드하세요.
@@ -147,10 +146,10 @@
 
 
 8. Actuator
-- [ ] Spring Boot Actuator 의존성을 추가하세요.
-- [ ] 기본 Actuator 엔트포인트를 설정하세요.
+- [x] Spring Boot Actuator 의존성을 추가하세요.
+- [x] 기본 Actuator 엔트포인트를 설정하세요.
   - health, info, metrics, loggers
-- [ ] Actuator info를 위한 애플리케이션 정보를 추가하세요.
+- [x] Actuator info를 위한 애플리케이션 정보를 추가하세요.
     ~~~text
     애플리케이션 이름: Discodeit
     애플리케이션 버전: 1.7.0
@@ -162,7 +161,7 @@
     storage 설정: type, path
     multipart 설정: max-file-size, max-request-size
     ~~~
-- [ ] Spring Boot 서버를 실행 후 각종 정보를 확인해보세요.
+- [x] Spring Boot 서버를 실행 후 각종 정보를 확인해보세요.
     ~~~text
       - /actuator/info
       - /actuator/metrics

@@ -5,13 +5,6 @@ import com.sprint.mission.discodeit.channel.dto.request.PublicChannelCreateReque
 import com.sprint.mission.discodeit.channel.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
-import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +59,7 @@ public class ChannelController {
     }
 
     @PatchMapping("/{channelId}")
-    public ResponseEntity<ChannelResult> updatePublic(@PathVariable UUID channelId, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+    public ResponseEntity<ChannelResult> updatePublic(@PathVariable UUID channelId, @Valid @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
         log.info("공개 채널 수정 요청: channelId={}, newName={}, newDescription={}", channelId, publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
         ChannelResult channelResult = channelService.updatePublic(channelId, publicChannelUpdateRequest);
         log.info("공개 채널 수정 성공: channelId={}", channelId);

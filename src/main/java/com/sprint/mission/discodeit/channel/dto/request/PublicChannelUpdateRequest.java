@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.channel.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
-@Schema(description = "Public 채널 수정 요청")
 public record PublicChannelUpdateRequest(
+        @NotBlank
         String newName,
-        String newDescription) {
+        @NotBlank
+        String newDescription
+) {
 }
