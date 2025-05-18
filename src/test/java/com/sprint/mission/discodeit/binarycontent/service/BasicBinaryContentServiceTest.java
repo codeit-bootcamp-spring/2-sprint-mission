@@ -28,7 +28,7 @@ class BasicBinaryContentServiceTest {
     @Test
     void getById() {
         // given
-        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", ""));
+        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
 
         // when
         BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContent.getId());
@@ -49,8 +49,8 @@ class BasicBinaryContentServiceTest {
     @Test
     void getByIdIn() {
         // given
-        BinaryContent firstBinaryContent = binaryContentRepository.save(new BinaryContent("", ""));
-        BinaryContent secondBinaryContent = binaryContentRepository.save(new BinaryContent("", ""));
+        BinaryContent firstBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+        BinaryContent secondBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
 
         // when
         List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(List.of(firstBinaryContent.getId(), secondBinaryContent.getId()));

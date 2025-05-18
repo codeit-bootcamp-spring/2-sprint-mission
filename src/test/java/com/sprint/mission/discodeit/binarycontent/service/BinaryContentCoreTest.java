@@ -49,7 +49,7 @@ class BinaryContentCoreTest {
     void createBinaryContent() {
         // given
         String name = UUID.randomUUID().toString();
-        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(name, "", "hello".getBytes());
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(name, "", 0, "hello".getBytes());
 
         // when
         BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
@@ -79,8 +79,8 @@ class BinaryContentCoreTest {
         // given
         String firstName = UUID.randomUUID().toString();
         String secondName = UUID.randomUUID().toString();
-        BinaryContentRequest firstBinaryContentRequest = new BinaryContentRequest(firstName, "", "hello".getBytes());
-        BinaryContentRequest secondBinaryContentRequest = new BinaryContentRequest(secondName, "", "hello".getBytes());
+        BinaryContentRequest firstBinaryContentRequest = new BinaryContentRequest(firstName, "", 0, "hello".getBytes());
+        BinaryContentRequest secondBinaryContentRequest = new BinaryContentRequest(secondName, "", 0, "hello".getBytes());
         List<BinaryContentRequest> binaryContentRequests = List.of(firstBinaryContentRequest, secondBinaryContentRequest);
 
         // when
@@ -96,7 +96,7 @@ class BinaryContentCoreTest {
     @Test
     void delete() {
         // given
-        BinaryContentRequest binaryContentRequest = new BinaryContentRequest("", "", "hello".getBytes());
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest("", "", 0, "hello".getBytes());
         BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
 
         // when

@@ -41,7 +41,6 @@ public class BasicUserService implements UserService {
         validateDuplicateUserName(userRequest.username());
 
         BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
-        log.debug("BinaryContent 생성 완료: id={}", binaryContent.getId());
         User savedUser = userRepository.save(new User(userRequest.username(), userRequest.email(), userRequest.password(), binaryContent));
         log.info("사용자 생성 완료: userId={}", savedUser.getId());
 
@@ -113,7 +112,6 @@ public class BasicUserService implements UserService {
         }
 
         BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
-        log.debug("새 BinaryContent 생성: id={}", binaryContent.getId());
         user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(), binaryContent);
         User updatedUser = userRepository.save(user);
 

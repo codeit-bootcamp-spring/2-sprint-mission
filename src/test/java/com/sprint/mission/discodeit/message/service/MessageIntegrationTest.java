@@ -180,7 +180,7 @@ public class MessageIntegrationTest {
         // given
         Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
         User savedUser = userRepository.save(new User("", "", "", null));
-        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of(new BinaryContent("", ""))));
+        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of(new BinaryContent("", "", 0))));
         List<UUID> binaryContentIds = savedMessage.getAttachments()
                 .stream()
                 .map(BaseEntity::getId)
