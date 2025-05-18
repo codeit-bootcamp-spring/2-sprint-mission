@@ -7,10 +7,13 @@ discodeit:
 spring:
   profiles:
     active: dev
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 4MB
   jpa:
     hibernate:
       ddl-auto: none
-    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
@@ -28,3 +31,33 @@ logging:
       orm.jdbc.bind: TRACE
       springframework.data: DEBUG
     com.sprint.mission.discodeit: info
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: none
+  storage:
+    type: local
+    path: filestorage/binary-content-storage
+  multipart:
+    max-file-size: 3MB
+    max-request-size: 4MB
