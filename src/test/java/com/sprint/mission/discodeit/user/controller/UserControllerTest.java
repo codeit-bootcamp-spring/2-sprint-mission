@@ -2,11 +2,12 @@ package com.sprint.mission.discodeit.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.user.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.service.UserService;
-import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
+import com.sprint.mission.discodeit.domain.user.controller.UserController;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.service.UserService;
+import com.sprint.mission.discodeit.domain.userstatus.service.UserStatusService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

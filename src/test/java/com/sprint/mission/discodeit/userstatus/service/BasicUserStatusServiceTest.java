@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.userstatus.service;
 
-import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.userstatus.dto.UserStatusResult;
-import com.sprint.mission.discodeit.userstatus.exception.UserStatusNotFoundException;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
-import jakarta.persistence.EntityNotFoundException;
+import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.userstatus.dto.UserStatusResult;
+import com.sprint.mission.discodeit.domain.userstatus.exception.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.domain.userstatus.service.UserStatusService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

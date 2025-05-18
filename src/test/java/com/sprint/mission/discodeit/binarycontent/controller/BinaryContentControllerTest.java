@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.binarycontent.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
-import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.binarycontent.service.BinaryContentService;
-import com.sprint.mission.discodeit.binarycontent.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.domain.binarycontent.controller.BinaryContentController;
+import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
+import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentService;
+import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

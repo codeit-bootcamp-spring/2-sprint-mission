@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.binarycontent.service;
 
-import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
-import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.binarycontent.exception.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.binarycontent.service.BinaryContentService;
-import jakarta.persistence.EntityNotFoundException;
+import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
+import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

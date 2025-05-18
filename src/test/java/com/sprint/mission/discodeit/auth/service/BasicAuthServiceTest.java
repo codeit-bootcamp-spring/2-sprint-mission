@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.auth.service;
 
-import com.sprint.mission.discodeit.auth.dto.LoginRequest;
-import com.sprint.mission.discodeit.auth.exception.AuthPasswordNotMatchException;
-import com.sprint.mission.discodeit.auth.service.AuthService;
-import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.userstatus.exception.UserStatusNotFoundException;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.sprint.mission.discodeit.domain.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.domain.auth.exception.AuthPasswordNotMatchException;
+import com.sprint.mission.discodeit.domain.auth.service.AuthService;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.userstatus.exception.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

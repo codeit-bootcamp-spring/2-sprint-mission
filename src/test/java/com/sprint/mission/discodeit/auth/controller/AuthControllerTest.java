@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.auth.dto.LoginRequest;
-import com.sprint.mission.discodeit.auth.service.AuthService;
-import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.domain.auth.controller.AuthController;
+import com.sprint.mission.discodeit.domain.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.domain.auth.service.AuthService;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.domain.user.entity.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

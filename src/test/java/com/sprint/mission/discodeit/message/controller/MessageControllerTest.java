@@ -2,13 +2,13 @@ package com.sprint.mission.discodeit.message.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.auth.service.AuthService;
-import com.sprint.mission.discodeit.channel.entity.Channel;
-import com.sprint.mission.discodeit.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.message.dto.MessageResult;
-import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.message.entity.Message;
-import com.sprint.mission.discodeit.message.service.MessageService;
+import com.sprint.mission.discodeit.domain.channel.entity.Channel;
+import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.domain.message.controller.MessageController;
+import com.sprint.mission.discodeit.domain.message.dto.MessageResult;
+import com.sprint.mission.discodeit.domain.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.domain.message.entity.Message;
+import com.sprint.mission.discodeit.domain.message.service.MessageService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;

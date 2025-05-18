@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.message.repository;
 
-import com.sprint.mission.discodeit.channel.entity.Channel;
-import com.sprint.mission.discodeit.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.discodeit.message.entity.Message;
-import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.channel.entity.Channel;
+import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.domain.message.entity.Message;
+import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

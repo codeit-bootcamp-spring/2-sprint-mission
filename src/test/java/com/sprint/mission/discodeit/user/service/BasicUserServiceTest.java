@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.user.service;
 
-import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.user.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.user.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.exception.*;
-import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.domain.user.service.UserService;
+import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
