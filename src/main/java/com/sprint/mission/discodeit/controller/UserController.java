@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentProcessingException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class UserController implements UserApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
-      @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("[USER] 생성 요청 - 이름: {}", userCreateRequest.username());
@@ -61,7 +62,7 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
     log.info("[USER] 수정 요청 - ID: {}", userId);
@@ -94,7 +95,7 @@ public class UserController implements UserApi {
   @PatchMapping(path = "{userId}/userStatus")
   @Override
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+      @RequestBody @Valid UserStatusUpdateRequest request) {
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
   }
