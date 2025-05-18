@@ -23,22 +23,17 @@ public class BasicAuthService implements AuthService {
 
     @Transactional
     @Override
-    public UserResult login(LoginRequest loginRequestUser) {
-        User user = findUserByNameAndValidatePassword(loginRequestUser);
+    public UserResult login(LoginRequest loginRequest) {
+        User user = validateUserName(loginRequest);
+        validatePassword(user, loginRequest.password());
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 유저의 상태가 존재하지 않습니다."));
 
         Instant now = Instant.now();
         userStatus.updateLastActiveAt(now);
+        UserStatus savedUserStatus = userStatusRepository.save(userStatus);
 
-        return UserResult.fromEntity(user, userStatus.isOnline(now));
-    }
-
-    private User findUserByNameAndValidatePassword(LoginRequest loginRequestUser) {
-        User user = validateUserName(loginRequestUser);
-        validatePassword(user, loginRequestUser.password());
-
-        return user;
+        return UserResult.fromEntity(user, savedUserStatus.isOnline(now));
     }
 
     private User validateUserName(LoginRequest loginRequestUser) {
@@ -51,4 +46,5 @@ public class BasicAuthService implements AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
     }
+
 }
