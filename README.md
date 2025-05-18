@@ -173,16 +173,16 @@
 ## 4. 심화요구사항 
 
 1. MDC를 활용한 로깅 고도화
-- [ ] 요청 ID, 요청 URL, 요청 방식 등의 정보를 MDC에 추가하는 인터셉터를 구현하세요.
-  - [ ] 클래스명: MDCLoggingInterceptor
-  - [ ] 패키지명: com.**.discodeit.config
-  - [ ] 요청 ID는 랜덤한 문자열로 생성합니다. (UUID)
-  - [ ] 요청 ID는 응답 헤더에 포함시켜 더 많은 분석이 가능하도록 합니다.
+- [x] 요청 ID, 요청 URL, 요청 방식 등의 정보를 MDC에 추가하는 인터셉터를 구현하세요.
+  - [x] 클래스명: MDCLoggingInterceptor
+  - [x] 패키지명: com.**.discodeit.config
+  - [x] 요청 ID는 랜덤한 문자열로 생성합니다. (UUID)
+  - [x] 요청 ID는 응답 헤더에 포함시켜 더 많은 분석이 가능하도록 합니다.
     - 헤더 이름: Discodeit-Request-ID
-- [ ] WebMvcConfigurer를 통해 MDCLoggingInterceptor를 등록하세요.
-  - [ ] 클래스명: WebMvcConfig
-  - [ ] 패키지명: com.**.discodeit.config
-- [ ] Logback 패턴에 MDC 값을 포함시키세요.
+- [x] WebMvcConfigurer를 통해 MDCLoggingInterceptor를 등록하세요.
+  - [x] 클래스명: WebMvcConfig
+  - [x] 패키지명: com.**.discodeit.config
+- [x] Logback 패턴에 MDC 값을 포함시키세요.
       - 로그 출력 예시
     ~~~text
     # 패턴

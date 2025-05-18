@@ -2,7 +2,7 @@
 <configuration>
     <!-- 패턴 정의 -->
     <property name="LOGBACK_PATTERN"
-              value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+              value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %-36logger [%X{requestId} | %X{requestMethod} | %X{requestUrl}] - %msg%n"/>
 
     <!-- 로그 파일 저장 경로 -->
     <property name="LOG_PATH" value=".logs"/>
