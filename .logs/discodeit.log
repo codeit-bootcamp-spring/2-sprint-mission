@@ -1,0 +1,1744 @@
+25-05-18 01:45:27.311 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 56996 (/Users/gimjihyeob/ideaProjects/2-sprint-mission/build/classes/java/main started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 01:45:27.313 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-18 01:45:27.314 [main] INFO  c.s.m.discodeit.DiscodeitApplication - The following 1 profile is active: "dev"
+25-05-18 01:45:27.932 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-18 01:45:27.969 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 31 ms. Found 6 JPA repository interfaces.
+25-05-18 01:45:28.364 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+25-05-18 01:45:28.372 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-18 01:45:28.373 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+25-05-18 01:45:28.373 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-18 01:45:28.405 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+25-05-18 01:45:28.405 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1071 ms
+25-05-18 01:45:28.527 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+25-05-18 01:45:28.623 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2f6f4ac4
+25-05-18 01:45:28.624 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+25-05-18 01:45:28.675 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-18 01:45:28.708 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-18 01:45:28.727 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+25-05-18 01:45:28.898 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-18 01:45:28.959 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 15.13
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-18 01:45:29.482 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-18 01:45:29.510 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 01:45:29.670 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-18 01:45:30.119 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 01:45:30.563 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+25-05-18 01:45:30.607 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+25-05-18 01:45:30.618 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+25-05-18 01:45:30.629 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 3.584 seconds (process running for 3.862)
+25-05-18 01:45:31.007 [RMI TCP Connection(2)-127.0.0.1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+25-05-18 01:45:31.007 [RMI TCP Connection(2)-127.0.0.1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+25-05-18 01:45:31.009 [RMI TCP Connection(2)-127.0.0.1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+25-05-18 01:53:21.793 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-18 01:53:21.796 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+25-05-18 01:53:21.801 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 01:53:21.806 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+25-05-18 01:53:21.810 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+25-05-18 20:30:24.563 [Test worker] INFO  c.s.m.d.r.UserRepositoryTest - Starting UserRepositoryTest using Java 17.0.14 with PID 17522 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 20:30:24.564 [Test worker] INFO  c.s.m.d.r.UserRepositoryTest - The following 1 profile is active: "test"
+25-05-18 20:30:24.782 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-18 20:30:24.821 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 34 ms. Found 6 JPA repository interfaces.
+25-05-18 20:30:24.853 [Test worker] INFO  edDataSourceBeanFactoryPostProcessor - Replacing 'dataSource' DataSource bean with embedded version
+25-05-18 20:30:24.920 [Test worker] INFO  o.s.j.d.e.EmbeddedDatabaseFactory - Starting embedded database: url='jdbc:h2:mem:6d4496b7-2261-4866-8bfd-8b4aceda7b73;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+25-05-18 20:30:25.078 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-18 20:30:25.109 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-18 20:30:25.127 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+25-05-18 20:30:25.254 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-18 20:30:25.295 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory$EmbeddedDataSourceProxy@1c58d7be']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-18 20:30:25.751 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-18 20:30:25.758 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:30:25.759 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:30:25.760 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:30:25.760 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:30:25.761 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:30:25.761 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:30:25.762 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:30:25.765 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-18 20:30:25.766 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+25-05-18 20:30:25.767 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+25-05-18 20:30:25.768 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+25-05-18 20:30:25.769 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+25-05-18 20:30:25.771 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-18 20:30:25.772 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-18 20:30:25.773 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-18 20:30:25.774 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-18 20:30:25.775 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-18 20:30:25.776 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:30:25.777 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:30:25.778 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-18 20:30:25.779 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-18 20:30:25.780 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-18 20:30:25.782 [Test worker] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:30:25.945 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-18 20:30:26.239 [Test worker] INFO  c.s.m.d.r.UserRepositoryTest - Started UserRepositoryTest in 1.916 seconds (process running for 2.437)
+25-05-18 20:30:26.548 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.profile_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+25-05-18 20:30:26.550 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [noone]
+25-05-18 20:30:26.631 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:30:26.632 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.615721Z]
+25-05-18 20:30:26.635 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [alice@test.com]
+25-05-18 20:30:26.635 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:30:26.635 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:30:26.635 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.615721Z]
+25-05-18 20:30:26.635 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [alice]
+25-05-18 20:30:26.635 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [34983677-88b4-4267-b185-ec27faa33e70]
+25-05-18 20:30:26.638 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.profile_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+25-05-18 20:30:26.638 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [alice]
+25-05-18 20:30:26.646 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:30:26.646 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.644654Z]
+25-05-18 20:30:26.646 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [bob@test.com]
+25-05-18 20:30:26.647 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:30:26.647 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:30:26.647 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.644654Z]
+25-05-18 20:30:26.647 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [bob]
+25-05-18 20:30:26.647 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [77d9efdd-b7bb-46a8-a53a-35f7a1405535]
+25-05-18 20:30:26.648 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    fetch
+        first ? rows only
+25-05-18 20:30:26.648 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [bob@test.com]
+25-05-18 20:30:26.648 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:INTEGER) <- [1]
+25-05-18 20:30:26.650 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.username=? 
+    fetch
+        first ? rows only
+25-05-18 20:30:26.650 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [bob]
+25-05-18 20:30:26.650 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:INTEGER) <- [1]
+25-05-18 20:30:26.651 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    fetch
+        first ? rows only
+25-05-18 20:30:26.651 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [x@test.com]
+25-05-18 20:30:26.651 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:INTEGER) <- [1]
+25-05-18 20:30:26.652 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.username=? 
+    fetch
+        first ? rows only
+25-05-18 20:30:26.653 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [x]
+25-05-18 20:30:26.653 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:INTEGER) <- [1]
+25-05-18 20:30:26.664 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.656481Z]
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [carol@test.com]
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.656481Z]
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [carol]
+25-05-18 20:30:26.665 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [470767f3-c094-468e-bf3c-01eacbf97c76]
+25-05-18 20:30:26.666 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-18 20:30:26.666 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.657169Z]
+25-05-18 20:30:26.666 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.656481Z]
+25-05-18 20:30:26.666 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.657169Z]
+25-05-18 20:30:26.666 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [470767f3-c094-468e-bf3c-01eacbf97c76]
+25-05-18 20:30:26.666 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:UUID) <- [447c6f38-1fdb-4ce2-a29e-0894765ab611]
+25-05-18 20:30:26.667 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        binary_contents
+        (content_type, created_at, file_name, size, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-18 20:30:26.667 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [image/png]
+25-05-18 20:30:26.667 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.659319Z]
+25-05-18 20:30:26.667 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [f.png]
+25-05-18 20:30:26.667 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:BIGINT) <- [10]
+25-05-18 20:30:26.667 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:UUID) <- [466c4f13-e51b-4211-870a-f2a91fecd13b]
+25-05-18 20:30:26.669 [Test worker] DEBUG org.hibernate.SQL - 
+    update
+        users 
+    set
+        email=?,
+        password=?,
+        profile_id=?,
+        updated_at=?,
+        username=? 
+    where
+        id=?
+25-05-18 20:30:26.670 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:VARCHAR) <- [carol@test.com]
+25-05-18 20:30:26.670 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [pw]
+25-05-18 20:30:26.670 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:UUID) <- [466c4f13-e51b-4211-870a-f2a91fecd13b]
+25-05-18 20:30:26.670 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:30:26.663992Z]
+25-05-18 20:30:26.671 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:VARCHAR) <- [carol]
+25-05-18 20:30:26.671 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [470767f3-c094-468e-bf3c-01eacbf97c76]
+25-05-18 20:30:26.672 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=u1_0.profile_id 
+    join
+        user_statuses s1_0 
+            on u1_0.id=s1_0.user_id
+25-05-18 20:30:26.685 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:30:26.685 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:30:26.686 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:30:26.686 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:30:26.687 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:30:26.687 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:30:26.687 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:30:26.687 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:40:41.533 [Test worker] INFO  c.s.m.d.r.ChannelRepositoryTest - Starting ChannelRepositoryTest using Java 17.0.14 with PID 18172 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 20:40:41.534 [Test worker] INFO  c.s.m.d.r.ChannelRepositoryTest - The following 1 profile is active: "test"
+25-05-18 20:40:41.738 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-18 20:40:41.775 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 33 ms. Found 6 JPA repository interfaces.
+25-05-18 20:40:41.805 [Test worker] INFO  edDataSourceBeanFactoryPostProcessor - Replacing 'dataSource' DataSource bean with embedded version
+25-05-18 20:40:41.870 [Test worker] INFO  o.s.j.d.e.EmbeddedDatabaseFactory - Starting embedded database: url='jdbc:h2:mem:fcee4546-8a32-4f1e-983c-6ece7d11fba8;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+25-05-18 20:40:42.034 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-18 20:40:42.063 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-18 20:40:42.079 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+25-05-18 20:40:42.204 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-18 20:40:42.245 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory$EmbeddedDataSourceProxy@1f6c4ae']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-18 20:40:42.700 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-18 20:40:42.707 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:40:42.709 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:40:42.709 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:40:42.710 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:40:42.710 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:40:42.710 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:40:42.711 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:40:42.714 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-18 20:40:42.715 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+25-05-18 20:40:42.716 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+25-05-18 20:40:42.717 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+25-05-18 20:40:42.718 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+25-05-18 20:40:42.719 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-18 20:40:42.720 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-18 20:40:42.722 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-18 20:40:42.723 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-18 20:40:42.724 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-18 20:40:42.725 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:40:42.726 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:40:42.727 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-18 20:40:42.728 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-18 20:40:42.728 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-18 20:40:42.731 [Test worker] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:40:42.873 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-18 20:40:43.182 [Test worker] INFO  c.s.m.d.r.ChannelRepositoryTest - Started ChannelRepositoryTest in 1.865 seconds (process running for 2.418)
+25-05-18 20:40:43.512 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:40:43.515 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.468393Z]
+25-05-18 20:40:43.519 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [Desc1]
+25-05-18 20:40:43.519 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [Public1]
+25-05-18 20:40:43.519 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PUBLIC]
+25-05-18 20:40:43.519 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.468393Z]
+25-05-18 20:40:43.519 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [fff19b9a-af5a-4bfe-b914-c4356bc3377f]
+25-05-18 20:40:43.526 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:40:43.526 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.479423Z]
+25-05-18 20:40:43.526 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [null]
+25-05-18 20:40:43.526 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [null]
+25-05-18 20:40:43.526 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PRIVATE]
+25-05-18 20:40:43.526 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.479423Z]
+25-05-18 20:40:43.526 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [41aad619-4e6e-4f30-9305-102a6fab0f1c]
+25-05-18 20:40:43.532 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?)
+25-05-18 20:40:43.533 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [PUBLIC]
+25-05-18 20:40:43.533 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [null]
+25-05-18 20:40:43.583 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:40:43.583 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.581568Z]
+25-05-18 20:40:43.583 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [Desc1]
+25-05-18 20:40:43.583 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [Public1]
+25-05-18 20:40:43.583 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PUBLIC]
+25-05-18 20:40:43.583 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.581568Z]
+25-05-18 20:40:43.583 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [61801330-8574-41fb-9eb8-0bcef5e9d7ad]
+25-05-18 20:40:43.584 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:40:43.585 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.581781Z]
+25-05-18 20:40:43.585 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [null]
+25-05-18 20:40:43.585 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [null]
+25-05-18 20:40:43.585 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PRIVATE]
+25-05-18 20:40:43.585 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:40:43.581781Z]
+25-05-18 20:40:43.585 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [1af9fb50-3a66-4beb-b9ce-67842fd287e4]
+25-05-18 20:40:43.585 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?)
+25-05-18 20:40:43.586 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [PUBLIC]
+25-05-18 20:40:43.586 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [1af9fb50-3a66-4beb-b9ce-67842fd287e4]
+25-05-18 20:40:43.594 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:40:43.595 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:40:43.596 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:40:43.596 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:40:43.597 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:40:43.597 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:40:43.597 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:40:43.598 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:48:36.136 [Test worker] INFO  c.s.m.d.r.MessageRepositoryTest - Starting MessageRepositoryTest using Java 17.0.14 with PID 18608 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 20:48:36.137 [Test worker] INFO  c.s.m.d.r.MessageRepositoryTest - The following 1 profile is active: "test"
+25-05-18 20:48:36.344 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-18 20:48:36.382 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 33 ms. Found 6 JPA repository interfaces.
+25-05-18 20:48:36.412 [Test worker] INFO  edDataSourceBeanFactoryPostProcessor - Replacing 'dataSource' DataSource bean with embedded version
+25-05-18 20:48:36.481 [Test worker] INFO  o.s.j.d.e.EmbeddedDatabaseFactory - Starting embedded database: url='jdbc:h2:mem:9c7ace73-2eba-424f-93ca-823aa81c490f;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+25-05-18 20:48:36.642 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-18 20:48:36.670 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-18 20:48:36.687 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+25-05-18 20:48:36.815 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-18 20:48:36.857 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory$EmbeddedDataSourceProxy@7d7d8911']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-18 20:48:37.349 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-18 20:48:37.357 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:48:37.359 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:48:37.359 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:48:37.360 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:48:37.360 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:48:37.361 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:48:37.361 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:48:37.364 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-18 20:48:37.366 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+25-05-18 20:48:37.367 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+25-05-18 20:48:37.368 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+25-05-18 20:48:37.369 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+25-05-18 20:48:37.370 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-18 20:48:37.372 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-18 20:48:37.373 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-18 20:48:37.374 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-18 20:48:37.375 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-18 20:48:37.376 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:48:37.377 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:48:37.378 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-18 20:48:37.379 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-18 20:48:37.380 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-18 20:48:37.383 [Test worker] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:48:37.579 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-18 20:48:37.863 [Test worker] INFO  c.s.m.d.r.MessageRepositoryTest - Started MessageRepositoryTest in 1.949 seconds (process running for 2.494)
+25-05-18 20:48:38.195 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:38.198 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.142206Z]
+25-05-18 20:48:38.201 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [desc]
+25-05-18 20:48:38.201 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [chan]
+25-05-18 20:48:38.201 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PUBLIC]
+25-05-18 20:48:38.201 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.142206Z]
+25-05-18 20:48:38.201 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [c6bb87d5-97ed-4fd4-8a93-db2e3a10aa1a]
+25-05-18 20:48:38.208 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.154780Z]
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [u@test.com]
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.154780Z]
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [user]
+25-05-18 20:48:38.208 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [572b59cb-3c9c-482c-8064-6392e29fb1d1]
+25-05-18 20:48:38.209 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-18 20:48:38.209 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.157598Z]
+25-05-18 20:48:38.209 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.154780Z]
+25-05-18 20:48:38.210 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.157598Z]
+25-05-18 20:48:38.210 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [572b59cb-3c9c-482c-8064-6392e29fb1d1]
+25-05-18 20:48:38.210 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:UUID) <- [e8f356ad-2ae7-40be-ad2a-246da97fff41]
+25-05-18 20:48:38.210 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:38.210 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [572b59cb-3c9c-482c-8064-6392e29fb1d1]
+25-05-18 20:48:38.211 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [c6bb87d5-97ed-4fd4-8a93-db2e3a10aa1a]
+25-05-18 20:48:38.211 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [first]
+25-05-18 20:48:38.211 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.160115Z]
+25-05-18 20:48:38.211 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.160115Z]
+25-05-18 20:48:38.211 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [3de2b056-0b90-4c15-a76e-977a8103430a]
+25-05-18 20:48:38.211 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:38.212 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [572b59cb-3c9c-482c-8064-6392e29fb1d1]
+25-05-18 20:48:38.212 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [c6bb87d5-97ed-4fd4-8a93-db2e3a10aa1a]
+25-05-18 20:48:38.212 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [second]
+25-05-18 20:48:38.212 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.164856Z]
+25-05-18 20:48:38.212 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:38.164856Z]
+25-05-18 20:48:38.212 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [d7f1d8d5-5262-41ba-b8a5-64b932049b44]
+25-05-18 20:48:38.219 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-05-18 20:48:38.220 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [c6bb87d5-97ed-4fd4-8a93-db2e3a10aa1a]
+25-05-18 20:48:38.264 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:48:38.264 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:48:38.265 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:48:38.265 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:48:38.266 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:48:38.266 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:48:38.266 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:48:38.266 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:48:40.744 [Test worker] INFO  c.s.m.d.r.MessageRepositoryTest - Starting MessageRepositoryTest using Java 17.0.14 with PID 18618 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 20:48:40.745 [Test worker] INFO  c.s.m.d.r.MessageRepositoryTest - The following 1 profile is active: "test"
+25-05-18 20:48:40.942 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-18 20:48:40.981 [Test worker] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 34 ms. Found 6 JPA repository interfaces.
+25-05-18 20:48:41.010 [Test worker] INFO  edDataSourceBeanFactoryPostProcessor - Replacing 'dataSource' DataSource bean with embedded version
+25-05-18 20:48:41.076 [Test worker] INFO  o.s.j.d.e.EmbeddedDatabaseFactory - Starting embedded database: url='jdbc:h2:mem:4c0f7649-5af9-475e-ad42-04480a23625b;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+25-05-18 20:48:41.227 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-18 20:48:41.251 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-18 20:48:41.265 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+25-05-18 20:48:41.394 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-18 20:48:41.434 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseFactory$EmbeddedDataSourceProxy@6231f77a']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-18 20:48:41.958 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-18 20:48:41.966 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:48:41.967 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:48:41.968 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:48:41.968 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:48:41.969 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:48:41.969 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:48:41.970 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:48:41.973 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-18 20:48:41.974 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+25-05-18 20:48:41.976 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+25-05-18 20:48:41.976 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+25-05-18 20:48:41.977 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+25-05-18 20:48:41.978 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-18 20:48:41.980 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-18 20:48:41.981 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-18 20:48:41.982 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-18 20:48:41.982 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-18 20:48:41.983 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:48:41.984 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-18 20:48:41.985 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-18 20:48:41.986 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-18 20:48:41.987 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-18 20:48:41.990 [Test worker] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:48:42.154 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-18 20:48:42.458 [Test worker] INFO  c.s.m.d.r.MessageRepositoryTest - Started MessageRepositoryTest in 1.93 seconds (process running for 2.522)
+25-05-18 20:48:42.803 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.806 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.743415Z]
+25-05-18 20:48:42.809 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [desc]
+25-05-18 20:48:42.810 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [chan]
+25-05-18 20:48:42.810 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PUBLIC]
+25-05-18 20:48:42.810 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.743415Z]
+25-05-18 20:48:42.810 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [5a3c077b-42d7-4b7e-891e-0ee7e4f17520]
+25-05-18 20:48:42.816 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.816 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.756415Z]
+25-05-18 20:48:42.816 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [u@test.com]
+25-05-18 20:48:42.817 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:48:42.817 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:48:42.817 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.756415Z]
+25-05-18 20:48:42.817 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [user]
+25-05-18 20:48:42.817 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [ff05b471-8690-4de3-9a95-7f77ace21ec4]
+25-05-18 20:48:42.818 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-18 20:48:42.818 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.758729Z]
+25-05-18 20:48:42.818 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.756415Z]
+25-05-18 20:48:42.818 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.758729Z]
+25-05-18 20:48:42.818 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [ff05b471-8690-4de3-9a95-7f77ace21ec4]
+25-05-18 20:48:42.818 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:UUID) <- [f871bcaa-ca01-44a9-acc8-48ea8bcc7b08]
+25-05-18 20:48:42.819 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.819 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [ff05b471-8690-4de3-9a95-7f77ace21ec4]
+25-05-18 20:48:42.819 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [5a3c077b-42d7-4b7e-891e-0ee7e4f17520]
+25-05-18 20:48:42.819 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [toDelete]
+25-05-18 20:48:42.819 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.761019Z]
+25-05-18 20:48:42.820 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.761019Z]
+25-05-18 20:48:42.820 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [72cf0d55-7e6e-4a10-a291-bb2a86fd5320]
+25-05-18 20:48:42.828 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.id,
+        m1_0.author_id,
+        m1_0.channel_id,
+        m1_0.content,
+        m1_0.created_at,
+        m1_0.updated_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=?
+25-05-18 20:48:42.829 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [5a3c077b-42d7-4b7e-891e-0ee7e4f17520]
+25-05-18 20:48:42.888 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-05-18 20:48:42.889 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [0a9d7cfe-759d-493b-8a65-1454cea8af3b]
+25-05-18 20:48:42.902 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.902 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.895882Z]
+25-05-18 20:48:42.902 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [desc]
+25-05-18 20:48:42.902 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [chan]
+25-05-18 20:48:42.903 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PUBLIC]
+25-05-18 20:48:42.903 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.895882Z]
+25-05-18 20:48:42.903 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [c634c765-789a-4039-8b75-203c6ee3807e]
+25-05-18 20:48:42.905 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.896141Z]
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [u@test.com]
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.896141Z]
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [user]
+25-05-18 20:48:42.905 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [86b8865c-603e-4068-aed2-7418d95dc797]
+25-05-18 20:48:42.906 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-18 20:48:42.906 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.896461Z]
+25-05-18 20:48:42.907 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.896141Z]
+25-05-18 20:48:42.907 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.896461Z]
+25-05-18 20:48:42.907 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [86b8865c-603e-4068-aed2-7418d95dc797]
+25-05-18 20:48:42.907 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:UUID) <- [6e4f8c66-f6a9-4f2a-88bd-078b6939e361]
+25-05-18 20:48:42.908 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.908 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [86b8865c-603e-4068-aed2-7418d95dc797]
+25-05-18 20:48:42.908 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [c634c765-789a-4039-8b75-203c6ee3807e]
+25-05-18 20:48:42.908 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [msg1]
+25-05-18 20:48:42.908 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.897789Z]
+25-05-18 20:48:42.908 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.897789Z]
+25-05-18 20:48:42.908 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [1e2ceab1-c8b8-4f1b-8ba9-d877babe5c97]
+25-05-18 20:48:42.909 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.910 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [86b8865c-603e-4068-aed2-7418d95dc797]
+25-05-18 20:48:42.910 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [c634c765-789a-4039-8b75-203c6ee3807e]
+25-05-18 20:48:42.910 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [msg2]
+25-05-18 20:48:42.910 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.898037Z]
+25-05-18 20:48:42.910 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.898037Z]
+25-05-18 20:48:42.910 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [4e46fe0c-03a2-4453-b5e9-431dd83b88a8]
+25-05-18 20:48:42.911 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.id,
+        a1_0.id,
+        a1_0.created_at,
+        a1_0.email,
+        a1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        a1_0.updated_at,
+        a1_0.username,
+        m1_0.channel_id,
+        m1_0.content,
+        m1_0.created_at,
+        m1_0.updated_at 
+    from
+        messages m1_0 
+    left join
+        users a1_0 
+            on a1_0.id=m1_0.author_id 
+    join
+        user_statuses s1_0 
+            on a1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=a1_0.profile_id 
+    where
+        m1_0.channel_id=? 
+        and m1_0.created_at<? 
+    fetch
+        first ? rows only
+25-05-18 20:48:42.912 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [c634c765-789a-4039-8b75-203c6ee3807e]
+25-05-18 20:48:42.912 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:48:52.898859Z]
+25-05-18 20:48:42.912 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:INTEGER) <- [2]
+25-05-18 20:48:42.927 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.928 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.924878Z]
+25-05-18 20:48:42.928 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [desc]
+25-05-18 20:48:42.928 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [chan]
+25-05-18 20:48:42.928 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:ENUM) <- [PUBLIC]
+25-05-18 20:48:42.928 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.924878Z]
+25-05-18 20:48:42.928 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [ece6bf80-9999-43d5-a3c6-77586b89b140]
+25-05-18 20:48:42.929 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925138Z]
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [u@test.com]
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [pw]
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [null]
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925138Z]
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:VARCHAR) <- [user]
+25-05-18 20:48:42.930 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (7:UUID) <- [08b62e4b-c723-405d-ae7f-6f37757b123f]
+25-05-18 20:48:42.931 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        user_statuses
+        (created_at, last_active_at, updated_at, user_id, id) 
+    values
+        (?, ?, ?, ?, ?)
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925309Z]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925138Z]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925309Z]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:UUID) <- [08b62e4b-c723-405d-ae7f-6f37757b123f]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:UUID) <- [3b28e074-d447-41ad-8d70-f13654474e1e]
+25-05-18 20:48:42.931 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [08b62e4b-c723-405d-ae7f-6f37757b123f]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [ece6bf80-9999-43d5-a3c6-77586b89b140]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [first]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925487Z]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925487Z]
+25-05-18 20:48:42.931 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [b6b90aa1-b5d3-4733-80bd-ea93935362eb]
+25-05-18 20:48:42.932 [Test worker] DEBUG org.hibernate.SQL - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-18 20:48:42.932 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [08b62e4b-c723-405d-ae7f-6f37757b123f]
+25-05-18 20:48:42.932 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:UUID) <- [ece6bf80-9999-43d5-a3c6-77586b89b140]
+25-05-18 20:48:42.932 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:VARCHAR) <- [second]
+25-05-18 20:48:42.932 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (4:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925657Z]
+25-05-18 20:48:42.932 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (5:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.925657Z]
+25-05-18 20:48:42.932 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (6:UUID) <- [9032cf5e-25b0-4eac-820e-a946e995e9f8]
+25-05-18 20:48:42.932 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-05-18 20:48:42.933 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [ece6bf80-9999-43d5-a3c6-77586b89b140]
+25-05-18 20:48:42.940 [Test worker] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.id,
+        a1_0.id,
+        a1_0.created_at,
+        a1_0.email,
+        a1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        a1_0.updated_at,
+        a1_0.username,
+        m1_0.channel_id,
+        m1_0.content,
+        m1_0.created_at,
+        m1_0.updated_at 
+    from
+        messages m1_0 
+    left join
+        users a1_0 
+            on a1_0.id=m1_0.author_id 
+    join
+        user_statuses s1_0 
+            on a1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=a1_0.profile_id 
+    where
+        m1_0.channel_id=? 
+        and m1_0.created_at<? 
+    fetch
+        first ? rows only
+25-05-18 20:48:42.941 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:UUID) <- [8b4153eb-330c-48f8-9136-f1f8ab636dcc]
+25-05-18 20:48:42.941 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP_UTC) <- [2025-05-18T11:48:42.940216Z]
+25-05-18 20:48:42.942 [Test worker] TRACE org.hibernate.orm.jdbc.bind - binding parameter (3:INTEGER) <- [11]
+25-05-18 20:48:42.952 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-18 20:48:42.953 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+25-05-18 20:48:42.954 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+25-05-18 20:48:42.954 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+25-05-18 20:48:42.955 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+25-05-18 20:48:42.955 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+25-05-18 20:48:42.955 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+25-05-18 20:48:42.956 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+25-05-18 20:55:21.099 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 18931 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 20:55:21.101 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 20:55:21.926 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 20:55:22.106 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 20:55:22.106 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 20:55:22.107 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 20:55:22.124 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.254 seconds (process running for 1.83)
+25-05-18 20:55:22.206 [Test worker] INFO  c.s.m.d.controller.UserController - Attempting to create user with data: UserCreateRequest[username=alice, email=alice@example.com, password=pwd1234]
+25-05-18 20:55:22.248 [Test worker] INFO  c.s.m.d.controller.UserController - Attempting to create user with data: UserCreateRequest[username=, email=bad-email, password=]
+25-05-18 20:55:55.931 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 18983 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 20:55:55.932 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 20:55:56.802 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 20:55:56.997 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 20:55:56.997 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 20:55:56.998 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 20:55:57.018 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.341 seconds (process running for 1.867)
+25-05-18 20:55:57.097 [Test worker] INFO  c.s.m.d.controller.UserController - Attempting to create user with data: UserCreateRequest[username=, email=bad-email, password=]
+25-05-18 21:00:39.055 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 19282 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:00:39.056 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:00:39.886 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:00:40.073 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:00:40.073 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:00:40.074 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:00:40.092 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.256 seconds (process running for 1.763)
+25-05-18 21:00:40.193 [Test worker] INFO  c.s.m.d.controller.UserController - Attempting to create user with data: UserCreateRequest[username=, email=bad-email, password=]
+25-05-18 21:04:05.138 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 19467 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:04:05.139 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:04:05.928 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:04:06.025 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:04:06.192 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:04:06.193 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:04:06.194 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:04:06.218 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.324 seconds (process running for 1.908)
+25-05-18 21:05:46.011 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 19556 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:05:46.012 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:05:46.752 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:05:46.836 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:05:46.995 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:05:46.995 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:05:46.996 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:05:47.019 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.225 seconds (process running for 1.773)
+25-05-18 21:12:06.833 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 19873 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:12:06.834 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:12:07.593 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:12:07.679 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:12:07.841 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:12:07.841 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:12:07.842 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:12:07.865 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.248 seconds (process running for 1.81)
+25-05-18 21:13:35.275 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 19955 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:13:35.276 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:13:36.046 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:13:36.133 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:13:36.293 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:13:36.293 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:13:36.294 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:13:36.317 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.271 seconds (process running for 1.826)
+25-05-18 21:17:35.839 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 20139 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:17:35.840 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:17:36.658 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:17:36.745 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:17:36.911 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:17:36.912 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:17:36.913 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 21:17:36.935 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.329 seconds (process running for 1.91)
+25-05-18 21:19:48.884 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 20269 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:19:48.885 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:19:49.714 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:19:49.806 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:19:49.969 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:19:49.970 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:19:49.971 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 21:19:49.994 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.343 seconds (process running for 1.902)
+25-05-18 21:19:50.029 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/23332912-55ae-4f86-a5f7-30a5b1344ffd
+25-05-18 21:19:50.063 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/a5d343b1-ebc1-4a01-868a-99edc7cc223c
+25-05-18 21:19:50.096 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:19:50.107 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for GET /api/users
+25-05-18 21:19:50.115 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:20:16.063 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 20304 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:20:16.064 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:20:16.843 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:20:16.929 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:20:17.087 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:20:17.087 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:20:17.088 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:20:17.111 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.275 seconds (process running for 1.785)
+25-05-18 21:20:17.167 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:20:30.994 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 20319 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:20:30.995 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:20:31.747 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:20:31.846 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:20:32.016 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:20:32.017 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:20:32.017 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 21:20:32.041 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.263 seconds (process running for 1.813)
+25-05-18 21:20:32.078 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/684bdc3b-6fa1-4716-bcfd-abdfcd2c5df5
+25-05-18 21:20:32.110 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/48612d45-d0e3-4325-90ca-2e2547a731f6
+25-05-18 21:20:32.143 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:20:32.152 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for GET /api/users
+25-05-18 21:20:32.160 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:20:38.529 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 20331 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:20:38.530 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:20:39.273 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:20:39.362 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:20:39.525 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:20:39.525 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:20:39.526 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:20:39.548 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.242 seconds (process running for 1.765)
+25-05-18 21:20:39.610 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:57:37.261 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 21991 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:57:37.262 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:57:38.041 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:57:38.140 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:57:38.314 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:57:38.315 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:57:38.315 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 21:57:38.337 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.29 seconds (process running for 1.812)
+25-05-18 21:57:38.380 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/b4cdc8a7-dd37-426c-a4df-2f393bc7cdbb
+25-05-18 21:57:38.431 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:57:38.442 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/0dfcc452-fd77-43dd-ab29-0ba550b7a2b7
+25-05-18 21:57:38.455 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:57:38.463 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for GET /api/users
+25-05-18 21:57:55.437 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 22036 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:57:55.438 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:57:56.239 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:57:56.328 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:57:56.480 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:57:56.480 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:57:56.480 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 21:57:56.501 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.29 seconds (process running for 1.839)
+25-05-18 21:57:56.536 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/bd763a4d-30bd-4717-aff0-fbf6cc132a07
+25-05-18 21:57:56.590 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:57:56.600 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for DELETE /api/users/06f17273-63c1-4667-a9e1-d3a6601e646a
+25-05-18 21:57:56.610 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 21:57:56.619 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for GET /api/users
+25-05-18 21:58:11.097 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 22049 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 21:58:11.098 [Test worker] INFO  c.s.m.d.c.UserControllerTest - The following 1 profile is active: "test"
+25-05-18 21:58:11.877 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 21:58:11.965 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 21:58:12.129 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 21:58:12.130 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 21:58:12.131 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 21:58:12.154 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.3 seconds (process running for 1.851)
+25-05-18 21:58:12.215 [Test worker] WARN  o.s.web.servlet.PageNotFound - No mapping for POST /api/users
+25-05-18 22:01:28.967 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 22212 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:01:28.968 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:01:29.802 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:01:29.984 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:01:29.984 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:01:29.985 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 22:01:30.004 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.245 seconds (process running for 1.783)
+25-05-18 22:01:30.091 [Test worker] INFO  c.s.m.d.controller.UserController - Attempting to create user with data: UserCreateRequest[username=alice, email=alice@example.com, password=pwd1234]
+25-05-18 22:02:20.531 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 22253 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:02:20.532 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:02:21.372 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:02:21.553 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:02:21.553 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:02:21.554 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:02:21.572 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.264 seconds (process running for 1.835)
+25-05-18 22:02:21.655 [Test worker] INFO  c.s.m.d.controller.UserController - Attempting to create user with data: UserCreateRequest[username=, email=not-an-email, password=]
+25-05-18 22:02:41.265 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 22276 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:02:41.266 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:02:42.095 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:02:42.267 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:02:42.267 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:02:42.268 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 22:02:42.289 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.234 seconds (process running for 1.738)
+25-05-18 22:02:48.031 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 22289 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:02:48.032 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:02:48.837 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:02:49.005 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:02:49.005 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:02:49.006 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:02:49.025 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.221 seconds (process running for 1.751)
+25-05-18 22:12:27.645 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22757 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:12:27.647 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:12:28.484 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:12:28.668 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:12:28.668 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:12:28.669 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:12:28.688 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.278 seconds (process running for 1.821)
+25-05-18 22:12:34.686 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22781 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:12:34.687 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:12:35.505 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:12:35.696 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:12:35.696 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:12:35.697 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:12:35.716 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.254 seconds (process running for 1.765)
+25-05-18 22:12:55.687 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22803 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:12:55.688 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:12:56.516 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:12:56.695 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:12:56.695 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:12:56.696 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:12:56.716 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.241 seconds (process running for 1.785)
+25-05-18 22:13:03.116 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22815 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:03.117 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:03.897 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:04.069 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:04.070 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:04.071 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:04.088 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.201 seconds (process running for 1.717)
+25-05-18 22:13:08.820 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22821 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:08.821 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:09.618 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:09.803 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:09.803 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:09.804 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:09.822 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.198 seconds (process running for 1.699)
+25-05-18 22:13:14.907 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22833 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:14.908 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:15.705 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:15.884 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:15.884 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:15.885 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:15.904 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.213 seconds (process running for 1.735)
+25-05-18 22:13:27.838 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22845 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:27.839 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:28.692 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:28.874 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:28.874 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:28.875 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:28.893 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.27 seconds (process running for 1.795)
+25-05-18 22:13:33.448 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22857 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:33.449 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:34.220 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:34.397 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:34.397 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:34.398 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:34.416 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.17 seconds (process running for 1.645)
+25-05-18 22:13:38.956 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22863 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:38.957 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:39.761 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:39.947 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:39.948 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:39.949 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:39.969 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.24 seconds (process running for 1.755)
+25-05-18 22:13:47.432 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 22875 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:13:47.433 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:13:48.200 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:13:48.370 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:13:48.370 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:13:48.371 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:13:48.388 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.192 seconds (process running for 1.683)
+25-05-18 22:16:53.378 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Starting ChannelControllerTest using Java 17.0.14 with PID 23022 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:16:53.379 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:16:54.215 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:16:54.384 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:16:54.385 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:16:54.385 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 22:16:54.407 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest - Started ChannelControllerTest in 1.269 seconds (process running for 1.83)
+25-05-18 22:18:02.072 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 23072 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:18:02.073 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:18:02.898 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:18:03.076 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:18:03.076 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:18:03.077 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:18:03.096 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.233 seconds (process running for 1.813)
+25-05-18 22:19:26.759 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 23163 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:19:26.761 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:19:27.573 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:19:27.749 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:19:27.750 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:19:27.750 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 0 ms
+25-05-18 22:19:27.768 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Started UserControllerTest in 1.217 seconds (process running for 1.731)
+25-05-18 22:39:09.570 [Test worker] INFO  c.s.m.d.c.UserControllerTest - Starting UserControllerTest using Java 17.0.14 with PID 24123 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:39:09.571 [Test worker] INFO  c.s.m.d.c.UserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:39:10.360 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 22:39:10.366 [Test worker] WARN  s.w.c.s.GenericWebApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'methodValidationPostProcessor' defined in class path resource [com/sprint/mission/discodeit/controller/ValidationConfig.class]: Unsatisfied dependency expressed through method 'methodValidationPostProcessor' parameter 0: Error creating bean with name 'validator' defined in class path resource [com/sprint/mission/discodeit/controller/ValidationConfig.class]: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+25-05-18 22:39:10.382 [Test worker] INFO  .a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-18 22:39:10.398 [Test worker] ERROR s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+The Bean Validation API is on the classpath but no implementation could be found
+
+Action:
+
+Add an implementation, such as Hibernate Validator, to the classpath
+
+25-05-18 22:39:10.401 [Test worker] WARN  o.s.test.context.TestContextManager - Caught exception while allowing TestExecutionListener [org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener] to prepare test instance [com.sprint.mission.discodeit.controller.UserControllerTest@6cd45b6c]
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@259195fe testClass = com.sprint.mission.discodeit.controller.UserControllerTest, locations = [], classes = [com.sprint.mission.discodeit.DiscodeitApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@4c2cc639, org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@ec2cc4, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@8d188738, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@219763b0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@32811494, [ImportsContextCustomizer@12209826 key = [org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration, com.sprint.mission.discodeit.controller.ValidationConfig, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@abf688e, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@2974f221, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@cd8cba54, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@20a8a64e, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@5c2164dd], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.postProcessFields(MockitoTestExecutionListener.java:128)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.injectFields(MockitoTestExecutionListener.java:112)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.prepareTestInstance(MockitoTestExecutionListener.java:69)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:160)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
+	at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:121)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'methodValidationPostProcessor' defined in class path resource [com/sprint/mission/discodeit/controller/ValidationConfig.class]: Unsatisfied dependency expressed through method 'methodValidationPostProcessor' parameter 0: Error creating bean with name 'validator' defined in class path resource [com/sprint/mission/discodeit/controller/ValidationConfig.class]: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:546)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1351)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1181)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:563)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:204)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.registerBeanPostProcessors(PostProcessorRegistrationDelegate.java:265)
+	at org.springframework.context.support.AbstractApplicationContext.registerBeanPostProcessors(AbstractApplicationContext.java:808)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:611)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 90 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'validator' defined in class path resource [com/sprint/mission/discodeit/controller/ValidationConfig.class]: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1568)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1514)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 114 common frames omitted
+Caused by: jakarta.validation.NoProviderFoundException: Unable to create a Configuration, because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.
+	at jakarta.validation.Validation$GenericBootstrapImpl.configure(Validation.java:291)
+	at org.springframework.validation.beanvalidation.LocalValidatorFactoryBean.afterPropertiesSet(LocalValidatorFactoryBean.java:270)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1849)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	... 124 common frames omitted
+25-05-18 22:47:11.603 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.1.Final
+25-05-18 22:47:11.629 [Test worker] INFO  c.s.m.d.c.BasicUserControllerTest - Starting BasicUserControllerTest using Java 17.0.14 with PID 24565 (started by gimjihyeob in /Users/gimjihyeob/ideaProjects/2-sprint-mission)
+25-05-18 22:47:11.630 [Test worker] INFO  c.s.m.d.c.BasicUserControllerTest - No active profile set, falling back to 1 default profile: "default"
+25-05-18 22:47:12.401 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'com.sprint.mission.discodeit.controller.ValidationConfig' of type [com.sprint.mission.discodeit.controller.ValidationConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [methodValidationPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+25-05-18 22:47:12.410 [Test worker] WARN  ionDelegate$BeanPostProcessorChecker - Bean 'validator' of type [org.springframework.validation.beanvalidation.LocalValidatorFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [methodValidationPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+25-05-18 22:47:12.505 [Test worker] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-18 22:47:12.673 [Test worker] INFO  b.t.m.w.SpringBootMockServletContext - Initializing Spring TestDispatcherServlet ''
+25-05-18 22:47:12.673 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Initializing Servlet ''
+25-05-18 22:47:12.674 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet - Completed initialization in 1 ms
+25-05-18 22:47:12.697 [Test worker] INFO  c.s.m.d.c.BasicUserControllerTest - Started BasicUserControllerTest in 1.281 seconds (process running for 1.874)

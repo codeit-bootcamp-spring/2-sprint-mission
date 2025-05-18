@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5434/discodeit_prod
+    username: discodeit_user_prod
+    password: discodeit1234
+
+  server:
+    port: 8082
