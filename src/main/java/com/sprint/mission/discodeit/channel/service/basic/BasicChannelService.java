@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.channel.dto.request.PublicChannelUpdateReque
 import com.sprint.mission.discodeit.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
 import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
@@ -14,16 +15,14 @@ import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-
-import static com.sprint.mission.common.exception.ErrorCode.ERROR_CHANNEL_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -69,10 +68,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResult getById(UUID channelId) {
         log.debug("채널 조회 요청: channelId={}", channelId);
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> {
-                    log.error("채널 조회 실패: channelId={} (존재하지 않음)", channelId);
-                    return new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessage());
-                });
+                .orElseThrow(() -> new ChannelNotFoundByID(Map.of("channelId", channelId)));
 
         return channelMapper.convertToChannelResult(channel);
     }
@@ -101,10 +97,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResult updatePublic(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest) {
         log.info("공개 채널 수정 요청: channelId={}, newName={}, newDescription={}", id, publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("공개 채널 수정 실패: channelId={} (존재하지 않음)", id);
-                    return new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessage());
-                });
+                .orElseThrow(() -> new ChannelNotFoundByID(Map.of("channelId", id)));
 
         channel.update(publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
         Channel updatedChannel = channelRepository.save(channel);
@@ -119,7 +112,7 @@ public class BasicChannelService implements ChannelService {
         log.warn("채널 삭제 요청: channelId={}", channelId);
         if (!channelRepository.existsById(channelId)) {
             log.error("채널 삭제 실패: channelId={} (존재하지 않음)", channelId);
-            throw new EntityNotFoundException(ERROR_CHANNEL_NOT_FOUND.getMessage());
+            throw new ChannelNotFoundByID(Map.of("channelId", channelId));
         }
 
         readStatusRepository.deleteAllByChannel_Id(channelId);

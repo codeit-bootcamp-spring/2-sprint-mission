@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.channel.dto.request.PublicChannelUpdateReque
 import com.sprint.mission.discodeit.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
+import com.sprint.mission.discodeit.channel.exception.PrivateChannelUpdateForbidden;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
 import com.sprint.mission.discodeit.message.entity.Message;
@@ -104,7 +106,7 @@ class BasicChannelServiceTest {
     void getById_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.getById(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ChannelNotFoundByID.class);
     }
 
     @DisplayName("채널 아이디로 Public 채널을 조회한다.")
@@ -187,7 +189,7 @@ class BasicChannelServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.updatePublic(UUID.randomUUID(), publicChannelUpdateRequest))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ChannelNotFoundByID.class);
     }
 
     @DisplayName("Private 채널을 수정을 시도하면, 예외를 반환합니다.")
@@ -199,7 +201,7 @@ class BasicChannelServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.updatePublic(savedChannel.getId(), publicChannelUpdateRequest))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(PrivateChannelUpdateForbidden.class);
     }
 
     @DisplayName("채널 삭제시 해당 채널이 없으면, 예외를 반환합니다.")
@@ -207,7 +209,7 @@ class BasicChannelServiceTest {
     void delete_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.delete(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ChannelNotFoundByID.class);
     }
 
     @DisplayName("Public 채널을 삭제하면, 채널과 채널의 메세지를 삭제한다.")

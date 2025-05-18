@@ -5,11 +5,13 @@ import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
+import com.sprint.mission.discodeit.message.exception.MessageNotFoundByID;
 import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.MessageService;
@@ -28,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.sprint.mission.common.exception.ErrorCode.ERROR_MESSAGE_NOT_FOUND;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,7 +45,7 @@ public class BasicMessageService implements MessageService {
     public MessageResult create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> files) {
         log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}", messageCreateRequest.channelId(), messageCreateRequest.authorId(), files != null ? files.size() : 0);
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 채널이 존재하지 않습니다."));
+                .orElseThrow(() -> new ChannelNotFoundByID(Map.of("channelId", messageCreateRequest.channelId())));
         User user = userRepository.findById(messageCreateRequest.authorId())
                 .orElseThrow(() -> new UserNotFoundByID(Map.of("userId", messageCreateRequest.authorId())));
 
@@ -61,7 +61,7 @@ public class BasicMessageService implements MessageService {
     public MessageResult getById(UUID id) {
         log.debug("메시지 조회 요청: messageId={}", id);
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new MessageNotFoundByID(Map.of("messageId", id)));
 
         log.info("메시지 조회 성공: messageId={}", id);
         return messageResultMapper.convertToMessageResult(message);
@@ -83,7 +83,7 @@ public class BasicMessageService implements MessageService {
     public MessageResult updateContext(UUID id, String context) {
         log.info("메시지 수정 요청: messageId={}, newContent={}", id, context);
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new MessageNotFoundByID(Map.of("messageId", id)));
 
         message.updateContext(context);
         Message savedMessage = messageRepository.save(message);
@@ -97,7 +97,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID id) {
         log.warn("메시지 삭제 요청: messageId={}", id);
         if (!messageRepository.existsById(id)) {
-            throw new EntityNotFoundException(ERROR_MESSAGE_NOT_FOUND.getMessage());
+            throw new MessageNotFoundByID(Map.of("messageId", id));
         }
 
         messageRepository.deleteById(id);

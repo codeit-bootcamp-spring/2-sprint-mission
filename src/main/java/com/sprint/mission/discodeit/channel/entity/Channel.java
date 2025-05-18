@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.channel.entity;
 
 import com.sprint.mission.common.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.channel.exception.PrivateChannelUpdateForbidden;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.Map;
 
 @Getter
 @Entity
@@ -29,7 +32,7 @@ public class Channel extends BaseUpdatableEntity {
 
     public void update(String name, String description) {
         if (this.type == ChannelType.PRIVATE) {
-            throw new IllegalStateException("Private 파일은 수정할 수 없습니다.");
+            throw new PrivateChannelUpdateForbidden(Map.of());
         }
 
         if (description != null && !description.equals(this.description)) {

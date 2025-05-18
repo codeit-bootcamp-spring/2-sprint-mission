@@ -1,22 +1,24 @@
 package com.sprint.mission.discodeit.message.service;
 
+import com.sprint.mission.common.dto.response.PageResponse;
+import com.sprint.mission.common.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.common.dto.response.PageResponse;
-import com.sprint.mission.common.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.message.entity.Message;
+import com.sprint.mission.discodeit.message.exception.MessageNotFoundByID;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundByID;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
@@ -86,7 +88,7 @@ public class MessageIntegrationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ChannelNotFoundByID.class);
     }
 
     @DisplayName("등록되지않은 유저가 메세지를 입력하면, 예외를 반환합니다.")
@@ -98,7 +100,7 @@ public class MessageIntegrationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundByID.class);
     }
 
     @DisplayName("메세지 아이디로 조회하면, 메세지를 반환한다.")
@@ -123,7 +125,7 @@ public class MessageIntegrationTest {
     void getByIdTest_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.getById(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(MessageNotFoundByID.class);
     }
 
     @DisplayName("채널 ID를 입력하면, 채널에 속한 메세지 전부를 반환합니다")
@@ -171,7 +173,7 @@ public class MessageIntegrationTest {
     void updateContextTest_EntityNotFoundException() {
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.updateContext(UUID.randomUUID(), ""))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(MessageNotFoundByID.class);
     }
 
     @DisplayName("메세지를 삭제하면, 메세지와 메세지와 연관된 첨부파일도 삭제한다.")
@@ -201,7 +203,7 @@ public class MessageIntegrationTest {
     void deleteTest_EntityNotFound() {
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.delete(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(MessageNotFoundByID.class);
     }
 
 }
