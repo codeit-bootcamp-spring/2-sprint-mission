@@ -10,7 +10,7 @@ spring:
       idle-timeout: 60000
     jpa:
       hibernate:
-        ddl-auto: validate
+        ddl-auto: auto
       show-sql: true
       properties:
         hibernate:
@@ -41,3 +41,7 @@ server:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
+storage:
+  type: local
+  path: C:\Users\user\example\2-sprint-mission\storage
