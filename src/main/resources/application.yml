@@ -23,6 +23,11 @@ spring:
   sql:
     init:
       mode: never
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
 
 logging:
   level:

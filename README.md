@@ -192,10 +192,10 @@
     25-01-01 10:33:55.740 [main] DEBUG o.s.api.AbstractOpenApiResource [827cbc0b | GET | /v3/api-docs] - Init duration for springdoc-openapi is: 216 ms
     ~~~
 2. Spring Boot Admin을 활용한 메트릭 가시화(서버 하나 더 띄우기)
-  - [ ]  Spring Boot Admin 서버를 구현할 모듈을 생성하세요.
-  - [ ]  admin 모듈의 메인 클래스에 @EnableAdminServer 어노테이션을 추가하고, 서버는 9090번 포트로 설정합니다.
-  - [ ]  discodeit 서버를 실행하고, admin 대시보드에 discodeit 인스턴스가 추가되었는지 확인합니다.
-  - [ ]  admin 대시보드 화면을 조작해보면서 각종 메트릭 정보를 확인해보세요.
+  - [x]  Spring Boot Admin 서버를 구현할 모듈을 생성하세요.
+  - [x]  admin 모듈의 메인 클래스에 @EnableAdminServer 어노테이션을 추가하고, 서버는 9090번 포트로 설정합니다.
+  - [x]  discodeit 서버를 실행하고, admin 대시보드에 discodeit 인스턴스가 추가되었는지 확인합니다.
+  - [x]  admin 대시보드 화면을 조작해보면서 각종 메트릭 정보를 확인해보세요.
     - 주요 API의 요청 횟수, 응답시간 등
     - 서비스 정보
 3. 테스트 커버리지 관리

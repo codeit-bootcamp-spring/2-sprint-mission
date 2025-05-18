@@ -8,6 +8,10 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       idle-timeout: 60000
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
 
 server:
   port: 8080
