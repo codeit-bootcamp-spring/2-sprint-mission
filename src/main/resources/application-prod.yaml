@@ -19,6 +19,11 @@ spring:
     init:
       mode: never
 
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+
 server:
   port: 80
 

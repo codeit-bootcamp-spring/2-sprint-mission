@@ -25,6 +25,11 @@ spring:
       mode: always
       schema-locations: classpath:schema.sql
 
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+
 server:
   port: 8080
 
