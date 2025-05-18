@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +48,7 @@ public class ChannelServiceTest {
     private ChannelMapper channelMapper;
 
     @InjectMocks
-    private ChannelService channelService;
+    private BasicChannelService channelService;
 
     @Test
     @DisplayName("정상적인 Public Channel 생성 테스트")

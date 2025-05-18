@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public class UserServiceTest {
     private BinaryContentMapper binaryContentMapper;
 
     @InjectMocks
-    private UserService userService;
+    private BasicUserService userService;
 
     @Test
     @DisplayName("정상적인 User 생성 테스트")
@@ -93,8 +94,6 @@ public class UserServiceTest {
                 (long) binaryContentCreateRequest.get().bytes().length,
                 binaryContentCreateRequest.get().contentType()
         );
-
-        given(binaryContentMapper.toDto(any())).willReturn(profile);
 
         UserDto expectedDto = new UserDto(
                 UUID.randomUUID(),
@@ -149,8 +148,8 @@ public class UserServiceTest {
         UserUpdateRequest request = new UserUpdateRequest("user00", "user00@gmail.com", "4321");
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
-        given(userRepository.existsByUsername(user.getUsername())).willReturn(false);
-        given(userRepository.existsByEmail(user.getEmail())).willReturn(false);
+        given(userRepository.existsByUsername(request.newUsername())).willReturn(false);
+        given(userRepository.existsByEmail(request.newEmail())).willReturn(false);
 
         userService.update(user.getId(), request, Optional.empty());
 
@@ -169,8 +168,6 @@ public class UserServiceTest {
         Optional<BinaryContentCreateRequest> profile = Optional.of(new BinaryContentCreateRequest("profile.png", "image/png", "ImageData".getBytes()));
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
-        given(userRepository.existsByUsername(user.getUsername())).willReturn(false);
-        given(userRepository.existsByEmail(user.getEmail())).willReturn(false);
 
         userService.update(user.getId(), request, profile);
 

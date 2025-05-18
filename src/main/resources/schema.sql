@@ -68,7 +68,7 @@ CREATE TABLE read_statuses
     updated_at   TIMESTAMP WITH TIME ZONE,
     user_id      UUID,
     channel_id   UUID,
-    last_read_at TIMESTAMPTZ NOT NULL,
+    last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (user_id)
         REFERENCES users (id)
         ON DELETE CASCADE,
@@ -86,4 +86,4 @@ CREATE TABLE message_attachments
     FOREIGN KEY (attachment_id)
         REFERENCES binary_contents (id)
         ON DELETE CASCADE
-)
+);
