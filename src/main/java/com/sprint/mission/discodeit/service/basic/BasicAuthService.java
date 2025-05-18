@@ -11,12 +11,14 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.time.Instant;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -25,40 +27,18 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserService userService;
+  private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
 
   @Transactional
   @Override
-  public UserDto register(CreateUserRequest request) {
-    log.info("Registering user: {}", request);
-    String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+  public UserDto register(CreateUserRequest request, MultipartFile profile) {
 
-    if (userRepository.existsByEmail(request.email())) {
-      log.warn("Email already exists: {}", request.email());
-      throw new DiscodeitException(ErrorCode.EMAIL_ALREADY_EXISTS);
-    }
-    if (userRepository.existsByUsername(request.username())) {
-      log.warn("Username already exists: {}", request.username());
-      throw new DiscodeitException(ErrorCode.USERNAME_ALREADY_EXISTS);
-    }
+    UserDto userDto = userService.createUser(request, profile);
 
-    User user = User.builder()
-        .username(request.username())
-        .email(request.email())
-        .password(hashedPassword)
-        .build();
-    userRepository.save(user);
-
-    UserStatus userStatus = UserStatus.builder()
-        .user(user)
-        .lastActiveAt(Instant.now())
-        .build();
-
-    userStatusRepository.save(userStatus);
-    user.setStatus(userStatus);
-
-    log.info("Registered user successfully: {}", user.getId());
-    return userMapper.toDto(user);
+    log.info("Registered user successfully: {}", userDto.id());
+    return userDto;
   }
 
   @Transactional

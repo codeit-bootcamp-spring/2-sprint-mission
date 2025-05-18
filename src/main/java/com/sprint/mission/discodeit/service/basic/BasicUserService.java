@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.exception.User.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Slf4j
@@ -32,10 +34,11 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
+  private final BinaryContentService binaryContentService;
 
   @Override
   @Transactional
-  public UserDto createUser(CreateUserRequest request) {
+  public UserDto createUser(CreateUserRequest request, MultipartFile profile) {
     log.info("Create user requested: {}", request);
     String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
@@ -62,6 +65,11 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
     userStatusRepository.save(userStatus);
     user.setStatus(userStatus);
+
+    if (profile != null && !profile.isEmpty()) {
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      updateProfile(user.getId(), binaryContent);
+    }
 
     log.info("User created successfully: {}", user.getUsername());
     return userMapper.toDto(user);
@@ -108,7 +116,7 @@ public class BasicUserService implements UserService {
 
   @Transactional
   @Override
-  public UserDto updateUser(UUID userId, UpdateUserRequest request) {
+  public UserDto updateUser(UUID userId, UpdateUserRequest request, MultipartFile profile) {
     log.info("Update user by id: {}, request: {}", userId, request);
     User user = findUserOrThrow(userId);
 
@@ -129,6 +137,10 @@ public class BasicUserService implements UserService {
     }
     if (request.newEmail() != null) {
       user.updateEmail(request.newEmail());
+    }
+    if (profile != null && !profile.isEmpty()) {
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      updateProfile(userId, binaryContent);
     }
 
     log.info("User updated successfully: {}", userId);
