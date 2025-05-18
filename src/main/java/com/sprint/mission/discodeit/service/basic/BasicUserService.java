@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.transaction.Transactional;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -123,13 +124,13 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     log.info("유저 삭제 시도: userId={}", userId);
-    try {
-      userRepository.deleteById(userId);
-      log.info("유저 삭제 성공: userId={}", userId);
-    } catch (Exception e) {
-      log.error("유저 삭제 실패: userId={}", userId, e);
-      throw e;
+    boolean exists = userRepository.existsById(userId);
+    if (!exists) {
+      log.error("유저 삭제 실패(존재하지 않음): userId={}", userId);
+      throw new UserNotFoundException();
     }
+    userRepository.deleteById(userId);
+    log.info("유저 삭제 성공: userId={}", userId);
   }
 
   private User getUserBy(UUID userId) {
