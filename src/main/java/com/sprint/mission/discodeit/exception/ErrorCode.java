@@ -42,7 +42,8 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "S001", "Internal server error."),
 
     // Validation
-    INVALID_INPUT_VALUE(400, "S002", "Invalid input value.");
+    INVALID_INPUT_VALUE(400, "S002", "Invalid input value."),
+    REQUIRED_PARAMETER(400, "S003", "Required parameter is missing.");
 
 
     private final int httpStatus;
