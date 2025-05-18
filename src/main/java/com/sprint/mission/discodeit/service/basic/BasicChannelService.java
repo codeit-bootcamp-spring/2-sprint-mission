@@ -5,19 +5,19 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.channel.ChannelExistsException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateNotSupportedException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +30,7 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final ReadStatusService readStatusService;
+    private final ReadStatusRepository readStatusRepository;
     private final ChannelMapper channelMapper;
 
     @Transactional
@@ -80,26 +81,15 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<UUID> joinedChannelIds = readStatusService.findAllByUserId(userId).stream()
-                .map(ReadStatusDto::channelId)
+        List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannel)
+                .map(Channel::getId)
                 .toList();
 
-        List<Channel> allChannels = channelRepository.findAll();
-
-        // PRIVATE 채널 중 가입한 것만
-        List<ChannelDto> privateChannels = allChannels.stream()
-                .filter(channel -> channel.getType().equals(ChannelType.PRIVATE) &&
-                        joinedChannelIds.contains(channel.getId()))
+        return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
+                .stream()
                 .map(channelMapper::toDto)
                 .toList();
-
-        // PUBLIC 채널
-        List<ChannelDto> publicChannels = allChannels.stream()
-                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
-                .map(channelMapper::toDto)
-                .toList();
-
-        return Stream.concat(privateChannels.stream(), publicChannels.stream()).toList();
     }
 
     @Transactional
