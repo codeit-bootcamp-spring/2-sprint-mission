@@ -3,8 +3,12 @@ package com.sprint.mission.discodeit.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -13,7 +17,9 @@ import com.sprint.mission.discodeit.dto.controller.PageResponse;
 import com.sprint.mission.discodeit.dto.service.binarycontent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.service.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.service.message.MessageDto;
+import com.sprint.mission.discodeit.dto.service.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.service.user.UserDto;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -105,11 +111,77 @@ public class MessageControllerTest {
         objectMapper.writeValueAsBytes(request)
     );
 
-    // When & Then
     mockMvc.perform(multipart("/api/messages")
             .file(jsonPart)
-            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+            .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void updateMessage_Success() throws Exception {
+    UUID userId = UUID.randomUUID();
+    UUID channelId = UUID.randomUUID();
+    UUID id = UUID.randomUUID();
+
+    MessageUpdateRequest updateRequest = new MessageUpdateRequest("updatedMessage");
+    Instant now = Instant.now();
+    UserDto userDto = new UserDto(
+        userId, "user", "user@gmail.com", null, true);
+
+    MessageDto updatedMessage = new MessageDto(
+        id, now, now, "updatedMessage", channelId, userDto, new ArrayList<>());
+
+    given(messageService.update(eq(id), any(MessageUpdateRequest.class)))
+        .willReturn(updatedMessage);
+
+    mockMvc.perform(patch("/api/messages/{messageId}", id)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(id.toString()))
+        .andExpect(jsonPath("$.content").value("updatedMessage"))
+        .andExpect(jsonPath("$.author.id").value(userId.toString()))
+        .andExpect(jsonPath("$.channelId").value(channelId.toString()));
+  }
+
+  @Test
+  void updateMessage_Failure_MessageNotFound() throws Exception {
+    UUID invalidMessageId = UUID.randomUUID();
+
+    MessageUpdateRequest updateRequest = new MessageUpdateRequest(
+        "수정된 메시지 내용입니다."
+    );
+
+    MessageNotFoundException ex = new MessageNotFoundException().notFoundWithId(invalidMessageId);
+    given(messageService.update(eq(invalidMessageId), any(MessageUpdateRequest.class))).willThrow(
+        ex);
+
+    mockMvc.perform(patch("/api/messages/{messageId}", invalidMessageId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateRequest)))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void deleteMessage_Success() throws Exception {
+    UUID id = UUID.randomUUID();
+    willDoNothing().given(messageService).delete(id);
+
+    mockMvc.perform(delete("/api/messages/{messageId}", id)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  void deleteMessage_Failure_MessageNotFound() throws Exception {
+    UUID invalidMessageId = UUID.randomUUID();
+
+    MessageNotFoundException ex = new MessageNotFoundException().notFoundWithId(invalidMessageId);
+    willThrow(ex).given(messageService).delete(invalidMessageId);
+
+    mockMvc.perform(delete("/api/messages/{messageId}", invalidMessageId)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
   }
 
   @Test
