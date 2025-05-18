@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -46,5 +47,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(errorResponse);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException e) {
+        ErrorCode errorCode = ErrorCode.REQUIRED_PARAMETER; // 혹은 적절한 ErrorCode 상수
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(new ErrorResponse(e, errorCode));
     }
 }
