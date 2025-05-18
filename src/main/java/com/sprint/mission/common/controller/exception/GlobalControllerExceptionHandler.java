@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.util.List;
 
@@ -21,6 +22,14 @@ public class GlobalControllerExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.ofCustomException(fieldErrors));
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingPart(MissingServletRequestPartException ex) {
+        log.error("Missing multipart part: {}", ex.getRequestPartName());
+
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), ex, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(DiscodeitException.class)

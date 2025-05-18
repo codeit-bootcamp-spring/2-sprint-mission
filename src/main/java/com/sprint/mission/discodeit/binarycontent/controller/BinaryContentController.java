@@ -4,12 +4,16 @@ import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentService;
 import com.sprint.mission.discodeit.binarycontent.storage.BinaryContentStorage;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +30,7 @@ public class BinaryContentController {
     private final BinaryContentStorage binaryContentStorage;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BinaryContentResult> create(@NotNull @RequestPart MultipartFile multipartFile) {
+    public ResponseEntity<BinaryContentResult> create(@RequestPart MultipartFile multipartFile) throws MethodArgumentNotValidException {
         log.info("파일 업로드 요청: filename={}, size={}", multipartFile.getOriginalFilename(), multipartFile.getSize());
         BinaryContentRequest binaryContentRequest = BinaryContentRequest.fromMultipartFile(multipartFile);
         BinaryContentResult binaryContentResult = binaryContentService.createBinaryContent(binaryContentRequest);
@@ -36,7 +40,7 @@ public class BinaryContentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BinaryContentResult>> getByIdIn(@NotNull @RequestParam(value = "binaryContentIds") List<UUID> binaryContentIds) {
+    public ResponseEntity<List<BinaryContentResult>> getByIdIn(@RequestParam(value = "binaryContentIds") List<UUID> binaryContentIds) {
         log.debug("여러 파일 메타데이터 조회 요청: binaryContentIds={}", binaryContentIds);
         List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(binaryContentIds);
         log.info("여러 파일 메타데이터 조회 성공: 조회 수={}", binaryContentResults.size());
@@ -45,7 +49,7 @@ public class BinaryContentController {
     }
 
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<BinaryContentResult> getById(@NotNull @PathVariable UUID binaryContentId) {
+    public ResponseEntity<BinaryContentResult> getById(@PathVariable UUID binaryContentId) {
         log.debug("파일 메타데이터 단건 조회 요청: binaryContentId={}", binaryContentId);
         BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContentId);
         log.info("파일 메타데이터 단건 조회 성공: binaryContentId={}", binaryContentId);
@@ -54,7 +58,7 @@ public class BinaryContentController {
     }
 
     @GetMapping("{binaryContentId}/download")
-    public ResponseEntity<?> download(@NotNull @RequestBody BinaryContentResult binaryContentResult) {
+    public ResponseEntity<?> download(@Valid @RequestBody BinaryContentResult binaryContentResult) {
         log.info("파일 다운로드 요청: binaryContentId={}", binaryContentResult.id());
         InputStreamResource download = binaryContentStorage.download(binaryContentResult);
         return ResponseEntity.ok(download);

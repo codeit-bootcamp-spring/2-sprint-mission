@@ -35,7 +35,6 @@ class AuthControllerTest {
     @MockitoBean
     private JpaMetamodelMappingContext jpaMetamodelMappingContext;
 
-
     @DisplayName("이름과 비밀번호를 사용해서 로그인 합니다.")
     @Test
     void login() {

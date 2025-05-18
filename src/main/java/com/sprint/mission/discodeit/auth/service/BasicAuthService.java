@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.auth.service.basic;
+package com.sprint.mission.discodeit.auth.service;
 
 import com.sprint.mission.discodeit.auth.dto.LoginRequest;
 import com.sprint.mission.discodeit.auth.exception.AuthPasswordNotMatchException;
