@@ -17,7 +17,9 @@ public enum ErrorCode {
     ERROR_READ_STATUS_ALREADY_EXISTS("해당 읽기 상태가 이미 존재합니다."),
     ERROR_READ_STATUS_NOT_FOUND("해당 읽기 상태가 없습니다."),
 
-    ERROR_BINARY_CONTENT_NOT_FOUND("해당 BinaryContent가 존재하지 않습니다.");
+    ERROR_BINARY_CONTENT_NOT_FOUND("해당 BinaryContent가 존재하지 않습니다."),
+
+    ERROR_AUTH_PASSWORD_NOT_MATCH("비밀번호가 일치하지 않습니다.");
 
     private static final String ERROR = "[ERROR]";
     private final String message;

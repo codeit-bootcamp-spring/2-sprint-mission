@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.auth.service.basic;
 
 import com.sprint.mission.discodeit.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.auth.exception.AuthPasswordNotMatchException;
 import com.sprint.mission.discodeit.auth.service.AuthService;
 import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.userstatus.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
@@ -62,7 +65,7 @@ class BasicAuthServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @DisplayName("로그인시 비밀번호가 일치하지 않으면, 예외를 반환합니다.")
@@ -76,7 +79,7 @@ class BasicAuthServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(AuthPasswordNotMatchException.class);
     }
 
     @DisplayName("로그인시 유저 상태가 없을 경우, 예외를 반환합니다.")
@@ -92,7 +95,7 @@ class BasicAuthServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserStatusNotFoundException.class);
     }
 
 }

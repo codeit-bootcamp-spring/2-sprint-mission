@@ -1,18 +1,21 @@
 package com.sprint.mission.discodeit.auth.service.basic;
 
 import com.sprint.mission.discodeit.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.auth.exception.AuthPasswordNotMatchException;
 import com.sprint.mission.discodeit.auth.service.AuthService;
 import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
+import com.sprint.mission.discodeit.userstatus.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class BasicAuthService implements AuthService {
         User user = validateUserName(loginRequest);
         validatePassword(user, loginRequest.password());
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 유저의 상태가 존재하지 않습니다."));
+                .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", user.getId())));
 
         Instant now = Instant.now();
         userStatus.updateLastActiveAt(now);
@@ -38,12 +41,12 @@ public class BasicAuthService implements AuthService {
 
     private User validateUserName(LoginRequest loginRequestUser) {
         return userRepository.findByName(loginRequestUser.username())
-                .orElseThrow(() -> new EntityNotFoundException("해당 유저는 등록되어 있지 않습니다. 회원가입부터 해주세요"));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userName", loginRequestUser.username())));
     }
 
     private void validatePassword(User user, String password) {
         if (!user.isSamePassword(password)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new AuthPasswordNotMatchException(Map.of("userId", user.getId()));
         }
     }
 
