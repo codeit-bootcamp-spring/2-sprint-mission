@@ -19,15 +19,6 @@ spring:
       mode: never
       schema-locations: classpath:schema.sql
 
-logging:
-  level:
-    root: DEBUG
-    com.sprint.mission.discodeit: DEBUG
-    org.hibernate.SQL: DEBUG
-    #org.hibernate.transaction: DEBUG
-    #org.hibernate.engine.transaction.internal: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
 discodeit:
   storage:
     type: local

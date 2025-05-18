@@ -7,3 +7,10 @@ spring:
     username: discodeit_prod_user
     password: discodeitprod1234
     driver-class-name: org.postgresql.Driver
+
+logging:
+  level:
+    root: INFO
+    com.sprint.mission.discodeit: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
