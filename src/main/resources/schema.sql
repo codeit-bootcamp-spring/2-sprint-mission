@@ -23,12 +23,11 @@ CREATE TABLE users
 
 CREATE TABLE user_statuses
 (
-    id             UUID PRIMARY KEY,
+    user_id UUID PRIMARY KEY,
     created_at     timestamp with time zone NOT NULL,
     updated_at     timestamp with time zone,
     last_active_at timestamp with time zone NOT NULL,
-    user_id        UUID UNIQUE              NOT NULL,
-    CONSTRAINT fk_user_statuses_user FOREIGN KEY (user_id)
+    CONSTRAINT fk_user_statuses_user FOREIGN KEY (id)
         REFERENCES users (id)
         ON DELETE CASCADE
 );
