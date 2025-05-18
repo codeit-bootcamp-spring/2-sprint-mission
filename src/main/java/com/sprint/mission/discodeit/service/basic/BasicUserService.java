@@ -135,8 +135,8 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     log.info("Deleting user: {}", userId);
-    if (userRepository.existsById(userId)) {
-      log.warn("User with id {} already exists", userId);
+    if (!userRepository.existsById(userId)) {
+      log.warn("User with id {} does not exist", userId);
       throw new UserNotFoundException(Map.of("존재하지 않는 ID", userId));
     }
 
