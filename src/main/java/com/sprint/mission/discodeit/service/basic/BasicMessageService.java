@@ -138,6 +138,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public void deleteMessage(UUID messageId) {
     log.warn("Delete message request: {}", messageId);
+    validateMessageExists(messageId);
     messageRepository.deleteById(messageId);
     log.info("Message deleted successfully: {}", messageId);
   }

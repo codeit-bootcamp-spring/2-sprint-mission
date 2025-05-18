@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   //기본 제공 쿼리 메서드 사용
-  
+
   List<Channel> findAllByType(ChannelType type);
 
 }

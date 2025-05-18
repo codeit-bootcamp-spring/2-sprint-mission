@@ -10,14 +10,15 @@ import org.springframework.context.ConfigurableApplicationContext;
 @SpringBootApplication
 public class DiscodeitApplication {
 
-    public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+  public static void main(String[] args) {
+    ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class,
+        args);
 
-        UserService userService = context.getBean(UserService.class);
-        ChannelService channelService = context.getBean(ChannelService.class);
-        MessageService messageService = context.getBean(MessageService.class);
+    UserService userService = context.getBean(UserService.class);
+    ChannelService channelService = context.getBean(ChannelService.class);
+    MessageService messageService = context.getBean(MessageService.class);
 
-    }
+  }
 
 //    @Bean
 //    CommandLineRunner run(ApplicationContext context) {
