@@ -1,21 +1,25 @@
 package com.sprint.mission.discodeit.readstatus.service.basic;
 
 import com.sprint.mission.discodeit.channel.entity.Channel;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.readstatus.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
+import com.sprint.mission.discodeit.readstatus.exception.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.readstatus.exception.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -30,11 +34,11 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResult create(ReadStatusCreateRequest readStatusCreateRequest) {
         Channel channel = channelRepository.findById(readStatusCreateRequest.channelId())
-                .orElseThrow(() -> new EntityNotFoundException("readStaus에 해당하는 채널이 없습니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", readStatusCreateRequest.channelId())));
         User user = userRepository.findById(readStatusCreateRequest.userId())
-                .orElseThrow(() -> new EntityNotFoundException("readStatus에 해당하는 유저가 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", readStatusCreateRequest.userId())));
         if (readStatusRepository.existsByChannel_IdAndUser_Id(channel.getId(), user.getId())) {
-            throw new IllegalArgumentException("해당 채널과 유저에 대한 읽기 상태가 이미 존재합니다.");
+            throw new ReadStatusAlreadyExistsException(Map.of("channelId", channel.getId(), "userId", user.getId()));
         }
 
         ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel));
@@ -54,7 +58,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResult updateLastReadTime(UUID readStatusId, Instant time) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 Id의 객체가 없습니다."));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId)));
 
         readStatus.updateLastReadTime(time);
         readStatusRepository.save(readStatus);
@@ -65,7 +69,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
-            throw new EntityNotFoundException("해당 Id의 객체가 없습니다.");
+            throw new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId));
         }
 
         readStatusRepository.deleteById(readStatusId);

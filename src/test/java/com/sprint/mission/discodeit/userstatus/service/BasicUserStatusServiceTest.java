@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.userstatus.service;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResult;
+import com.sprint.mission.discodeit.userstatus.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
 import jakarta.persistence.EntityNotFoundException;
@@ -57,7 +58,7 @@ class BasicUserStatusServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> userStatusService.updateByUserId(UUID.randomUUID(), instant))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserStatusNotFoundException.class);
     }
 
 }

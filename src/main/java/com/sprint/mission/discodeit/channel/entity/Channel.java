@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.channel.entity;
 
 import com.sprint.mission.common.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.channel.exception.PrivateChannelUpdateForbidden;
+import com.sprint.mission.discodeit.channel.exception.PrivateChannelUpdateForbiddenException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class Channel extends BaseUpdatableEntity {
 
     public void update(String name, String description) {
         if (this.type == ChannelType.PRIVATE) {
-            throw new PrivateChannelUpdateForbidden(Map.of());
+            throw new PrivateChannelUpdateForbiddenException(Map.of());
         }
 
         if (description != null && !description.equals(this.description)) {

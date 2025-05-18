@@ -2,12 +2,16 @@ package com.sprint.mission.discodeit.readstatus.service;
 
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.readstatus.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.readstatus.entity.ReadStatus;
+import com.sprint.mission.discodeit.readstatus.exception.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.readstatus.exception.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.user.entity.User;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -77,7 +81,7 @@ class BasicReadStatusServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> readStatusService.create(readStatusCreateRequest))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ChannelNotFoundException.class);
     }
 
     @DisplayName("채널내 유저의 읽기 상태를 생성시, 유저가 등록되있지 않으면 예외를 반환합니다.")
@@ -89,7 +93,7 @@ class BasicReadStatusServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> readStatusService.create(readStatusCreateRequest))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @DisplayName("채널내 유저의 읽기 상태를 생성시, 이미 읽기 상태가 있으면 예외를 반환합니다.")
@@ -103,7 +107,7 @@ class BasicReadStatusServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> readStatusService.create(readStatusCreateRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(ReadStatusAlreadyExistsException.class);
     }
 
     @DisplayName("유저가 가진 모든 채널내 읽기 상태를 조회합니다.")
@@ -154,7 +158,7 @@ class BasicReadStatusServiceTest {
         Assertions.assertThat(readStatusResult.lastReadAt()).isEqualTo(instant);
     }
 
-    @DisplayName("읽기 상태의 ID를 통해 유저의 마지막 읽기 상태를 갱신합니다.")
+    @DisplayName("읽기 상태 업데이트 시도시, 없는 읽기상태면 예외를 반환합니다.")
     @Test
     void updateLastReadTime_Exception() {
         // given
@@ -162,7 +166,7 @@ class BasicReadStatusServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> readStatusService.updateLastReadTime(UUID.randomUUID(), instant))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ReadStatusNotFoundException.class);
     }
 
     @DisplayName("읽기 상태를 삭제합니다.")
@@ -185,7 +189,7 @@ class BasicReadStatusServiceTest {
     void delete_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> readStatusService.delete(UUID.randomUUID()))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ReadStatusNotFoundException.class);
     }
 
 }

@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.channel.dto.request.PublicChannelUpdateReque
 import com.sprint.mission.discodeit.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
@@ -68,7 +68,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResult getById(UUID channelId) {
         log.debug("채널 조회 요청: channelId={}", channelId);
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new ChannelNotFoundByID(Map.of("channelId", channelId)));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", channelId)));
 
         return channelMapper.convertToChannelResult(channel);
     }
@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResult updatePublic(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest) {
         log.info("공개 채널 수정 요청: channelId={}, newName={}, newDescription={}", id, publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new ChannelNotFoundByID(Map.of("channelId", id)));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", id)));
 
         channel.update(publicChannelUpdateRequest.newName(), publicChannelUpdateRequest.newDescription());
         Channel updatedChannel = channelRepository.save(channel);
@@ -112,7 +112,7 @@ public class BasicChannelService implements ChannelService {
         log.warn("채널 삭제 요청: channelId={}", channelId);
         if (!channelRepository.existsById(channelId)) {
             log.error("채널 삭제 실패: channelId={} (존재하지 않음)", channelId);
-            throw new ChannelNotFoundByID(Map.of("channelId", channelId));
+            throw new ChannelNotFoundException(Map.of("channelId", channelId));
         }
 
         readStatusRepository.deleteAllByChannel_Id(channelId);

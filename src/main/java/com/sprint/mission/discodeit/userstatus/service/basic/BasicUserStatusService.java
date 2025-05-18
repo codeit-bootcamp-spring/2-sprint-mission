@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.userstatus.service.basic;
 
 import com.sprint.mission.discodeit.userstatus.dto.UserStatusResult;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
+import com.sprint.mission.discodeit.userstatus.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.userstatus.service.UserStatusService;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -22,7 +24,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusResult updateByUserId(UUID userId, Instant instant) {
         UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+                .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", userId)));
 
         userStatus.updateLastActiveAt(instant);
         UserStatus updatedUserStatus = userStatusRepository.save(userStatus);

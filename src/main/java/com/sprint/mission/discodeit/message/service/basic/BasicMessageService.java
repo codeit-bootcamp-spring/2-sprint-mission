@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.channel.entity.Channel;
-import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
@@ -16,7 +16,7 @@ import com.sprint.mission.discodeit.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.MessageService;
 import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.exception.UserNotFoundByID;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +44,9 @@ public class BasicMessageService implements MessageService {
     public MessageResult create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> files) {
         log.info("메시지 생성 요청: channelId={}, authorId={}, 첨부파일 수={}", messageCreateRequest.channelId(), messageCreateRequest.authorId(), files != null ? files.size() : 0);
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(() -> new ChannelNotFoundByID(Map.of("channelId", messageCreateRequest.channelId())));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", messageCreateRequest.channelId())));
         User user = userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(() -> new UserNotFoundByID(Map.of("userId", messageCreateRequest.authorId())));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", messageCreateRequest.authorId())));
 
         List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
         Message savedMessage = messageRepository.save(new Message(channel, user, messageCreateRequest.content(), attachments));

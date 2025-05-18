@@ -7,7 +7,8 @@ import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.user.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.exception.*;
+import com.sprint.mission.discodeit.user.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.mapper.UserResultMapper;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.service.UserService;
@@ -49,7 +50,7 @@ public class BasicUserService implements UserService {
     public UserResult getById(UUID userId) {
         log.debug("사용자 조회 요청: userId={}", userId);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundByID(Map.of("userId", userId)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
         return userResultMapper.convertToUserResult(user);
     }
@@ -59,7 +60,7 @@ public class BasicUserService implements UserService {
     public UserResult getByName(String name) {
         log.debug("사용자 이름으로 조회 요청: name={}", name);
         User user = userRepository.findByName(name)
-                .orElseThrow(() -> new UserNotFoundByName(Map.of("userName", name)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userName", name)));
 
         return userResultMapper.convertToUserResult(user);
     }
@@ -79,7 +80,7 @@ public class BasicUserService implements UserService {
     public UserResult getByEmail(String email) {
         log.debug("사용자 이메일로 조회 요청: email={}", email);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundByEmail(Map.of("userEmail", email)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userEmail", email)));
 
         return userResultMapper.convertToUserResult(user);
     }
@@ -89,7 +90,7 @@ public class BasicUserService implements UserService {
     public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
         log.info("사용자 수정 요청: userId={}, newUsername={}, newEmail={}", userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundByID(Map.of("userId", userId)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
         if (user.getBinaryContent() != null) {
             log.debug("기존 BinaryContent 삭제: id={}", user.getBinaryContent().getId());
@@ -110,7 +111,7 @@ public class BasicUserService implements UserService {
         log.warn("사용자 삭제 요청: userId={}", userId);
         if (!userRepository.existsById(userId)) {
             log.error("사용자 삭제 실패: userId={} (존재하지 않음)", userId);
-            throw new UserNotFoundByID(Map.of("userId", userId));
+            throw new UserNotFoundException(Map.of("userId", userId));
         }
 
         userRepository.deleteById(userId);
@@ -120,14 +121,14 @@ public class BasicUserService implements UserService {
     private void validateDuplicateUserName(String name) {
         if (userRepository.existsUserByName(name)) {
             log.warn("중복된 사용자 이름: {}", name);
-            throw new UserAlreadyExistsName(Map.of("userName", name));
+            throw new UserAlreadyExistsException(Map.of("userName", name));
         }
     }
 
     private void validateDuplicateEmail(String email) {
         if (userRepository.existsUserByEmail(email)) {
             log.warn("중복된 이메일: {}", email);
-            throw new UserAlreadyExistsEmail(Map.of("email", email));
+            throw new UserAlreadyExistsException(Map.of("email", email));
         }
     }
 

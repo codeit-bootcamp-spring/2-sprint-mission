@@ -6,10 +6,9 @@ import com.sprint.mission.discodeit.channel.dto.request.PublicChannelUpdateReque
 import com.sprint.mission.discodeit.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
-import com.sprint.mission.discodeit.channel.exception.PrivateChannelUpdateForbidden;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.channel.exception.PrivateChannelUpdateForbiddenException;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.discodeit.channel.service.ChannelService;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.readstatus.repository.ReadStatusRepository;
@@ -17,7 +16,6 @@ import com.sprint.mission.discodeit.user.dto.UserResult;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
@@ -106,7 +104,7 @@ class BasicChannelServiceTest {
     void getById_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.getById(UUID.randomUUID()))
-                .isInstanceOf(ChannelNotFoundByID.class);
+                .isInstanceOf(ChannelNotFoundException.class);
     }
 
     @DisplayName("채널 아이디로 Public 채널을 조회한다.")
@@ -189,7 +187,7 @@ class BasicChannelServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.updatePublic(UUID.randomUUID(), publicChannelUpdateRequest))
-                .isInstanceOf(ChannelNotFoundByID.class);
+                .isInstanceOf(ChannelNotFoundException.class);
     }
 
     @DisplayName("Private 채널을 수정을 시도하면, 예외를 반환합니다.")
@@ -201,7 +199,7 @@ class BasicChannelServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.updatePublic(savedChannel.getId(), publicChannelUpdateRequest))
-                .isInstanceOf(PrivateChannelUpdateForbidden.class);
+                .isInstanceOf(PrivateChannelUpdateForbiddenException.class);
     }
 
     @DisplayName("채널 삭제시 해당 채널이 없으면, 예외를 반환합니다.")
@@ -209,7 +207,7 @@ class BasicChannelServiceTest {
     void delete_Exception() {
         // when & then
         Assertions.assertThatThrownBy(() -> channelService.delete(UUID.randomUUID()))
-                .isInstanceOf(ChannelNotFoundByID.class);
+                .isInstanceOf(ChannelNotFoundException.class);
     }
 
     @DisplayName("Public 채널을 삭제하면, 채널과 채널의 메세지를 삭제한다.")

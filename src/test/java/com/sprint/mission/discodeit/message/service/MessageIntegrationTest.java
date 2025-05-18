@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundByID;
+import com.sprint.mission.discodeit.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.message.dto.MessageResult;
 import com.sprint.mission.discodeit.message.dto.request.ChannelMessagePageRequest;
@@ -16,7 +16,7 @@ import com.sprint.mission.discodeit.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.message.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.exception.UserNotFoundByID;
+import com.sprint.mission.discodeit.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import org.assertj.core.api.Assertions;
@@ -88,7 +88,7 @@ public class MessageIntegrationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(ChannelNotFoundByID.class);
+                .isInstanceOf(ChannelNotFoundException.class);
     }
 
     @DisplayName("등록되지않은 유저가 메세지를 입력하면, 예외를 반환합니다.")
@@ -100,7 +100,7 @@ public class MessageIntegrationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(UserNotFoundByID.class);
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @DisplayName("메세지 아이디로 조회하면, 메세지를 반환한다.")
