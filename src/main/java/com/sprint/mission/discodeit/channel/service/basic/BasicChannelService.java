@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.channel.service;
+package com.sprint.mission.discodeit.channel.service.basic;
 
 import com.sprint.mission.discodeit.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.channel.dto.request.PublicChannelCreateRequest;

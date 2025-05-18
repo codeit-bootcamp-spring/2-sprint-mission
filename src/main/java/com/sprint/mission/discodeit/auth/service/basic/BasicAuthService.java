@@ -1,10 +1,10 @@
-package com.sprint.mission.discodeit.auth.service;
+package com.sprint.mission.discodeit.auth.service.basic;
 
+import com.sprint.mission.discodeit.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.auth.service.AuthService;
 import com.sprint.mission.discodeit.user.dto.UserResult;
-import com.sprint.mission.discodeit.auth.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
-import com.sprint.mission.discodeit.auth.service.AuthService;
 import com.sprint.mission.discodeit.userstatus.entity.UserStatus;
 import com.sprint.mission.discodeit.userstatus.repository.UserStatusRepository;
 import jakarta.persistence.EntityNotFoundException;
