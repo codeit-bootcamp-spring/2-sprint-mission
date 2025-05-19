@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.dto.userStatus;
 
 import java.time.Instant;
-import lombok.Data;
 
-@Data
-public class UserStatusUpdateRequest {
+public record UserStatusUpdateRequest(
+    Instant newLastActiveAt
+) {
 
-  private Instant newLastActiveAt;
 }

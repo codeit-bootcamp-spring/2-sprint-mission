@@ -2,11 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.jwt.JwtUtil;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -14,6 +13,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,65 +31,52 @@ public class UserController {
   private final UserService userService;
   private final AuthService authService;
   private final UserStatusService userStatusService;
-  private final JwtUtil jwtUtil;
   private final BinaryContentService binaryContentService;
 
+  @RequestMapping(value = "", method = RequestMethod.GET)
+  public ResponseEntity<List<UserDto>> findAll() {
+    return ResponseEntity.ok(userService.getAllUsers());
+  }
+
   @RequestMapping(value = "", method = RequestMethod.POST)
-  public ResponseEntity<User> register(@RequestPart("userCreateRequest") CreateUserRequest request,
+  public ResponseEntity<UserDto> createUser(
+      @RequestPart("userCreateRequest") CreateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-    User user = authService.register(request);
+    UserDto user = authService.register(request);
     if (!profile.isEmpty()) {
-      UUID binaryId = binaryContentService.createBinaryContent(profile);
-      user = userService.updateProfile(user.getId(), binaryId);
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      user = userService.updateProfile(user.id(), binaryContent);
     }
-    return ResponseEntity.status(201).body(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  }
+
+  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+  public ResponseEntity<?> delete(@PathVariable("userId") UUID userId) {
+    userService.deleteUser(userId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("회원 탈퇴 완료");
   }
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-  public ResponseEntity<User> updateUser(
+  public ResponseEntity<UserDto> update(
       @RequestPart("userUpdateRequest") UpdateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
       @PathVariable("userId") UUID userId
   ) {
-    User user = userService.updateUser(userId, request);
+    UserDto userDto = userService.updateUser(userId, request);
 
     if (!profile.isEmpty()) {
-      UUID binaryId = binaryContentService.createBinaryContent(profile);
-      userService.updateProfile(userId, binaryId);
+      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
+      userService.updateProfile(userId, binaryContent);
     }
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(userDto);
   }
 
-//  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
-//  public ResponseEntity<?> updateUserProfile(
-//      @RequestParam("profile") MultipartFile profile,
-//      @PathVariable("userId") UUID userId
-//  ) {
-//    UUID binaryId = binaryContentService.createBinaryContent(profile);
-//
-//    userService.updateProfile(userId, binaryId);
-//
-//    return ResponseEntity.ok("프로필사진 변경 완료");
-//  }
-
-
-  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-  public ResponseEntity<?> deleteUser(@PathVariable("userId") UUID userId) {
-    userService.deleteUser(userId);
-    return ResponseEntity.status(204).body("회원 탈퇴 완료");
-  }
-
-  @RequestMapping(value = "", method = RequestMethod.GET)
-  public ResponseEntity<List<UserInfoDto>> findAll() {
-    return ResponseEntity.ok(userService.getAllUsers());
-  }
 
   @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-  public ResponseEntity<?> updateStatus(
+  public ResponseEntity<UserStatusDto> updateStatus(
       @PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
-    UserStatus userStatus = userStatusService.update(userId, request);
-    return ResponseEntity.ok(userStatus);
+    return ResponseEntity.ok(userStatusService.update(userId, request));
   }
 }

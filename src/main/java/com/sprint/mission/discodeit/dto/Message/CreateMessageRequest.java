@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.dto.Message;
 
 import java.util.UUID;
-import lombok.Data;
 
-@Data
-public class CreateMessageRequest {
+public record CreateMessageRequest(
+    String content,
+    UUID channelId,
+    UUID authorId
+) {
 
-  private String content;
-  private UUID channelId;
-  private UUID authorId;
 }

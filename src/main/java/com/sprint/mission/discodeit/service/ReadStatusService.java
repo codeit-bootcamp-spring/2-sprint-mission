@@ -1,22 +1,26 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
 
-  ReadStatus createReadStatus(CreateReadStatusRequest request);
+  ReadStatusDto createReadStatus(CreateReadStatusRequest request);
 
-  ReadStatus findReadStatusById(UUID readStatusId);
+  ReadStatusDto findReadStatusById(UUID readStatusId);
 
-  ReadStatus findReadStatusByUserIdAndChannelId(UUID userId, UUID channelId);
+  ReadStatusDto findReadStatusByUserIdAndChannelId(UUID userId, UUID channelId);
 
-  List<ReadStatus> findAll();
+  List<ReadStatusDto> findAll();
 
-  ReadStatus updateReadStatus(UUID readStatusId, UpdateReadStatusRequest request);
+  List<ReadStatusDto> findAllByUserId(UUID userId);
 
-  void deleteReadStatus(UUID id);
+  ReadStatusDto updateReadStatus(UUID readStatusId, UpdateReadStatusRequest request);
+
+  void deleteReadStatus(UUID readStatusId);
+
+  void validateReadStatusExists(UUID readStatusId);
 }

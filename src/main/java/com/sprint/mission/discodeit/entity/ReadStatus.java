@@ -1,30 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ReadStatus extends BaseEntity implements Serializable {
+@Entity
+@Table(name = "read_statuses", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+})
+public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  private final UUID channelId;
-  private final UUID userId;
-  private Instant lastReadAt;
-  //private final Map<UUID, Instant> userIds = new ConcurrentHashMap<>();
+  
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @Column(name = "last_read_at", nullable = false)
+  private Instant lastReadAt;
+
+  @Builder
+  public ReadStatus(Channel channel, User user, Instant lastReadAt) {
     super();
-    this.userId = userId;
-    this.channelId = channelId;
-    if (lastReadAt != null) {
-      this.lastReadAt = Instant.now();
-    } else {
-      this.lastReadAt = lastReadAt;
-    }
+    this.channel = channel;
+    this.user = user;
+    this.lastReadAt = lastReadAt;
+  }
+
+  protected ReadStatus() {
   }
 
   public void updateLastAccessTime() {
@@ -36,8 +55,8 @@ public class ReadStatus extends BaseEntity implements Serializable {
     return "ReadStatus{" +
 
         "id=" + getId() +
-        ", channelId=" + channelId +
-        ", userIds=" + userId +
+        ", channel=" + channel +
+        ", user=" + user +
         ", readTime=" + lastReadAt +
         '}';
   }

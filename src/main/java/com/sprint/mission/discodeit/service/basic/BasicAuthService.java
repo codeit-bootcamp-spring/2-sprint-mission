@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.jwt.JwtUtil;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -13,6 +14,7 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,55 +22,51 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
-  private final JwtUtil jwtUtil;
+  private final UserMapper userMapper;
 
+  @Transactional
   @Override
-  public User register(CreateUserRequest request) {
-    String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
+  public UserDto register(CreateUserRequest request) {
+    String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
 
-    if (userRepository.existsByEmail(request.getEmail())) {
+    if (userRepository.existsByEmail(request.email())) {
       throw new IllegalArgumentException("이미 존재하는 Email입니다");
     }
-    if (userRepository.existsByUsername(request.getUsername())) {
+    if (userRepository.existsByUsername(request.username())) {
       throw new IllegalArgumentException("이미 존재하는 Username입니다");
     }
 
-    User user = new User(request.getUsername(), request.getEmail(), hashedPassword);
-    userRepository.addUser(user);
-    userStatusRepository.addUserStatus(new UserStatus(user.getId(), Instant.now()));
+    User user = User.builder()
+        .username(request.username())
+        .email(request.email())
+        .password(hashedPassword)
+        .build();
+    userRepository.save(user);
 
-    return user;
+    UserStatus userStatus = UserStatus.builder()
+        .user(user)
+        .lastActiveAt(Instant.now())
+        .build();
 
-//    return RegisterResponse.builder()
-//        .userId(user.getId())
-//        .success(true)
-//        .message("회원 가입이 완료되었습니다.")
-//        .build();
+    userStatusRepository.save(userStatus);
+    user.setStatus(userStatus);
+
+    return userMapper.toDto(user);
   }
 
+  @Transactional
   @Override
-  public User login(LoginRequest request) {
-    User user = userRepository.findUserByName(request.getUsername())
+  public UserDto login(LoginRequest request) {
+    User user = userRepository.findByUsername(request.username())
         .orElseThrow(NoSuchElementException::new);
-    if (user == null) {
-      throw new NoSuchElementException("존재하지 않는 유저입니다.");
-    }
 
-    // 비밀번호 검증
-    if (!BCrypt.checkpw(request.getPassword(), user.getPassword())) {
+    if (!BCrypt.checkpw(request.password(), user.getPassword())) {
       throw new RuntimeException("비밀번호가 일치하지 않습니다.");
     }
 
-    userStatusRepository.findUserStatusById(user.getId())
+    userStatusRepository.findByUserId(user.getId())
         .ifPresent(UserStatus::updateLastActiveAt);
-    userStatusRepository.save();
 
-    return user;
-
-//    return LoginResponse.builder()
-//        .success(true)
-//        .message("성공적으로 로그인 되었습니다.")
-//        .token(token)
-//        .build();
+    return userMapper.toDto(user);
   }
 }
