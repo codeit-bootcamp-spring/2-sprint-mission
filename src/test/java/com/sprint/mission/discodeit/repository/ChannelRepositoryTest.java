@@ -1,119 +1,96 @@
 package com.sprint.mission.discodeit.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+/**
+ * ChannelRepository 슬라이스 테스트
+ */
 @DataJpaTest
-@ActiveProfiles("test")
 @EnableJpaAuditing
-@Sql(scripts = "classpath:schema.sql")
+@ActiveProfiles("test")
 class ChannelRepositoryTest {
 
-    @Autowired
-    private ChannelRepository channelRepository;
+  @Autowired
+  private ChannelRepository channelRepository;
 
-    private Channel createChannel(ChannelType type, UUID id) {
-        return Channel.builder()
-                .type(type)
-                .name("Test Channel")
-                .build();
-    }
+  @Autowired
+  private TestEntityManager entityManager;
 
-    // 성공 케이스 1: 타입 조건으로 조회 (PUBLIC)
-    @Test
-    void findAllByTypeOrIdIn_ByPublicTypeSuccess() {
-        // Given
-        UUID id1 = UUID.randomUUID();
-        UUID id2 = UUID.randomUUID();
-        channelRepository.saveAll(List.of(
-                createChannel(ChannelType.PUBLIC, id1),
-                createChannel(ChannelType.PRIVATE, id2)
-        ));
+  /**
+   * TestFixture: 채널 생성용 테스트 픽스처
+   */
+  private Channel createTestChannel(ChannelType type, String name) {
+    Channel channel = new Channel(type, name, "설명: " + name);
+    return channelRepository.save(channel);
+  }
 
-        // When
-        List<Channel> result = channelRepository.findAllByTypeOrIdIn(
-                ChannelType.PUBLIC,
-                List.of()
-        );
+  @Test
+  @DisplayName("타입이 PUBLIC이거나 ID 목록에 포함된 채널을 모두 조회할 수 있다")
+  void findAllByTypeOrIdIn_ReturnsChannels() {
+    // given
+    Channel publicChannel1 = createTestChannel(ChannelType.PUBLIC, "공개채널1");
+    Channel publicChannel2 = createTestChannel(ChannelType.PUBLIC, "공개채널2");
+    Channel privateChannel1 = createTestChannel(ChannelType.PRIVATE, "비공개채널1");
+    Channel privateChannel2 = createTestChannel(ChannelType.PRIVATE, "비공개채널2");
 
-        // Then
-        assertThat(result)
-                .hasSize(1)
-                .extracting(Channel::getType)
-                .containsExactly(ChannelType.PUBLIC);
-    }
+    channelRepository.saveAll(
+        Arrays.asList(publicChannel1, publicChannel2, privateChannel1, privateChannel2));
 
-    // 성공 케이스 2: ID 목록으로 조회 (PRIVATE 타입 채널을 ID로 검색)
-    @Test
-    void findAllByTypeOrIdIn_ByIdsSuccess() {
-        // Given
-        UUID targetId = UUID.randomUUID();
-        channelRepository.saveAll(List.of(
-                createChannel(ChannelType.PRIVATE, UUID.randomUUID()),
-                createChannel(ChannelType.PRIVATE, targetId) // 타입은 PRIVATE
-        ));
+    // 영속성 컨텍스트 초기화
+    entityManager.flush();
+    entityManager.clear();
 
-        // When
-        List<Channel> result = channelRepository.findAllByTypeOrIdIn(
-                ChannelType.PUBLIC, // 존재하지 않는 타입 조건
-                List.of(targetId)   // ID로 검색
-        );
+    // when
+    List<UUID> selectedPrivateIds = List.of(privateChannel1.getId());
+    List<Channel> foundChannels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        selectedPrivateIds);
 
-        // Then
-        assertThat(result)
-                .hasSize(1)
-                .extracting(Channel::getId)
-                .containsExactly(targetId);
-    }
+    // then
+    assertThat(foundChannels).hasSize(3); // 공개채널 2개 + 선택된 비공개채널 1개
 
-    // 실패 케이스: 타입과 ID 모두 불일치
-    @Test
-    void findAllByTypeOrIdIn_NoResults() {
-        // Given
-        channelRepository.save(createChannel(ChannelType.PUBLIC, UUID.randomUUID()));
+    // 공개 채널 2개가 모두 포함되어 있는지 확인
+    assertThat(
+        foundChannels.stream().filter(c -> c.getType() == ChannelType.PUBLIC).count()).isEqualTo(2);
 
-        // When
-        List<Channel> result = channelRepository.findAllByTypeOrIdIn(
-                ChannelType.PRIVATE, // 저장된 타입과 다름
-                List.of(UUID.randomUUID()) // 존재하지 않는 ID
-        );
+    // 선택된 비공개 채널만 포함되어 있는지 확인
+    List<Channel> privateChannels = foundChannels.stream()
+        .filter(c -> c.getType() == ChannelType.PRIVATE)
+        .toList();
+    assertThat(privateChannels).hasSize(1);
+    assertThat(privateChannels.get(0).getId()).isEqualTo(privateChannel1.getId());
+  }
 
-        // Then
-        assertThat(result).isEmpty();
-    }
+  @Test
+  @DisplayName("타입이 PUBLIC이 아니고 ID 목록이 비어있으면 비어있는 리스트를 반환한다")
+  void findAllByTypeOrIdIn_EmptyList_ReturnsEmptyList() {
+    // given
+    Channel privateChannel1 = createTestChannel(ChannelType.PRIVATE, "비공개채널1");
+    Channel privateChannel2 = createTestChannel(ChannelType.PRIVATE, "비공개채널2");
 
-    // 추가 테스트: 타입과 ID 조합 검증
-    @Test
-    void findAllByTypeOrIdIn_Combination() {
-        // Given
-        UUID publicId = UUID.randomUUID();
-        UUID privateId = UUID.randomUUID();
-        channelRepository.saveAll(List.of(
-                createChannel(ChannelType.PUBLIC, publicId),
-                createChannel(ChannelType.PRIVATE, privateId)
-        ));
+    channelRepository.saveAll(Arrays.asList(privateChannel1, privateChannel2));
 
-        // When: PUBLIC 타입이거나 privateId인 경우
-        List<Channel> result = channelRepository.findAllByTypeOrIdIn(
-                ChannelType.PUBLIC,
-                List.of(privateId)
-        );
+    // 영속성 컨텍스트 초기화
+    entityManager.flush();
+    entityManager.clear();
 
-        // Then: PUBLIC 1개 + PRIVATE 1개 = 총 2개
-        assertThat(result)
-                .hasSize(2)
-                .extracting(Channel::getId)
-                .containsExactlyInAnyOrder(publicId, privateId);
-    }
-}
+    // when
+    List<Channel> foundChannels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        List.of());
+
+    // then
+    assertThat(foundChannels).isEmpty();
+  }
+} 

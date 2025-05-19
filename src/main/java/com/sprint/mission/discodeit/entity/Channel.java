@@ -1,36 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.*;
-import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "channels")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel extends BaseUpdatableEntity {
 
-    @Setter
-    @Column(name = "name", length = 100)
-    private String name;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
 
-    @Setter
-    @Column(name = "description", length = 500)
-    private String description;
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 10)
-    private ChannelType type;
-
-    @Builder
-    public Channel(String name, String description, ChannelType type) {
-        super();
-        this.name = name;
-        this.description = description;
-        this.type = type;
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+    }
+  }
 }

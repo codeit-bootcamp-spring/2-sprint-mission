@@ -1,20 +1,12 @@
 package com.sprint.mission.discodeit.dto.data;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.UUID;
 
-@Schema(description = "바이너리 콘텐츠 응답 DTO")
 public record BinaryContentDto(
+    UUID id,
+    String fileName,
+    Long size,
+    String contentType
+) {
 
-        @Schema(description = "바이너리 콘텐츠 ID")
-        java.util.UUID id,
-
-        @Schema(description = "파일명")
-        String fileName,
-
-        @Schema(description = "파일 크기")
-        Long size,
-
-        @Schema(description = "콘텐츠 타입")
-        String contentType
-
-) {}
+}
