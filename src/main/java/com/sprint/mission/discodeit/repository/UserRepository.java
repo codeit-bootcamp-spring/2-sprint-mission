@@ -6,19 +6,17 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  boolean existsByUsername(String username);
+  Optional<User> findByUsername(String username);
 
   boolean existsByEmail(String email);
 
-  @Query("select u from User u left join fetch u.profile join fetch u.userStatus where u.id = :id")
-  Optional<User> findByIdWithProfileAndUserStatus(@Param("id") UUID id);
+  boolean existsByUsername(String username);
 
-  @Query("select u from User u left join fetch u.profile join fetch u.userStatus")
-  List<User> findAllWithProfileAndUserStatus();
-
-  Optional<User> findByUsername(String username);
+  @Query("SELECT u FROM User u "
+      + "LEFT JOIN FETCH u.profile "
+      + "JOIN FETCH u.status")
+  List<User> findAllWithProfileAndStatus();
 }
