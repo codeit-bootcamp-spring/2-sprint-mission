@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.message.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
-import com.sprint.mission.discodeit.common.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
@@ -19,9 +20,7 @@ import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
-import net.bytebuddy.description.annotation.AnnotationValue;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.util.List;
@@ -42,9 +39,7 @@ import java.util.stream.Stream;
 import static com.sprint.mission.discodeit.message.service.BasicMessageServiceTest.MESSAGE_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@ActiveProfiles("test")
-@SpringBootTest
-public class MessageIntegrationTest {
+public class MessageIntegrationTest extends IntegrationTestSupport {
 
     @Autowired
     private ChannelRepository channelRepository;
@@ -67,22 +62,52 @@ public class MessageIntegrationTest {
         channelRepository.deleteAllInBatch();
     }
 
-    @DisplayName("유저가 메세지 내용을 입력하면, 채널에 메세지를 생성합니다.")
+    @DisplayName("유저가 채널에 메세지 내용을 입력하면, 채널에 메세지 내용을 보여줍니다.")
     @Test
-    void createTest() {
+    void createTest_NullAttachments() {
         // given
         Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
         User savedUser = userRepository.save(new User("", "", "", null));
         MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId());
 
         // when
-        MessageResult savedMessage = messageService.create(messageCreateRequest, List.of());
+        MessageResult savedMessage = messageService.create(messageCreateRequest, null);
 
         // then
         assertAll(
-                () -> Assertions.assertThat(messageRepository.findByChannel_Id(savedMessage.channelId())).hasSize(1),
                 () -> Assertions.assertThat(savedMessage)
-                        .extracting(MessageResult::content, MessageResult::channelId, messageResult -> messageResult.author().id())
+                        .extracting(
+                                MessageResult::content, MessageResult::channelId, MessageResult::attachments, messageResult -> messageResult.author().id()
+                        )
+                        .containsExactlyInAnyOrder(MESSAGE_CONTENT, savedChannel.getId(), null, savedUser.getId())
+        );
+    }
+
+    @DisplayName("유저가 채널에 메세지 내용과 이미지 첨부파일들 입력하면, 채널에 메세지와 이미지 첨부파일들을 보여줍니다.")
+    @Test
+    void createTest_HaveAttachments() {
+        // given
+        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+        User savedUser = userRepository.save(new User("", "", "", null));
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId());
+        String fileName = UUID.randomUUID().toString();
+        String bytes = UUID.randomUUID().toString();
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(fileName, "", 10, bytes.getBytes());
+        List<BinaryContentRequest> files = List.of(binaryContentRequest);
+
+        // when
+        MessageResult savedMessage = messageService.create(messageCreateRequest, files);
+
+        // then
+        assertAll(
+                () -> Assertions.assertThat(binaryContentRepository.findById(savedMessage.attachments().get(0).id())).isPresent()
+                        .get()
+                        .extracting(BinaryContent::getFileName)
+                        .isEqualTo(fileName),
+                () -> Assertions.assertThat(savedMessage)
+                        .extracting(
+                                MessageResult::content, MessageResult::channelId, messageResult -> messageResult.author().id()
+                        )
                         .containsExactlyInAnyOrder(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId())
         );
     }
@@ -234,16 +259,17 @@ public class MessageIntegrationTest {
                 .isInstanceOf(MessageNotFoundException.class);
     }
 
-    @DisplayName("메세지를 삭제하면, 메세지와 메세지와 연관된 첨부파일도 삭제한다.")
+    @DisplayName("메세지를 삭제하면, 메세지와 첨부파일도 삭제한다.")
     @Test
     void deleteTest() {
         // given
         Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of(new BinaryContent("", "", 0))));
+        User savedUser = userRepository.save(new User("", "", "", null)); // 여기서 문제가 나오네
+        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of(binaryContent)));
         List<UUID> binaryContentIds = savedMessage.getAttachments()
                 .stream()
-                .map(BaseEntity::getId)
+                .map(BinaryContent::getId)
                 .toList();
 
         // when

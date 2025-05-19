@@ -1,30 +1,27 @@
 package com.sprint.mission.discodeit.user.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.domain.user.service.UserService;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.domain.user.service.UserService;
 import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@ActiveProfiles("test")
-@SpringBootTest
-class BasicUserServiceTest {
+class BasicUserServiceTest extends IntegrationTestSupport {
 
     private static final String USER_NAME = "hwang";
     private static final String USER_EMAIL = "h@naver.com";

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.binarycontent.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
@@ -12,8 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +24,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@ActiveProfiles("test")
-@SpringBootTest
-class BinaryContentCoreTest {
+
+class BinaryContentCoreTest extends IntegrationTestSupport {
 
     @Autowired
     private BinaryContentCore binaryContentCore;
@@ -142,4 +140,5 @@ class BinaryContentCoreTest {
             throw new UncheckedIOException("Failed to delete: " + path, e);
         }
     }
+
 }

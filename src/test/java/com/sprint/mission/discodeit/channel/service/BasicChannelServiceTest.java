@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.channel.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelUpdateRequest;
@@ -23,17 +24,14 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@ActiveProfiles("test")
-@SpringBootTest
-class BasicChannelServiceTest {
+
+class BasicChannelServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private UserStatusRepository userStatusRepository;

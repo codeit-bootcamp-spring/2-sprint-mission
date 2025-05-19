@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.LocalBinaryContentStorage;
@@ -19,7 +20,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class LocalBinaryContentStorageTest {
+class LocalBinaryContentStorageTest extends IntegrationTestSupport {
 
     private BinaryContentStorage binaryContentStorage;
     @TempDir

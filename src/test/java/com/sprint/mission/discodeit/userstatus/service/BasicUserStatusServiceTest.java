@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.userstatus.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.userstatus.dto.UserStatusResult;
@@ -11,16 +12,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.util.UUID;
 
-
-@ActiveProfiles("test")
-@SpringBootTest
-class BasicUserStatusServiceTest {
+class BasicUserStatusServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private UserRepository userRepository;

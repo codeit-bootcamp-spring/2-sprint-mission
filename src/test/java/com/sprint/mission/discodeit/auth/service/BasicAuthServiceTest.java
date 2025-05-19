@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.auth.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.auth.dto.LoginRequest;
 import com.sprint.mission.discodeit.domain.auth.exception.AuthPasswordNotMatchException;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
@@ -14,14 +15,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-@ActiveProfiles("test")
-@SpringBootTest
-class BasicAuthServiceTest {
+
+class BasicAuthServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private UserRepository userRepository;

@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.domain.binarycontent.dto;
 
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.message.entity.Message;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record BinaryContentResult(
@@ -25,6 +27,16 @@ public record BinaryContentResult(
                 binaryContent.getFileName(),
                 binaryContent.getContentType()
         );
+    }
+
+    public static List<BinaryContentResult> fromEntity(List<BinaryContent> binaryContents) {
+        if (binaryContents == null) {
+            return null;
+        }
+
+        return binaryContents.stream()
+                .map(BinaryContentResult::fromEntity)
+                .toList();
     }
 
 }

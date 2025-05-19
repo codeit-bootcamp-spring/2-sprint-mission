@@ -8,22 +8,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 public class MessageResultMapper {
 
     public MessageResult convertToMessageResult(Message message) {
-        List<BinaryContentResult> attachments = message.getAttachments()
-                .stream()
-                .map(BinaryContentResult::fromEntity)
-                .toList();
-
-
         return MessageResult.fromEntity(message,
                 UserResult.fromEntity(message.getUser(), message.getUser().getUserStatus().isOnline(Instant.now())),
-                attachments);
+                BinaryContentResult.fromEntity(message.getAttachments()));
     }
 
 }
