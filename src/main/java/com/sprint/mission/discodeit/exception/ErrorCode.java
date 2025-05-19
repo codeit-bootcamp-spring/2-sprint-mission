@@ -25,6 +25,7 @@ public enum ErrorCode {
   USER_STATUS_ALREADY_EXIXTS(400, "이미 존재하는 유저 상태입니다."),
   BINARY_CONTENT_ALREADY_EXISTS(400, "이미 존재하는 콘텐츠입니다."),
   PASSWORD_MISMATCH(400, "잘못된 비밀번호입니다."),
+  BAD_REQUEST(400, "잘못된 요청입니다."),
 
   //500
   INTERNAL_SERVER_ERROR(500, "서버 에러");

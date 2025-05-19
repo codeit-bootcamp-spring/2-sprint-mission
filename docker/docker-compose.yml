@@ -1,0 +1,16 @@
+version: '3'
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: local_postgres
+    environment:
+      POSTGRES_USER: discodeit_user
+      POSTGRES_PASSWORD: discodeit1234
+      POSTGRES_DB: discodeit
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

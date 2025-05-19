@@ -32,4 +32,16 @@ public class ErrorResponse {
     this.exceptionType = exceptionType;
     this.status = status;
   }
+
+  public static ErrorResponse of(ErrorCode errorCode, Map<String, Object> details,
+      String exceptionName) {
+    return new ErrorResponse(
+        Instant.now(),
+        errorCode.name(),
+        errorCode.getMessage(),
+        details,
+        exceptionName,
+        errorCode.getStatus()
+    );
+  }
 }
