@@ -1,63 +1,69 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
+import com.sprint.mission.discodeit.dto.response.ErrorResponse;
+import com.sprint.mission.discodeit.exception.auth.AuthException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
+import com.sprint.mission.discodeit.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.exception.message.MessageException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusException;
+import com.sprint.mission.discodeit.exception.storage.StorageException;
+import com.sprint.mission.discodeit.exception.user.UserException;
+import com.sprint.mission.discodeit.exception.userStatus.UserStatusException;
+import java.time.Instant;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.View;
 
-import java.util.NoSuchElementException;
-
-@ControllerAdvice
-@ResponseBody
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<String> handleException(IllegalArgumentException e) {
-    return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
-        .body(e.getMessage());
+  private final View error;
+
+  public GlobalExceptionHandler(View error) {
+    this.error = error;
   }
 
-  @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<String> handleException(NoSuchElementException e) {
+  @ExceptionHandler({
+      AuthException.class,
+      BinaryContentException.class,
+      ChannelException.class,
+      MessageException.class,
+      ReadStatusException.class,
+      StorageException.class,
+      UserException.class,
+      UserStatusException.class
+  })
+  public ResponseEntity<ErrorResponse> handleException(DiscodeitException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        e.getTimestamp(),
+        e.getErrorCode().name(),
+        e.getErrorCode().getMessage(),
+        e.getDetails(),
+        e.getClass().getSimpleName(),
+        e.getErrorCode().getHttpStatus().value()
+    );
     return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
-        .body(e.getMessage());
+        .status(e.getErrorCode().getHttpStatus())
+        .body(errorResponse);
   }
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
+  @ExceptionHandler({
+      MethodArgumentNotValidException.class
+  })
+  public ResponseEntity<ErrorResponse> handleNotValidException(MethodArgumentNotValidException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        ErrorCode.NOT_VALID.name(),
+        e.getMessage(),
+        Map.of(),
+        ErrorCode.NOT_VALID.getHttpStatus().name(),
+        ErrorCode.NOT_VALID.getHttpStatus().value()
+    );
     return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(e.getMessage());
-  }
-
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, String>> handleException(MethodArgumentNotValidException e) {
-    BindingResult bindingResult = e.getBindingResult();
-
-    Field[] fields = UserCreateRequest.class.getDeclaredFields();
-    List<String> fieldOrder = Arrays.stream(fields).map(Field::getName)
-        .toList();   //응답 필드를 DTO에 작성된 순서대로 나열
-
-    Map<String, String> errorResponse = new LinkedHashMap<>();
-    fieldOrder.forEach(field -> {
-      bindingResult.getFieldErrors(field).forEach(error ->
-          errorResponse.put(field, error.getDefaultMessage())
-      );
-    });
-
-    return ResponseEntity
-        .status(HttpStatus.BAD_REQUEST)
+        .status(ErrorCode.NOT_VALID.getHttpStatus())
         .body(errorResponse);
   }
 }

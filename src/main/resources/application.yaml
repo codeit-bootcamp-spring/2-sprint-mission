@@ -5,51 +5,62 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update           # 개발 중엔 update, 운영에선 validate 또는 none 추천
-    show-sql: true               # 실행되는 SQL을 콘솔에 출력
+      ddl-auto: update
     properties:
-      hibernate.hibernate.jdbc.batch_size: 50
       hibernate:
-        format_sql: true         # SQL 쿼리 보기 좋게 출력
-    open-in-view: false  # OSIV 비활성화(권장)
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    #        default_batch_fetch_size: 100
+    open-in-view: false
+    show-sql: true
+  sql:
+    init:
+      mode: embedded
 
 logging:
   level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE  # Hibernate 6에서 변경된 로거
-      springframework:
-        data: DEBUG
-    com:
-      example:
-        myapp: DEBUG  # 자신의 애플리케이션 패키지
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/application.log
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
 
 discodeit:
   storage:
     type: local
     local:
-      root-path: .discodeit.binaryContents
+      root-path: .discodeit/storage
 
-springdoc:
-  api-docs:
-    path: /api-docs
-  swagger-ui:
-    path: /swagger-ui.html
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  endpoint:
+    health:
+      show-details: always    # health 정보 자세히 보기
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java:
+      version: 17
+    spring:
+      boot:
+        version: 3.4.0
+    datasource:
+      url: jdbc:postgresql://localhost:5432/discodeit
+      username: discodeit_user
+      password: discodeit1234
+    jpa:
+      ddl-auto: validate
+    storage:
+      type: local
+      path: .discodeit/storage
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB

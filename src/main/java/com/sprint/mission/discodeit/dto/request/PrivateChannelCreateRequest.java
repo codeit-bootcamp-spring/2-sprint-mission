@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.UUID;
 
-@Schema(description = "Private Channel 생성 정보")
 public record PrivateChannelCreateRequest(
-    @NotNull(message = "participantsIds(List)에는 null이 들어갈 수 없습니다.")
+    @NotEmpty(message = "참여자 목록은 최소 1명 이상이어야 합니다.")
     List<UUID> participantIds
 ) {
 

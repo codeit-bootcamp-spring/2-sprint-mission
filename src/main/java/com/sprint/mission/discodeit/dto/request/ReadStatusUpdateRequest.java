@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
-@Schema(description = "수정할 읽음 상태 정보")
 public record ReadStatusUpdateRequest(
-    @NotNull(message = "newLastReadAt이 null 일 수 없습니다.")
+    @NotNull(message = "마지막 읽은 시간은 필수 입력 값입니다.")
     Instant newLastReadAt
 ) {
 
