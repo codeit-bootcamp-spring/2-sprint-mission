@@ -10,21 +10,24 @@ import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.domain.message.dto.MessageResult;
 import com.sprint.mission.discodeit.domain.message.dto.request.ChannelMessagePageRequest;
 import com.sprint.mission.discodeit.domain.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.domain.message.entity.Message;
 import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
+import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.domain.message.entity.Message;
-import com.sprint.mission.discodeit.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -68,13 +71,15 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public PageResponse<MessageResult> getAllByChannelId(ChannelMessagePageRequest channelMessagePageRequest) {
-        log.debug("채널별 메시지 목록 조회 요청: channelId={}, size={}", channelMessagePageRequest.channelId(), channelMessagePageRequest.size());
-        Pageable page = Pageable.ofSize(channelMessagePageRequest.size());
-        Slice<Message> messages = messageRepository.findByChannelIdOrderByCreatedAtDesc(channelMessagePageRequest.channelId(), page);
-        log.info("채널별 메시지 목록 조회 성공: channelId={}, 조회 메시지 수={}", channelMessagePageRequest.channelId(), messages.getNumberOfElements());
+    public PageResponse<MessageResult> getAllByChannelId(UUID channelId, ChannelMessagePageRequest channelMessagePageRequest) {
+        log.debug("채널별 메시지 목록 조회 요청: channelId={}, pageSize={}", channelId, channelMessagePageRequest.pageSize());
+        Instant cursorCreatedAt = getInstant(channelMessagePageRequest);
+        Pageable pageable = createPageable(channelMessagePageRequest);
 
-        return PageResponse.of(messages, messageResultMapper::convertToMessageResult);
+        Slice<Message> messages = messageRepository.findAllByChannelIdWithAuthorDesc(channelId, cursorCreatedAt, pageable);
+        log.info("채널별 메시지 목록 조회 성공: channelId={}, 조회 메시지 수={}", channelId, messages.getNumberOfElements());
+
+        return PageResponse.of(messages, messageResultMapper::convertToMessageResult, getNextCursor(messages));
     }
 
     @Transactional
@@ -101,6 +106,26 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.deleteById(id);
         log.info("메시지 삭제 성공: messageId={}", id);
+    }
+
+    private Pageable createPageable(ChannelMessagePageRequest request) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+
+        return PageRequest.of(request.pageNumber(), request.pageSize(), sort);
+    }
+
+    private Instant getInstant(ChannelMessagePageRequest channelMessagePageRequest) {
+        if (channelMessagePageRequest.cursor() == null) {
+            return Instant.now();
+        }
+        return channelMessagePageRequest.cursor();
+    }
+
+    private Instant getNextCursor(Slice<Message> messages) {
+        if (messages.getContent().isEmpty()) {
+            return null;
+        }
+        return messages.getContent().get(messages.getContent().size() - 1).getCreatedAt();
     }
 
 }

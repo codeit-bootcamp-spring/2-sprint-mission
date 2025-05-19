@@ -8,11 +8,11 @@ import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-    List<ReadStatus> findByChannel_Id(UUID channelId);
+    List<ReadStatus> findByChannelId(UUID channelId);
 
-    List<ReadStatus> findByUser_Id(UUID userId);
+    List<ReadStatus> findByUserId(UUID userId);
 
-    boolean existsByChannel_IdAndUser_Id(UUID channelId, UUID userId);
+    boolean existsByChannelIdAndUserId(UUID channelId, UUID userId);
 
     void deleteAllByChannel_Id(UUID channelId);
 

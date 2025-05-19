@@ -26,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     @Override
     public BinaryContentResult createBinaryContent(BinaryContentRequest binaryContentRequest) {
-        log.info("파일 메타데이터 생성 요청: fileName={}, size={}", binaryContentRequest.fileName(), binaryContentRequest.bytes() != null ? binaryContentRequest.bytes().length : 0);
+        log.info("파일 메타데이터 생성 요청: fileName={}, pageSize={}", binaryContentRequest.fileName(), binaryContentRequest.bytes() != null ? binaryContentRequest.bytes().length : 0);
         BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
         log.info("파일 메타데이터 생성 성공: binaryContentId={}", binaryContent.getId());
 

@@ -65,7 +65,7 @@ class BasicReadStatusServiceTest {
 
         // then
         assertAll(
-                () -> Assertions.assertThat(readStatusRepository.findByChannel_Id(savedChannel.getId())).hasSize(1),
+                () -> Assertions.assertThat(readStatusRepository.findByChannelId(savedChannel.getId())).hasSize(1),
                 () -> Assertions.assertThat(readStatusResult)
                         .extracting(ReadStatusResult::channelId, ReadStatusResult::userId)
                         .containsExactlyInAnyOrder(readStatusResult.channelId(), readStatusResult.userId())

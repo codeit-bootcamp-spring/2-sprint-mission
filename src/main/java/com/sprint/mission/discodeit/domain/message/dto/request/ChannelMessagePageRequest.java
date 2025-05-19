@@ -1,22 +1,13 @@
 package com.sprint.mission.discodeit.domain.message.dto.request;
 
-import jakarta.validation.constraints.NotNull;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.data.domain.Sort;
 
-import java.util.UUID;
+import java.time.Instant;
 
 public record ChannelMessagePageRequest(
-        @RequestParam
-        @NotNull
-        UUID channelId,
-        @RequestParam
-        Integer size
+        Instant cursor,
+        int pageSize,
+        int pageNumber,
+        Sort sort
 ) {
-
-    public ChannelMessagePageRequest {
-        if (size == null) {
-            size = 50;
-        }
-    }
-
 }

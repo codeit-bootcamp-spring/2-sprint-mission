@@ -29,7 +29,7 @@ public class BinaryContentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BinaryContentResult> create(@RequestPart MultipartFile multipartFile) throws MethodArgumentNotValidException {
-        log.info("파일 업로드 요청: filename={}, size={}", multipartFile.getOriginalFilename(), multipartFile.getSize());
+        log.info("파일 업로드 요청: filename={}, pageSize={}", multipartFile.getOriginalFilename(), multipartFile.getSize());
         BinaryContentRequest binaryContentRequest = BinaryContentRequest.fromMultipartFile(multipartFile);
         BinaryContentResult binaryContentResult = binaryContentService.createBinaryContent(binaryContentRequest);
         log.info("파일 업로드 성공: binaryContentId={}", binaryContentResult.id());

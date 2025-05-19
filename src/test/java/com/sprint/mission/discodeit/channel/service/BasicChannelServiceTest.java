@@ -91,7 +91,7 @@ class BasicChannelServiceTest {
                 () -> Assertions.assertThat(channel)
                         .extracting(ChannelResult::type, c -> c.participants().stream().map(UserResult::id).toList())
                         .containsExactly(ChannelType.PRIVATE, List.of(savedUser.getId())),
-                () -> Assertions.assertThat(readStatusRepository.findByChannel_Id(channel.id()))
+                () -> Assertions.assertThat(readStatusRepository.findByChannelId(channel.id()))
                         .extracting(
                                 readStatus -> readStatus.getUser().getId(),
                                 readStatus -> readStatus.getChannel().getId()
@@ -152,16 +152,20 @@ class BasicChannelServiceTest {
         List<ChannelResult> channelsByUser = channelService.getAllByUserId(savedUser.getId());
 
         // then
-        Assertions.assertThat(channelsByUser)
-                .extracting(ChannelResult::id, ChannelResult::type,
-                        channel -> {
-                            List<UserResult> participants = channel.participants();
-                            return participants == null ? null : participants.stream().map(UserResult::id).toList();
-                        })
-                .containsExactlyInAnyOrder(
-                        Tuple.tuple(aPublic.id(), aPublic.type(), null),
-                        Tuple.tuple(aPrivate.id(), aPrivate.type(), List.of(savedUser.getId()))
-                );
+        assertAll(
+
+                () -> Assertions.assertThat(channelsByUser).hasSize(2),
+                () -> Assertions.assertThat(channelsByUser)
+                        .extracting(ChannelResult::id, ChannelResult::type,
+                                channel -> {
+                                    List<UserResult> participants = channel.participants();
+                                    return participants == null ? null : participants.stream().map(UserResult::id).toList();
+                                })
+                        .containsExactlyInAnyOrder(
+                                Tuple.tuple(aPublic.id(), aPublic.type(), null),
+                                Tuple.tuple(aPrivate.id(), aPrivate.type(), List.of(savedUser.getId()))
+                        )
+        );
     }
 
     @DisplayName("Public 채널을 수정합니다.")
@@ -243,7 +247,7 @@ class BasicChannelServiceTest {
         // then
         assertAll(
                 () -> Assertions.assertThat(channelRepository.findById(aPrivate.id())).isNotPresent(),
-                () -> Assertions.assertThat(readStatusRepository.findByChannel_Id(aPrivate.id())).hasSize(0),
+                () -> Assertions.assertThat(readStatusRepository.findByChannelId(aPrivate.id())).hasSize(0),
                 () -> Assertions.assertThat(messageRepository.findByChannel_Id(aPrivate.id())).hasSize(0)
         );
     }

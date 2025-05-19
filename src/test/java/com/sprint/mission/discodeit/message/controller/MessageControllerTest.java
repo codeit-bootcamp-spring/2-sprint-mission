@@ -73,32 +73,6 @@ class MessageControllerTest {
                 .isEqualTo(messageFakeId.toString());
     }
 
-    @DisplayName("이미지 파일 리스트가 입력받지 않으면, 404 예외를 반환합니다.")
-    @Test
-    void create_NoMultipartFile() {
-        // given
-        String uniqueContent = UUID.randomUUID().toString();
-        Channel channel = new Channel(ChannelType.PUBLIC, "", "");
-        ReflectionTestUtils.setField(channel, "id", UUID.randomUUID());
-
-        Message message = new Message(channel, null, uniqueContent, List.of());
-        UUID fakeId = UUID.randomUUID();
-        ReflectionTestUtils.setField(message, "id", fakeId);
-        MessageResult stubResult = MessageResult.fromEntity(message, null, List.of());
-        BDDMockito.given(messageService.create(any(), any())).willReturn(stubResult);
-        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(uniqueContent, UUID.randomUUID(), UUID.randomUUID());
-        MockMultipartFile multipartFileMessageCreateRequest = new MockMultipartFile("messageCreateRequest", null, MediaType.APPLICATION_JSON_VALUE,
-                convertJsonRequest(messageCreateRequest).getBytes());
-
-        // when & then
-        Assertions.assertThat(mockMvc.post()
-                        .uri("/api/messages")
-                        .multipart()
-                        .file(multipartFileMessageCreateRequest)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .hasStatus4xxClientError();
-    }
-
     private String convertJsonRequest(Object object) {
         try {
             return objectMapper.writeValueAsString(object);

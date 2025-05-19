@@ -92,7 +92,7 @@ public class UserController {
             log.debug("프로필 이미지가 첨부되지 않음");
             return null;
         }
-        log.debug("프로필 이미지 업로드 요청: filename={}, size={}", profileImage.getOriginalFilename(), profileImage.getSize());
+        log.debug("프로필 이미지 업로드 요청: filename={}, pageSize={}", profileImage.getOriginalFilename(), profileImage.getSize());
 
         return BinaryContentRequest.fromMultipartFile(profileImage);
     }

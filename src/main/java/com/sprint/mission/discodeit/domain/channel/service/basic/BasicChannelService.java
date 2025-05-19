@@ -20,9 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -77,13 +75,13 @@ public class BasicChannelService implements ChannelService {
     @Override
     public List<ChannelResult> getAllByUserId(UUID userId) {
         log.debug("사용자별 채널 목록 조회 요청: userId={}", userId);
-        List<Channel> publicChannels = channelRepository.findChannelByType(ChannelType.PUBLIC);
+        Set<Channel> publicChannels = new HashSet<>(channelRepository.findChannelByType(ChannelType.PUBLIC));
 
-        List<UUID> privateChannelIds = readStatusRepository.findByUser_Id(userId)
+        List<UUID> privateChannelIds = readStatusRepository.findByUserId(userId)
                 .stream()
                 .map(readStatus -> readStatus.getChannel().getId())
                 .toList();
-        List<Channel> privateChannels = channelRepository.findAllById(privateChannelIds);
+        Set<Channel> privateChannels = new HashSet<>(channelRepository.findAllById(privateChannelIds));
         publicChannels.addAll(privateChannels);
         log.info("사용자별 채널 목록 조회 성공: userId={}, 전체 채널 수={}", userId, publicChannels.size());
 

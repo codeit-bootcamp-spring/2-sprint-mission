@@ -10,9 +10,11 @@ public record PageResponse<T>(
         int number,
         int size,
         boolean hasNext,
-        Long totalElements) {
+        Long totalElements,
+        Object nextCursor
+) {
 
-    public static <E, D> PageResponse<D> of(Slice<E> slice, Function<E, D> mapper) {
+    public static <E, D> PageResponse<D> of(Slice<E> slice, Function<E, D> mapper, Object nextCursor) {
         List<D> content = slice.getContent().stream()
                 .map(mapper)
                 .toList();
@@ -22,7 +24,9 @@ public record PageResponse<T>(
                 slice.getNumber(),
                 slice.getSize(),
                 slice.hasNext(),
-                null
+                null,
+                nextCursor
         );
     }
+
 }

@@ -28,7 +28,12 @@ public class Message extends BaseUpdatableEntity {
     @Column(name = "content", nullable = false)
     private String context;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "message_attachments",
+            joinColumns = @JoinColumn(name = "message_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id")
+    )
     private List<BinaryContent> attachments;
 
     public Message(Channel channel, User user, String context, List<BinaryContent> attachments) {

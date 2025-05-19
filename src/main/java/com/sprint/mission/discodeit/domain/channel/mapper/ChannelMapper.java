@@ -25,7 +25,7 @@ public class ChannelMapper {
         Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())
                 .orElse(null);
         if (channel.isPrivate()) {
-            List<UserResult> participants = readStatusRepository.findByChannel_Id(channel.getId())
+            List<UserResult> participants = readStatusRepository.findByChannelId(channel.getId())
                     .stream()
                     .map(ReadStatus::getUser)
                     .map(userResultMapper::convertToUserResult)

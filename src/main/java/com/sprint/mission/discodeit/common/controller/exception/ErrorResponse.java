@@ -21,7 +21,7 @@ public record ErrorResponse(
         return new ErrorResponse(
                 discodeitException.getTimestamp(),
                 error,
-                discodeitException.getMessage(),
+                discodeitException.getErrorCode().getMessage(),
                 discodeitException.getDetails(),
                 discodeitException.getClass().getTypeName(),
                 status

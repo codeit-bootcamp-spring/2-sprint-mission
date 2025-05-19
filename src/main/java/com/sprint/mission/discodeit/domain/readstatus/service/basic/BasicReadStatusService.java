@@ -37,7 +37,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", readStatusCreateRequest.channelId())));
         User user = userRepository.findById(readStatusCreateRequest.userId())
                 .orElseThrow(() -> new UserNotFoundException(Map.of("userId", readStatusCreateRequest.userId())));
-        if (readStatusRepository.existsByChannel_IdAndUser_Id(channel.getId(), user.getId())) {
+        if (readStatusRepository.existsByChannelIdAndUserId(channel.getId(), user.getId())) {
             throw new ReadStatusAlreadyExistsException(Map.of("channelId", channel.getId(), "userId", user.getId()));
         }
 
@@ -49,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional(readOnly = true)
     @Override
     public List<ReadStatusResult> getAllByUserId(UUID userId) {
-        List<ReadStatus> readStatuses = readStatusRepository.findByUser_Id(userId);
+        List<ReadStatus> readStatuses = readStatusRepository.findByUserId(userId);
 
         return ReadStatusResult.fromEntity(readStatuses);
     }

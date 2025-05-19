@@ -19,17 +19,25 @@ import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
+import net.bytebuddy.description.annotation.AnnotationValue;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.sprint.mission.discodeit.message.service.BasicMessageServiceTest.MESSAGE_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -128,28 +136,78 @@ public class MessageIntegrationTest {
                 .isInstanceOf(MessageNotFoundException.class);
     }
 
-    @DisplayName("채널 ID를 입력하면, 채널에 속한 메세지 전부를 반환합니다")
-    @Test
-    void getAllByChannelId() {
+    private static Stream<Arguments> provideSortAndCursorCase() {
+        return Stream.of(
+                Arguments.of(null, null, List.of("msg5", "msg4")),
+                Arguments.of(null, Sort.by(Sort.Direction.DESC, "createdAt"), List.of("msg5", "msg4"))
+        );
+    }
+
+    @DisplayName("채널내 메세지 조회시, 생성날짜 순 내림차순(default)으로 반환합니다")
+    @ParameterizedTest
+    @MethodSource("provideSortAndCursorCase")
+    void getAllByChannelId(Instant cursor, Sort sort, List<String> expectedMessages) {
         // given
         Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
         User savedUser = userRepository.save(new User("", "", "", null));
         Message firstMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
         Message secondMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(savedChannel.getId(), 2);
+        Message thirdMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+        Message fourthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+        Message fifthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+
+        ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(cursor, 2, 0, sort);
+
+        Map<String, Message> messageMap = Map.of(
+                "msg1", firstMessage,
+                "msg2", secondMessage,
+                "msg3", thirdMessage,
+                "msg4", fourthMessage,
+                "msg5", fifthMessage
+        );
 
         // when
-        PageResponse<MessageResult> allByChannelId = messageService.getAllByChannelId(channelMessagePageRequest);
+        PageResponse<MessageResult> allByChannelId = messageService.getAllByChannelId(savedChannel.getId(), channelMessagePageRequest);
 
         // then
         assertAll(
                 () -> Assertions.assertThat(allByChannelId).extracting(PageResponse::size).isEqualTo(2),
                 () -> Assertions.assertThat(allByChannelId.content())
-                        .extracting(MessageResult::id, MessageResult::channelId, messageResult -> messageResult.author().id())
+                        .extracting(MessageResult::id)
                         .containsExactlyInAnyOrder(
-                                Tuple.tuple(firstMessage.getId(), firstMessage.getChannel().getId(), firstMessage.getUser().getId()),
-                                Tuple.tuple(secondMessage.getId(), secondMessage.getChannel().getId(), secondMessage.getUser().getId())
+                                messageMap.get(expectedMessages.get(0)).getId(),
+                                messageMap.get(expectedMessages.get(1)).getId()
                         )
+        );
+    }
+
+    @DisplayName("채널내 메세지 조회시, 입력된 생성날짜(커서) 이후 내림차순(default) 반환합니다")
+    @Test
+    void getAllByChannelIdDesc_NextCursor() {
+        // given
+        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+        User savedUser = userRepository.save(new User("", "", "", null));
+        Message firstMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+        Message secondMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+        Message thirdMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+        Message fourthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+        Message fifthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+
+        ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(null, 2, 0, null);
+        PageResponse<MessageResult> noCursorMessage = messageService.getAllByChannelId(savedChannel.getId(), channelMessagePageRequest);
+        ChannelMessagePageRequest nextCursorPageRequest = new ChannelMessagePageRequest((Instant) noCursorMessage.nextCursor(), 2, 0, null);
+
+        // when
+        PageResponse<MessageResult> nextCursorMessages = messageService.getAllByChannelId(savedChannel.getId(), nextCursorPageRequest);
+
+        // then
+        assertAll(
+                () -> Assertions.assertThat(noCursorMessage.content())
+                        .extracting(MessageResult::id)
+                        .containsExactlyInAnyOrder(fourthMessage.getId(), fifthMessage.getId()),
+                () -> Assertions.assertThat(nextCursorMessages.content())
+                        .extracting(MessageResult::id)
+                        .containsExactlyInAnyOrder(thirdMessage.getId(), secondMessage.getId())
         );
     }
 
