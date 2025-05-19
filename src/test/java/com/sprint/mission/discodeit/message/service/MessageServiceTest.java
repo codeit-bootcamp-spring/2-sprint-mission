@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.message.service;
 import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
+import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
@@ -39,7 +40,7 @@ import java.util.stream.Stream;
 import static com.sprint.mission.discodeit.message.service.BasicMessageServiceTest.MESSAGE_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-public class MessageIntegrationTest extends IntegrationTestSupport {
+public class MessageServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private ChannelRepository channelRepository;
@@ -259,25 +260,28 @@ public class MessageIntegrationTest extends IntegrationTestSupport {
                 .isInstanceOf(MessageNotFoundException.class);
     }
 
-    @DisplayName("메세지를 삭제하면, 메세지와 첨부파일도 삭제한다.")
+    @DisplayName("메세지를 삭제하면, 메세지와 첨부파일도 삭제합니다.")
     @Test
     void deleteTest() {
         // given
         Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null)); // 여기서 문제가 나오네
-        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
-        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of(binaryContent)));
-        List<UUID> binaryContentIds = savedMessage.getAttachments()
+        User savedUser = userRepository.save(new User("", "", "", null));
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId());
+        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(UUID.randomUUID().toString(), "", 10, UUID.randomUUID().toString().getBytes());
+        List<BinaryContentRequest> files = List.of(binaryContentRequest);
+
+        MessageResult savedMessage = messageService.create(messageCreateRequest, files);
+        List<UUID> binaryContentIds = savedMessage.attachments()
                 .stream()
-                .map(BinaryContent::getId)
+                .map(BinaryContentResult::id)
                 .toList();
 
         // when
-        messageService.delete(savedMessage.getId());
+        messageService.delete(savedMessage.id());
 
         // then
         assertAll(
-                () -> Assertions.assertThat(messageRepository.findById(savedMessage.getId())).isNotPresent(),
+                () -> Assertions.assertThat(messageRepository.findById(savedMessage.id())).isNotPresent(),
                 () -> Assertions.assertThat(binaryContentRepository.findAllById(binaryContentIds)).isEmpty()
         );
     }

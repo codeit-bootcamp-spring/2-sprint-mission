@@ -79,7 +79,7 @@ CREATE TABLE messages
 CREATE TABLE message_attachments
 (
     message_id    UUID NOT NULL,
-    attachment_id UUID NOT NULL,
+    attachment_id UUID UNIQUE NOT NULL,
     CONSTRAINT fk_message_attachments_message FOREIGN KEY (message_id)
         REFERENCES messages (id)
         ON DELETE CASCADE,

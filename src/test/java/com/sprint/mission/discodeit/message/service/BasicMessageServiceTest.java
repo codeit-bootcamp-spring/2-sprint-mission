@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -192,13 +193,12 @@ class BasicMessageServiceTest {
                 .isInstanceOf(MessageNotFoundException.class);
     }
 
-    @DisplayName("메세지를 삭제하면, 메세지와 메세지에 등록된 첨부파일도 삭제한다.")
+    @DisplayName("메세지를 삭제하면, 메세지와 메세지에 등록된 첨부파일도 삭제합니다.")
     @Test
     void deleteTest() {
         // given
         Channel channel = new Channel(ChannelType.PUBLIC, "", "");
         User user = new User("", "", "", null);
-        Message message = new Message(channel, user, "hello", List.of());
 
         BDDMockito.given(messageRepository.existsById(any())).willReturn(true);
 
@@ -206,7 +206,7 @@ class BasicMessageServiceTest {
         messageService.delete(UUID.randomUUID());
 
         // then
-        BDDMockito.verify(messageRepository).deleteById(any());
+        Mockito.verify(messageRepository).deleteById(any());
     }
 
     @DisplayName("삭제하려는 메세지가 없으면 예외를 반환한다")
