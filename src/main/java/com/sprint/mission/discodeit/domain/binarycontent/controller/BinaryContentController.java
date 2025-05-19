@@ -47,7 +47,7 @@ public class BinaryContentController {
     }
 
     @GetMapping("/{binaryContentId}")
-    public ResponseEntity<BinaryContentResult> getById(@PathVariable UUID binaryContentId) {
+    public ResponseEntity<BinaryContentResult> getById(@PathVariable(value = "binaryContentId") UUID binaryContentId) {
         log.debug("파일 메타데이터 단건 조회 요청: binaryContentId={}", binaryContentId);
         BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContentId);
         log.info("파일 메타데이터 단건 조회 성공: binaryContentId={}", binaryContentId);
@@ -56,9 +56,9 @@ public class BinaryContentController {
     }
 
     @GetMapping("{binaryContentId}/download")
-    public ResponseEntity<?> download(@Valid @RequestBody BinaryContentResult binaryContentResult) {
-        log.info("파일 다운로드 요청: binaryContentId={}", binaryContentResult.id());
-        InputStreamResource download = binaryContentStorage.download(binaryContentResult);
+    public ResponseEntity<?> download(@PathVariable(value = "binaryContentId") UUID binaryContentId) {
+        log.info("파일 다운로드 요청: binaryContentId={}", binaryContentId);
+        InputStreamResource download = binaryContentStorage.download(binaryContentId);
         return ResponseEntity.ok(download);
     }
 

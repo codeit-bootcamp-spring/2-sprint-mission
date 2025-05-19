@@ -44,7 +44,6 @@ class LocalBinaryContentStorageTest {
                 () -> Assertions.assertThat(binaryContentID).isEqualTo(binaryContentId),
                 () -> Assertions.assertThat(getFileBytes(tempDirPath.resolve(binaryContentID.toString()))).isEqualTo("hello".getBytes())
         );
-
     }
 
     @DisplayName("바이너리 컨텐츠를 저장할떄 아이디가 null 이면, 예외를 반환합니다.")
@@ -88,7 +87,7 @@ class LocalBinaryContentStorageTest {
         BinaryContentResult binaryContentResult = new BinaryContentResult(binaryContentId, null, "", "");
 
         // when
-        InputStreamResource download = binaryContentStorage.download(binaryContentResult);
+        InputStreamResource download = binaryContentStorage.download(binaryContentResult.id());
 
         // then
         Assertions.assertThat(download.getInputStream().readAllBytes())

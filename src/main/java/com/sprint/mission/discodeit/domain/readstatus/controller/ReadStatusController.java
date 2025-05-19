@@ -20,10 +20,8 @@ import java.util.UUID;
 public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
-    // public을 만들떄 readStatus를 만드는가? -> 아님
-    // 아이게 메세지를 보내서 그런건가?
 
-    @PostMapping // public도 읽음 상태가 있을 수 있으니깐 인정, 읽은 상태 생성으로 가는게 맞나 이게?, 근데 public도 만들어준이
+    @PostMapping
     public ResponseEntity<ReadStatusResult> create(@Valid @RequestBody ReadStatusCreateRequest request) {
         log.info("읽음 상태 생성 요청 수신: channelId={}, userId={}", request.channelId(), request.userId());
         ReadStatusResult readStatusResult = readStatusService.create(request);

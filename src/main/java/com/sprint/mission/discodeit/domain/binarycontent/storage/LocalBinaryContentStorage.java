@@ -39,8 +39,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public InputStreamResource download(BinaryContentResult binaryContentResult) {
-        InputStream inputStream = get(binaryContentResult.id());
+    public InputStreamResource download(UUID binaryContentId) {
+        InputStream inputStream = get(binaryContentId);
 
         return new InputStreamResource(inputStream);
     }
