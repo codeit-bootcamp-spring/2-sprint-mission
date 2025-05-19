@@ -31,10 +31,10 @@ public class UserController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResult> register(
             @Valid @RequestPart UserCreateRequest userCreateRequest,
-            @RequestPart(required = false) MultipartFile profileImage
+            @RequestPart(required = false) MultipartFile profile
     ) {
         log.info("사용자 생성 요청: username={}, email={}", userCreateRequest.username(), userCreateRequest.email());
-        BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profileImage);
+        BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profile);
         UserResult user = userService.register(userCreateRequest, binaryContentRequest);
         log.info("사용자 생성 성공: userId={}", user.id());
 
@@ -60,9 +60,9 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId, @Valid @RequestPart UserUpdateRequest userUpdateRequest, @RequestPart(required = false) MultipartFile profileImage) {
+    public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId, @Valid @RequestPart UserUpdateRequest userUpdateRequest, @RequestPart(required = false) MultipartFile profile) {
         log.info("사용자 수정 요청: userId={}, newUsername={}, newEmail={}", userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
-        BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profileImage);
+        BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profile);
         UserResult updatedUser = userService.update(userId, userUpdateRequest, binaryContentRequest);
         log.info("사용자 수정 성공: userId={}", userId);
 

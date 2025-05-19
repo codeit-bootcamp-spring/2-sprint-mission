@@ -16,13 +16,13 @@ import java.time.Instant;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
 
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String name;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @OneToOne
@@ -50,7 +50,7 @@ public class User extends BaseUpdatableEntity {
         if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
         }
-        if (binaryContent != null && !binaryContent.getId().equals(this.binaryContent.getId())) {
+        if (binaryContent != null) {
             this.binaryContent = binaryContent;
         }
     }

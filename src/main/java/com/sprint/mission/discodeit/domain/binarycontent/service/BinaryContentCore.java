@@ -30,7 +30,11 @@ public class BinaryContentCore {
             return null;
         }
         log.info("바이너리 컨텐츠 저장 요청: fileName={}, pageSize={}", binaryContentRequest.fileName(), binaryContentRequest.size());
-        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType(), binaryContentRequest.size()));
+        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(
+                binaryContentRequest.fileName(),
+                binaryContentRequest.contentType(),
+                binaryContentRequest.size()
+        ));
         binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
         log.info("바이너리 컨텐츠 저장 성공: binaryContentId={}", savedBinaryContent.getId());
 

@@ -27,10 +27,11 @@ public record UserResult(UUID id,
     }
 
     private static BinaryContentResult getBinaryContentResult(User user) {
-        if (user.getBinaryContent() != null) {
-            return BinaryContentResult.fromEntity(user.getBinaryContent());
+        if (user.getBinaryContent() == null) {
+            return null;
         }
 
-        return null;
+        return BinaryContentResult.fromEntity(user.getBinaryContent());
     }
+
 }
