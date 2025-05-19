@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.exception.auth;
 
-import java.util.NoSuchElementException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.util.Map;
 
-public class PasswordMismatchException extends NoSuchElementException {
+public class PasswordMismatchException extends AuthException {
 
-  public PasswordMismatchException(String message) {
-    super(message);
+  public PasswordMismatchException(String password) {
+    super(ErrorCode.PASSWORD_MISMATCH, Map.of("password", password));
   }
 }

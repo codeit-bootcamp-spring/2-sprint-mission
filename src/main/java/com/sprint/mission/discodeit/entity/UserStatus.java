@@ -1,50 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
-public class UserStatus extends BaseEntity implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private static final int ONLINE_TIME = 5;
-  //
-  private UserStatusType type;
-  private Instant activatedAt;
-  private UUID userId;
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastActiveAt;
 
-  public UserStatus(UUID userId, Instant activatedAt) {
-    super();
-    this.type = UserStatusType.OFFLINE;
-    this.userId = userId;
-    this.activatedAt = activatedAt;
+  public UserStatus(User user, Instant lastActiveAt) {
+    setUser(user);
+    this.lastActiveAt = lastActiveAt;
   }
 
-  public void update(Instant newActivatedAt) {
-    boolean anyValueUpdated = false;
-    if (activatedAt != null && !newActivatedAt.equals(activatedAt)) {
-      this.activatedAt = newActivatedAt;
-      anyValueUpdated = true;
-    }
-    if (anyValueUpdated) {
-      update();
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
     }
   }
 
-  public boolean isOnline() {
-    Duration duration = Duration.between(activatedAt, Instant.now());
-    if (duration.toMinutes() <= ONLINE_TIME) {
-      if (type != UserStatusType.ONLINE) {
-        type = UserStatusType.ONLINE;
-      }
-      return true;
-    }
-    if (type != UserStatusType.OFFLINE) {
-      type = UserStatusType.OFFLINE;
-    }
-    return false;
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
+
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
   }
 }

@@ -1,0 +1,16 @@
+version: '3'
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: prod_postgres
+    environment:
+      POSTGRES_USER: produser
+      POSTGRES_PASSWORD: prodpass
+      POSTGRES_DB: proddb
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
