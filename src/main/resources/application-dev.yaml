@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit_dev
+    username: discodeit_user
+    password: password1234
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 60000
+    jpa:
+      hibernate:
+        ddl-auto: auto
+      show-sql: true
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          format_sql: true
+          use_sql_comments: true
+      open-in-view: false
+    logging:
+      level:
+        org:
+          hibernate:
+            SQL: DEBUG
+            orm.jdbc.bind: TRACE
+          springframework:
+            data: DEBUG
+        com:
+          example:
+            myapp: DEBUG
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ./storage
+server:
+  port: 8080
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+storage:
+  type: local
+  path: C:\Users\user\example\2-sprint-mission\storage

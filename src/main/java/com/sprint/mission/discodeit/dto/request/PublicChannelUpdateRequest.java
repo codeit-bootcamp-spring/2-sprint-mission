@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.util.Optional;
+import jakarta.validation.constraints.NotBlank;
 
 public record PublicChannelUpdateRequest(
-    Optional<String> newName,
-    Optional<String> newDescription
+    @NotBlank
+    String newName,
+
+    @NotBlank
+    String newDescription
 ) {
 
 }

@@ -1,11 +1,16 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.util.Optional;
+import jakarta.validation.constraints.NotBlank;
 
 public record UserUpdateRequest(
-    Optional<String> newUsername,
-    Optional<String> newEmail,
-    Optional<String> newPassword
+    @NotBlank
+    String newUsername,
+
+    @NotBlank
+    String newEmail,
+
+    @NotBlank
+    String newPassword
 ) {
 
 }

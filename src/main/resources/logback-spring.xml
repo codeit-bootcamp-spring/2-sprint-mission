@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- 로그 파일 저장 경로 property 정의 -->
+  <property name="LOG_PATH" value=".logs"/>
+
+  <!-- 로그 패턴 정의 -->
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+  <!-- 콘솔 로그 Appender -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <charset>UTF-8</charset>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 파일 로그 Appender (일자별 롤링, 30일 보관) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_PATH}/application.log</file>
+    <encoder>
+      <charset>UTF-8</charset>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 일자별 롤링 -->
+      <fileNamePattern>${LOG_PATH}/application.%d{yy-MM-dd}.log</fileNamePattern>
+      <!-- 30일간 보관 -->
+      <maxHistory>30</maxHistory>
+      <!-- (선택) 전체 로그 파일 용량 제한, 필요시 사용 -->
+      <!-- <totalSizeCap>3GB</totalSizeCap> -->
+    </rollingPolicy>
+  </appender>
+
+  <!-- Root Logger: 콘솔과 파일 모두 기록 -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>
