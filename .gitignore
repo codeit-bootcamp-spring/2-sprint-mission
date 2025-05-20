@@ -1,3 +1,4 @@
+# .dockerignore
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -44,3 +45,7 @@ bin/
 ### 숨김 파일 ###
 .*
 !.gitignore
+.env
+*.db
+*.swp
+*.tmp
