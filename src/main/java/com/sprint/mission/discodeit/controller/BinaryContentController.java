@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,96 +28,99 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
 @Tag(name = "BinaryContent", description = "첨부 파일 API")
 public class BinaryContentController {
 
-  private final BinaryContentService binaryContentService;
-  private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
-  @GetMapping("/{binaryContentId}")
-  @Operation(summary = "첨부 파일 조회", operationId = "find")
-  @Parameters(value = {
-      @Parameter(
-          name = "binaryContentId",
-          in = ParameterIn.PATH,
-          description = "조회할 첨부 파일 ID",
-          required = true,
-          schema = @Schema(type = "string", format = "uuid")
-      )
-  })
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "첨부 파일 조회 성공",
-          content = @Content(
-              mediaType = "*/*",
-              schema = @Schema(implementation = BinaryContent.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "첨부 파일을 찾을 수 없음",
-          content = @Content(
-              mediaType = "*/*",
-              examples = @ExampleObject("BinaryContent with id {binaryContentId} not found")
-          )
-      )
-  })
-  public ResponseEntity<BinaryContentDto> find(
-      @PathVariable("binaryContentId") UUID binaryContentId
-  ) {
-    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
-    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDto);
-  }
+    @GetMapping("/{binaryContentId}")
+    @Operation(summary = "첨부 파일 조회", operationId = "find")
+    @Parameters(value = {
+        @Parameter(
+            name = "binaryContentId",
+            in = ParameterIn.PATH,
+            description = "조회할 첨부 파일 ID",
+            required = true,
+            schema = @Schema(type = "string", format = "uuid")
+        )
+    })
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "첨부 파일 조회 성공",
+            content = @Content(
+                mediaType = "*/*",
+                schema = @Schema(implementation = BinaryContent.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "첨부 파일을 찾을 수 없음",
+            content = @Content(
+                mediaType = "*/*",
+                examples = @ExampleObject("BinaryContent with id {binaryContentId} not found")
+            )
+        )
+    })
+    public ResponseEntity<BinaryContentDto> find(
+        @PathVariable("binaryContentId") UUID binaryContentId
+    ) {
+        BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContentDto);
+    }
 
-  @GetMapping("")
-  @Operation(summary = "여러 첨부 파일 조회", operationId = "findAllByIdIn")
-  @Parameters(value = {
-      @Parameter(
-          name = "binaryContentIds",
-          in = ParameterIn.QUERY,
-          description = "조회할 첨부 파일 ID 목록",
-          required = true,
-          array = @ArraySchema(schema = @Schema(type = "string", format = "uuid"))
-      )
-  })
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "첨부 파일 목록 조회 성공",
-          content = @Content(
-              mediaType = "*/*",
-              array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
-          )
-      )
-  })
-  public ResponseEntity<List<BinaryContentDto>> findByIdIn(
-      @RequestParam("binaryContentIds") List<UUID> binaryContentIdList
-  ) {
-    List<BinaryContentDto> binaryContentDtoList = binaryContentService.findByIdIn(
-        binaryContentIdList);
-    return ResponseEntity.status(HttpStatus.OK).body(binaryContentDtoList);
-  }
+    @GetMapping("")
+    @Operation(summary = "여러 첨부 파일 조회", operationId = "findAllByIdIn")
+    @Parameters(value = {
+        @Parameter(
+            name = "binaryContentIds",
+            in = ParameterIn.QUERY,
+            description = "조회할 첨부 파일 ID 목록",
+            required = true,
+            array = @ArraySchema(schema = @Schema(type = "string", format = "uuid"))
+        )
+    })
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "첨부 파일 목록 조회 성공",
+            content = @Content(
+                mediaType = "*/*",
+                array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))
+            )
+        )
+    })
+    public ResponseEntity<List<BinaryContentDto>> findByIdIn(
+        @RequestParam("binaryContentIds") List<UUID> binaryContentIdList
+    ) {
+        List<BinaryContentDto> binaryContentDtoList = binaryContentService.findByIdIn(
+            binaryContentIdList);
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContentDtoList);
+    }
 
-  @GetMapping("/{binaryContentId}/download")
-  @Operation(summary = "파일 다운로드", operationId = "download")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "200",
-          description = "파일 다운로드 성공",
-          content = @Content(
-              mediaType = "*/*",
-              schema = @Schema(type = "string", format = "binary")
-          )
-      )
-  })
-  public ResponseEntity<Resource> binaryContentDownload(
-      @PathVariable("binaryContentId") UUID binaryContentId
-  ) {
-    BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
-    return binaryContentStorage.download(binaryContentDto);
-  }
+    @GetMapping("/{binaryContentId}/download")
+    @Operation(summary = "파일 다운로드", operationId = "download")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "파일 다운로드 성공",
+            content = @Content(
+                mediaType = "*/*",
+                schema = @Schema(type = "string", format = "binary")
+            )
+        )
+    })
+    public ResponseEntity<Resource> binaryContentDownload(
+        @PathVariable("binaryContentId") UUID binaryContentId
+    ) {
+        log.info("파일 다운로드 진행: binaryContentId = {}", binaryContentId);
+        BinaryContentDto binaryContentDto = binaryContentService.findById(binaryContentId);
+        log.info("파일 다운로드 완료: binaryContentsId = {}", binaryContentDto.id());
+        return binaryContentStorage.download(binaryContentDto);
+    }
 }

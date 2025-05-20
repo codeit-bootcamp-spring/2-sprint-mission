@@ -1,30 +1,8 @@
 spring:
   application:
     name: discodeit
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
-  jpa:
-    hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
-
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-  sql:
-    init:
-      mode: always
+  profiles:
+    active: dev
 
 discodeit:
   storage:
@@ -36,16 +14,3 @@ springdoc:
   api-docs:
     enabled: true
     version: openapi_3_1
-
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        SQL: DEBUG
-#        orm.jdbc.bind: TRACE
-#      springframework:
-#        data: DEBUG
-#    com:
-#      sprint:
-#        mission:
-#          discodeit: DEBUG
