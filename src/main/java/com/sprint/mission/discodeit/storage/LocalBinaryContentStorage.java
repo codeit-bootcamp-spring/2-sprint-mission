@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponse;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,16 +57,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {
+  public ResponseEntity<?> download(BinaryContentResponse binaryContentResponse) {
     try {
-      Path path = resolvePath(binaryContentDto.id());
+      Path path = resolvePath(binaryContentResponse.id());
       InputStream in = Files.newInputStream(path);
       Resource resource = new InputStreamResource(in);
 
       return ResponseEntity.ok()
           .header(HttpHeaders.CONTENT_DISPOSITION,
-              "attachment; filename=\"" + binaryContentDto.id() + "\"")
-          .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
+              "attachment; filename=\"" + binaryContentResponse.id() + "\"")
+          .contentType(MediaType.parseMediaType(binaryContentResponse.contentType()))
           .contentLength(Files.size(path))
           .body(resource);
 

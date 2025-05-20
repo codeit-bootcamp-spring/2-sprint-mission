@@ -1,8 +1,13 @@
 package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.dto.common.ErrorResponse;
+import com.sprint.mission.discodeit.exception.base.DiscodeitException;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,44 +15,38 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException ex) {
+    return ResponseEntity.status(ex.getCode())
+        .body(ErrorResponse.builder()
+            .timestamp(ex.getTimestamp())
+            .code(ex.getErrorCodeName())
+            .message(ex.getMessage())
+            .details(ex.getDetails())
+            .exceptionType(ex.getExceptionType())
+            .status(ex.getCode())
+            .build());
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ErrorResponse> handleValidationExceptions(
+  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(
       MethodArgumentNotValidException ex) {
-    String errorMessages = ex.getBindingResult().getAllErrors().stream()
-        .map(error -> error.getDefaultMessage())
-        .findFirst().orElse("");
+    Map<String, Object> errors = new HashMap<>();
+    ex.getBindingResult().getAllErrors().forEach(error -> {
+      String fieldName = ((FieldError) error).getField();
+      String errorMessage = error.getDefaultMessage();
+      errors.put(fieldName, errorMessage);
+    });
 
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), errorMessages));
-  }
+    ErrorResponse errorResponse = ErrorResponse.builder()
+        .timestamp(Instant.now())
+        .code("VALIDATION_ERROR")
+        .message("입력 데이터 유효성 검사에 실패했습니다.")
+        .details(errors)
+        .exceptionType(ex.getClass().getSimpleName())
+        .status(HttpStatus.BAD_REQUEST.value())
+        .build();
 
-  @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
-  }
-
-  @ExceptionHandler(DuplicateResourceException.class)
-  public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage()));
-  }
-
-  @ExceptionHandler(InvalidCredentialsException.class)
-  public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage()));
-  }
-
-  @ExceptionHandler(MissingArgumentException.class)
-  public ResponseEntity<ErrorResponse> handleMissingArgument(MissingArgumentException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
-  }
-
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
   }
 }
