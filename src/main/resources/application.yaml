@@ -3,11 +3,6 @@ spring:
     name: discodeit
   profiles:
     active: prod
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
 discodeit:
   storage:
     type: local
