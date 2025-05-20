@@ -1,30 +1,54 @@
 package com.sprint.mission.discodeit.exception;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.NoSuchElementException;
+import java.time.Instant;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-@ControllerAdvice
-@ResponseBody
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    @ExceptionHandler(DiscodeitException.class)
+    public ResponseEntity<ErrorResponse> handleException(DiscodeitException e) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getTimestamp(),
+                e.getErrorCode().getCode(),
+                e.getErrorCode().getMessage(),
+                e.getDetails(),
+                e.getClass().getSimpleName(),
+                e.getErrorCode().getHttpStatus().value()
+        );
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
+        Map<String, Object> details = e.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fieldError -> {
+                            String msg = fieldError.getDefaultMessage();
+                            return msg != null ? msg : "Invalid value";
+                        },
+                        (msg1, msg2) -> msg1
+                ));
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
+        ErrorCode errorCode = ErrorCode.INVALID_INPUT_VALUE;
 
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now(),
+                errorCode.getCode(),
+                errorCode.getMessage(),
+                details,
+                e.getClass().getSimpleName(),
+                errorCode.getHttpStatus().value()
+        );
+
+        return ResponseEntity.status(errorCode.getHttpStatus()).body(errorResponse);
+    }
 }

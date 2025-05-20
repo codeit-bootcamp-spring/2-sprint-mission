@@ -1,30 +1,37 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.user.WrongPasswordException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.NoSuchElementException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
 
+    private final UserMapper userMapper;
+
+    @Transactional(readOnly = true)
     @Override
-    public User login(LoginRequest dto) {
-        String userName = dto.username();
+    public UserDto login(LoginRequest dto) {
+        String username = dto.username();
         String password = dto.password();
 
-        User user = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new NoSuchElementException(userName + " 이 존재하지 않습니다."));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new UserNotFoundException(username));
 
         if (!user.getPassword().equals(password)) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new WrongPasswordException(username);
         }
-        return user;
+        return userMapper.toDto(user);
     }
 }
