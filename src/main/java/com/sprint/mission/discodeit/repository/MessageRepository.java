@@ -9,21 +9,12 @@ import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    @NonNull
-    Message save(@NonNull Message message);
-
-    @NonNull
-    Optional<Message> findById(@NonNull UUID id);
-
-    boolean existsById(@NonNull UUID id);
-
-    void deleteById(@NonNull UUID id);
-
-    void deleteAllByChannelId(UUID channelId);
 
     Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId);
 
@@ -31,4 +22,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
         Instant createdAt, Pageable pageable);
 
     List<Message> findByChannelIdOrderByCreatedAtDesc(UUID channelId, Pageable pageable);
+
+    List<Message> findByAuthorId(UUID authorId);
+
+    @Modifying
+    @Transactional
+    void deleteAllByChannelId(UUID channelId);
 }

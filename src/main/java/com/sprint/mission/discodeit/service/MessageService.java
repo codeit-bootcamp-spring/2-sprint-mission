@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,7 +19,7 @@ public interface MessageService {
 
     @Transactional
     MessageDto create(MessageCreateRequest messageCreateRequest,
-        List<BinaryContentCreateRequest> binaryContentCreateRequests);
+        List<MultipartFile> attachments);
 
     MessageDto find(UUID messageId);
 

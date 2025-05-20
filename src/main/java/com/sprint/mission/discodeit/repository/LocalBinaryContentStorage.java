@@ -26,6 +26,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
+import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
+
 @jakarta.annotation.Resource
 
 @Service
@@ -45,9 +48,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     public void init() {
         try {
             Files.createDirectories(rootPath);
-            log.info("생성완료");
+            log.info("저장소 디렉토리 생성 완료: {}", rootPath);
         } catch (IOException e) {
-            throw new RuntimeException("생성 실패");
+            log.error("저장소 디렉토리 생성 실패: {}", rootPath, e);
+            throw new FileProcessingCustomException("initialize storage", rootPath.toString(), "저장소 디렉토리 생성 실패");
         }
     }
 
@@ -71,7 +75,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             return id;
         } catch (IOException e) {
             log.error("파일 저장 실패: {}", destinationPath, e);
-            throw new RuntimeException("파일 저장 실패: " + destinationPath, e);
+            throw new FileProcessingCustomException("save", destinationPath.toString(), "파일 저장 실패");
         }
     }
 
@@ -79,12 +83,33 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     public InputStream get(UUID id) throws IOException {
         Path filePath = resolvePath(id);
         if (!Files.exists(filePath)) {
-            throw new FileNotFoundException("요청한 파일을 찾을 수 없습니다: " + filePath);
+            log.warn("요청한 파일을 찾을 수 없음: {}", filePath);
+            throw new FileNotFoundCustomException(filePath.toString(), "요청한 파일을 찾을 수 없음");
         }
         try {
+            log.debug("파일 스트림 열기 시도: {}", filePath);
             return Files.newInputStream(filePath);
         } catch (IOException e) {
-            throw new IOException("읽기 실패");
+            log.error("파일 읽기 실패: {}", filePath, e);
+            throw new FileProcessingCustomException("read", filePath.toString(), "파일 읽기 실패");
+        }
+    }
+
+    @Override
+    public void delete(UUID id) {
+        Path filePath = resolvePath(id);
+        if (!Files.exists(filePath)) {
+            log.warn("삭제할 파일을 찾을 수 없음: {}", filePath);
+            throw new FileNotFoundCustomException(filePath.toString(), "삭제할 파일을 찾을 수 없음");
+        }
+
+        try {
+            log.debug("파일 삭제 시도: {}", filePath);
+            Files.delete(filePath);
+            log.info("파일 삭제 성공: {}", filePath);
+        } catch (IOException e) {
+            log.error("파일 삭제 실패: {}", filePath, e);
+            throw new FileProcessingCustomException("delete", filePath.toString(), "파일 삭제 실패");
         }
     }
 
@@ -111,12 +136,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                 .body(resource);
 
-        } catch (FileNotFoundException e) {
-            return ResponseEntity.notFound().build();
+        } catch (FileNotFoundCustomException e) {
+            log.warn("다운로드 실패 (파일 없음): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage());
+            throw e;
+        } catch (FileProcessingCustomException e) {
+            log.error("다운로드 실패 (파일 처리 오류): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage(), e);
+            throw e;
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("다운로드 실패 (IOException): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage(), e);
+            throw new FileProcessingCustomException("download-io", id.toString(), "다운로드 준비 중 IOException 발생");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("다운로드 실패 (예상치 못한 오류): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage(), e);
+            throw new FileProcessingCustomException("download-unexpected", id.toString(), "다운로드 중 예상치 못한 오류 발생");
         }
     }
 

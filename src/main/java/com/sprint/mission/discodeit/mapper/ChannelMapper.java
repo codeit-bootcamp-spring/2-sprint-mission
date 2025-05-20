@@ -41,8 +41,8 @@ public abstract class ChannelMapper {
     }
 
     protected Set<UserDto> mapParticipants(Channel channel) {
-        return channel.getParticipants().stream()
-            .map(userChannel -> userMapper.toDto(userChannel.getUser()))
+        return readStatusRepository.findAllByChannelId(channel.getId()).stream()
+            .map(readStatus -> userMapper.toDto(readStatus.getUser()))
             .collect(Collectors.toSet());
     }
 }

@@ -2,12 +2,10 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.BinaryContentStorage;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -21,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
+
 public class BinaryContentController implements BinaryContentApi {
 
     private final BinaryContentService binaryContentService;
@@ -46,27 +45,19 @@ public class BinaryContentController implements BinaryContentApi {
     }
 
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<?> download(
+    public ResponseEntity<Resource> download(
         @PathVariable("binaryContentId") UUID binaryContentId) {
-
-        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
-        BinaryContentDto dto = binaryContentMapper.toDto(binaryContent);
-        return binaryContentStorage.download(dto);
+        BinaryContent bc = binaryContentService.find(binaryContentId);
+        BinaryContentDto dto = binaryContentMapper.toDto(bc);
+        return (ResponseEntity<Resource>) binaryContentStorage.download(dto);
     }
 
     @PostMapping("/upload")
     public ResponseEntity<BinaryContentDto> upload(
-        @RequestParam("file") MultipartFile file) throws IOException {
+        @RequestParam("file") MultipartFile file) {
 
-        if (file != null && !file.isEmpty()) {
-            BinaryContentCreateRequest createRequest = new BinaryContentCreateRequest(
-                file.getOriginalFilename(),
-                file.getContentType(),
-                file.getBytes()
-            );
-            BinaryContentDto binaryContentDto = binaryContentService.create(createRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(binaryContentDto);
-        }
-        return ResponseEntity.badRequest().build();
+        BinaryContentDto profileDto = binaryContentService.create(file);
+        return ResponseEntity.status(HttpStatus.CREATED).body(profileDto);
     }
 }
+

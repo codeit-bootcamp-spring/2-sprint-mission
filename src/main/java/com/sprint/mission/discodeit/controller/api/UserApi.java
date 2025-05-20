@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.UUID;
 import java.util.*;
@@ -46,7 +47,7 @@ public interface UserApi {
             description = "User 프로필 이미지",
             content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
         ) MultipartFile profile
-    );
+    ) throws MethodArgumentNotValidException;
 
     @Operation(summary = "User 정보 수정")
     @ApiResponses(value = {
@@ -67,7 +68,7 @@ public interface UserApi {
         @Parameter(description = "수정할 User ID") UUID userId,
         @Parameter(description = "수정할 User 정보") UserUpdateRequest userUpdateRequest,
         @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
-    );
+    ) throws MethodArgumentNotValidException;
 
     @Operation(summary = "User 삭제")
     @ApiResponses(value = {
