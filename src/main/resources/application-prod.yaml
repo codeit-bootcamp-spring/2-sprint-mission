@@ -1,0 +1,17 @@
+spring:
+  #profiles: prod
+
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: 80
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info

@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import jakarta.annotation.Resource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.InputStreamResource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,36 +19,45 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
-   private final Path root;
+    private final Path root;
 
-   public LocalBinaryContentStorage(@Value("{discodeit.storage.local.root-path}") String rootDir) {
-       this.root = Paths.get(rootDir);
-       init();
-   }
+    public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootDir) {
+        this.root = Paths.get(rootDir);
+        init();
+    }
 
     private void init() {
+        log.info("▶▶ [STORAGE] Initializing local storage - root: {}", root.toAbsolutePath());
         try {
             if (!Files.exists(root)) {
                 Files.createDirectories(root);
+                log.info("◀◀ [STORAGE] Local storage directory created - root: {}", root.toAbsolutePath());
+            } else {
+                log.info("◀◀ [STORAGE] Local storage directory already exists - root: {}", root.toAbsolutePath());
             }
         } catch (IOException e) {
-            throw new RuntimeException("저장 위치 초기화 불가능", e);
+            log.error("◀◀ [STORAGE] Failed to initialize storage location - root: {}", root.toAbsolutePath(), e);
+            throw new RuntimeException("Failed to initialize storage location", e);
         }
     }
 
     @Override
     public UUID put(UUID id, byte[] bytes) {
         Path path = resolvePath(id);
-        try{
+        log.info("▶▶ [STORAGE] Attempting to save file - id: {}, path: {}", id, path.toAbsolutePath());
+        try {
             Files.createDirectories(path.getParent());
             Files.write(path, bytes);
+            log.info("◀◀ [STORAGE] File saved successfully - id: {}, size: {} bytes", id, bytes.length);
             return id;
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 실패",e);
+            log.error("◀◀ [STORAGE] Failed to save file - id: {}, path: {}", id, path.toAbsolutePath(), e);
+            throw new RuntimeException("Failed to save file", e);
         }
     }
 
@@ -58,39 +68,47 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     @Override
     public InputStream get(UUID id) {
         Path path = resolvePath(id);
-        try{
+        log.info("▶▶ [STORAGE] Attempting to read file - id: {}, path: {}", id, path.toAbsolutePath());
+        try {
             if (!Files.exists(path)) {
-                throw new RuntimeException("파일 찾을 수 없음.");
+                log.warn("◀◀ [STORAGE] File not found - id: {}, path: {}", id, path.toAbsolutePath());
+                throw new RuntimeException("File not found.");
             }
+            log.info("◀◀ [STORAGE] File read successfully - id: {}", id);
             return new FileInputStream(path.toFile());
         } catch (IOException e) {
-            throw new RuntimeException("파일 읽어오기 실패",e);
+            log.error("◀◀ [STORAGE] Failed to read file - id: {}, path: {}", id, path.toAbsolutePath(), e);
+            throw new RuntimeException("Failed to read file", e);
         }
     }
 
     @Override
     public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
-        try{
-            InputStream inputStream = get (binaryContentDto.id());
+        UUID id = binaryContentDto.id();
+        log.info("▶▶ [STORAGE] Attempting to download file - id: {}, fileName: {}", id, binaryContentDto.fileName());
+        try {
+            InputStream inputStream = get(id);
             InputStreamResource resource = new InputStreamResource(inputStream);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + binaryContentDto.fileName());
 
             MediaType mediaType;
-            try{
+            try {
                 mediaType = MediaType.parseMediaType(binaryContentDto.contentType());
-            } catch (Exception e){
+            } catch (Exception e) {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
             }
 
+            log.info("◀◀ [STORAGE] File download response created successfully - id: {}", id);
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentType(mediaType)
                     .contentLength(binaryContentDto.size())
-                    .body((Resource) resource);
-        } catch (Exception e){
-            throw new RuntimeException("다운로드 실패", e);
+                    .body(resource);
+        } catch (Exception e) {
+            log.error("◀◀ [STORAGE] Failed to download file - id: {}, fileName: {}", id, binaryContentDto.fileName(), e);
+            throw new RuntimeException("Failed to download file", e);
         }
     }
 }

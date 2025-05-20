@@ -1,0 +1,2171 @@
+25-05-08 09:18:29.270 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 16212 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 09:18:29.276 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 09:18:29.278 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 09:18:30.453 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 09:18:30.553 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 86 ms. Found 6 JPA repository interfaces.
+25-05-08 09:18:31.203 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 09:18:31.218 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 09:18:31.220 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 09:18:31.220 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 09:18:31.315 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 09:18:31.315 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1979 ms
+25-05-08 09:18:31.436 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 09:18:31.774 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6f96dd64
+25-05-08 09:18:31.780 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 09:18:31.813 [main] WARN  igServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+25-05-08 09:18:31.814 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 09:18:31.816 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 09:18:31.820 [main] INFO  o.a.catalina.core.StandardService    - Stopping service [Tomcat]
+25-05-08 09:18:31.835 [main] INFO  .a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-08 09:18:31.859 [main] ERROR o.s.boot.SpringApplication           - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:325)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:204)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:9)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:312)
+	... 10 common frames omitted
+Caused by: org.springframework.jdbc.datasource.init.ScriptStatementFailedException: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:282)
+	at org.springframework.jdbc.datasource.init.ResourceDatabasePopulator.populate(ResourceDatabasePopulator.java:254)
+	at org.springframework.jdbc.datasource.init.DatabasePopulatorUtils.execute(DatabasePopulatorUtils.java:54)
+	at org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer.runScripts(DataSourceScriptDatabaseInitializer.java:87)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.runScripts(AbstractScriptDatabaseInitializer.java:146)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.applyScripts(AbstractScriptDatabaseInitializer.java:108)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.applySchemaScripts(AbstractScriptDatabaseInitializer.java:98)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.initializeDatabase(AbstractScriptDatabaseInitializer.java:76)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.afterPropertiesSet(AbstractScriptDatabaseInitializer.java:66)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1849)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	... 17 common frames omitted
+Caused by: org.postgresql.util.PSQLException: 오류: "binary_contents" 이름의 릴레이션(relation)이 이미 있습니다
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2733)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2420)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:372)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:517)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:434)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:356)
+	at org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:341)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:317)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:312)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:261)
+	... 27 common frames omitted
+25-05-08 09:19:03.264 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 4868 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 09:19:03.266 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 09:19:03.267 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 09:19:04.504 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 09:19:04.614 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 98 ms. Found 6 JPA repository interfaces.
+25-05-08 09:19:05.275 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 09:19:05.291 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 09:19:05.294 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 09:19:05.294 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 09:19:05.387 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 09:19:05.387 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2063 ms
+25-05-08 09:19:05.525 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 09:19:05.841 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1e92c3b6
+25-05-08 09:19:05.847 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 09:19:05.873 [main] WARN  igServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+25-05-08 09:19:05.874 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 09:19:05.876 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 09:19:05.880 [main] INFO  o.a.catalina.core.StandardService    - Stopping service [Tomcat]
+25-05-08 09:19:05.891 [main] INFO  .a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-08 09:19:05.914 [main] ERROR o.s.boot.SpringApplication           - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:325)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:204)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.sprint.mission.discodeit.DiscodeitApplication.main(DiscodeitApplication.java:9)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1802)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:601)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:523)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:336)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:288)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:334)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:199)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:312)
+	... 10 common frames omitted
+Caused by: org.springframework.jdbc.datasource.init.ScriptStatementFailedException: Failed to execute SQL script statement #1 of class path resource [schema.sql]: CREATE TABLE binary_contents ( uuid UUID PRIMARY KEY, id VARCHAR, created_at TIMESTAMP WITH TIME ZONE NOT NULL, file_name VARCHAR(255) NOT NULL, size BIGINT NOT NULL, content_type VARCHAR(100) NOT NULL, bytes BYTEA NOT NULL )
+	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:282)
+	at org.springframework.jdbc.datasource.init.ResourceDatabasePopulator.populate(ResourceDatabasePopulator.java:254)
+	at org.springframework.jdbc.datasource.init.DatabasePopulatorUtils.execute(DatabasePopulatorUtils.java:54)
+	at org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer.runScripts(DataSourceScriptDatabaseInitializer.java:87)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.runScripts(AbstractScriptDatabaseInitializer.java:146)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.applyScripts(AbstractScriptDatabaseInitializer.java:108)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.applySchemaScripts(AbstractScriptDatabaseInitializer.java:98)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.initializeDatabase(AbstractScriptDatabaseInitializer.java:76)
+	at org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer.afterPropertiesSet(AbstractScriptDatabaseInitializer.java:66)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1849)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1798)
+	... 17 common frames omitted
+Caused by: org.postgresql.util.PSQLException: 오류: "binary_contents" 이름의 릴레이션(relation)이 이미 있습니다
+	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:2733)
+	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:2420)
+	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:372)
+	at org.postgresql.jdbc.PgStatement.executeInternal(PgStatement.java:517)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:434)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:356)
+	at org.postgresql.jdbc.PgStatement.executeCachedSql(PgStatement.java:341)
+	at org.postgresql.jdbc.PgStatement.executeWithFlags(PgStatement.java:317)
+	at org.postgresql.jdbc.PgStatement.execute(PgStatement.java:312)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.springframework.jdbc.datasource.init.ScriptUtils.executeSqlScript(ScriptUtils.java:261)
+	... 27 common frames omitted
+25-05-08 09:19:44.491 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 12428 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 09:19:44.493 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 09:19:44.493 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 09:19:45.479 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 09:19:45.585 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 95 ms. Found 6 JPA repository interfaces.
+25-05-08 09:19:46.189 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 09:19:46.202 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 09:19:46.204 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 09:19:46.204 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 09:19:46.292 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 09:19:46.293 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1746 ms
+25-05-08 09:19:46.492 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 09:19:46.593 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 09:19:46.645 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 09:19:47.140 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 09:19:47.187 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 09:19:47.460 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@3578a45b
+25-05-08 09:19:47.464 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 09:19:47.578 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 09:19:49.143 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 09:19:49.170 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 09:19:49.172 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 09:19:49.183 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 09:19:49.184 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 09:19:49.186 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 09:19:49.191 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 09:19:49.194 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 09:19:49.195 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 09:19:49.196 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 09:19:49.198 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 09:19:49.207 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 09:19:49.219 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 09:19:49.224 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 09:19:49.228 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 09:19:49.233 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 09:19:49.239 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 09:19:49.255 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 09:19:49.278 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 09:19:49.288 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 09:19:49.292 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 09:19:49.296 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 09:19:49.303 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 09:19:49.312 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 09:19:49.320 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 09:19:49.334 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 09:19:49.339 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 09:19:49.343 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 09:19:49.346 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 09:19:49.350 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 09:19:49.352 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 09:19:49.357 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 09:19:49.367 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 09:19:50.104 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 09:19:50.685 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 09:19:50.709 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 09:19:50.717 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 6.991 seconds (process running for 7.99)
+25-05-08 09:23:05.944 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 09:23:07.465 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 09:23:07.471 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 09:23:07.474 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 09:23:07.484 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 09:23:35.419 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 26360 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 09:23:35.425 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 09:23:35.427 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 09:23:37.065 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 09:23:37.223 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 145 ms. Found 6 JPA repository interfaces.
+25-05-08 09:23:38.089 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 09:23:38.106 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 09:23:38.109 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 09:23:38.110 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 09:23:38.221 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 09:23:38.221 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2693 ms
+25-05-08 09:23:38.387 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 09:23:38.771 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@20a3e10c
+25-05-08 09:23:38.778 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 09:23:39.121 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 09:23:39.260 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 09:23:39.323 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 09:23:39.980 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 09:23:40.170 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 09:23:42.224 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 09:23:42.250 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 09:23:42.255 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 09:23:42.266 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 09:23:42.268 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 09:23:42.271 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 09:23:42.272 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 09:23:42.274 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 09:23:42.275 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 09:23:42.278 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 09:23:42.279 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 09:23:42.287 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 09:23:42.297 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 09:23:42.300 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 09:23:42.309 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 09:23:42.315 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 09:23:42.322 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 09:23:42.344 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 09:23:42.354 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 09:23:42.366 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 09:23:42.372 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 09:23:42.379 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 09:23:42.389 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 09:23:42.400 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 09:23:42.418 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 09:23:42.426 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 09:23:42.429 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 09:23:42.436 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 09:23:42.444 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 09:23:42.448 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 09:23:42.458 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 09:23:42.467 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 09:23:42.480 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 09:23:43.489 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 09:23:44.249 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 09:23:44.280 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 09:23:44.295 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 10.218 seconds (process running for 11.786)
+25-05-08 09:24:46.132 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 09:24:47.524 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 09:24:47.529 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 09:24:47.531 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 09:24:47.538 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 11:12:31.637 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 6912 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 11:12:31.639 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 11:12:31.640 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 11:12:32.857 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 11:12:32.960 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 93 ms. Found 6 JPA repository interfaces.
+25-05-08 11:12:33.576 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 11:12:33.592 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 11:12:33.594 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 11:12:33.595 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 11:12:33.675 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 11:12:33.675 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1968 ms
+25-05-08 11:12:33.790 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 11:12:34.100 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@7ec08115
+25-05-08 11:12:34.107 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 11:12:34.353 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 11:12:34.457 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 11:12:34.512 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 11:12:34.965 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 11:12:35.103 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 11:12:36.438 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 11:12:36.462 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 11:12:36.463 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 11:12:36.465 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 11:12:36.466 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 11:12:36.467 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 11:12:36.468 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 11:12:36.469 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 11:12:36.470 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 11:12:36.472 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 11:12:36.473 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 11:12:36.478 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 11:12:36.482 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 11:12:36.486 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 11:12:36.490 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 11:12:36.495 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 11:12:36.499 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 11:12:36.511 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 11:12:36.516 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 11:12:36.522 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 11:12:36.526 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 11:12:36.531 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 11:12:36.536 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 11:12:36.542 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 11:12:36.549 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 11:12:36.557 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 11:12:36.560 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 11:12:36.563 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 11:12:36.567 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 11:12:36.570 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 11:12:36.571 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 11:12:36.574 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 11:12:36.579 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 11:12:37.289 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 11:12:37.782 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 11:12:37.806 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 11:12:37.816 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 7.237 seconds (process running for 8.338)
+25-05-08 11:13:51.262 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 11:13:52.392 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 11:13:52.396 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 11:13:52.398 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 11:13:52.407 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 11:33:51.929 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 12624 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 11:33:51.932 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 11:33:51.933 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 11:33:52.930 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 11:33:53.026 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 87 ms. Found 6 JPA repository interfaces.
+25-05-08 11:33:53.576 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 11:33:53.587 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 11:33:53.590 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 11:33:53.591 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 11:33:53.663 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 11:33:53.663 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1672 ms
+25-05-08 11:33:53.767 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 11:33:54.051 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1e92c3b6
+25-05-08 11:33:54.054 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 11:33:54.256 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 11:33:54.333 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 11:33:54.385 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 11:33:54.766 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 11:33:54.882 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 11:33:56.095 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 11:33:56.114 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 11:33:56.115 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 11:33:56.126 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 11:33:56.128 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 11:33:56.130 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 11:33:56.131 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 11:33:56.132 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 11:33:56.133 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 11:33:56.134 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 11:33:56.135 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 11:33:56.140 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 11:33:56.145 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 11:33:56.147 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 11:33:56.157 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 11:33:56.163 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 11:33:56.168 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 11:33:56.182 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 11:33:56.186 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 11:33:56.198 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 11:33:56.203 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 11:33:56.209 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 11:33:56.214 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 11:33:56.219 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 11:33:56.225 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 11:33:56.232 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 11:33:56.235 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 11:33:56.239 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 11:33:56.243 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 11:33:56.246 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 11:33:56.247 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 11:33:56.251 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 11:33:56.256 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 11:33:56.612 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] 로컬 저장소 초기화 시도 - root: C:\Users\KIMM\2-sprint-mission\{discodeit.storage.local.root-path}
+25-05-08 11:33:56.613 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] 로컬 저장소 디렉토리 이미 존재 - root: C:\Users\KIMM\2-sprint-mission\{discodeit.storage.local.root-path}
+25-05-08 11:33:56.853 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 11:33:57.306 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 11:33:57.328 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 11:33:57.339 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 6.179 seconds (process running for 7.148)
+25-05-08 11:36:05.795 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 11:36:06.970 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 11:36:06.974 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 11:36:06.976 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 11:36:06.985 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 13:05:00.121 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 14592 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 13:05:00.124 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 13:05:00.125 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 13:05:01.646 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 13:05:01.770 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 111 ms. Found 6 JPA repository interfaces.
+25-05-08 13:05:02.479 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 13:05:02.496 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 13:05:02.498 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 13:05:02.499 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 13:05:02.586 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 13:05:02.586 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2398 ms
+25-05-08 13:05:02.698 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 13:05:03.070 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@b506ed0
+25-05-08 13:05:03.075 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 13:05:03.352 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 13:05:03.461 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 13:05:03.514 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 13:05:03.994 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 13:05:04.137 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 13:05:05.540 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 13:05:05.564 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 13:05:05.566 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 13:05:05.568 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 13:05:05.569 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 13:05:05.572 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 13:05:05.574 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 13:05:05.575 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 13:05:05.576 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 13:05:05.577 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 13:05:05.578 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 13:05:05.582 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 13:05:05.588 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 13:05:05.591 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 13:05:05.596 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 13:05:05.601 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 13:05:05.606 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 13:05:05.627 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 13:05:05.634 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 13:05:05.646 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 13:05:05.652 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 13:05:05.657 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 13:05:05.664 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 13:05:05.670 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 13:05:05.681 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 13:05:05.690 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 13:05:05.694 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 13:05:05.698 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:05:05.701 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:05:05.705 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:05:05.707 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:05:05.711 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 13:05:05.717 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:05:06.292 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:05:06.293 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory created - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:05:06.684 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 13:05:07.388 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 13:05:07.424 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 13:05:07.438 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 8.302 seconds (process running for 9.661)
+25-05-08 13:06:00.799 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 13:06:01.892 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 13:06:01.897 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:06:01.899 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 13:06:01.902 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 13:06:12.038 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 21444 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 13:06:12.040 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 13:06:12.041 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 13:06:13.445 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 13:06:13.575 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 115 ms. Found 6 JPA repository interfaces.
+25-05-08 13:06:14.307 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 13:06:14.324 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 13:06:14.327 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 13:06:14.327 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 13:06:14.445 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 13:06:14.445 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2322 ms
+25-05-08 13:06:14.601 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 13:06:14.989 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@426c0486
+25-05-08 13:06:14.999 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 13:06:15.264 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 13:06:15.368 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 13:06:15.433 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 13:06:15.937 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 13:06:16.072 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 13:06:17.512 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 13:06:17.529 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 13:06:17.531 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 13:06:17.542 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 13:06:17.543 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 13:06:17.545 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 13:06:17.546 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 13:06:17.546 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 13:06:17.547 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 13:06:17.548 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 13:06:17.549 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 13:06:17.554 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 13:06:17.559 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 13:06:17.563 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 13:06:17.567 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 13:06:17.573 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 13:06:17.578 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 13:06:17.590 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 13:06:17.595 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 13:06:17.602 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 13:06:17.606 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 13:06:17.612 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 13:06:17.617 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 13:06:17.626 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 13:06:17.635 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 13:06:17.639 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 13:06:17.643 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 13:06:17.647 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:06:17.649 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:06:17.653 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:06:17.656 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:06:17.660 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 13:06:17.665 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:06:18.172 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:06:18.172 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory already exists - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:06:18.524 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 13:06:19.164 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 13:06:19.191 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 13:06:19.200 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 8.339 seconds (process running for 9.48)
+25-05-08 13:09:01.669 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 13:09:03.615 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 13:09:03.621 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:09:03.624 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 13:09:03.630 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 13:14:05.184 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 12756 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 13:14:05.187 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 13:14:05.189 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 13:14:06.242 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 13:14:06.349 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 94 ms. Found 6 JPA repository interfaces.
+25-05-08 13:14:06.903 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 13:14:06.918 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 13:14:06.920 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 13:14:06.920 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 13:14:06.994 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 13:14:06.995 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1749 ms
+25-05-08 13:14:07.095 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 13:14:07.379 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5aea8994
+25-05-08 13:14:07.381 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 13:14:07.597 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 13:14:07.670 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 13:14:07.717 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 13:14:08.083 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 13:14:08.192 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 13:14:09.437 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 13:14:09.457 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 13:14:09.459 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 13:14:09.469 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 13:14:09.471 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 13:14:09.474 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 13:14:09.475 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 13:14:09.477 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 13:14:09.479 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 13:14:09.480 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 13:14:09.481 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 13:14:09.485 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 13:14:09.490 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 13:14:09.492 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 13:14:09.498 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 13:14:09.501 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 13:14:09.506 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 13:14:09.518 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 13:14:09.522 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 13:14:09.530 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 13:14:09.534 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 13:14:09.539 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 13:14:09.544 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 13:14:09.549 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 13:14:09.557 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 13:14:09.561 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 13:14:09.564 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 13:14:09.567 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:14:09.569 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:14:09.572 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:14:09.574 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:14:09.577 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 13:14:09.583 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:14:09.967 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:14:09.969 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory already exists - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:14:10.224 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 13:14:10.707 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 13:14:10.729 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 13:14:10.738 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 6.337 seconds (process running for 7.285)
+25-05-08 13:15:55.958 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 13:15:57.077 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 13:15:57.081 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:15:57.082 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 13:15:57.092 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 13:25:59.424 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 5392 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 13:25:59.427 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 13:25:59.428 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 13:26:00.654 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 13:26:00.763 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 100 ms. Found 6 JPA repository interfaces.
+25-05-08 13:26:01.497 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 13:26:01.517 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 13:26:01.522 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 13:26:01.523 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 13:26:01.634 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 13:26:01.634 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2131 ms
+25-05-08 13:26:01.783 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 13:26:02.182 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@426c0486
+25-05-08 13:26:02.191 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 13:26:02.463 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 13:26:02.553 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 13:26:02.617 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 13:26:03.149 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 13:26:03.331 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 13:26:05.002 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 13:26:05.027 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 13:26:05.031 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 13:26:05.041 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 13:26:05.043 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 13:26:05.045 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 13:26:05.047 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 13:26:05.048 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 13:26:05.050 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 13:26:05.052 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 13:26:05.055 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 13:26:05.060 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 13:26:05.064 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 13:26:05.067 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 13:26:05.075 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 13:26:05.081 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 13:26:05.087 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 13:26:05.099 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 13:26:05.106 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 13:26:05.115 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 13:26:05.122 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 13:26:05.128 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 13:26:05.132 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 13:26:05.140 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 13:26:05.148 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 13:26:05.154 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 13:26:05.157 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 13:26:05.161 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:26:05.164 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:26:05.167 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:26:05.170 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:26:05.174 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 13:26:05.180 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:26:05.657 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:26:05.658 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory already exists - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:26:05.947 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 13:26:06.464 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 13:26:06.490 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 13:26:06.501 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 8.045 seconds (process running for 9.117)
+25-05-08 13:28:00.959 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 13:28:03.049 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 13:28:03.055 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:28:03.057 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 13:28:03.064 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 13:42:39.292 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 23332 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 13:42:39.300 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 13:42:39.301 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 13:42:40.329 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 13:42:40.433 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 91 ms. Found 6 JPA repository interfaces.
+25-05-08 13:42:41.025 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 13:42:41.044 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 13:42:41.048 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 13:42:41.048 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 13:42:41.144 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 13:42:41.144 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1786 ms
+25-05-08 13:42:41.277 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 13:42:41.615 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@207dd1b7
+25-05-08 13:42:41.618 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 13:42:41.851 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 13:42:41.924 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 13:42:41.979 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 13:42:42.375 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 13:42:42.488 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 13:42:43.713 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 13:42:43.729 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 13:42:43.730 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 13:42:43.734 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 13:42:43.735 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 13:42:43.736 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 13:42:43.738 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 13:42:43.739 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 13:42:43.740 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 13:42:43.741 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 13:42:43.742 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 13:42:43.746 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 13:42:43.750 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 13:42:43.753 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 13:42:43.758 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 13:42:43.762 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 13:42:43.770 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 13:42:43.780 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 13:42:43.784 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 13:42:43.793 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 13:42:43.796 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 13:42:43.801 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 13:42:43.807 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 13:42:43.811 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 13:42:43.818 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 13:42:43.823 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 13:42:43.826 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 13:42:43.829 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:42:43.833 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 13:42:43.836 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:42:43.839 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 13:42:43.842 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 13:42:43.847 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:42:44.223 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:42:44.223 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory already exists - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 13:42:44.477 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 13:42:44.968 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 13:42:44.991 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 13:42:45.001 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 6.448 seconds (process running for 7.331)
+25-05-08 13:44:10.592 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 13:44:11.695 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 13:44:11.700 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 13:44:11.702 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 13:44:11.713 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 14:26:46.110 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 27808 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 14:26:46.113 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 14:26:46.114 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 14:26:47.353 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 14:26:47.485 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 120 ms. Found 6 JPA repository interfaces.
+25-05-08 14:26:48.101 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 14:26:48.118 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 14:26:48.120 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 14:26:48.121 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 14:26:48.208 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 14:26:48.209 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2024 ms
+25-05-08 14:26:48.325 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 14:26:48.620 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@23ad2d17
+25-05-08 14:26:48.629 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 14:26:48.845 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 14:26:48.929 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 14:26:48.984 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 14:26:49.406 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 14:26:49.548 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 14:26:51.121 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 14:26:51.145 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 14:26:51.147 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 14:26:51.150 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 14:26:51.153 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 14:26:51.153 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 14:26:51.156 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 14:26:51.157 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 14:26:51.158 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 14:26:51.160 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 14:26:51.162 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 14:26:51.170 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 14:26:51.175 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 14:26:51.179 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 14:26:51.185 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 14:26:51.190 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 14:26:51.197 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 14:26:51.209 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 14:26:51.214 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 14:26:51.225 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 14:26:51.231 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 14:26:51.235 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 14:26:51.241 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 14:26:51.248 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 14:26:51.259 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 14:26:51.264 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 14:26:51.267 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 14:26:51.271 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 14:26:51.274 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 14:26:51.277 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 14:26:51.280 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 14:26:51.283 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 14:26:51.290 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 14:26:51.725 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 14:26:51.726 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory already exists - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 14:26:52.040 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 14:26:52.559 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 14:26:52.586 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 14:26:52.596 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 7.361 seconds (process running for 8.401)
+25-05-08 14:27:50.673 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 14:27:51.838 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 14:27:51.843 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 14:27:51.845 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 14:27:51.855 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.
+25-05-08 15:43:13.964 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Starting DiscodeitApplication using Java 17.0.14 with PID 1492 (C:\Users\KIMM\2-sprint-mission\out\production\classes started by KIMM in C:\Users\KIMM\2-sprint-mission)
+25-05-08 15:43:13.967 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
+25-05-08 15:43:13.968 [main] INFO  c.s.m.discodeit.DiscodeitApplication - No active profile set, falling back to 1 default profile: "dev"
+25-05-08 15:43:15.216 [main] INFO  .r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-08 15:43:15.355 [main] INFO  .r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 124 ms. Found 6 JPA repository interfaces.
+25-05-08 15:43:16.035 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat initialized with port 8080 (http)
+25-05-08 15:43:16.050 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Initializing ProtocolHandler ["http-nio-8080"]
+25-05-08 15:43:16.052 [main] INFO  o.a.catalina.core.StandardService    - Starting service [Tomcat]
+25-05-08 15:43:16.053 [main] INFO  o.a.catalina.core.StandardEngine     - Starting Servlet engine: [Apache Tomcat/10.1.33]
+25-05-08 15:43:16.169 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/]   - Initializing Spring embedded WebApplicationContext
+25-05-08 15:43:16.169 [main] INFO  c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2140 ms
+25-05-08 15:43:16.300 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Starting...
+25-05-08 15:43:16.645 [main] INFO  com.zaxxer.hikari.pool.HikariPool    - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@5882b202
+25-05-08 15:43:16.652 [main] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Start completed.
+25-05-08 15:43:16.894 [main] INFO  o.h.jpa.internal.util.LogHelper      - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-08 15:43:17.019 [main] INFO  org.hibernate.Version                - HHH000412: Hibernate ORM core version 6.6.2.Final
+25-05-08 15:43:17.081 [main] INFO  o.h.c.i.RegionFactoryInitiator       - HHH000026: Second-level cache disabled
+25-05-08 15:43:17.575 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo  - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-08 15:43:17.726 [main] INFO  o.hibernate.orm.connections.pooling  - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.4
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+25-05-08 15:43:19.102 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator   - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-08 15:43:19.121 [main] DEBUG org.hibernate.SQL                    - 
+    set client_min_messages = WARNING
+25-05-08 15:43:19.123 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_binary
+25-05-08 15:43:19.125 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       drop constraint if exists fk_attachment_message
+25-05-08 15:43:19.126 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_author
+25-05-08 15:43:19.128 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       drop constraint if exists fk_message_channel
+25-05-08 15:43:19.129 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_channel
+25-05-08 15:43:19.130 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       drop constraint if exists fk_read_status_user
+25-05-08 15:43:19.132 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       drop constraint if exists fk_user_status_user
+25-05-08 15:43:19.134 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       drop constraint if exists fk_profile
+25-05-08 15:43:19.134 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists binary_contents cascade
+25-05-08 15:43:19.139 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists channels cascade
+25-05-08 15:43:19.143 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists message_attachments cascade
+25-05-08 15:43:19.146 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists messages cascade
+25-05-08 15:43:19.150 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists read_statuses cascade
+25-05-08 15:43:19.157 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists user_statuses cascade
+25-05-08 15:43:19.163 [main] DEBUG org.hibernate.SQL                    - 
+    drop table if exists users cascade
+25-05-08 15:43:19.177 [main] DEBUG org.hibernate.SQL                    - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-08 15:43:19.182 [main] DEBUG org.hibernate.SQL                    - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        type varchar(10) not null check (type in ('PUBLIC','PRIVATE')),
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        primary key (id)
+    )
+25-05-08 15:43:19.193 [main] DEBUG org.hibernate.SQL                    - 
+    create table message_attachments (
+        attachment_id uuid not null,
+        message_id uuid not null,
+        uuid uuid not null,
+        primary key (uuid)
+    )
+25-05-08 15:43:19.198 [main] DEBUG org.hibernate.SQL                    - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content varchar(255),
+        primary key (id)
+    )
+25-05-08 15:43:19.203 [main] DEBUG org.hibernate.SQL                    - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+25-05-08 15:43:19.208 [main] DEBUG org.hibernate.SQL                    - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-08 15:43:19.212 [main] DEBUG org.hibernate.SQL                    - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-08 15:43:19.222 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_binary 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-08 15:43:19.230 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists message_attachments 
+       add constraint fk_attachment_message 
+       foreign key (message_id) 
+       references messages
+25-05-08 15:43:19.234 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_author 
+       foreign key (author_id) 
+       references users
+25-05-08 15:43:19.237 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists messages 
+       add constraint fk_message_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 15:43:19.239 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_channel 
+       foreign key (channel_id) 
+       references channels
+25-05-08 15:43:19.242 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists read_statuses 
+       add constraint fk_read_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 15:43:19.243 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists user_statuses 
+       add constraint fk_user_status_user 
+       foreign key (user_id) 
+       references users
+25-05-08 15:43:19.246 [main] DEBUG org.hibernate.SQL                    - 
+    alter table if exists users 
+       add constraint fk_profile 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-08 15:43:19.250 [main] INFO  calContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 15:43:19.692 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ▶▶ [STORAGE] Initializing local storage - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 15:43:19.693 [main] INFO  c.s.m.d.s.LocalBinaryContentStorage  - ◀◀ [STORAGE] Local storage directory already exists - root: C:\Users\KIMM\2-sprint-mission\.discodeit\storage
+25-05-08 15:43:19.981 [main] INFO  .s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+25-05-08 15:43:20.533 [main] INFO  o.a.coyote.http11.Http11NioProtocol  - Starting ProtocolHandler ["http-nio-8080"]
+25-05-08 15:43:20.554 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer     - Tomcat started on port 8080 (http) with context path '/'
+25-05-08 15:43:20.564 [main] INFO  c.s.m.discodeit.DiscodeitApplication - Started DiscodeitApplication in 7.509 seconds (process running for 8.693)
+25-05-08 15:43:38.520 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Commencing graceful shutdown. Waiting for active requests to complete
+25-05-08 15:43:39.612 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown    - Graceful shutdown complete
+25-05-08 15:43:39.616 [SpringApplicationShutdownHook] INFO  calContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-08 15:43:39.617 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown initiated...
+25-05-08 15:43:39.620 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource   - HikariPool-1 - Shutdown completed.

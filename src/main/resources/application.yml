@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    default: dev
   application:
     name: discodeit
   servlet:
@@ -7,13 +9,10 @@ spring:
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres123
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -24,6 +23,11 @@ spring:
       mode: always
       schema-locations: classpath:schema.sql
 
+logging:
+  level:
+    root: info
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
 
 springdoc:
   swagger-ui:
@@ -33,4 +37,41 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: /path/to/storage
+      root-path: .discodeit/storage
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    build:
+      enabled: true
+
+info:
+  application:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: ${java.version}
+  spring-boot:
+    version: 3.4.0
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.maxFileSize}
+      max-request-size: ${spring.servlet.multipart.maxRequestSize}
