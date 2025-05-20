@@ -1,24 +1,23 @@
 spring:
   application:
     name: discodeit
+
+  profiles:
+    active: dev
+
   servlet:
     multipart:
           max-file-size: 10MB
           max-request-size: 10MB
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    jpa:
-      hibernate:
-        ddl-auto: none
-      show-sql: true
-      properties:
-        hibernate:
-          format_sql: true
-    sql:
-      init:
-        mode: always
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
+
+logging:
+  level:
+    root: info
 
 discodeit:
   repository:
@@ -29,3 +28,19 @@ discodeit:
     type: local
     local:
       root-path: ./binary-files
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+info:
+  app:
+    name: discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring:
+    boot:
+      version: 3.4.0

@@ -1,16 +1,12 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 
-@Getter
-public class UserStatusUpdateRequest {
-    private Instant newLastActiveAt;
+public record UserStatusUpdateRequest(
+    @NotNull(message = "마지막 활동시간에는 null값이 허용되지 않습니다.")
+    Instant newLastActiveAt
+) {
 
-    @Builder
-    public UserStatusUpdateRequest(Instant newLastActiveAt) {
-        this.newLastActiveAt = newLastActiveAt;
-    }
 }

@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.validation.constraints.*;
 
-@Getter
-public class UserCreateRequest {
-    private String username;
-    private String email;
-    private String password;
+public record UserCreateRequest(
+    @NotBlank(message = "이름을 반드시 입력해야 합니다..")
+    String username,
 
-    @Builder
-    public UserCreateRequest(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
+    @NotBlank(message = "이메일을 반드시 입력해야 합니다.")
+    @Email(message = "유효한 이메일 양식이 아닙니다.")
+    String email,
+
+    @NotBlank(message = "비밀번호를 반드시 입력해야 합니다.")
+    String password
+) {
+
 }

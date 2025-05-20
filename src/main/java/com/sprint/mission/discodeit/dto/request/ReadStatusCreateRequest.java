@@ -1,21 +1,18 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-public class ReadStatusCreateRequest {
-    private UUID userId;
-    private UUID channelId;
-    private Instant lastReadAt;
+public record ReadStatusCreateRequest(
+    @NotNull(message = "유저ID는 필수입니다.")
+    UUID userId,
 
-    @Builder
-    public ReadStatusCreateRequest(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
-    }
+    @NotNull(message = "채널ID는 필수입니다.")
+    UUID channelId,
+
+    Instant lastReadAt
+) {
+
 }

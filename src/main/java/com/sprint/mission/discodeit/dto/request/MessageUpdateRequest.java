@@ -1,14 +1,7 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import lombok.Builder;
-import lombok.Getter;
+public record MessageUpdateRequest(
+    String newContent
+) {
 
-@Getter
-public class MessageUpdateRequest {
-    private String newContent;
-
-    @Builder
-    public MessageUpdateRequest(String newContent) {
-        this.newContent = newContent;
-    }
 }

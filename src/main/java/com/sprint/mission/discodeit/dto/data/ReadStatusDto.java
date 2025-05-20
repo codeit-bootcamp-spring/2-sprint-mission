@@ -9,4 +9,5 @@ public record ReadStatusDto(
     UUID channelId,
     Instant lastReadAt
 ) {
+
 }

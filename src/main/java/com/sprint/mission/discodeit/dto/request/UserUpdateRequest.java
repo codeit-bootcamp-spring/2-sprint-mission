@@ -1,19 +1,14 @@
 package com.sprint.mission.discodeit.dto.request;
 
+import jakarta.validation.constraints.Email;
 
-import lombok.Builder;
-import lombok.Getter;
+public record UserUpdateRequest(
+    String newUsername,
 
-@Getter
-public class UserUpdateRequest {
-    private String newUsername;
-    private String newEmail;
-    private String newPassword;
+    @Email(message = "유효한 이메일 양식이 아닙니다.")
+    String newEmail,
 
-    @Builder
-    public UserUpdateRequest(String newUsername, String newEmail, String newPassword) {
-        this.newUsername = newUsername;
-        this.newEmail = newEmail;
-        this.newPassword = newPassword;
-    }
+    String newPassword
+) {
+
 }
