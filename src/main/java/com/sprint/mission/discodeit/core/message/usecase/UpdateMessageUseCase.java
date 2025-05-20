@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.core.message.usecase;
 
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageResult;
-import com.sprint.mission.discodeit.core.message.usecase.dto.UpdateMessageCommand;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
+import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
 
 public interface UpdateMessageUseCase {
 
-  MessageResult update(UpdateMessageCommand command);
+  MessageDto update(MessageUpdateCommand command);
 
 }

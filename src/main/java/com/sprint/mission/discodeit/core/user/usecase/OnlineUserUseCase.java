@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.OnlineUserStatusCommand;
-import com.sprint.mission.discodeit.core.status.usecase.user.dto.UserStatusResult;
+import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
+import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
 
 public interface OnlineUserUseCase {
 
-  UserStatusResult online(OnlineUserStatusCommand command);
+  UserStatusDto online(UserStatusOnlineCommand command);
 
 }

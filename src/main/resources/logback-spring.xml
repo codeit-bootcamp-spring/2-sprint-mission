@@ -1,12 +1,31 @@
 <configuration>
+  <!-- 날짜 변수 정의 -->
+  <timestamp key="DATE" datePattern="yyyy-MM-dd"/>
 
+  <!-- 메모리 로그 -->
   <appender name="MEMORY" class="com.sprint.mission.discodeit.logging.InMemoryLogAppender"/>
+
+  <!-- 콘솔 출력 -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      <pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+        [%X{requestId} | %X{method} | %X{requestURI}] - %msg%n
+      </pattern>
     </encoder>
+  </appender>
+
+  <!-- 일반 파일 로그 (일별 롤링) -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>logs/myapp.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/myapp.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%throwable
+      <pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+        [%X{requestId} | %X{method} | %X{requestURI}] - %msg%n
       </pattern>
     </encoder>
   </appender>
@@ -15,7 +34,9 @@
   <appender name="ERROR_FILE" class="ch.qos.logback.core.FileAppender">
     <file>logs/error-${DATE}.txt</file>
     <encoder>
-      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%throwable
+      <pattern>
+        %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}
+        [%X{requestId} | %X{method} | %X{requestURI}] - %msg%n%throwable
       </pattern>
       <charset>UTF-8</charset>
     </encoder>
@@ -24,12 +45,11 @@
     </filter>
   </appender>
 
-  <!-- 날짜 변수 정의 -->
-  <timestamp key="DATE" datePattern="yyyy-MM-dd_HH-mm-ss"/>
-
+  <!-- 루트 로거에 모든 Appender 연결 -->
   <root level="INFO">
     <appender-ref ref="MEMORY"/>
     <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
     <appender-ref ref="ERROR_FILE"/>
   </root>
 </configuration>

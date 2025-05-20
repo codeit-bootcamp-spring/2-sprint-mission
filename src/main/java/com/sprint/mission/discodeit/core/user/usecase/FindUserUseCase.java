@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserResult;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +13,7 @@ public interface FindUserUseCase {
    * @param userId
    * @return 아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부
    */
-  UserResult findById(UUID userId);
+  UserDto findById(UUID userId);
 
   boolean existsById(UUID userId);
 
@@ -23,6 +23,6 @@ public interface FindUserUseCase {
    *
    * @return List [아이디, 이름, 이메일, 프로필 이미지 메타데이터, 온라인 여부]
    */
-  List<UserResult> findAll();
+  List<UserDto> findAll();
 
 }

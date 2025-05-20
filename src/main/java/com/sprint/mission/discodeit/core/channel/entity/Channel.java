@@ -9,8 +9,6 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @ToString
 @Getter
@@ -25,8 +23,7 @@ public class Channel extends BaseUpdatableEntity {
   private String description;
 
   @Enumerated(EnumType.STRING)
-  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-  @Column(name = "type", columnDefinition = "channel_type")
+  @Column(name = "type")
   private ChannelType type;
 
   private Channel(String name, String description, ChannelType type) {
@@ -37,27 +34,33 @@ public class Channel extends BaseUpdatableEntity {
   }
 
   public static Channel create(String name, String description, ChannelType type) {
+    Validator.validate(name, description);
     return new Channel(name, description, type);
   }
 
   public void update(String newName, String newDescription) {
     if (newName != null && !newName.equals(this.name)) {
+      Validator.validateName(newName);
       this.name = newName;
     }
     if (newDescription != null && !newDescription.equals(this.description)) {
+      Validator.validateDescription(newDescription);
       this.description = newDescription;
     }
   }
 
-  //TODO. Channel Validator 구현해야 함
   public static class Validator {
 
-    public static void validate(String name) {
+    //TODO 정규패턴을 사용해서 유효성 검증할 예정 => 채널 이름 조건, 설명 조건 등
+    public static void validate(String name, String description) {
       validateName(name);
+      validateDescription(description);
     }
 
     public static void validateName(String name) {
+    }
 
+    public static void validateDescription(String description) {
     }
   }
 }
