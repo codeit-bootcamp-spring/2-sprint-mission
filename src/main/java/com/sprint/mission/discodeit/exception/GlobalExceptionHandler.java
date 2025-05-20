@@ -1,34 +1,77 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.dto.data.ErrorDto;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(RestException.class)
-  public ResponseEntity<ErrorDto> handlerRestException(RestException e) {
-    Code code = e.getCode();
-    return ResponseEntity.status(mapToHttpStatus(code))
-        .body(new ErrorDto(code.getCode(), code.getMessage()));
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<String> handleException(IllegalArgumentException e) {
+    e.printStackTrace();
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(e.getMessage());
+  }
+
+  @ExceptionHandler(NoSuchElementException.class)
+  public ResponseEntity<String> handleException(NoSuchElementException e) {
+    e.printStackTrace();
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(e.getMessage());
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorDto> handleUnexpected(Exception e) {
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new ErrorDto(500, "예상치 못한 서버 오류가 발생했습니다."));
+  public ResponseEntity<String> handleException(Exception e) {
+    e.printStackTrace();
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(e.getMessage());
   }
 
-  private HttpStatus mapToHttpStatus(Code code) {
-    return switch (code.getCode()) {
-      case 400 -> HttpStatus.BAD_REQUEST;
-      case 403 -> HttpStatus.FORBIDDEN;
-      case 404, 404001 -> HttpStatus.NOT_FOUND;
-      default -> HttpStatus.INTERNAL_SERVER_ERROR;
-    };
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleException(DiscodeitException e) {
+    ErrorResponse errorResponse = new ErrorResponse(
+        e.getTimestamp(),
+        e.getErrorCode().name(),
+        e.getErrorCode().getMessage(),
+        e.getDetails(),
+        e.getClass().getSimpleName(),
+        e.getErrorCode().getStatus()
+    );
+    return ResponseEntity
+        .status(e.getErrorCode().getStatus()).body(errorResponse);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleException(MethodArgumentNotValidException e) {
+    Map<String, Object> details = e.getBindingResult()
+        .getFieldErrors()
+        .stream()
+        .collect(Collectors.toMap(
+            fieldError -> fieldError.getField(),
+            fieldError -> fieldError.getDefaultMessage(),
+            (first, second) -> first
+        ));
+
+    ErrorResponse response = new ErrorResponse(
+        Instant.now(),
+        "VALIDATION_ERROR",
+        "요청한 값이 유효하지 않습니다.",
+        details,
+        e.getClass().getSimpleName(),
+        HttpStatus.BAD_REQUEST.value()
+    );
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 }

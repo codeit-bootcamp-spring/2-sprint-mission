@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public record PublicChannelUpdateRequest(
-        String newName,
-        String newDescription
+    @NotBlank String newName,
+    String newDescription
 ) {
+
 }
