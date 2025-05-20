@@ -8,7 +8,7 @@ plugins {
 
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '1.2.-M8'
 
 java {
 	toolchain {
@@ -45,9 +45,6 @@ dependencies {
 
 	// test H2
 	testImplementation 'com.h2database:h2'
-
-	// admin client
-	implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
 }
 
 tasks.withType(JavaCompile).configureEach {

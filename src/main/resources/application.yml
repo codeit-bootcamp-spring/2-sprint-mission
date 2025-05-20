@@ -1,13 +1,8 @@
 spring:
   application:
     name: discodeit
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
   profiles:
-    active: dev # dev:9090 or prod:8080
+    active: ${SPRING_PROFILES_ACTIVE:prod} # dev:8080 or prod:80
   servlet:
     multipart:
       enabled: true
