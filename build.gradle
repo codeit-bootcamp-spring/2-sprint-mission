@@ -1,0 +1,101 @@
+plugins {
+    id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.3.1'
+    id 'io.spring.dependency-management' version '1.1.5'
+    id 'org.openapi.generator' version '7.0.0'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+jacoco {
+    toolVersion = "0.8.10" // 최신 버전 기준, 필요 시 생략 가능
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+
+openApiGenerate {
+    generatorName = "spring" // 사용할 generator 이름
+    inputSpec = "C:/Users/dlwns/2-sprint-mission/src/main/resources/api-docs_1.1.json"
+// JSON 파일 경로
+    outputDir = "${buildDir}/generated"
+    apiPackage = "com.sprint.mission.discodeit.controller" // API 클래스 패키지 경로
+    modelPackage = "import com.sprint.mission.discodeit.dto" // 모델 클래스 패키지 경로
+    configOptions = [
+            useSpringBoot3     : "true",
+            useSpringController: "true",
+            supportingFiles    : "ApiUtil.java",
+            interfaceOnly      : "true", // API 인터페이스만 생성 (구현 클래스 제외)
+            generateModels     : "true",// DTO 생성 활성화
+            useBeanValidation  : "true",
+            generateApis       : "true", // API 인터페이스 생성 활성화
+            dateLibrary        : "java8", // 날짜 라이브러리 설정
+            useTags            : "true"
+    ]
+    importMappings = [
+            "MultipartFile": "org.springframework.web.multipart.MultipartFile"
+    ]
+}
+
+sourceSets.main.java.srcDir("$buildDir/generated/src/main/java")
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.2'
+    implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
+    // Map Struct
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    implementation 'org.glassfish:jakarta.el:3.0.3'  // 필요할 수도 있음
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

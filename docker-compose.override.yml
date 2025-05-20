@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: discodeit-dev-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: discodeit_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev1234
+    volumes:
+      - dev_db_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: discodeit-dev-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+    depends_on:
+      - db
+
+volumes:
+  dev_db_data:

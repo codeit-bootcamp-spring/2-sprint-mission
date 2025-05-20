@@ -1,0 +1,9 @@
+services:
+  app:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://prod-db-host:5432/discodeit
+      SPRING_DATASOURCE_USERNAME: prod_user
+      SPRING_DATASOURCE_PASSWORD: prod-secure-password
+    ports:
+      - "80:80"

@@ -1,0 +1,21 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: discodeit
+
+    boot:
+      admin:
+        client:
+          url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://prod-db-host:5432/discodeit
+    username: prod_user
+    password: prod-secure-password
+
+logging:
+  level:
+    root: info
+    com.sprint: info
