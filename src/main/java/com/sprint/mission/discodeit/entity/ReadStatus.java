@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
 @Entity
@@ -18,29 +14,31 @@ import java.time.Instant;
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"})
 )
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_read_user"))
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", columnDefinition = "uuid", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_read_user"))
     private User user;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "channel_id", nullable = false, foreignKey = @ForeignKey(name = "fk_read_channel"))
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", columnDefinition = "uuid", nullable = false,
+        foreignKey = @ForeignKey(name = "fk_read_channel"))
     private Channel channel;
 
-    @Column(name = "last_read_at")
+    @Column(name = "last_read_at", columnDefinition = "timestamp with time zone", nullable = false)
     private Instant lastReadAt;
 
-    protected ReadStatus() {
-    }
-
-    public ReadStatus(User user, Channel channel) {
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
         this.user = user;
         this.channel = channel;
-        this.lastReadAt = Instant.now();
+        this.lastReadAt = lastReadAt;
     }
 
-    public void updateLastReadAt(Instant lastReadAt) {
-        this.lastReadAt = lastReadAt;
+    public void update(Instant newLastReadAt) {
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+        }
     }
 }

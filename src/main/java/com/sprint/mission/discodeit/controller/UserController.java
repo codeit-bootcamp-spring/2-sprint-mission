@@ -11,9 +11,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -38,8 +41,12 @@ public class UserController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createUser(
-        @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest request,
+        @RequestPart(value = "userCreateRequest", required = false) @Valid CreateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
+
+        log.info("사용자 생성 API 호출 - username: {}, email: {}",
+            request != null ? request.username() : "null",
+            request != null ? request.email() : "null");
 
         Optional<CreateBinaryContentRequest> profileOpt = Optional.ofNullable(profileFile)
             .filter(file -> !file.isEmpty())
@@ -51,11 +58,13 @@ public class UserController {
                         file.getBytes()
                     );
                 } catch (IOException e) {
+                    log.error("프로필 이미지 변환 실패", e);
                     throw new RuntimeException("프로필 이미지 변환 실패", e);
                 }
             });
 
-        UserDto user = userService.createUser(request, profileOpt); // 변경됨
+        UserDto user = userService.createUser(request, profileOpt);
+        log.info("사용자 생성 완료 - userId: {}", user.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -70,10 +79,12 @@ public class UserController {
         }
     )
     @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateUser(
+    public ResponseEntity<UserDto> updateUser(
         @PathVariable UUID userId,
-        @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest request,
+        @RequestPart(value = "userUpdateRequest", required = false) @Valid UpdateUserRequest request,
         @RequestPart(value = "profile", required = false) MultipartFile profileFile) {
+
+        log.info("사용자 수정 API 호출 - userId: {}", userId);
 
         UpdateUserRequest realRequest = new UpdateUserRequest(
             userId,
@@ -92,19 +103,23 @@ public class UserController {
                         profileFile.getBytes()
                     );
                 } catch (IOException e) {
+                    log.error("프로필 이미지 변환 실패", e);
                     throw new RuntimeException("프로필 이미지 변환 실패", e);
                 }
             });
 
-        userService.updateUser(realRequest, profileOpt);
-        return ResponseEntity.noContent().build();
+        UserDto updatedUser = userService.updateUser(realRequest, profileOpt);
+        log.info("사용자 수정 완료 - userId: {}", userId);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @Operation(summary = "사용자 삭제")
     @ApiResponse(responseCode = "204", description = "사용자 삭제 성공")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        log.info("사용자 삭제 API 호출 - userId: {}", userId);
         userService.deleteUser(userId);
+        log.info("사용자 삭제 완료 - userId: {}", userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -127,14 +142,11 @@ public class UserController {
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<Void> updateOnlineStatus(
         @PathVariable UUID userId,
-        @RequestBody UpdateUserStatusRequest request
+        @RequestBody @Valid UpdateUserStatusRequest request
     ) {
-        UpdateUserStatusRequest fixedRequest = new UpdateUserStatusRequest(
-            userId,
-            request.newLastActiveAt()
-        );
-
-        userStatusService.update(fixedRequest);
+        log.info("사용자 상태 변경 API 호출 - userId: {}", userId);
+        userStatusService.update(userId, request);
+        log.info("사용자 상태 변경 완료 - userId: {}", userId);
         return ResponseEntity.ok().build();
     }
 }

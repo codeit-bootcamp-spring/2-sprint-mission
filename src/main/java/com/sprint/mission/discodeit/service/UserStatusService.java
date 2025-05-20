@@ -15,7 +15,7 @@ public interface UserStatusService {
 
     List<UserStatus> getAll();
 
-    void update(UpdateUserStatusRequest request);
+    void update(UUID userId, UpdateUserStatusRequest request);
 
     void updateByUserId(UUID userId);
 

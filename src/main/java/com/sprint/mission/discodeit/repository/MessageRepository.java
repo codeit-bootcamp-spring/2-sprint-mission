@@ -16,6 +16,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     List<Message> findAllByChannel(Channel channel);
 
+    void deleteAllByChannelId(UUID channelId);
+
     @EntityGraph(attributePaths = {"author"})
     @Query("SELECT m FROM Message m WHERE m.channel = :channel ORDER BY m.createdAt DESC")
     List<Message> findFirstPageByChannel(@Param("channel") Channel channel, Pageable pageable);

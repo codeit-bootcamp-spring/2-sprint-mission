@@ -4,10 +4,14 @@ import com.sprint.mission.discodeit.dto.status.CreateUserStatusRequest;
 import com.sprint.mission.discodeit.dto.status.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.handler.UserStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusAlreadyExistsException;
+
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +33,10 @@ public class BasicUserStatusService implements UserStatusService {
         UUID userId = request.userId();
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 입니다: " + userId));
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
-        if (userRepository.findById(userId).isPresent()) {
-            throw new IllegalArgumentException("이미 정보가 존재하는 사용자 입니다. " + userId);
+        if (userStatusRepository.existsById(userId)) {
+            throw new UserStatusAlreadyExistsException(Map.of("userId", userId));
         }
 
         UserStatus userStatus = new UserStatus(user);
@@ -44,7 +48,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional(readOnly = true)
     public UserStatus getById(UUID userId) {
         return userStatusRepository.findById(userId)
-            .orElseThrow(() -> new UserStatusNotFoundException(userId));
+            .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", userId)));
     }
 
     @Override
@@ -55,11 +59,11 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public void update(UpdateUserStatusRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
+    public void update(UUID userId, UpdateUserStatusRequest request) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
             .orElseGet(() -> {
-                User user = userRepository.findById(request.userId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
                 return userStatusRepository.save(new UserStatus(user));
             });
 
@@ -72,7 +76,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = userStatusRepository.findById(userId)
             .orElseGet(() -> {
                 User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+                    .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
                 return userStatusRepository.save(new UserStatus(user));
             });
         userStatus.updateLastActiveAt(Instant.now());
@@ -81,6 +85,9 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     @Transactional
     public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserStatusNotFoundException(Map.of("userId", userId));
+        }
         userStatusRepository.deleteById(userId);
     }
 }
