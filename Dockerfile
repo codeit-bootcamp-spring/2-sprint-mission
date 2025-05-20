@@ -1,5 +1,9 @@
 FROM amazoncorretto:17 as build
-WORKDIR /app
+
+ARG PROJECT_NAME=2-sprint-mission
+ARG PROJECT_VERSION=1.2-M8
+
+WORKDIR /workspace/app
 
 # Gradle 파일 복사
 COPY gradle gradle
@@ -7,16 +11,31 @@ COPY gradlew .
 COPY build.gradle .
 COPY settings.gradle .
 
-# Gradle 의존성 캐시 활용
-RUN ./gradlew dependencies
+# 의존성 설치
+RUN ./gradlew dependencies -q
 
 # 소스 코드 복사 및 빌드
 COPY src src
-RUN ./gradlew build -x test
+RUN ./gradlew build -PprojectName=${PROJECT_NAME} -PprojectVersion=${PROJECT_VERSION} -x test -q
 
-# 실행 이미지
 FROM amazoncorretto:17
-VOLUME /tmp
-COPY --from=build /app/build/libs/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ARG PROJECT_NAME=2-sprint-mission
+ARG PROJECT_VERSION=1.2-M8
+
+# 환경 변수 설정
+ENV PROJECT_NAME=${PROJECT_NAME}
+ENV PROJECT_VERSION=${PROJECT_VERSION}
+ENV JVM_OPTS=""
+
+WORKDIR /app
+
+# 시스템 설정
+VOLUME /tmp
+EXPOSE 80
+
+# 빌드 결과물 복사
+COPY --from=build /workspace/app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
+
+# 실행 명령
+ENTRYPOINT ["java", "${JVM_OPTS}", "-jar", "/app.jar"]
