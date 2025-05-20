@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelCreatePrivateDto(
-
         List<UUID> participantIds
-
 ) {
 }

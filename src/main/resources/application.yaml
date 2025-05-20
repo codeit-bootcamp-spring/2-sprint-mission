@@ -1,15 +1,19 @@
 spring:
   application:
     name: discodeit
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
+  profiles:
+    active: dev # dev:9090 or prod:8080
   servlet:
     multipart:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -18,7 +22,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-
     defer-datasource-initialization: true
     show-sql: false
     properties:
@@ -31,17 +34,11 @@ spring:
     init:
       mode: always
 
-logging:
-  level:
-    org:
+logging.level.org:
       hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE
-      springframework:
-        data: DEBUG
-    com:
-      sb02:
-        jpa_demo: DEBUG
+        SQL: debug
+        orm.jdbc.bind: trace
+      springframework.data: debug
 
 springdoc:
   api-docs:
@@ -57,3 +54,33 @@ discodeit:
     type: local
     local:
       root-path: .discodeit
+
+# Actuator 설정
+management:
+  info:
+    env:
+      enabled: true # info 세부정보를 표시하기위해 해당 설정 필요
+  endpoints:
+    web:
+      exposure:
+        # include: "*" // 모든 endpoint 노출
+        # 또는 특정 엔드포인트만 활성화
+        include: health, info, metrics, loggers
+info: # Actuator info 설정
+  app:
+    name: "Discodeit"
+    version: "1.7.0"
+    java_version: "17"
+    spring_boot_version: "3.4.0"
+    setting_info:
+      datasource:
+        url: "${spring.datasource.url}"
+        driver-class-name: "${spring.datasource.driver-class-name}"
+      jpa:
+        ddl-auto: "${spring.jpa.hibernate.ddl-auto}"
+      storage:
+        type: "${discodeit.storage.type}"
+        path: "${discodeit.storage.local.root-path}"
+      multipart:
+        max-file-size: "${spring.servlet.multipart.max-file-size}"
+        max-request-size: "${spring.servlet.multipart.max-request-size}"

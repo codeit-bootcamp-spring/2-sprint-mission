@@ -35,11 +35,7 @@ public class UserStatus extends BaseUpdatableEntity {
     // 마지막 접속시간과 현재시간을 계산했을 때 300보다 작으면 : 5분 이내 -> true
     // 마지막 접속시간과 현재시간을 계산했을 때 300보다 크면 : 5분 초과 -> false
     public boolean currentUserStatus() {
-        if (Duration.between(lastActiveAt, Instant.now()).getSeconds() < 300) {
-            return true;
-        } else {
-            return false;
-        }
+        return Duration.between(lastActiveAt, Instant.now()).getSeconds() < 300;
     }
 
     public void updateLastConnectionTime(Instant LastConnectionTime) {
@@ -59,14 +55,5 @@ public class UserStatus extends BaseUpdatableEntity {
         return id != null && user != null &&
                 id.equals(userStatus.getId()) &&
                 user.getId().equals(userStatus.user.getId());
-    }
-
-    @Override
-    public String toString() {
-        return "\nID: " + getId() +
-                "\nUser ID: " + user +
-                "\nLastConnectionTime: " + getLastActiveAt() +
-                "\nUser Status: " + currentUserStatus();
-
     }
 }

@@ -50,11 +50,4 @@ public class BinaryContent extends BaseEntity {
         }
         return false;
     }
-
-    @Override
-    public String toString() {
-        return "\nContent ID: " + getId();
-
-
-    }
 }

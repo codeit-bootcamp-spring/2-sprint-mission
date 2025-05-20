@@ -36,3 +36,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Storage ###
+.discodeit/
+.logs/
+
+### git ###
+.github/

@@ -4,12 +4,9 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
@@ -55,13 +52,4 @@ public class ReadStatus extends BaseUpdatableEntity {
                 user.getId().equals(readStatus.user.getId()) &&
                 channel.getId().equals(readStatus.channel.getId());
     }
-
-    @Override
-    public String toString() {
-        return "\nID: " + getId() +
-                "\nUser ID: " + user +
-                "\nChannel ID: " + channel +
-                "\nLast Read Time: " + getLastReadAt();
-    }
-
 }

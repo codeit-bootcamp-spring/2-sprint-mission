@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.dto.request.binarycontentdto.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.service.dto.request.userdto.UserCreateDto;
 import com.sprint.mission.discodeit.service.dto.request.userdto.UserUpdateDto;
+import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.UserStatusResponseDto;
-import com.sprint.mission.discodeit.service.dto.request.userstatusdto.UserStatusUpdateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,6 +16,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,8 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     private final UserService userService;
     private final UserStatusService userStatusService;
 
@@ -41,23 +45,17 @@ public class UserController {
     @ApiResponse(responseCode = "201", description = "user가 성공적으로 생성됨")
     @ApiResponse(responseCode = "400", description = "같은 email 또는 username을 사용하는 User가 이미 존재함", content = @Content(examples = @ExampleObject(value = "User already exists or Email already exists")))
     public ResponseEntity<UserResponseDto> createUser(
-            @RequestPart("userCreateRequest") UserCreateDto userCreateRequest,
+            @RequestPart("userCreateRequest") @Valid UserCreateDto userCreateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "User 프로필 이미지") MultipartFile profile
     ) {
-        Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
-        if (profile != null && !profile.isEmpty()) {
-            try {
-                contentCreate = Optional.of(new BinaryContentCreateDto(
-                        profile.getOriginalFilename(),
-                        profile.getContentType(),
-                        profile.getBytes()
-                ));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
+        logger.debug("[User Controller][createUser] Received userCreateRequest: username={}, email={}", userCreateRequest.username(), userCreateRequest.email());
+        Optional<BinaryContentCreateDto> contentCreate = toBinaryContent(profile);
+
+        logger.debug("[User Controller][createUser] Calling userService.create()");
         UserResponseDto user = userService.create(userCreateRequest, contentCreate);
+
+        logger.info("[UserController][Create] Created successfully: userId={}", user.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -70,7 +68,10 @@ public class UserController {
             @PathVariable @Parameter(description = "상태를 변경할 User ID") UUID userId,
             @RequestBody UserStatusUpdateDto userStatusUpdateRequest
     ) {
+        logger.debug("[User Controller][updateUserStatusByUserId] Received userStatusUpdateRequest: userId={}", userId);
+        logger.debug("[User Controller][updateUserStatusByUserId] Calling userStatusService.updateByUserId()");
         UserStatusResponseDto updateUserStatusResponse = userStatusService.updateByUserId(userId, userStatusUpdateRequest);
+        logger.info("[User Controller][updateUserStatusByUserId] Updated successfully: userId={}", userId);
         return ResponseEntity.ok(updateUserStatusResponse);
     }
 
@@ -85,19 +86,14 @@ public class UserController {
             @RequestPart("userUpdateRequest") @Valid UserUpdateDto userUpdateRequest,
             @RequestPart(value = "profile", required = false) @Parameter(description = "수정 할 User 프로필 이미지") MultipartFile profile
     ) {
-        Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
-        if (profile != null && !profile.isEmpty()) {
-            try {
-                contentCreate = Optional.of(new BinaryContentCreateDto(
-                        profile.getOriginalFilename(),
-                        profile.getContentType(),
-                        profile.getBytes()
-                ));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+
+        logger.debug("[User Controller][updateUser] Received userUpdateRequest: userId={}", userId);
+        Optional<BinaryContentCreateDto> contentCreate = toBinaryContent(profile);
+
+        logger.debug("[User Controller][updateUser] Calling userService.update()");
         UserResponseDto user = userService.update(userId, userUpdateRequest, contentCreate);
+
+        logger.info("[User Controller][updateUser] Updated successfully: userId={}", userId);
         return ResponseEntity.ok(user);
     }
 
@@ -109,7 +105,10 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(
             @PathVariable @Parameter(description = "삭제 할 User ID") UUID userId
     ) {
+        logger.debug("[User Controller][deleteUser] Received delete request: userId={}", userId);
+        logger.debug("[User Controller][deleteUser] Calling userService.delete()");
         userService.delete(userId);
+        logger.info("[User Controller][deleteUser] Deleted successfully: userId={}", userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -131,4 +130,24 @@ public class UserController {
         return ResponseEntity.ok(userFindAllResponse);
     }
 
+
+    // profile -> BinaryContent 변환
+    private Optional<BinaryContentCreateDto> toBinaryContent(MultipartFile profile) {
+        Optional<BinaryContentCreateDto> contentCreate = Optional.empty();
+        if (profile != null && !profile.isEmpty()) {
+            logger.debug("[User Controller][createUser] Starting profile upload process: filename:{}, type:{}", profile.getOriginalFilename(), profile.getContentType());
+            try {
+                contentCreate = Optional.of(new BinaryContentCreateDto(
+                        profile.getOriginalFilename(),
+                        profile.getContentType(),
+                        profile.getBytes()
+                ));
+                logger.debug("[User Controller][createUser] BinaryContentCreateDto constructed");
+            } catch (IOException e) {
+                logger.error("[User Controller][createUser] Exception occurred while uploading profile image", e);
+                throw new RuntimeException(e);
+            }
+        }
+        return contentCreate;
+    }
 }

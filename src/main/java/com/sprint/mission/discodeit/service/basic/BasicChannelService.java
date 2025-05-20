@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import com.sprint.mission.discodeit.exceptions.InvalidInputException;
-import com.sprint.mission.discodeit.exceptions.NotFoundException;
+import com.sprint.mission.discodeit.exceptions.ErrorCode;
+import com.sprint.mission.discodeit.exceptions.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exceptions.channel.DuplicateChannelException;
+import com.sprint.mission.discodeit.exceptions.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelJPARepository;
-import com.sprint.mission.discodeit.repository.MessageJPARepository;
 import com.sprint.mission.discodeit.repository.ReadStatusJPARepository;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -18,19 +19,24 @@ import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelFindDt
 import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.ChannelResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
+    private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
+
     private final ChannelJPARepository channelJpaRepository;
     private final ReadStatusJPARepository readStatusJpaRepository;
-    private final MessageJPARepository messageJpaRepository;
     private final UserJPARepository userJpaRepository;
     private final ChannelMapper channelMapper;
 
@@ -38,27 +44,39 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelResponseDto createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
+        logger.debug("[Channel][createPrivate] Entity constructed");
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-        Channel createdPirvateChannel = channelJpaRepository.save(channel);
+        logger.debug("[Channel][createPrivate] Calling channelJpaRepository.save()");
+        Channel createdPrivateChannel = channelJpaRepository.save(channel);
 
+        logger.debug("[Channel][createPrivate] Calling userJpaRepository.findByIdIn()");
         userJpaRepository.findByIdIn(channelCreatePrivateDto.participantIds()).stream()
-                .map(user -> new ReadStatus(user, createdPirvateChannel, createdPirvateChannel.getCreatedAt()))
+                .peek(user -> logger.debug("[Channel][createPrivate] ReadStatus entity constructed: userId={}", user.getId()))
+                .map(user -> new ReadStatus(user, createdPrivateChannel, createdPrivateChannel.getCreatedAt()))
                 .forEach(readStatusJpaRepository::save);
 
-        return channelMapper.toDto(createdPirvateChannel);
+        ChannelResponseDto channelResponse = channelMapper.toDto(createdPrivateChannel);
+        logger.info("[Channel][createPrivate] Created successfully: channelId={}", channelResponse.id());
+        return channelResponse;
     }
 
 
     @Override
     @Transactional
     public ChannelResponseDto createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
+        logger.debug("[Channel][createPublic] Calling channelJpaRepository.existsByTypeAndName()");
         if (channelJpaRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
-            throw new InvalidInputException("A channel already exists.");
+            logger.warn("[Channel][createPublic] A channel already exists: channelName={}", channelCreatePublicDto.name());
+            throw new DuplicateChannelException(Instant.now(), ErrorCode.DUPLICATE_CHANNEL, Map.of("channelName", channelCreatePublicDto.name()));
         }
 
+        logger.debug("[Channel][createPublic] Entity constructed");
         Channel createdPublicChannel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(), channelCreatePublicDto.description());
+        logger.debug("[Channel][createPublic] Calling channelJpaRepository.save()");
         channelJpaRepository.save(createdPublicChannel);
-        return channelMapper.toDto(createdPublicChannel);
+        ChannelResponseDto channelResponse =channelMapper.toDto(createdPublicChannel);
+        logger.info("[Channel][createPublic] Created successfully: channelId={}", channelResponse.id());
+        return channelResponse;
     }
 
 
@@ -67,7 +85,6 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto find(ChannelFindDto channelFindDto) {
         Channel matchingChannel = channelJpaRepository.findById(channelFindDto.channelId())
                 .orElse(null);
-
         return channelMapper.toDto(matchingChannel);
     }
 
@@ -90,15 +107,20 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelResponseDto update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
+        logger.debug("[Channel][update] Calling channelJpaRepository.findById(): channelId={}", channelId);
         Channel matchingChannel = channelJpaRepository.findById(channelId)
-                .orElseThrow(() -> new NotFoundException("A channel does not exist"));
+                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
 
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
-            throw new InvalidInputException("Private channels cannot be changed.");
+            logger.warn("[Channel][update] Private channels cannot be changed.");
+            throw new PrivateChannelUpdateException(Instant.now(), ErrorCode.PRIVATE_CHANNEL_UPDATE, Map.of("channelId", channelId));
         }
-        matchingChannel.updateChannel(channelUpdateDto.newName(), channelUpdateDto.newDescription());
-        Channel updateChannel = channelJpaRepository.save(matchingChannel);
 
+        logger.debug("[Channel][update] Calling updateChannel(): channelId={}", channelId);
+        matchingChannel.updateChannel(channelUpdateDto.newName(), channelUpdateDto.newDescription());
+        logger.debug("[Channel][update] Calling channelJpaRepository.save(): channelId={}", channelId);
+        Channel updateChannel = channelJpaRepository.save(matchingChannel);
+        logger.info("[Channel][update] Updated successfully: channelId={}", channelId);
         return channelMapper.toDto(updateChannel);
 
     }
@@ -107,8 +129,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public void delete(UUID channelId) {
+        logger.debug("[Channel][delete] Calling userJpaRepository.findById()");
         Channel matchingChannel = channelJpaRepository.findById(channelId)
-                .orElseThrow(() -> new NotFoundException("A channel does not exist"));
+                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
         channelJpaRepository.delete(matchingChannel);
+        logger.info("[Channel][delete] Deleted successfully: channelId]{}", channelId);
     }
 }

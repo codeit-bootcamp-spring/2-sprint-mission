@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageCreate
 import com.sprint.mission.discodeit.service.dto.request.messagedto.MessageUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponseDto;
-import com.sprint.mission.discodeit.service.dto.response.PageableResponseDto;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.dto.request.authdto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record AuthServiceLoginDto(
-        String username,
-        String password
+        @NotBlank String username,
+        @NotBlank String password
 ) {
 }

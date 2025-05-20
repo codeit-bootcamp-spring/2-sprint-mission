@@ -2,7 +2,10 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
+
+
 
 group = 'com.sprint.mission'
 version = '0.0.1-SNAPSHOT'
@@ -26,9 +29,10 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator' // Actuator
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // mapStruct
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	runtimeOnly 'org.postgresql:postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -38,8 +42,31 @@ dependencies {
 	// mapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+	// test H2
+	testImplementation 'com.h2database:h2'
+
+	// admin client
+	implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.5'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ["-Xlint:-removal"]
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+test {
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
