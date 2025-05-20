@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.StorageException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDeleteFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDownloadFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentLoadFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentSaveFailedException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ByteArrayResource;
@@ -19,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -34,7 +38,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     private void init() {
         try {
             Files.createDirectories(root);
+            log.info("BinaryContent directory initialized at {}", root);
         } catch (IOException e) {
+            log.error("Failed to create BinaryContent directory: {}", e.getMessage());
             throw new RuntimeException("BinaryContent 디렉토리 생성을 실패했습니다: " + e.getMessage());
         }
     }
@@ -44,9 +50,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             Path filePath = resolvePath(binaryContentId);
             Files.write(filePath, bytes);
+            log.info("Binary content saved at {}", filePath);
             return binaryContentId;
         } catch (IOException e) {
-            throw new StorageException(ErrorCode.BINARY_CONTENT_SAVE_FAILED);
+            log.error("Failed to save binary content: {}", e.getMessage());
+            throw new BinaryContentSaveFailedException(binaryContentId);
         }
     }
 
@@ -55,9 +63,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             Path filePath = resolvePath(binaryContentId);
             Files.deleteIfExists(filePath);
+            log.info("Binary content deleted at {}", filePath);
             return binaryContentId;
         } catch (IOException e) {
-            throw new StorageException(ErrorCode.BINARY_CONTENT_DELETE_FAILED);
+            log.error("Failed to delete binary content: {}", e.getMessage());
+            throw new BinaryContentDeleteFailedException(binaryContentId);
         }
     }
 
@@ -65,9 +75,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     public InputStream get(UUID binaryContentId) {
         try {
             Path filePath = resolvePath(binaryContentId);
+            log.debug("Loading binary content from {}", filePath);
             return Files.newInputStream(filePath);
         } catch (IOException e) {
-            throw new StorageException(ErrorCode.BINARY_CONTENT_LOAD_FAILED);
+            log.error("Failed to load binary content: {}", e.getMessage());
+            throw new BinaryContentLoadFailedException(binaryContentId);
         }
     }
 
@@ -76,14 +88,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try (InputStream inputStream = get(binaryContentDto.id())) {
             byte[] content = StreamUtils.copyToByteArray(inputStream);
             ByteArrayResource resource = new ByteArrayResource(content);
-
+            log.info("Binary content ready for download: {}", binaryContentDto);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION,
                             "attachment; filename=\"" + binaryContentDto.fileName() + "\"")
                     .body(resource);
         } catch (IOException e) {
-            throw new StorageException(ErrorCode.BINARY_CONTENT_DOWNLOAD_FAILED);
+            log.error("Failed to download binary content: {}", e.getMessage());
+            throw new BinaryContentDownloadFailedException(binaryContentDto.id());
         }
     }
 

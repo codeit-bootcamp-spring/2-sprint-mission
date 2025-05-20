@@ -9,9 +9,12 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/messages")
@@ -41,10 +45,12 @@ public class MessageController {
     @Operation(summary = "Message 생성")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(
-            @RequestPart("messageCreateRequest") MessageCreateDto messageCreateDto,
+            @RequestPart("messageCreateRequest") @Valid MessageCreateDto messageCreateDto,
             @RequestPart(name = "attachments", required = false) List<MultipartFile> files) {
+        log.info("Received message create request: {}", messageCreateDto);
         List<BinaryContentCreateDto> binaryDtos = MultipartToBinaryConverter.toBinaryContentCreateDtos(files);
         MessageDto messageDto = messageService.create(messageCreateDto, binaryDtos);
+        log.info("Message created successfully: messageId={}", messageDto.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }
@@ -52,8 +58,10 @@ public class MessageController {
     @Operation(summary = "Message 내용 수정")
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
-                                                    @RequestBody MessageUpdateDto messageUpdateDto) {
+                                                    @RequestBody @Valid MessageUpdateDto messageUpdateDto) {
+        log.info("Received message update request: messageId={}, updateDto={}", messageId, messageUpdateDto);
         MessageDto messageDto = messageService.update(messageId, messageUpdateDto);
+        log.info("Message updated successfully: messageId={}", messageDto.id());
 
         return ResponseEntity.ok(messageDto);
     }
@@ -61,7 +69,9 @@ public class MessageController {
     @Operation(summary = "Message 삭제")
     @DeleteMapping("/{messageId}")
     public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+        log.info("Received message delete request: messageId={}", messageId);
         messageService.delete(messageId);
+        log.info("Message deleted successfully: messageId={}", messageId);
 
         return ResponseEntity.noContent().build();
     }
@@ -70,13 +80,14 @@ public class MessageController {
     @GetMapping
     public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelId(
             @RequestParam UUID channelId,
+            @RequestParam(required = false) Instant cursor,
             @PageableDefault(
                     size = 50,
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             ) Pageable pageable
     ) {
-        PageResponse<MessageDto> messageDtos = messageService.findAllByChannelId(channelId, pageable);
+        PageResponse<MessageDto> messageDtos = messageService.findAllByChannelId(channelId, cursor, pageable);
         return ResponseEntity.ok(messageDtos);
     }
 }

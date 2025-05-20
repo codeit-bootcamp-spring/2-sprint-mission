@@ -20,11 +20,12 @@ public class ChannelMapper {
     private final UserMapper userMapper;
 
     public ChannelDto toDto(Channel channel) {
-        Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId());
+        Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId())
+                .orElse(Instant.MIN);
 
         boolean isPrivate = channel.getType().equals(ChannelType.PRIVATE);
         List<UserDto> participants = isPrivate ?
-                readStatusRepository.findAllByChannelId(channel.getId()).stream()
+                readStatusRepository.findAllByChannelIdWithUser(channel.getId()).stream()
                         .map(ReadStatus::getUser)
                         .map(userMapper::toDto)
                         .toList()
