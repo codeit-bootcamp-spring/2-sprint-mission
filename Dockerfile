@@ -38,4 +38,5 @@ EXPOSE 80
 COPY --from=build /workspace/app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
 
 # 실행 명령
-ENTRYPOINT ["java", "${JVM_OPTS}", "-jar", "/app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java ${JVM_OPTS} -jar app.jar"]
+
