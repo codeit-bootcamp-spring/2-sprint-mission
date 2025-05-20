@@ -1,7 +1,15 @@
 package com.sprint.mission.discodeit.exception;
 
+import java.time.Instant;
+import java.util.Map;
+
 public record ErrorResponse(
-        int status,
-        String message
+    Instant timestamp,
+    String code,
+    String message,
+    Map<String, Object> details,
+    String exceptionType,
+    int status
 ) {
+
 }

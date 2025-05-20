@@ -17,14 +17,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   @EntityGraph(attributePaths = {
       "author",
       "author.profile",
-      "author.status",
-      "attachments"
+      "author.status"
   })
-  Slice<Message> findAllByChannelId(UUID channelId, Pageable pageable);
-
-  Slice<Message> findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
+  @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId AND m.createdAt < :createdAt")
+  Slice<Message> findAllByChannelId(
       UUID channelId,
-      Instant cursor,
+      Instant createdAt,
       Pageable pageable
   );
 

@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -20,8 +23,10 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,6 +34,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -50,11 +56,9 @@ public class BasicMessageService implements MessageService {
     String content = messageCreateRequest.content();
 
     User author = userRepository.findById(authorId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "해당 ID의 사용자를 찾을 수 없습니다: " + authorId));
+        .orElseThrow(() -> new UserNotFoundException(authorId));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException(
-            "해당 ID의 채널을 찾을 수 없습니다: " + channelId));
+        .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
@@ -79,58 +83,48 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto findById(UUID id) {
     Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + id));
+        .orElseThrow(() -> new MessageNotFoundException(id));
     return messageMapper.toDto(message);
   }
 
   @Transactional(readOnly = true)
   @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
-    int pageSize = 50;
-    Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
+      Pageable pageable) {
+    Slice<MessageDto> slice = messageRepository.findAllByChannelId(channelId,
+            Optional.ofNullable(createAt).orElse(Instant.now()),
+            pageable)
+        .map(messageMapper::toDto);
 
-    Slice<Message> messages = messageRepository.findAllByChannelId(channelId, pageable);
-    List<MessageDto> messageDtos = messages.stream()
-        .map(messageMapper::toDto)
-        .toList();
-
-    return pageResponseMapper.fromSlice(messages, messageDtos);
-  }
-
-  /*
-  @Transactional(readOnly = true)
-  @Override
-  public PageResponse<MessageDto> findALLByChannelIdWithCursor(UUID channelId, Instant cursor) {
-    int pageSize = 50;
-    Pageable pageable = PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-    Slice<Message> messages;
-    if (cursor != null) {
-      messages = messageRepository.findByChannelIdAndCreatedAtLessThanOrderByCreatedAtDesc(
-          channelId, cursor, pageable);
-    } else {
-      // cursor가 없을 땐 최신 메시지부터 조회
-      messages = messageRepository.findAllByChannelId(channelId, pageable);
+    Instant nextCursor = null;
+    if (!slice.getContent().isEmpty()) {
+      nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+          .createdAt();
     }
 
-    List<MessageDto> messageDtos = messages.stream()
-        .map(messageMapper::toDto)
-        .toList();
-
-    Instant nextCursor = messages.hasNext() && !messages.isEmpty()
-        ? messages.getContent().get(messages.getNumberOfElements() - 1).getCreatedAt()
-        : null;
-
-    return pageResponseMapper.fromSliceWithCursor(messages, messageDtos, nextCursor);
+    return pageResponseMapper.fromSlice(slice, nextCursor);
   }
-  */
+
+//  @Transactional(readOnly = true)
+//  @Override
+//  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
+//    int pageSize = 50;
+//    Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+//
+//    Slice<Message> messages = messageRepository.findAllByChannelId(channelId, pageable);
+//    List<MessageDto> messageDtos = messages.stream()
+//        .map(messageMapper::toDto)
+//        .toList();
+//
+//    return pageResponseMapper.fromSlice(messages, messageDtos);
+//  }
 
   @Transactional
   @Override
   public MessageDto updateMessage(UUID messageId, MessageUpdateRequest request) {
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + messageId));
+        .orElseThrow(() -> new MessageNotFoundException(messageId));
 
     message.update(newContent);
     return messageMapper.toDto(message);
@@ -140,7 +134,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public void deleteMessage(UUID messageId) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 메시지를 찾을 수 없습니다: " + messageId));
+        .orElseThrow(() -> new MessageNotFoundException(messageId));
     checkUserExists(message.getAuthor().getId());
     ensureMessageBelongsToChannel(message, message.getChannel().getId());
 
@@ -167,7 +161,7 @@ public class BasicMessageService implements MessageService {
 
   private void checkUserExists(UUID userId) {
     if (userRepository.findById(userId).isEmpty()) {
-      throw new NoSuchElementException("해당 사용자가 존재하지 않습니다. : " + userId);
+      throw new UserNotFoundException(userId);
     }
   }
 

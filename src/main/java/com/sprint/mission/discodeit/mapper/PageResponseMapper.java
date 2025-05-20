@@ -19,24 +19,15 @@ public interface PageResponseMapper {
     );
   }
 
-  default <T, R> PageResponse<R> fromSlice(Slice<T> slice, List<R> content) {
+  default <T> PageResponse<T> fromSlice(Slice<T> slice, Object nextCursor) {
     return new PageResponse<>(
-        content,
-        slice.getNumber(),
+        slice.getContent(),
+        nextCursor,
         slice.getSize(),
         slice.hasNext(),
         null
     );
   }
 
-//  default <T, R> PageResponse<R> fromSliceWithCursor(Slice<T> slice, List<R> content,
-//      Object nextCursor) {
-//    return new PageResponse<>(
-//        content,
-//        nextCursor,
-//        slice.getSize(),
-//        slice.hasNext(),
-//        null
-//    );
-//  }
+
 }

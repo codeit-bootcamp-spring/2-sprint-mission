@@ -4,13 +4,16 @@ import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.ChannelType;
 import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.InvalidChannelUpdateException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -20,7 +23,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,7 +54,7 @@ public class BasicChannelService implements ChannelService {
 
     List<User> participants = request.participantIds().stream()
         .map(id -> userRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자 ID: " + id)))
+            .orElseThrow(() -> new UserNotFoundException(id)))
         .toList();
 
     Channel channel = Channel.create(ChannelType.PRIVATE, null, null);
@@ -73,7 +75,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public ChannelDto findChannelById(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 채널을 찾을 수 없습니다: " + channelId));
+        .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
     Instant lastMessageCreatedAt = messageRepository.findLatestCreatedAtByChannelId(channelId)
         .orElse(null);
@@ -116,7 +118,7 @@ public class BasicChannelService implements ChannelService {
                 .stream()
                 .map(ReadStatus::getUser)
                 .map(user -> {
-                  boolean online = user.getStatus().isOnline();
+                  boolean online = user.getStatus() != null && user.getStatus().isOnline();
                   return userMapper.toDto(user, online);
                 })
                 .forEach(participantDtos::add);
@@ -133,10 +135,10 @@ public class BasicChannelService implements ChannelService {
     String newName = request.newName();
     String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 채널을 찾을 수 없습니다: " + channelId));
+        .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
     if (channel.getType() == ChannelType.PRIVATE) {
-      throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
+      throw new InvalidChannelUpdateException(channelId);
     }
 
     channel.update(newName, newDescription);
@@ -147,7 +149,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public void deleteChannel(UUID channelId) {
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 채널을 찾을 수 없습니다: " + channelId));
+        .orElseThrow(() -> new ChannelNotFoundException(channelId));
 
     if (messageRepository.existsByChannelId(channel.getId())) {
       messageRepository.deleteAllByChannelId(channelId);

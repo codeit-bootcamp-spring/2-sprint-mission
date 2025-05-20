@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -76,7 +78,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserDto findById(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 사용자를 찾을 수 없습니다: " + userId));
+        .orElseThrow(() -> new UserNotFoundException(userId));
     boolean online = user.getStatus().isOnline();
 
     return userMapper.toDto(user, online);
@@ -121,7 +123,7 @@ public class BasicUserService implements UserService {
   public UserDto updateUser(UUID userId, UserUpdateRequest request,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 사용자를 찾을 수 없습니다: " + userId));
+        .orElseThrow(() -> new UserNotFoundException(userId));
 
     String newUsername = request.newUsername();
     String newEmail = request.newEmail();
@@ -161,7 +163,7 @@ public class BasicUserService implements UserService {
   @Override
   public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("해당 ID의 사용자를 찾을 수 없습니다: " + userId));
+        .orElseThrow(() -> new UserNotFoundException(userId));
 
     if (user.getProfile() != null && user.getProfile().getId() != null) {
       UUID profileId = user.getProfile().getId();
@@ -181,14 +183,14 @@ public class BasicUserService implements UserService {
    * Validation check
    ****************************/
   private void checkUserEmailExists(String email) {
-    if (userRepository.findByEmail(email).isPresent()) {
-      throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+    if (userRepository.existsByEmail(email)) {
+      throw UserAlreadyExistException.byEmail(email);
     }
   }
 
   private void checkUserUsernameExists(String username) {
-    if (userRepository.findByUsername(username).isPresent()) {
-      throw new IllegalArgumentException("이미 사용 중인 이름입니다.");
+    if (userRepository.existsByUsername(username)) {
+      throw UserAlreadyExistException.byUsername(username);
     }
   }
 
