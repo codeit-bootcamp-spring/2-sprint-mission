@@ -1,0 +1,15 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db-server:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+
+# 운영 시에는 debug 로그가 많지 않게 info 이상만 출력하는 것이 일반적
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: info  # info 레벨까지만 표시
