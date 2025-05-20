@@ -5,68 +5,58 @@ import com.sprint.mission.discodeit.dto.user.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.time.Instant;
-import java.util.NoSuchElementException;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserService userService;
+  private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
 
   @Transactional
   @Override
-  public UserDto register(CreateUserRequest request) {
-    String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+  public UserDto register(CreateUserRequest request, MultipartFile profile) {
 
-    if (userRepository.existsByEmail(request.email())) {
-      throw new IllegalArgumentException("이미 존재하는 Email입니다");
-    }
-    if (userRepository.existsByUsername(request.username())) {
-      throw new IllegalArgumentException("이미 존재하는 Username입니다");
-    }
+    UserDto userDto = userService.createUser(request, profile);
 
-    User user = User.builder()
-        .username(request.username())
-        .email(request.email())
-        .password(hashedPassword)
-        .build();
-    userRepository.save(user);
-
-    UserStatus userStatus = UserStatus.builder()
-        .user(user)
-        .lastActiveAt(Instant.now())
-        .build();
-
-    userStatusRepository.save(userStatus);
-    user.setStatus(userStatus);
-
-    return userMapper.toDto(user);
+    log.info("Registered user successfully: {}", userDto.id());
+    return userDto;
   }
 
   @Transactional
   @Override
   public UserDto login(LoginRequest request) {
+    log.info("Login user: {}", request);
     User user = userRepository.findByUsername(request.username())
-        .orElseThrow(NoSuchElementException::new);
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.USERNAME_NOT_FOUND));
 
     if (!BCrypt.checkpw(request.password(), user.getPassword())) {
-      throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+      log.warn("Wrong password: {}", request.password());
+      throw new DiscodeitException(ErrorCode.PASSWORD_NOT_CORRECT);
     }
 
     userStatusRepository.findByUserId(user.getId())
         .ifPresent(UserStatus::updateLastActiveAt);
 
+    log.info("Login user successfully: {}", user.getId());
     return userMapper.toDto(user);
   }
 }

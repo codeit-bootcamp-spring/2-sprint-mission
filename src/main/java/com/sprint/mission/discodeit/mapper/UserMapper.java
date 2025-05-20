@@ -2,26 +2,12 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-@RequiredArgsConstructor
-public class UserMapper {
+@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
+public interface UserMapper {
 
-  private final BinaryContentMapper binaryContentMapper;
-
-  public UserDto toDto(User user) {
-    if (user == null) {
-      return null;
-    }
-
-    return new UserDto(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        binaryContentMapper.toDto(user.getProfile()),
-        user.getStatus().isUserOnline()
-    );
-  }
+  @Mapping(target = "online", expression = "java(user.getStatus().isUserOnline())")
+  UserDto toDto(User user);
 }

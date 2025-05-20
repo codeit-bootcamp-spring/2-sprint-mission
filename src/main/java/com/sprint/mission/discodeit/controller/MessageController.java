@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.Message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class MessageController {
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<MessageDto> createMessage(
-      @RequestPart("messageCreateRequest") CreateMessageRequest request,
+      @Valid @RequestPart("messageCreateRequest") CreateMessageRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     MessageDto messageDto = messageService.createMessage(request);
@@ -59,7 +60,7 @@ public class MessageController {
 
   @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
   public ResponseEntity<MessageDto> updateMessage(
-      @PathVariable("messageId") UUID messageId,
+      @Valid @PathVariable("messageId") UUID messageId,
       @RequestBody UpdateMessageRequest request) {
     return ResponseEntity.ok(messageService.updateMessage(messageId, request));
   }

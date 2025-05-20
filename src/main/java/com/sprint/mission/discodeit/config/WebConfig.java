@@ -9,15 +9,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final JwtAuthInterceptor jwtAuthInterceptor;
+  private final JwtAuthInterceptor jwtAuthInterceptor;
 
-    public WebConfig(JwtAuthInterceptor jwtAuthInterceptor) {
-        this.jwtAuthInterceptor = jwtAuthInterceptor;
-    }
+  public WebConfig(JwtAuthInterceptor jwtAuthInterceptor) {
+    this.jwtAuthInterceptor = jwtAuthInterceptor;
+  }
 
-    @Override
-    public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(jwtAuthInterceptor)
-                .addPathPatterns("/api/**");
-    }
+  @Override
+  public void addInterceptors(@NonNull InterceptorRegistry registry) {
+    registry.addInterceptor(jwtAuthInterceptor)
+        .addPathPatterns("/api/**");
+  }
 }

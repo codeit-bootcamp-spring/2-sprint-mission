@@ -5,11 +5,11 @@ import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,14 +40,11 @@ public class UserController {
 
   @RequestMapping(value = "", method = RequestMethod.POST)
   public ResponseEntity<UserDto> createUser(
-      @RequestPart("userCreateRequest") CreateUserRequest request,
+      @Valid @RequestPart("userCreateRequest") CreateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
-    UserDto user = authService.register(request);
-    if (!profile.isEmpty()) {
-      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
-      user = userService.updateProfile(user.id(), binaryContent);
-    }
+    UserDto user = authService.register(request, profile);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
@@ -59,16 +56,11 @@ public class UserController {
 
   @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
   public ResponseEntity<UserDto> update(
-      @RequestPart("userUpdateRequest") UpdateUserRequest request,
+      @Valid @RequestPart("userUpdateRequest") UpdateUserRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
       @PathVariable("userId") UUID userId
   ) {
-    UserDto userDto = userService.updateUser(userId, request);
-
-    if (!profile.isEmpty()) {
-      BinaryContent binaryContent = binaryContentService.createBinaryContent(profile);
-      userService.updateProfile(userId, binaryContent);
-    }
+    UserDto userDto = userService.updateUser(userId, request, profile);
     return ResponseEntity.ok(userDto);
   }
 
