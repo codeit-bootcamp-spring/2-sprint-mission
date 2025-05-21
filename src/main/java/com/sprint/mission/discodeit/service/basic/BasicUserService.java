@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.service.binarycontent.CreateBinaryContentResult;
-import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
@@ -10,19 +9,22 @@ import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.file.FileReadException;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.util.MaskingUtil;
 import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mindrot.jbcrypt.BCrypt;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,15 +40,14 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
-  private final UserStatusMapper userStatusMapper;
   private final BinaryContentStorage binaryContentStorage;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
   @Override
@@ -62,10 +63,14 @@ public class BasicUserService implements UserService {
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
+        // 로그를 binaryContentStorage 내부에서 남기기 떄문에 추적이 어려움 - MDC traceId로 해결
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
-        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-        throw RestExceptions.FILE_READ_ERROR;
+        log.error("User create failed: multipartFile read failed (filename: {})",
+            multipartFile.getOriginalFilename());
+        throw new FileReadException(Map.of("contentType", multipartFile.getContentType(),
+            "size", multipartFile.getSize(),
+            "filename", multipartFile.getOriginalFilename()));
       }
     }
 
@@ -75,7 +80,7 @@ public class BasicUserService implements UserService {
     // GenerationType.UUID의 경우, save()만 해줘도 User의 id를 DB가 아닌 자바에서 직접 생성
     // IDENTITY와 다르게 flush()를 안해줘도 user.getId()로 접근이 가능하다.
     UserStatus userStatus = new UserStatus(user, Instant.now());
-    userStatusService.create(userStatusMapper.toCreateUserStatusCommand(userStatus));
+    user.updateUserStatus(userStatus);
 
     return userMapper.toCreateUserResult(user);
   }
@@ -84,7 +89,7 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   @Cacheable(value = "user", key = "#p0")
   public FindUserResult find(UUID userId) {
-    User findUser = findUserById(userId);
+    User findUser = findUserById(userId, "find");
     return userMapper.toFindUserResult(findUser);
   }
 
@@ -105,7 +110,7 @@ public class BasicUserService implements UserService {
   @CacheEvict(value = "allUsers", allEntries = true)
   public UpdateUserResult update(UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
-    User findUser = findUserById(userId);
+    User findUser = findUserById(userId, "update");
     findUser.updateUserInfo(updateUserCommand.newUsername(), updateUserCommand.newEmail(),
         updateUserCommand.newPassword());
     if (multipartFile != null && !multipartFile.isEmpty()) { // 프로필을 유지하거나 프로필 변경 요청이 있을 때 업데이트
@@ -120,16 +125,18 @@ public class BasicUserService implements UserService {
       try {
         binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
       } catch (IOException e) {
-        logger.error("파일 읽기 실패: {}", multipartFile.getOriginalFilename(), e);
-        throw RestExceptions.FILE_READ_ERROR;
+        log.error("User update failed: multipartFile read failed (filename: {})",
+            multipartFile.getOriginalFilename());
+        throw new FileReadException(Map.of("contentType", multipartFile.getContentType(),
+            "size", multipartFile.getSize(),
+            "filename", multipartFile.getOriginalFilename()));
       }
-
       findUser.updateProfile(binaryContent);
-    } else { // 기본 프로필로 변경할 때
-      binaryContentService.delete(findUser.getProfile().getId());
-      findUser.updateProfileDefault();
     }
-    // 변경감지로 User는 save() 안해줘도 commit 시점에 자동으로 save()됨
+    // multipartFile이 없다면 기본 프로필로 유지
+
+    userRepository.save(findUser);
+
     return userMapper.toUpdateUserResult(findUser);
   }
 
@@ -141,7 +148,7 @@ public class BasicUserService implements UserService {
       @CacheEvict(value = "allUsers", allEntries = true)
   })
   public void delete(UUID userId) {
-    User user = findUserById(userId);
+    User user = findUserById(userId, "delete");
     userRepository.deleteById(userId);
     if (user.getProfile() != null) {
       binaryContentService.delete(user.getProfile().getId());
@@ -153,13 +160,17 @@ public class BasicUserService implements UserService {
 
   private void checkDuplicateUsername(CreateUserCommand createUserCommand) {
     if (userRepository.existsByUsername(createUserCommand.username())) {
-      throw RestExceptions.DUPLICATE_USERNAME;
+      String maskedUsername = MaskingUtil.maskUsername(createUserCommand.username());
+      log.warn("User create failed: duplicate username (username: {})", maskedUsername);
+      throw new DuplicateUsernameException(Map.of("username", maskedUsername));
     }
   }
 
   private void checkDuplicateEmail(CreateUserCommand createUserCommand) {
     if (userRepository.existsByEmail(createUserCommand.email())) {
-      throw RestExceptions.DUPLICATE_EMAIL;
+      String maskedEmail = MaskingUtil.maskEmail(createUserCommand.email());
+      log.warn("User create failed: duplicate email (email: {})", maskedEmail);
+      throw new DuplicateEmailException(Map.of("email", maskedEmail));
     }
   }
 
@@ -173,15 +184,6 @@ public class BasicUserService implements UserService {
         .build();
   }
 
-
-  private User findUserById(UUID userId) {
-    return userRepository.findById(userId)
-        .orElseThrow(() -> {
-          logger.error("유저 찾기 실패: {}", userId);
-          return RestExceptions.USER_NOT_FOUND;
-        });
-  }
-
   private BinaryContent createBinaryContentEntity(MultipartFile multipartFile) {
     if (multipartFile == null || multipartFile.isEmpty() || multipartFile.getSize() == 0) {
       return null;  // 파일이 없으면 BinaryContent를 생성하지 않음
@@ -191,6 +193,13 @@ public class BasicUserService implements UserService {
         .size(multipartFile.getSize())
         .filename(multipartFile.getOriginalFilename())
         .build();
+  }
 
+  private User findUserById(UUID userId, String method) {
+    return userRepository.findById(userId).
+        orElseThrow(() -> {
+          log.warn("User {} failed: user not found (userId: {})", method, userId);
+          return new UserNotFoundException(Map.of("userId", userId, "method", method));
+        });
   }
 }

@@ -8,17 +8,19 @@ import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusResul
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.RestExceptions;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,13 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
-  private Logger logger = LoggerFactory.getLogger(this.getClass());
 
   @Override
   @Transactional
@@ -60,7 +62,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional(readOnly = true)
   public FindReadStatusResult find(UUID id) {
-    ReadStatus readStatus = findReadStatusById(id);
+    ReadStatus readStatus = findReadStatusById(id, "find");
     return readStatusMapper.toFindReadStatusResult(readStatus);
   }
 
@@ -85,7 +87,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional
   public UpdateReadStatusResult update(UUID id, UpdateReadStatusCommand updateReadStatusCommand) {
-    ReadStatus readStatus = findReadStatusById(id);
+    ReadStatus readStatus = findReadStatusById(id, "update");
     readStatus.updateReadStatus(updateReadStatusCommand.newLastReadAt());
     return readStatusMapper.toUpdateReadStatusResult(readStatus);
   }
@@ -105,16 +107,19 @@ public class BasicReadStatusService implements ReadStatusService {
   private User checkUserExists(CreateReadStatusCommand createReadStatusCommand) {
     return userRepository.findById(createReadStatusCommand.userId())
         .orElseThrow(() -> {
-          logger.error("읽음상태 생성 중 유저 찾기 실패: {}", createReadStatusCommand.userId());
-          return RestExceptions.USER_NOT_FOUND;
+          log.warn("ReadStatus create failed: user not found (userId: {})",
+              createReadStatusCommand.userId());
+          return new UserNotFoundException(Map.of("userId", createReadStatusCommand.userId()));
         });
   }
 
   private Channel checkChannelExists(CreateReadStatusCommand createReadStatusCommand) {
     return channelRepository.findById(createReadStatusCommand.channelId())
         .orElseThrow(() -> {
-          logger.error("읽음상태 생성 중 채널 찾기 실패: {}", createReadStatusCommand.channelId());
-          return RestExceptions.CHANNEL_NOT_FOUND;
+          log.warn("ReadStatus create failed: channel not found (channelId: {})",
+              createReadStatusCommand.channelId());
+          return new ChannelNotFoundException(
+              Map.of("channelId", createReadStatusCommand.channelId()));
         });
   }
 
@@ -127,11 +132,11 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
 
-  private ReadStatus findReadStatusById(UUID id) {
+  private ReadStatus findReadStatusById(UUID id, String method) {
     return readStatusRepository.findById(id)
         .orElseThrow(() -> {
-          logger.error("읽음상태 찾기 실패: {}", id);
-          return RestExceptions.READ_STATUS_NOT_FOUND;
+          log.warn("ReadStatus {} failed: readStatus not found (readStatusId: {})", id, method);
+          return new ReadStatusNotFoundException(Map.of("readStatusId", id, "method", method));
         });
   }
 }

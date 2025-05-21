@@ -14,7 +14,7 @@ public enum ResultCode implements Code {
 
   // Channel
   CHANNEL_NOT_FOUND(404, "Channel not found"),
-  FORBIDDEN_PRIVATE_CHANNEL(403, "Private channel is forbidden"),
+  FORBIDDEN_PRIVATE_CHANNEL(403, "Private channel update is forbidden"),
 
   // Message
   MESSAGE_NOT_FOUND(404, "Message not found"),
@@ -31,12 +31,16 @@ public enum ResultCode implements Code {
   BINARY_CONTENT_NOT_FOUND(404, "BinaryContent not found"),
 
   // File
+  FILE_NOT_FOUND(404, "File not found"),
+  DUPLICATE_FILE_PATH(409, "FilePath exists already"),
   FILE_READ_ERROR(500, "File reading fails"),
   FILE_WRITE_ERROR(500, "File writing fails"),
   FILE_DELETE_ERROR(500, "File deleting fails"),
   INIT_DIRECTORY_ERROR(500, "Init directory fails"),
   FILE_DOWNLOAD_ERROR(500, "File download fails"),
-  UNSUPPORTED_MEDIA_TYPE(415, "Unsupported mediaType");
+  UNSUPPORTED_PROFILE_MEDIA_TYPE(415,
+      "Unsupported profile mediaType (allow: jpg, jpeg, gif, webp, png)"),
+  INVALID_MEDIA_TYPE(415, "invalid media type");
 
 
   private final int status;

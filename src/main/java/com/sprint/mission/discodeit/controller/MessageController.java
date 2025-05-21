@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.swagger.MessageApi;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
+@Slf4j
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
@@ -35,6 +37,9 @@ public class MessageController implements MessageApi {
   public ResponseEntity<CreateMessageResponseDTO> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequestDTO createMessageRequestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
+    log.info("Message create request (authorId: {}, channelId: {}, fileCount: {})",
+        createMessageRequestDTO.authorId(), createMessageRequestDTO.channelId(),
+        multipartFileList != null ? multipartFileList.size() : 0);
     CreateMessageResult createMessageResult = messageService.create(
         messageMapper.toCreateMessageCommand(createMessageRequestDTO), multipartFileList);
     CreateMessageResponseDTO createdMessage = messageMapper.toCreateMessageResponseDTO(
@@ -47,7 +52,7 @@ public class MessageController implements MessageApi {
   public ResponseEntity<UpdateMessageResponseDTO> updateMessage(@PathVariable("messageId") UUID id,
       @RequestPart("messageUpdateRequest") @Valid UpdateMessageRequestDTO updateMessageRequestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {
-
+    log.info("Message update request (messageId: {}, fileCount: {})", id, multipartFileList.size());
     UpdateMessageResult updateMessageResult = messageService.update(id,
         messageMapper.toUpdateMessageCommand(updateMessageRequestDTO), multipartFileList);
     UpdateMessageResponseDTO updatedMessage = messageMapper.toUpdateMessageResponseDTO(
@@ -59,10 +64,9 @@ public class MessageController implements MessageApi {
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> deleteMessage(
       @PathVariable("messageId") UUID id) {
+    log.info("Message delete request (messageId: {})", id);
     messageService.delete(id);
-    return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @Override

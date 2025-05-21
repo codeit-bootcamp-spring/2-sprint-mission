@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.swagger.ChannelApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/channels")
 public class ChannelController implements ChannelApi {
 
@@ -29,6 +31,7 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/public")
   public ResponseEntity<CreatePublicChannelResponseDTO> createPublicChannel(
       @RequestBody @Valid CreatePublicChannelRequestDTO createChannelRequestDTO) {
+    log.info("Public channel create request (channelName: {})", createChannelRequestDTO.name());
     CreatePublicChannelResult createPublicChannelResult =
         channelService.createPublicChannel(
             channelMapper.toCreatePublicChannelCommand(createChannelRequestDTO));
@@ -41,6 +44,8 @@ public class ChannelController implements ChannelApi {
   @PostMapping("/private")
   public ResponseEntity<CreatePrivateChannelResponseDTO> createPrivateChannel(
       @RequestBody @Valid CreatePrivateChannelRequestDTO createPrivateChannelRequestDTO) {
+    log.info("Private channel create request (participants: {})",
+        createPrivateChannelRequestDTO.participantIds());
     CreatePrivateChannelResult createPrivateChannelResult =
         channelService.createPrivateChannel(
             channelMapper.toCreatePrivateChannelCommand(createPrivateChannelRequestDTO));
@@ -54,6 +59,7 @@ public class ChannelController implements ChannelApi {
   public ResponseEntity<UpdateChannelResponseDTO> updateChannel(
       @PathVariable("channelId") UUID channelId,
       @RequestBody @Valid UpdateChannelRequestDTO updateChannelRequestDTO) {
+    log.info("channel update request (channelId: {})", channelId);
     UpdateChannelResult updateChannelResult =
         channelService.update(channelId,
             channelMapper.toUpdateChannelCommand(updateChannelRequestDTO));
@@ -66,6 +72,7 @@ public class ChannelController implements ChannelApi {
   @DeleteMapping("/{channelId}")
   public ResponseEntity<Void> deleteChannel(
       @PathVariable("channelId") UUID channelId) {
+    log.info("channel delete request (channelId: {})", channelId);
     channelService.delete(channelId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)

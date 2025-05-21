@@ -1,19 +1,28 @@
 package com.sprint.mission.discodeit.exception;
 
-// ResultCode를 받아서 예외를 생성 -> 잡을 때 e.get~으로 메시지 확인 가능
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Map;
+import lombok.Getter;
+
+@Getter
 public class RestException extends RuntimeException {
-    private final ResultCode resultCode;
 
-    public RestException(ResultCode resultCode) {
-        super(resultCode.getMessage());
-        this.resultCode = resultCode;
-    }
+  private final Instant timestamp;
+  private final ResultCode resultCode;
+  private final Map<String, Object> details;
 
-    public int getStatus() {
-        return resultCode.getStatus();
-    }
+  public RestException(ResultCode resultCode) {
+    super(resultCode.getMessage());
+    this.timestamp = Instant.now();
+    this.resultCode = resultCode;
+    this.details = Collections.emptyMap();
+  }
 
-    public String getMessage() {
-        return resultCode.getMessage();
-    }
+  public RestException(ResultCode resultCode, Map<String, Object> details) {
+    super(resultCode.getMessage());
+    this.timestamp = Instant.now();
+    this.resultCode = resultCode;
+    this.details = details;
+  }
 }

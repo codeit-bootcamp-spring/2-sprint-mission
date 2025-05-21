@@ -4,10 +4,19 @@ discodeit:
     local:
       root-path: "${user.dir}/local-storage"
 
-
 spring:
+  profiles:
+    active:
   application:
     name: discodeit
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
   cache:
     type: simple
   datasource:
@@ -19,14 +28,11 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       idle-timeout: 60000
-    # JPA 설정
+
   jpa:
     hibernate:
-      # JPA Entity 설정 참고하여 DB table 생성(업데이트)
       ddl-auto: none
-      # src/main/resources/data.sql에 기록된 INSERT query를 DB table 초기화 이후에 실행
     defer-datasource-initialization: true
-    # 실제 실행되는 DB query 출력
     show-sql: true
     properties:
       hibernate:
@@ -34,28 +40,52 @@ spring:
         format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-      # JPA의 영속성 컨텍스트(Persistence Context)를 서비스 계층으로 제한
     open-in-view: false
 
   sql:
     init:
-      # 애플리케이션이 시작될 때마다 항상(always) SQL 초기화 스크립트를 실행
-      # 데이터베이스가 이미 존재하고 데이터가 있더라도 매번 스크립트를 실행
       mode: never
 
   logging:
     level:
-      org:
-        hibernate:
-          SQL: DEBUG
-          orm.jdbc.bind: TRACE
-        springframework:
-          data: DEBUG
-          cache:
-            interceptor: DEBUG
-      com:
-        sb02:
-          jpa_demo: DEBUG
+      root: INFO
+      org.hibernate.SQL: DEBUG
+      org.hibernate.orm.jdbc.bind: TRACE
+      org.springframework.data: INFO
+      org.springframework.cache.interceptor: INFO
+      com.sprint.mission: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: update
+  storage:
+    type: local
+    path: "${user.dir}/local-storage"
+  multipart:
+    max-file-size: 5MB
+    max-request-size: 10MB
 
 
 
