@@ -6,8 +6,8 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_DB:     ${DB_NAME}
-      POSTGRES_USER:   ${DB_USERNAME}
+      POSTGRES_DB:       ${DB_NAME}
+      POSTGRES_USER:     ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
@@ -19,7 +19,6 @@ services:
       interval: 10s
       retries: 5
 
-
   file-management-app:
     build:
       context: .
@@ -27,17 +26,31 @@ services:
     env_file:
       - .env
     environment:
+      # Local 스토리지 루트 경로 (컨테이너 내)
+      DISCODEIT_STORAGE_LOCAL_ROOT_PATH: /data/discodeit-storage
+
+      # Spring & DB
       SPRING_PROFILES_ACTIVE:       ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL:        jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
       SPRING_DATASOURCE_USERNAME:   ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD:   ${DB_PASSWORD}
+
+      # (AWS 모드 시 사용)
+      AWS_S3_ACCESS_KEY:      ${AWS_S3_ACCESS_KEY}
+      AWS_S3_SECRET_KEY:      ${AWS_S3_SECRET_KEY}
+      AWS_S3_REGION:          ${AWS_S3_REGION}
+      AWS_S3_BUCKET:          ${AWS_S3_BUCKET}
+
     depends_on:
       db:
         condition: service_healthy
+
     ports:
-      - "${APP_PORT:-8081}:8081"      # 호스트 8081 → 컨테이너 80
+      - "${APP_PORT:-8081}:8081"
+
     volumes:
-      - binary-content-storage:/app/BinaryContentStorage
+      - "${STORAGE_LOCAL_ROOT_PATH}:/data/discodeit-storage"
+
     restart: always
 
 volumes:

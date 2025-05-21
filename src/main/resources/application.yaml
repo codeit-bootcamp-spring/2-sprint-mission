@@ -22,9 +22,15 @@ discodeit:
     type: jpa
     file-directory: .discodeit
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: ${user.home}/Documents/discodeit-storage
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      accessKeyId: ${AWS_ACCESS_KEY_ID}
+      secretAccessKey: ${AWS_SECRET_ACCESS_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+
 
 management:
   info:
