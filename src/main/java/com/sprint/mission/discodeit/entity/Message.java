@@ -11,31 +11,28 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
+@Table(name = "messages")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
 
-  @Column(columnDefinition = "text")
+  @Column(columnDefinition = "text", nullable = false)
   private String content;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "channel_id", columnDefinition = "uuid", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
-
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "author_id", columnDefinition = "uuid", nullable = false)
+  @JoinColumn(name = "author_id", columnDefinition = "uuid")
   private User author;
-
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  @BatchSize(size = 100)
+  @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
@@ -44,8 +41,8 @@ public class Message extends BaseUpdatableEntity {
   private List<BinaryContent> attachments = new ArrayList<>();
 
   public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
-    this.content = content;
     this.channel = channel;
+    this.content = content;
     this.author = author;
     this.attachments = attachments;
   }

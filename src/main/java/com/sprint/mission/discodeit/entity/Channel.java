@@ -8,24 +8,21 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
-import java.time.Instant;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "channels")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "channels")
 public class Channel extends BaseUpdatableEntity {
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
   @Column(length = 100)
   private String name;
-
   @Column(length = 500)
   private String description;
-
-  @Enumerated(EnumType.STRING)
-  @Column(length = 10, nullable = false)
-  private ChannelType type;
 
   public Channel(ChannelType type, String name, String description) {
     this.type = type;
