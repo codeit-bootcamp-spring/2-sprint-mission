@@ -1,61 +1,31 @@
 server:
-  port: 8080
+    port: 8082
 
 spring:
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
-  jpa:
-    hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-  sql:
-    init:
-      mode: always
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, metrics, loggers
-  info:
-    env:
-      enabled: true
-
-info:
-  app:
-    name: Discodeit
-    version: 1.7.0
-  java:
-    version: 17
-  spring-boot:
-    version: 3.4.0
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    ddl-auto: update
-  storage:
-    type: local
-    path: ./upload
-  multipart:
-    max-file-size: 10MB
-    max-request-size: 10MB
-
+    datasource:
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
+        username: ${DB_USERNAME:discodeit_user}
+        password: ${DB_PASSWORD:discodeit1234}
+        driver-class-name: org.postgresql.Driver
+        hikari:
+            maximum-pool-size: 10
+            minimum-idle: 5
+            idle-timeout: 60000
+    jpa:
+        hibernate:
+            ddl-auto: update
+        defer-datasource-initialization: true
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+                use_sql_comments: true
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+        open-in-view: false
+    sql:
+        init:
+            mode: always
 
 logging:
-  level:
-    root: debug
+    level:
+        root: debug

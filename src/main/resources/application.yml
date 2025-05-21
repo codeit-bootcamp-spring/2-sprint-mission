@@ -1,16 +1,49 @@
 spring:
-  application:
-    name: discodeit
-  profiles:
-    active: dev
+    application:
+        name: discodeit
+    profiles:
+        active: dev
 
 discodeit:
-  storage:
-    type: local
-    local:
-      root-path: ./upload
+    storage:
+        type: local
+        local:
+            root-path: ./upload
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: health, info, metrics, loggers
+    info:
+        env:
+            enabled: true
+
+info:
+    app:
+        name: Discodeit
+        version: 1.7.0
+    java:
+        version: 17
+    spring-boot:
+        version: 3.4.0
+    datasource:
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
+        driver-class-name: org.postgresql.Driver
+    jpa:
+        ddl-auto: update
+    storage:
+        type: local
+        path: ./upload
+    multipart:
+        max-file-size: 10MB
+        max-request-size: 10MB
 
 springdoc:
-  api-docs:
-    enabled: true
-    version: openapi_3_1
+    api-docs:
+        enabled: true
+        version: openapi_3_1
+
+logging:
+    level:
+        root: info
