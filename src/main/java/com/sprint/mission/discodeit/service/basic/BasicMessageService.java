@@ -126,10 +126,19 @@ public class BasicMessageService implements MessageService {
   @Override
   public void delete(UUID messageId) {
     log.debug("메시지 삭제 시작: id={}", messageId);
-    if (!messageRepository.existsById(messageId)) {
-      throw MessageNotFoundException.withId(messageId);
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> MessageNotFoundException.withId(messageId));
+
+    for (BinaryContent attachment : message.getAttachments()) {
+      try {
+        binaryContentStorage.deleteById(attachment.getId());
+        binaryContentRepository.deleteById(attachment.getId());
+      } catch (Exception e) {
+        log.warn("파일 삭제 실패: id={}, reason={}", attachment.getId(), e.getMessage());
+      }
     }
-    messageRepository.deleteById(messageId);
+
+    messageRepository.delete(message);
     log.info("메시지 삭제 완료: id={}", messageId);
   }
 }
