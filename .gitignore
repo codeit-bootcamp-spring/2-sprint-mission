@@ -36,6 +36,7 @@ out/
 ### files ###
 /upload
 .logs
+.env
 
 ### VS Code ###
 .vscode/
