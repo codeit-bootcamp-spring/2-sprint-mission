@@ -40,5 +40,5 @@ bin/
 
 .discodeit
 **/*.ser
-.logs
-.env
+*/.logs
+*/.env
