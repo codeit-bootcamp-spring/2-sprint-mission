@@ -38,8 +38,11 @@ info:
     jpa:
       ddl-auto: ${spring.jpa.hibernate.ddl-auto}
     storage:
-      type: ${discodeit.storage.type}
-      path: ${discodeit.storage.local.root-path}
+      type: s3
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+        base-url: ${AWS_S3_BASE_URL}
+        region: ${AWS_REGION:ap-northeast-2}
     multipart:
       max-file-size: ${spring.servlet.multipart.maxFileSize}
       max-request-size: ${spring.servlet.multipart.maxRequestSize}

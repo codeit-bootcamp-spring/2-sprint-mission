@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local", matchIfMissing = true)
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
