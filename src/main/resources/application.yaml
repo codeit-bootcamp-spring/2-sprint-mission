@@ -2,11 +2,14 @@ spring:
   application:
     name: discodeit
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE}    # 기본값도 지정 가능
   servlet:
     multipart:
-      maxFileSize: 10MB
-      maxRequestSize: 30MB
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+server:
+  port: ${APP_PORT:8081}                    # .env 의 APP_PORT 사용
 
 logging:
   level:
