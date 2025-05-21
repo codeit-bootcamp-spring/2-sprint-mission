@@ -20,12 +20,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @ActiveProfiles("test")
 @Import(AppConfig.class)
 public class MessageRepositoryTest {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private MessageRepository messageRepository;
@@ -54,13 +58,18 @@ public class MessageRepositoryTest {
         UserStatus userStatus = new UserStatus(user, Instant.MIN);
         channel = new Channel(ChannelType.PUBLIC, "Public Channel", "This is a public channel.");
         message1 = new Message(user, channel, "1", null);
-        Thread.sleep(5);
         message2 = new Message(user, channel, "2", null);
 
         userRepository.save(user);
         channelRepository.save(channel);
         messageRepository.save(message1);
         messageRepository.save(message2);
+
+        jdbcTemplate.update("UPDATE  messages SET created_at = ? WHERE id = ?",
+                Instant.parse("2025-05-20T00:00:00Z"), message1.getId());
+
+        jdbcTemplate.update("UPDATE  messages SET created_at = ? WHERE id = ?",
+                Instant.parse("2025-05-21T00:00:00Z"), message2.getId());
 
         entityManager.flush();
         entityManager.clear();
