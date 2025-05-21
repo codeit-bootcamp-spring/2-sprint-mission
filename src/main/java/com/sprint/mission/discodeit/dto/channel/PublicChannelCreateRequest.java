@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 
 public record PublicChannelCreateRequest(
         @NotBlank
-        @Size(max = 100)
+        @Size(min = 2, max = 100)
         String name,
 
         @NotBlank
