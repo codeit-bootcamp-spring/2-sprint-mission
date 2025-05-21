@@ -81,11 +81,22 @@ jobs:
 
       - name: Scale down ECS service to 0 (stop current tasks)
         run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --desired-count 0
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --desired-count 0
+
+      - name: Debug render-task-def output
+        run: |
+          echo "Rendered task definition: ${{ steps.render-task-def.outputs.task-definition }}"
 
       - name: Deploy new task definition to ECS service
         run: |
-          aws ecs update-service --cluster ${{ env.ECS_CLUSTER }} --service ${{ env.ECS_SERVICE }} --task-definition ${{ steps.render-task-def.outputs.task-definition }} --desired-count 1
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition ${{ steps.render-task-def.outputs.task-definition }} \
+            --desired-count 1
 
       - name: Wait for ECS service stability
         run: |
