@@ -5,15 +5,14 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 discodeit:
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: ./storage
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:./storage}
   servlet:
     multipart:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
-
 
 management:
   info:
@@ -37,7 +36,8 @@ aws:
   region: ${AWS_S3_REGION:ap-northeast-2}
   s3:
     bucket: ${AWS_S3_BUCKET:your-bucket-name}
-    base-url: ${AWS_S3_BASE_URL:https://your-bucket-name.s3.amazonaws.com}
+    expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
 
 info:
   app:

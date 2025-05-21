@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.content.usecase.dto;
+package com.sprint.mission.discodeit.core.storage.usecase.dto;
 
 import java.io.IOException;
 import lombok.Builder;

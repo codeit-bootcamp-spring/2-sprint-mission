@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.core.content.controller.dto;
+package com.sprint.mission.discodeit.core.storage.controller.dto;
 
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 import lombok.Builder;

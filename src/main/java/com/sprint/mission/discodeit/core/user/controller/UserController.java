@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.user.controller;
 
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;

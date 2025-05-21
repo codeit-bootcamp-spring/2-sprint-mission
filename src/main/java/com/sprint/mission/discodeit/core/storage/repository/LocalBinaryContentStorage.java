@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.core.content.repository;
+package com.sprint.mission.discodeit.core.storage.repository;
 
-import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
