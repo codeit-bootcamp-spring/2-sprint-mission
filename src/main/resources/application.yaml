@@ -9,7 +9,7 @@ spring:
       max-request-size: 30MB
 
 server:
-  port: ${APP_PORT:8081}                    # .env 의 APP_PORT 사용
+  port: ${APP_PORT}                    # .env 의 APP_PORT 사용
 
 logging:
   level:

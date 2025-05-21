@@ -5,4 +5,5 @@ out/
 .idea/
 .git
 .gitignore
-docker-compose.yml
+docker-compose.yaml
+.env
