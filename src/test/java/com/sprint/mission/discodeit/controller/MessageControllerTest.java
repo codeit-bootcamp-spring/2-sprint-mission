@@ -7,13 +7,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.exception.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.List;
@@ -22,14 +18,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(MessageController.class)
-@Import({GlobalExceptionHandler.class, MessageControllerTest.JacksonConfig.class})
 class MessageControllerTest {
 
     @Autowired
@@ -84,16 +76,5 @@ class MessageControllerTest {
         mockMvc.perform(get("/api/messages"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.exceptionType").value("MissingServletRequestParameterException"));
-    }
-
-    @TestConfiguration
-    static class JacksonConfig {
-        @Bean
-        public ObjectMapper objectMapper() {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new ParameterNamesModule());
-            mapper.registerModule(new JavaTimeModule());
-            return mapper;
-        }
     }
 }
