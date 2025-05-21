@@ -48,8 +48,18 @@ discodeit:
   storage:
     type: local
     local:
-      root-path: .discodeit/storage
+      root-path: /app/.discodeit/storage
 
 logging:
   level:
     root: info
+
+server:
+  port: 80
+
+aws:
+  s3:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+    region: ${AWS_REGION}
+    bucket: ${AWS_S3_BUCKET}
