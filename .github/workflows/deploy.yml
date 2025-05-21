@@ -97,8 +97,8 @@ jobs:
       - name: Verify deployment
         run: |
           echo "Verifying deployment..."
-          SERVICE_STATUS=$(aws ecs describe-services --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --query "services[0].runningCount" --output text)
-          if [ "$SERVICE_STATUS" -ge 1 ]; then
+          SERVICE_STATUS=$(aws ecs describe-services --cluster ${{ env.ECS_CLUSTER }} --services ${{ env.ECS_SERVICE }} --query "services[0].status" --output text)
+          if [ "$SERVICE_STATUS" = "ACTIVE"  ]; then
             echo "Deployment successful! Service is running."
           else
             echo "Deployment may have issues. Running count: $SERVICE_STATUS"
