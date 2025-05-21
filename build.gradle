@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.sprint.mission'
@@ -22,6 +23,10 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = "0.8.8" //추가: 버전 명시
 }
 
 dependencies {
@@ -76,8 +81,23 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
+}
+
+jacocoTestReport {
+    dependsOn test // tast 실행 전에 수행될 task
+    reports { // 어떤 파일을 생성할지/생성하지 않을지
+        xml.required = true
+        html.required = true
+        csv.required = false
+        // 기본 경로 $buildDir/reports/jacoco/test
+
+        // 리포트 타입마다 destination file 옵션으로 경로 변경 가능
+        //  html.destination file("$buildDir/jacocoHtml")
+        //  xml.destination file("$buildDir/jacoco.xml")
+    }
 }
