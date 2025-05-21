@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
+import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +23,7 @@ public class AuthController {
 
     @Operation(summary = "로그인")
     @PostMapping
-    public ResponseEntity<UserDto> login(@RequestBody @Valid AuthLoginDto authLoginDto) {
-        return ResponseEntity.ok(authService.login(authLoginDto));
+    public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest) {
+        return ResponseEntity.ok(authService.login(loginRequest));
     }
 }

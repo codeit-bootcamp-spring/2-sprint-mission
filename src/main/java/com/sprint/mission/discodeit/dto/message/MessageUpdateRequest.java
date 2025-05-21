@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.dto.message;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record MessageUpdateDto(
+public record MessageUpdateRequest(
         @NotBlank
         String newContent
 ) {

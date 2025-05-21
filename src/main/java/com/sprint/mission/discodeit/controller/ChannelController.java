@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,9 +35,10 @@ public class ChannelController {
 
     @Operation(summary = "Public Channel 생성")
     @PostMapping("/public")
-    public ResponseEntity<ChannelDto> createPublic(@RequestBody @Valid ChannelCreatePublicDto channelCreatePublicDto) {
-        log.info("Received public channel create request: {}", channelCreatePublicDto);
-        ChannelDto channelDto = channelService.createPublic(channelCreatePublicDto);
+    public ResponseEntity<ChannelDto> createPublic(
+            @RequestBody @Valid PublicChannelCreateRequest publicChannelCreateRequest) {
+        log.info("Received public channel create request: {}", publicChannelCreateRequest);
+        ChannelDto channelDto = channelService.createPublic(publicChannelCreateRequest);
         log.info("Public channel created successfully: channelId={}", channelDto.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
@@ -46,9 +47,9 @@ public class ChannelController {
     @Operation(summary = "Private Channel 생성")
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> createPrivate(
-            @RequestBody @Valid ChannelCreatePrivateDto channelCreatePrivateDto) {
-        log.info("Received private channel create request: {}", channelCreatePrivateDto);
-        ChannelDto channelDto = channelService.createPrivate(channelCreatePrivateDto);
+            @RequestBody @Valid PrivateChannelCreateRequest privateChannelCreateRequest) {
+        log.info("Received private channel create request: {}", privateChannelCreateRequest);
+        ChannelDto channelDto = channelService.createPrivate(privateChannelCreateRequest);
         log.info("Private channel created successfully: channelId={}", channelDto.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
@@ -57,9 +58,9 @@ public class ChannelController {
     @Operation(summary = "Channel 정보 수정")
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(@PathVariable UUID channelId,
-                                                    @RequestBody @Valid ChannelUpdateDto channelUpdateDto) {
-        log.info("Received channel update request: channelId={}, updateDto={}", channelId, channelUpdateDto);
-        ChannelDto channelDto = channelService.update(channelId, channelUpdateDto);
+                                                    @RequestBody @Valid ChannelUpdateRequest channelUpdateRequest) {
+        log.info("Received channel update request: channelId={}, updateDto={}", channelId, channelUpdateRequest);
+        ChannelDto channelDto = channelService.update(channelId, channelUpdateRequest);
         log.info("Channel updated successfully: channelId={}", channelDto.id());
 
         return ResponseEntity.ok(channelDto);

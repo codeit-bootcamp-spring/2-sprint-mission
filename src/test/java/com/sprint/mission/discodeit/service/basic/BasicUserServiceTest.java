@@ -11,10 +11,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserEmailExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNameExistsException;
@@ -52,7 +52,7 @@ public class BasicUserServiceTest {
     @DisplayName("유저 생성 성공 테스트")
     void createUser_success() {
         // given
-        UserCreateDto dto = new UserCreateDto("test", "test1234", "test@gmail.com");
+        UserCreateRequest dto = new UserCreateRequest("test", "test1234", "test@gmail.com");
         User user = new User(dto.username(), dto.email(), dto.password(), null);
         UserDto expectedUserDto = new UserDto(user, null, false);
 
@@ -72,7 +72,7 @@ public class BasicUserServiceTest {
     @DisplayName("유저 중복 이메일 테스트")
     void createUser_fail_whenEmailExists() {
         // given
-        UserCreateDto dto = new UserCreateDto("test", "test1234", "test@gmail.com");
+        UserCreateRequest dto = new UserCreateRequest("test", "test1234", "test@gmail.com");
         given(userRepository.existsByEmail(dto.email())).willReturn(true);
 
         // when / then
@@ -84,7 +84,7 @@ public class BasicUserServiceTest {
     @DisplayName("유저 중복 이름 테스트")
     void createUser_fail_whenUsernameExists() {
         // given
-        UserCreateDto dto = new UserCreateDto("test", "test1234", "test@gmail.com");
+        UserCreateRequest dto = new UserCreateRequest("test", "test1234", "test@gmail.com");
         given(userRepository.existsByUsername(dto.username())).willReturn(true);
 
         // when / then
@@ -96,8 +96,9 @@ public class BasicUserServiceTest {
     @DisplayName("프로필을 포함한 유저 생성 성공 테스트")
     void createUser_success_withProfile() {
         // given
-        UserCreateDto dto = new UserCreateDto("test", "test1234", "test@gmail.com");
-        BinaryContentCreateDto profileDto = new BinaryContentCreateDto("profile.jpg", "image/jpeg", new byte[10]);
+        UserCreateRequest dto = new UserCreateRequest("test", "test1234", "test@gmail.com");
+        BinaryContentCreateRequest profileDto = new BinaryContentCreateRequest("profile.jpg", "image/jpeg",
+                new byte[10]);
         User user = new User(dto.username(), dto.email(), dto.password(), null);
         UserDto expectedUserDto = new UserDto(user, null, false);
 
@@ -120,7 +121,7 @@ public class BasicUserServiceTest {
     void updateUser_success_withoutProfile() {
         // given
         UUID userId = UUID.randomUUID();
-        UserUpdateDto updateDto = new UserUpdateDto("newName", "new@gmail.com", "newPassword");
+        UserUpdateRequest updateDto = new UserUpdateRequest("newName", "new@gmail.com", "newPassword");
         User user = new User("oldName", "old@gmail.com", "oldPassword", null);
         UserDto expectedUserDto = new UserDto(user, null, false);
 
@@ -143,10 +144,10 @@ public class BasicUserServiceTest {
     void updateUser_success_withProfile() {
         // given
         UUID userId = UUID.randomUUID();
-        UserUpdateDto updateDto = new UserUpdateDto("newName", "new@gmail.com", "newPassword");
+        UserUpdateRequest updateDto = new UserUpdateRequest("newName", "new@gmail.com", "newPassword");
         User user = new User("oldName", "old@gmail.com", "oldPassword", null);
         UserDto expectedDto = new UserDto(user, null, false);
-        BinaryContentCreateDto profileDto = new BinaryContentCreateDto("file.jpg", "image/jpeg", new byte[20]);
+        BinaryContentCreateRequest profileDto = new BinaryContentCreateRequest("file.jpg", "image/jpeg", new byte[20]);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(userRepository.existsByEmail(updateDto.newEmail())).willReturn(false);
@@ -167,7 +168,7 @@ public class BasicUserServiceTest {
     void updateUser_fail_whenUserNotFound() {
         // given
         UUID userId = UUID.randomUUID();
-        UserUpdateDto updateDto = new UserUpdateDto("newName", "new@gmail.com", "newPassword");
+        UserUpdateRequest updateDto = new UserUpdateRequest("newName", "new@gmail.com", "newPassword");
 
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
@@ -181,7 +182,7 @@ public class BasicUserServiceTest {
     void updateUser_fail_whenEmailExists() {
         // given
         UUID userId = UUID.randomUUID();
-        UserUpdateDto updateDto = new UserUpdateDto("newName", "new@gmail.com", "newPassword");
+        UserUpdateRequest updateDto = new UserUpdateRequest("newName", "new@gmail.com", "newPassword");
         User user = new User("oldName", "old@gmail.com", "oldPassword", null);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
@@ -196,7 +197,7 @@ public class BasicUserServiceTest {
     void updateUser_fail_whenUsernameExists() {
         // given
         UUID userId = UUID.randomUUID();
-        UserUpdateDto updateDto = new UserUpdateDto("newName", "new@gmail.com", "newPassword");
+        UserUpdateRequest updateDto = new UserUpdateRequest("newName", "new@gmail.com", "newPassword");
         User user = new User("oldName", "old@gmail.com", "oldPassword", null);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user));
@@ -212,7 +213,7 @@ public class BasicUserServiceTest {
     void updateUser_callsUserUpdateMethod() {
         // given
         UUID userId = UUID.randomUUID();
-        UserUpdateDto updateDto = new UserUpdateDto("newName", "new@gmail.com", "newPassword");
+        UserUpdateRequest updateDto = new UserUpdateRequest("newName", "new@gmail.com", "newPassword");
         User user = spy(new User("oldName", "old@gmail.com", "oldPassword", null));
         UserDto expectedDto = new UserDto(user, null, false);
 

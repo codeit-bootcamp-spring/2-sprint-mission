@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
@@ -45,11 +45,11 @@ public class MessageController {
     @Operation(summary = "Message 생성")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(
-            @RequestPart("messageCreateRequest") @Valid MessageCreateDto messageCreateDto,
+            @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
             @RequestPart(name = "attachments", required = false) List<MultipartFile> files) {
-        log.info("Received message create request: {}", messageCreateDto);
-        List<BinaryContentCreateDto> binaryDtos = MultipartToBinaryConverter.toBinaryContentCreateDtos(files);
-        MessageDto messageDto = messageService.create(messageCreateDto, binaryDtos);
+        log.info("Received message create request: {}", messageCreateRequest);
+        List<BinaryContentCreateRequest> binaryDtos = MultipartToBinaryConverter.toBinaryContentCreateDtos(files);
+        MessageDto messageDto = messageService.create(messageCreateRequest, binaryDtos);
         log.info("Message created successfully: messageId={}", messageDto.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
@@ -58,9 +58,9 @@ public class MessageController {
     @Operation(summary = "Message 내용 수정")
     @PatchMapping("/{messageId}")
     public ResponseEntity<MessageDto> updateMessage(@PathVariable UUID messageId,
-                                                    @RequestBody @Valid MessageUpdateDto messageUpdateDto) {
-        log.info("Received message update request: messageId={}, updateDto={}", messageId, messageUpdateDto);
-        MessageDto messageDto = messageService.update(messageId, messageUpdateDto);
+                                                    @RequestBody @Valid MessageUpdateRequest messageUpdateRequest) {
+        log.info("Received message update request: messageId={}, updateDto={}", messageId, messageUpdateRequest);
+        MessageDto messageDto = messageService.update(messageId, messageUpdateRequest);
         log.info("Message updated successfully: messageId={}", messageDto.id());
 
         return ResponseEntity.ok(messageDto);

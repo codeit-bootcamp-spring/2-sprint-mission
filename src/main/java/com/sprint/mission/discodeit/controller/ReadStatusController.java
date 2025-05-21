@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,16 +31,17 @@ public class ReadStatusController {
 
     @Operation(summary = "Message 읽음 상태 생성")
     @PostMapping
-    public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody @Valid ReadStatusCreateDto readStatusCreateDto) {
-        ReadStatusDto readStatus = readStatusService.create(readStatusCreateDto);
+    public ResponseEntity<ReadStatusDto> createReadStatus(
+            @RequestBody @Valid ReadStatusCreateRequest readStatusCreateRequest) {
+        ReadStatusDto readStatus = readStatusService.create(readStatusCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
     }
 
     @Operation(summary = "Message 읽음 상태 수정")
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatusDto> updateReadStatus(@PathVariable UUID readStatusId,
-                                                          @RequestBody @Valid ReadStatusUpdateDto readStatusUpdateDto) {
-        ReadStatusDto readStatus = readStatusService.update(readStatusId, readStatusUpdateDto);
+                                                          @RequestBody @Valid ReadStatusUpdateRequest readStatusUpdateRequest) {
+        ReadStatusDto readStatus = readStatusService.update(readStatusId, readStatusUpdateRequest);
         return ResponseEntity.ok(readStatus);
     }
 

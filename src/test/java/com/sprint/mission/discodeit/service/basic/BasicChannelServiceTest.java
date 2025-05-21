@@ -8,10 +8,10 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -61,7 +61,7 @@ class BasicChannelServiceTest {
         given(channelMapper.toDto(any())).willReturn(expectedDto);
 
         // when
-        ChannelDto result = channelService.createPrivate(new ChannelCreatePrivateDto(List.of(userId, userId2)));
+        ChannelDto result = channelService.createPrivate(new PrivateChannelCreateRequest(List.of(userId, userId2)));
 
         // then
         assertThat(result).isEqualTo(expectedDto);
@@ -72,7 +72,7 @@ class BasicChannelServiceTest {
     @DisplayName("퍼블릭 채널 생성 성공 테스트")
     void createPublicChannel_success() {
         // given
-        ChannelCreatePublicDto dto = new ChannelCreatePublicDto("notice", "공지사항 채널");
+        PublicChannelCreateRequest dto = new PublicChannelCreateRequest("notice", "공지사항 채널");
         ChannelDto expectedDto = new ChannelDto(UUID.randomUUID(), null, null, null, null, null);
 
         given(channelRepository.existsByTypeAndName(ChannelType.PUBLIC, dto.name())).willReturn(false);
@@ -89,7 +89,7 @@ class BasicChannelServiceTest {
     @DisplayName("퍼블릭 채널 생성 실패 - 중복된 이름")
     void createPublicChannel_fail_whenDuplicate() {
         // given
-        ChannelCreatePublicDto dto = new ChannelCreatePublicDto("notice", "공지사항 채널");
+        PublicChannelCreateRequest dto = new PublicChannelCreateRequest("notice", "공지사항 채널");
         given(channelRepository.existsByTypeAndName(ChannelType.PUBLIC, dto.name())).willReturn(true);
 
         // when / then
@@ -102,7 +102,7 @@ class BasicChannelServiceTest {
     void updateChannel_success() {
         // given
         UUID channelId = UUID.randomUUID();
-        ChannelUpdateDto updateDto = new ChannelUpdateDto("new-name", "new-desc");
+        ChannelUpdateRequest updateDto = new ChannelUpdateRequest("new-name", "new-desc");
         Channel channel = Channel.createPublic("old", "desc");
         ChannelDto expectedDto = new ChannelDto(channel.getId(), null, null, null, null, null);
 
@@ -124,7 +124,7 @@ class BasicChannelServiceTest {
         given(channelRepository.findById(channelId)).willReturn(Optional.empty());
 
         // when / then
-        assertThatThrownBy(() -> channelService.update(channelId, new ChannelUpdateDto("a", "b")))
+        assertThatThrownBy(() -> channelService.update(channelId, new ChannelUpdateRequest("a", "b")))
                 .isInstanceOf(ChannelNotFoundException.class);
     }
 
@@ -137,7 +137,7 @@ class BasicChannelServiceTest {
         given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
 
         // when / then
-        assertThatThrownBy(() -> channelService.update(channelId, new ChannelUpdateDto("a", "b")))
+        assertThatThrownBy(() -> channelService.update(channelId, new ChannelUpdateRequest("a", "b")))
                 .isInstanceOf(PrivateChannelUpdateNotSupportedException.class);
     }
 
