@@ -8,7 +8,7 @@ plugins {
 
 
 group = 'com.sprint.mission'
-version = '1.2.-M8'
+version = '1.2-M8'
 
 java {
 	toolchain {
@@ -38,13 +38,14 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
 	// mapStruct
 	implementation 'org.mapstruct:mapstruct:1.6.3'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-
 	// test H2
 	testImplementation 'com.h2database:h2'
+	// AWS S3 SDK
+	implementation 'software.amazon.awssdk:s3:2.31.7'
+
 }
 
 tasks.withType(JavaCompile).configureEach {

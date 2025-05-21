@@ -17,8 +17,7 @@ import com.sprint.mission.discodeit.service.dto.request.userdto.UserUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.UserResponseDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +26,8 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BasicUserService.class);
 
     private final UserJPARepository userJpaRepository;
     private final BinaryContentJPARepository binaryContentJpaRepository;
@@ -41,21 +39,21 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserResponseDto create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        logger.debug("[User][create] Calling userJpaRepository.existsByUsernameOrEmail(): username={}, email={}", userCreateDto.username(), userCreateDto.email());
+        log.debug("[User][create] Calling userJpaRepository.existsByUsernameOrEmail(): username={}, email={}", userCreateDto.username(), userCreateDto.email());
 
         if (userJpaRepository.existsByUsernameOrEmail(userCreateDto.username(), userCreateDto.email())) {
-            logger.warn("[User][create] Username or email already exists: username={}, email={}", userCreateDto.username(), userCreateDto.email());
-            throw new DuplicateUserOrEmailException(Instant.now(), ErrorCode.DUPLICATE_USER_OR_EMAIL, Map.of("userName", userCreateDto.username(), "email", userCreateDto.email()));
+            log.warn("[User][create] Username or email already exists: username={}, email={}", userCreateDto.username(), userCreateDto.email());
+            throw new DuplicateUserOrEmailException(Map.of("userName", userCreateDto.username(), "email", userCreateDto.email()));
         }
 
-        BinaryContent nullableProfile = mapProfile(optionalBinaryContentCreateDto);
+        BinaryContent nullableProfile = saveProfile(optionalBinaryContentCreateDto);
 
-        logger.debug("[User][create] Entity constructed: username={}, email={}", userCreateDto.username(), userCreateDto.email());
+        log.debug("[User][create] Entity constructed: username={}, email={}", userCreateDto.username(), userCreateDto.email());
         User user = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(), nullableProfile);
         UserStatus userStatus = new UserStatus(user, Instant.now());
-        logger.debug("[User][create] Calling userJpaRepository.save()");
+        log.debug("[User][create] Calling userJpaRepository.save()");
         User createdUser = userJpaRepository.save(user);
-        logger.info("[User][create] Created successfully: userId={}", createdUser.getId());
+        log.info("[User][create] Created successfully: userId={}", createdUser.getId());
         return responseMapStruct.toUserDto(createdUser);
     }
 
@@ -64,7 +62,7 @@ public class BasicUserService implements UserService {
     @Transactional(readOnly = true)
     public UserResponseDto find(UUID userId) {
         User matchingUser = userJpaRepository.findByIdWithProfile(userId)
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
         return responseMapStruct.toUserDto(matchingUser);
     }
 
@@ -77,8 +75,8 @@ public class BasicUserService implements UserService {
                 .map(responseMapStruct::toUserDto)
                 .forEach(userAllList::add);
         if (userAllList.isEmpty()) {
-            logger.warn("[User][findAllUser] User list is empty.");
-            throw new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", List.of()));
+            log.warn("[User][findAllUser] User list is empty.");
+            throw new UserNotFoundException(Map.of("userId", List.of()));
         }
         return userAllList;
     }
@@ -87,22 +85,22 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserResponseDto update(UUID userId, UserUpdateDto userUpdateDto, Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
-        logger.debug("[User][update] Calling userJpaRepository.findById(): userId={}", userId);
+        log.debug("[User][update] Calling userJpaRepository.findById(): userId={}", userId);
         User matchingUser = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
-        BinaryContent nullableProfile = mapProfile(optionalBinaryContentCreateDto);
+        BinaryContent nullableProfile = saveProfile(optionalBinaryContentCreateDto);
 
         if (userUpdateDto.newPassword() == null || userUpdateDto.newPassword().isEmpty()) {
-            logger.debug("[User][update] New password is empty.");
+            log.debug("[User][update] New password is empty.");
             matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), matchingUser.getPassword(), nullableProfile);
         } else {
-            logger.debug("[User][update] New password is not empty.");
+            log.debug("[User][update] New password is not empty.");
             matchingUser.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(), nullableProfile);
         }
-        logger.debug("[User][update] Calling userJpaRepository.save()");
+        log.debug("[User][update] Calling userJpaRepository.save()");
         userJpaRepository.save(matchingUser);
-        logger.info("[User][update] Updated successfully: userId={}", userId);
+        log.info("[User][update] Updated successfully: userId={}", userId);
         return responseMapStruct.toUserDto(matchingUser);
     }
 
@@ -110,27 +108,27 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public void delete(UUID userId) {
-        logger.debug("[User][delete] Calling userJpaRepository.findById(): userId={}", userId);
+        log.debug("[User][delete] Calling userJpaRepository.findById(): userId={}", userId);
         User matchingUser = userJpaRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userId)));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
 
-        logger.debug("[User][delete] Calling userJpaRepository.delete(): userId={}", userId);
+        log.debug("[User][delete] Calling userJpaRepository.delete(): userId={}", userId);
         userJpaRepository.delete(matchingUser);
-        logger.info("[User][delete] Deleted successfully: userId={}", userId);
+        log.info("[User][delete] Deleted successfully: userId={}", userId);
     }
 
 
     // user profile 생성 및 수정
-    private BinaryContent mapProfile(Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
+    private BinaryContent saveProfile(Optional<BinaryContentCreateDto> optionalBinaryContentCreateDto) {
         return optionalBinaryContentCreateDto.map(profileRequest -> {
-                    logger.debug("[User] Starting profile upload process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
+                    log.debug("[User] Starting profile upload process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
                     BinaryContent updateBinaryContent = binaryContentJpaRepository.save(binaryContent);
                     binaryContentStorage.put(updateBinaryContent.getId(), bytes);
-                    logger.debug("[User] Profile upload completed process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
+                    log.debug("[User] Profile upload completed process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
                     return updateBinaryContent;
                 })
                 .orElse(null);

@@ -9,8 +9,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +20,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/binaryContents")
 @RequiredArgsConstructor
+@Slf4j
 public class BinaryContentController {
-
-    private static final Logger logger = LoggerFactory.getLogger(BinaryContentController.class);
 
     private final BinaryContentService binaryContentService;
 
@@ -56,10 +54,10 @@ public class BinaryContentController {
     public ResponseEntity<?> download(
             @PathVariable UUID binaryContentId
     ) {
-        logger.debug("[BinaryContent Controller][download] Received download request: binaryContentId={}", binaryContentId);
-        logger.debug("[BinaryContent Controller][download] Calling binaryContentService.download()");
+        log.debug("[BinaryContent Controller][download] Received download request: binaryContentId={}", binaryContentId);
+        log.debug("[BinaryContent Controller][download] Calling binaryContentService.download()");
         ResponseEntity<?> downloadResponse = binaryContentService.download(binaryContentId);
-        logger.debug("[BinaryContent Controller][download] Download successfully: binaryContentId={}", binaryContentId);
+        log.debug("[BinaryContent Controller][download] Download successfully: binaryContentId={}", binaryContentId);
         return downloadResponse;
     }
 }

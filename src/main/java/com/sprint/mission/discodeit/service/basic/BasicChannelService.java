@@ -19,8 +19,7 @@ import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelFindDt
 import com.sprint.mission.discodeit.service.dto.request.channeldto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.service.dto.response.ChannelResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +30,8 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicChannelService implements ChannelService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BasicChannelService.class);
 
     private final ChannelJPARepository channelJpaRepository;
     private final ReadStatusJPARepository readStatusJpaRepository;
@@ -44,19 +42,19 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelResponseDto createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
-        logger.debug("[Channel][createPrivate] Entity constructed");
+        log.debug("[Channel][createPrivate] Entity constructed");
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
-        logger.debug("[Channel][createPrivate] Calling channelJpaRepository.save()");
+        log.debug("[Channel][createPrivate] Calling channelJpaRepository.save()");
         Channel createdPrivateChannel = channelJpaRepository.save(channel);
 
-        logger.debug("[Channel][createPrivate] Calling userJpaRepository.findByIdIn()");
+        log.debug("[Channel][createPrivate] Calling userJpaRepository.findByIdIn()");
         userJpaRepository.findByIdIn(channelCreatePrivateDto.participantIds()).stream()
-                .peek(user -> logger.debug("[Channel][createPrivate] ReadStatus entity constructed: userId={}", user.getId()))
+                .peek(user -> log.debug("[Channel][createPrivate] ReadStatus entity constructed: userId={}", user.getId()))
                 .map(user -> new ReadStatus(user, createdPrivateChannel, createdPrivateChannel.getCreatedAt()))
                 .forEach(readStatusJpaRepository::save);
 
         ChannelResponseDto channelResponse = channelMapper.toDto(createdPrivateChannel);
-        logger.info("[Channel][createPrivate] Created successfully: channelId={}", channelResponse.id());
+        log.info("[Channel][createPrivate] Created successfully: channelId={}", channelResponse.id());
         return channelResponse;
     }
 
@@ -64,18 +62,18 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelResponseDto createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
-        logger.debug("[Channel][createPublic] Calling channelJpaRepository.existsByTypeAndName()");
+        log.debug("[Channel][createPublic] Calling channelJpaRepository.existsByTypeAndName()");
         if (channelJpaRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
-            logger.warn("[Channel][createPublic] A channel already exists: channelName={}", channelCreatePublicDto.name());
+            log.warn("[Channel][createPublic] A channel already exists: channelName={}", channelCreatePublicDto.name());
             throw new DuplicateChannelException(Instant.now(), ErrorCode.DUPLICATE_CHANNEL, Map.of("channelName", channelCreatePublicDto.name()));
         }
 
-        logger.debug("[Channel][createPublic] Entity constructed");
+        log.debug("[Channel][createPublic] Entity constructed");
         Channel createdPublicChannel = new Channel(ChannelType.PUBLIC, channelCreatePublicDto.name(), channelCreatePublicDto.description());
-        logger.debug("[Channel][createPublic] Calling channelJpaRepository.save()");
+        log.debug("[Channel][createPublic] Calling channelJpaRepository.save()");
         channelJpaRepository.save(createdPublicChannel);
         ChannelResponseDto channelResponse =channelMapper.toDto(createdPublicChannel);
-        logger.info("[Channel][createPublic] Created successfully: channelId={}", channelResponse.id());
+        log.info("[Channel][createPublic] Created successfully: channelId={}", channelResponse.id());
         return channelResponse;
     }
 
@@ -107,20 +105,20 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public ChannelResponseDto update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
-        logger.debug("[Channel][update] Calling channelJpaRepository.findById(): channelId={}", channelId);
+        log.debug("[Channel][update] Calling channelJpaRepository.findById(): channelId={}", channelId);
         Channel matchingChannel = channelJpaRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
 
         if (matchingChannel.getType().equals(ChannelType.PRIVATE)) {
-            logger.warn("[Channel][update] Private channels cannot be changed.");
+            log.warn("[Channel][update] Private channels cannot be changed.");
             throw new PrivateChannelUpdateException(Instant.now(), ErrorCode.PRIVATE_CHANNEL_UPDATE, Map.of("channelId", channelId));
         }
 
-        logger.debug("[Channel][update] Calling updateChannel(): channelId={}", channelId);
+        log.debug("[Channel][update] Calling updateChannel(): channelId={}", channelId);
         matchingChannel.updateChannel(channelUpdateDto.newName(), channelUpdateDto.newDescription());
-        logger.debug("[Channel][update] Calling channelJpaRepository.save(): channelId={}", channelId);
+        log.debug("[Channel][update] Calling channelJpaRepository.save(): channelId={}", channelId);
         Channel updateChannel = channelJpaRepository.save(matchingChannel);
-        logger.info("[Channel][update] Updated successfully: channelId={}", channelId);
+        log.info("[Channel][update] Updated successfully: channelId={}", channelId);
         return channelMapper.toDto(updateChannel);
 
     }
@@ -129,10 +127,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional
     public void delete(UUID channelId) {
-        logger.debug("[Channel][delete] Calling userJpaRepository.findById()");
+        log.debug("[Channel][delete] Calling userJpaRepository.findById()");
         Channel matchingChannel = channelJpaRepository.findById(channelId)
                 .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", channelId)));
         channelJpaRepository.delete(matchingChannel);
-        logger.info("[Channel][delete] Deleted successfully: channelId]{}", channelId);
+        log.info("[Channel][delete] Deleted successfully: channelId]{}", channelId);
     }
 }

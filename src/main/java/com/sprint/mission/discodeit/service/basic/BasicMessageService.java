@@ -23,8 +23,7 @@ import com.sprint.mission.discodeit.service.dto.response.MessageResponseDto;
 import com.sprint.mission.discodeit.service.dto.response.PageResponseDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,9 +38,8 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicMessageService implements MessageService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BasicMessageService.class);
 
     private final MessageJPARepository messageJpaRepository;
     private final UserJPARepository userJpaRepository;
@@ -56,33 +54,33 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageResponseDto create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtoList) {
-        logger.debug("[Message][create] Calling userJpaRepository.findById(): authorId={}", messageCreateDto.authorId());
+        log.debug("[Message][create] Calling userJpaRepository.findById(): authorId={}", messageCreateDto.authorId());
         User matchingUser = userJpaRepository.findById(messageCreateDto.authorId())
                 .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("authorId", messageCreateDto.authorId())));
 
-        logger.debug("[Message][create] Calling channelJpaRepository.findById(): channelId={}", messageCreateDto.channelId());
+        log.debug("[Message][create] Calling channelJpaRepository.findById(): channelId={}", messageCreateDto.channelId());
         Channel matchingChannel = channelJpaRepository.findById(messageCreateDto.channelId())
                 .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", messageCreateDto.channelId())));
 
         List<BinaryContent> attachments = binaryContentCreateDtoList.stream()
                 .map(profileRequest -> {
-                    logger.debug("[Message] Starting profile upload process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
+                    log.debug("[Message] Starting profile upload process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
                     BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType);
                     BinaryContent createBinaryContent = binaryContentJpaRepository.save(binaryContent);
                     binaryContentStorage.put(createBinaryContent.getId(), bytes);
-                    logger.debug("[Message] Profile upload completed process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
+                    log.debug("[Message] Profile upload completed process: filename:{}, type:{}", profileRequest.fileName(), profileRequest.contentType());
                     return createBinaryContent;
                 })
                 .toList();
 
-        logger.debug("[Message][create] Entity constructed: channelID={}, authorId={}", messageCreateDto.authorId(), messageCreateDto.channelId());
+        log.debug("[Message][create] Entity constructed: channelID={}, authorId={}", messageCreateDto.authorId(), messageCreateDto.channelId());
         Message messages = new Message(messageCreateDto.content(), matchingChannel, matchingUser, attachments);
-        logger.debug("[Message][create] Calling messageJpaRepository.save()");
+        log.debug("[Message][create] Calling messageJpaRepository.save()");
         Message createdMessage = messageJpaRepository.save(messages);
-        logger.info("[Message][create] Created successfully: messageId={}", createdMessage.getId());
+        log.info("[Message][create] Created successfully: messageId={}", createdMessage.getId());
         return responseMapStruct.toMessageDto(createdMessage);
     }
 
@@ -113,15 +111,15 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageResponseDto update(UUID messageId, MessageUpdateDto messageUpdateDto) {
-        logger.debug("[Message][update] Calling messageJpaRepository.findById(): messageId={}", messageId);
+        log.debug("[Message][update] Calling messageJpaRepository.findById(): messageId={}", messageId);
         Message matchingMessage = messageJpaRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
 
-        logger.debug("[Message][update] Calling updateChannel(): messageId={}", messageId);
+        log.debug("[Message][update] Calling updateChannel(): messageId={}", messageId);
         matchingMessage.updateMessage(messageUpdateDto.newContent());
-        logger.debug("[Message][update] Calling messageJpaRepository.save()");
+        log.debug("[Message][update] Calling messageJpaRepository.save()");
         Message updateMessage = messageJpaRepository.save(matchingMessage);
-        logger.info("[Message][update] Updated successfully: messageId={}", messageId);
+        log.info("[Message][update] Updated successfully: messageId={}", messageId);
         return responseMapStruct.toMessageDto(updateMessage);
     }
 
@@ -129,20 +127,20 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public void delete(UUID messageId) {
-        logger.debug("[Message][delete] Calling messageJpaRepository.findById(): messageId={}", messageId);
+        log.debug("[Message][delete] Calling messageJpaRepository.findById(): messageId={}", messageId);
         Message matchingMessage = messageJpaRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
 
-        logger.debug("[Message][delete] Calling matchingMessage.getAttachments()");
+        log.debug("[Message][delete] Calling matchingMessage.getAttachments()");
         if (matchingMessage.getAttachments() != null) {
             matchingMessage.getAttachments().stream()
                     .map(BinaryContent::getId)
                     .forEach(binaryContentService::delete);
         }
 
-        logger.debug("[Message][delete] Calling messageJpaRepository.delete(): messageId={}", messageId);
+        log.debug("[Message][delete] Calling messageJpaRepository.delete(): messageId={}", messageId);
         messageJpaRepository.delete(matchingMessage);
-        logger.info("[Message][delete] Deleted successfully: messageId={}", messageId);
+        log.info("[Message][delete] Deleted successfully: messageId={}", messageId);
     }
 
     private PageRequest pageRequestSortByCreatedAt(int page, int size) {
