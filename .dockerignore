@@ -1,0 +1,11 @@
+.gradle
+build
+!build/libs/discodeit-1.2-M8.jar
+**/*.iml
+*.log
+.idea
+.git
+.env
+.gitignore
+Dockerfile
+README.md

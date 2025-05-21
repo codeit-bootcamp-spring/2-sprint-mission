@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ReadStatusController.class)
@@ -36,7 +36,7 @@ class ReadStatusControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockitoBean
+  @MockBean
   private ReadStatusService readStatusService;
 
   @Test
@@ -46,7 +46,7 @@ class ReadStatusControllerTest {
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
     Instant lastReadAt = Instant.now();
-    
+
     ReadStatusCreateRequest createRequest = new ReadStatusCreateRequest(
         userId,
         channelId,
@@ -100,7 +100,7 @@ class ReadStatusControllerTest {
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
     Instant newLastReadAt = Instant.now();
-    
+
     ReadStatusUpdateRequest updateRequest = new ReadStatusUpdateRequest(newLastReadAt);
 
     ReadStatusDto updatedReadStatus = new ReadStatusDto(
@@ -130,7 +130,7 @@ class ReadStatusControllerTest {
     // Given
     UUID nonExistentId = UUID.randomUUID();
     Instant newLastReadAt = Instant.now();
-    
+
     ReadStatusUpdateRequest updateRequest = new ReadStatusUpdateRequest(newLastReadAt);
 
     given(readStatusService.update(eq(nonExistentId), any(ReadStatusUpdateRequest.class)))
@@ -151,7 +151,7 @@ class ReadStatusControllerTest {
     UUID channelId1 = UUID.randomUUID();
     UUID channelId2 = UUID.randomUUID();
     Instant now = Instant.now();
-    
+
     List<ReadStatusDto> readStatuses = List.of(
         new ReadStatusDto(UUID.randomUUID(), userId, channelId1, now.minusSeconds(60)),
         new ReadStatusDto(UUID.randomUUID(), userId, channelId2, now)

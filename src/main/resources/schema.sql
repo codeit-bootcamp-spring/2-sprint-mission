@@ -1,4 +1,5 @@
 -- 테이블
+
 -- User
 CREATE TABLE users
 (
