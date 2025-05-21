@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @PostMapping("/public")
-  public ResponseEntity<ChannelDto> create(@RequestBody PublicChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(@Validated @RequestBody PublicChannelCreateRequest request) {
     ChannelDto createdChannel = channelService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -30,7 +31,7 @@ public class ChannelController {
   }
 
   @PostMapping("/private")
-  public ResponseEntity<ChannelDto> create(@RequestBody PrivateChannelCreateRequest request) {
+  public ResponseEntity<ChannelDto> create(@Validated @RequestBody PrivateChannelCreateRequest request) {
     ChannelDto createdChannel = channelService.create(request);
     return ResponseEntity
         .status(HttpStatus.CREATED)
@@ -40,7 +41,7 @@ public class ChannelController {
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> update(
           @PathVariable("channelId") UUID channelId,
-        @RequestBody PublicChannelUpdateRequest request) {
+        @Validated @RequestBody PublicChannelUpdateRequest request) {
 
     ChannelDto udpatedChannel = channelService.update(channelId, request);
     return ResponseEntity

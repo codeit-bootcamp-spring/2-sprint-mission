@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping(path = "login")
-  public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<UserDto> login(@Validated @RequestBody LoginRequest loginRequest) {
     UserDto user = authService.login(loginRequest);
     return ResponseEntity
         .status(HttpStatus.OK)
