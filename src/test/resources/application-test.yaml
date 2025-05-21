@@ -1,10 +1,33 @@
 discodeit:
-  repository:
-    type: file   # jcf | file
-    file-directory:
-      binary-content-path: filestorage/test/binary-content.ser
-      channel-path: filestorage/test/channel.ser
-      message-path: filestorage/test/message.ser
-      readStatus-path: filestorage/test/readStatus.ser
-      user-path: filestorage/test/user.ser
-      user-status-path: filestorage/test/userStatus.ser
+  storage:
+    type: local
+    local:
+      root-path: filestorage/binary-content-storage/test
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        orm.jdbc.bind: TRACE
+      springframework:
+        data: DEBUG
+    com:
+      sprint:
+        mission:
+          discodeit: DEBUG

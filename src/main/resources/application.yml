@@ -1,53 +1,68 @@
 discodeit:
-  repository:
-    type: jcf  # jcf | file | local
-    file-directory:
-      binary-content-path: filestorage/binary-content.ser
-      channel-path: filestorage/channel.ser
-      message-path: filestorage/message.ser
-      readStatus-path: filestorage/readStatus.ser
-      user-path: filestorage/user.ser
-      user-status-path: filestorage/userStatus.ser
   storage:
     type: local
     local:
       root-path: filestorage/binary-content-storage
 
-
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 4MB
   jpa:
     hibernate:
       ddl-auto: none
-    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
         use_sql_comments: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
   sql:
     init:
       mode: never
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
 
 logging:
   level:
     org:
-      hibernate:
-        SQL: DEBUG
-        orm.jdbc.bind: TRACE
-      springframework:
-        data: DEBUG
-    com:
-      sprint:
-        mission:
-          discodeit: DEBUG
+      hibernate.SQL: DEBUG
+      orm.jdbc.bind: TRACE
+      springframework.data: DEBUG
+    com.sprint.mission.discodeit: info
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, loggers
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    ddl-auto: none
+  storage:
+    type: local
+    path: filestorage/binary-content-storage
+  multipart:
+    max-file-size: 3MB
+    max-request-size: 4MB
