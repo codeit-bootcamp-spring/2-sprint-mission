@@ -10,7 +10,7 @@ spring:
       idle-timeout: 60000
   jpa:
     hibernate:
-      ddl-auto: update # none | update | create | create-drop
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -21,13 +21,11 @@ spring:
 logging:
   level:
     root: info
-    com.example.discodeit: debug # 우리 코드
+    com.sprint.mission.discodeit: debug
     org:
       hibernate:
-        SQL: debug # SQL 쿼리 로그
-        orm.jdbc.bind: trace # SQL 쿼리와 바인딩된 파라미터를 로그에 출력
-      springframework:
-        data: debug # Spring Data 관련 디버깅
+        SQL: debug
+        orm.jdbc.bind: trace
 
 server:
   port: 8080
