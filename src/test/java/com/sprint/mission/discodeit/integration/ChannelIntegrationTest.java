@@ -3,16 +3,10 @@ package com.sprint.mission.discodeit.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.DiscodeitApplication;
-import com.sprint.mission.discodeit.dto.controller.channel.CreatePrivateChannelRequestDTO;
-import com.sprint.mission.discodeit.dto.controller.channel.CreatePrivateChannelResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.channel.CreatePublicChannelRequestDTO;
-import com.sprint.mission.discodeit.dto.service.channel.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.dto.service.channel.CreatePublicChannelResult;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

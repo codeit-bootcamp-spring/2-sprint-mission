@@ -19,8 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
 
-@Import(JpaAuditingConfig.class)
 @DataJpaTest
+@Import(JpaAuditingConfig.class)
 @ActiveProfiles("test")
 public class JpaUserRepositoryTest {
 

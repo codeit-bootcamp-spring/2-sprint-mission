@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
-public enum ResultCode implements Code {
-
-  SUCCESS(200, "SUCCESS"),
+public enum ErrorCode implements Code {
 
   BAD_REQUEST(400, "BAD REQUEST"),
 
@@ -46,7 +44,7 @@ public enum ResultCode implements Code {
   private final int status;
   private final String message;
 
-  ResultCode(int status, String message) {
+  ErrorCode(int status, String message) {
     this.status = status;
     this.message = message;
   }

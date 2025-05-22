@@ -1,13 +1,10 @@
 package com.sprint.mission.discodeit.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.controller.user.CreateUserRequestDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;

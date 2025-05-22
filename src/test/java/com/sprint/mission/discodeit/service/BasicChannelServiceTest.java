@@ -23,7 +23,6 @@ import com.sprint.mission.discodeit.mapper.UserMapperImpl;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;

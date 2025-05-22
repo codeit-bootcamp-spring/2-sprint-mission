@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.config.testAuditingConfig;
+import com.sprint.mission.discodeit.config.JpaAuditingConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-@Import(testAuditingConfig.class)
+@Import(JpaAuditingConfig.class)
 @ActiveProfiles("test")
 public class JpaChannelRepositoryTest {
 

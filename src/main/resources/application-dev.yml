@@ -1,8 +1,4 @@
 spring:
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
@@ -15,18 +11,19 @@ spring:
 
   logging:
     level:
-      root: DEBUG
-      org:
-        hibernate:
-          SQL: DEBUG
-          orm.jdbc.bind: TRACE
-        springframework:
-          data: DEBUG
-          cache:
-            interceptor: DEBUG
-      com:
-        sprint:
-          mission: DEBUG
+      com.sprint.mission.discodeit: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
 
 
 

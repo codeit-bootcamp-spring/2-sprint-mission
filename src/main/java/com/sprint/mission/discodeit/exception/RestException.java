@@ -9,20 +9,20 @@ import lombok.Getter;
 public class RestException extends RuntimeException {
 
   private final Instant timestamp;
-  private final ResultCode resultCode;
+  private final ErrorCode errorCode;
   private final Map<String, Object> details;
 
-  public RestException(ResultCode resultCode) {
-    super(resultCode.getMessage());
+  public RestException(ErrorCode errorCode) {
+    super(errorCode.getMessage());
     this.timestamp = Instant.now();
-    this.resultCode = resultCode;
+    this.errorCode = errorCode;
     this.details = Collections.emptyMap();
   }
 
-  public RestException(ResultCode resultCode, Map<String, Object> details) {
-    super(resultCode.getMessage());
+  public RestException(ErrorCode errorCode, Map<String, Object> details) {
+    super(errorCode.getMessage());
     this.timestamp = Instant.now();
-    this.resultCode = resultCode;
+    this.errorCode = errorCode;
     this.details = details;
   }
 }
