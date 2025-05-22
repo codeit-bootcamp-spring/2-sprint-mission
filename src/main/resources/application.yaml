@@ -5,25 +5,44 @@ spring:
     multipart:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
+  datasource:
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    #        default_batch_fetch_size: 100
+      ddl-auto: validate
     open-in-view: false
-    show-sql: true
-  sql:
-    init:
-      mode: embedded
+  profiles:
+    active:
+      - dev
 
-logging:
-  level:
-    root: info
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+
+info:
+  name: Discodeit
+  version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.maxFileSize}
+      max-request-size: ${spring.servlet.multipart.maxRequestSize}
 
 discodeit:
   storage:
@@ -31,36 +50,6 @@ discodeit:
     local:
       root-path: .discodeit/storage
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, metrics, loggers
-  endpoint:
-    health:
-      show-details: always    # health 정보 자세히 보기
-  info:
-    env:
-      enabled: true
-
-info:
-  app:
-    name: Discodeit
-    version: 1.7.0
-    java:
-      version: 17
-    spring:
-      boot:
-        version: 3.4.0
-    datasource:
-      url: jdbc:postgresql://localhost:5432/discodeit
-      username: discodeit_user
-      password: discodeit1234
-    jpa:
-      ddl-auto: validate
-    storage:
-      type: local
-      path: .discodeit/storage
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 50MB
+logging:
+  level:
+    root: info
