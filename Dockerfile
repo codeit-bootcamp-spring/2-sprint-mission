@@ -20,7 +20,7 @@ RUN ./gradlew dependencies -q --no-daemon
 COPY src src
 RUN ./gradlew build -PprojectName=${PROJECT_NAME} -PprojectVersion=${PROJECT_VERSION} -x test -q
 
-FROM amazoncorretto:17
+FROM amazoncorretto:17-alpine-jdk
 
 ARG PROJECT_NAME=2-sprint-mission
 ARG PROJECT_VERSION=1.2-M8
