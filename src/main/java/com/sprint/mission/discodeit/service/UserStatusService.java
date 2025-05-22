@@ -19,7 +19,7 @@ public interface UserStatusService {
 
   UserStatus findByUserId(UUID userId);
 
-  UserStatus update(UUID id, UserStatusUpdateRequest request);
+  UserStatusDto update(UUID id, UserStatusUpdateRequest request);
 
   UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request);
 

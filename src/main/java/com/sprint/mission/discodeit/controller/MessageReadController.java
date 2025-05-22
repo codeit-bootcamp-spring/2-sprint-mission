@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api/readStatuses")
 public class MessageReadController implements MessageReadApi {
 
@@ -31,7 +33,9 @@ public class MessageReadController implements MessageReadApi {
   @PostMapping
   public ResponseEntity<ReadStatusDto> createByChannelId(
       @RequestBody @Valid ReadStatusCreateRequest request) {
+    log.debug("메시지 수신 정보 생성 요청: {}", request);
     ReadStatusDto response = readStatusService.create(request);
+    log.info("메시지 수신 정보 생성 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 
@@ -40,7 +44,9 @@ public class MessageReadController implements MessageReadApi {
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusDto> updateByChannelId(@PathVariable("readStatusId") UUID id,
       @RequestBody @Valid ReadStatusUpdateRequest request) {
+    log.debug("메시지 수신 정보 수정 요청: id={}, request={}", id, request);
     ReadStatusDto response = readStatusService.update(id, request);
+    log.info("메시지 수신 정보 수정 응답: {}", response);
     return ResponseEntity.ok(response);
   }
 

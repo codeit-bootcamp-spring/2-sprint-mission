@@ -1,0 +1,15 @@
+package com.sprint.mission.discodeit.exception.binarycontent;
+
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.util.UUID;
+
+public class BinaryContentNotFoundException extends BinaryContentException{
+  public BinaryContentNotFoundException() {
+    super(ErrorCode.BINARY_CONTENT_NOT_FOUND);
+  }
+
+  public BinaryContentNotFoundException notFoundWithId(UUID id) {
+    this.putDetails("id", id);
+    return this;
+  }
+}
