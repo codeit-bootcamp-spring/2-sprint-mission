@@ -40,8 +40,4 @@ out/
 ### Storage ###
 .discodeit/
 .logs/
-
-### git ###
-.github/
-
 .env

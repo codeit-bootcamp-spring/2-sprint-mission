@@ -15,7 +15,7 @@ public class S3Properties {
     static {
         Properties props = new Properties();
         try (
-                InputStream inputStream = new FileInputStream(".env");
+                InputStream inputStream = new FileInputStream(".env")
         ) {
             props.load(inputStream);
             for (String key : props.stringPropertyNames()) {

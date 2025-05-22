@@ -56,11 +56,11 @@ public class BasicMessageService implements MessageService {
     public MessageResponseDto create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtoList) {
         log.debug("[Message][create] Calling userJpaRepository.findById(): authorId={}", messageCreateDto.authorId());
         User matchingUser = userJpaRepository.findById(messageCreateDto.authorId())
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("authorId", messageCreateDto.authorId())));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("authorId", messageCreateDto.authorId())));
 
         log.debug("[Message][create] Calling channelJpaRepository.findById(): channelId={}", messageCreateDto.channelId());
         Channel matchingChannel = channelJpaRepository.findById(messageCreateDto.channelId())
-                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", messageCreateDto.channelId())));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", messageCreateDto.channelId())));
 
         List<BinaryContent> attachments = binaryContentCreateDtoList.stream()
                 .map(profileRequest -> {
@@ -92,7 +92,7 @@ public class BasicMessageService implements MessageService {
                 .findByIdEntityGraph(messageId, pageRequestSortByCreatedAt(page, size))
                 .map(responseMapStruct::toMessageDto);
         if (matchingMessage.isEmpty()) {
-            throw new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId));
+            throw new MessageNotFoundException(Map.of("messageId", messageId));
         }
         return pageMapper.fromPage(matchingMessage);
     }
@@ -113,7 +113,7 @@ public class BasicMessageService implements MessageService {
     public MessageResponseDto update(UUID messageId, MessageUpdateDto messageUpdateDto) {
         log.debug("[Message][update] Calling messageJpaRepository.findById(): messageId={}", messageId);
         Message matchingMessage = messageJpaRepository.findById(messageId)
-                .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
+                .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
 
         log.debug("[Message][update] Calling updateChannel(): messageId={}", messageId);
         matchingMessage.updateMessage(messageUpdateDto.newContent());
@@ -129,7 +129,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID messageId) {
         log.debug("[Message][delete] Calling messageJpaRepository.findById(): messageId={}", messageId);
         Message matchingMessage = messageJpaRepository.findById(messageId)
-                .orElseThrow(() -> new MessageNotFoundException(Instant.now(), ErrorCode.MESSAGE_NOT_FOUND, Map.of("messageId", messageId)));
+                .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
 
         log.debug("[Message][delete] Calling matchingMessage.getAttachments()");
         if (matchingMessage.getAttachments() != null) {

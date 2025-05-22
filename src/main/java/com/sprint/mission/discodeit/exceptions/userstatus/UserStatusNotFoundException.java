@@ -9,4 +9,8 @@ public class UserStatusNotFoundException extends UserStatusException {
   public UserStatusNotFoundException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
+
+  public UserStatusNotFoundException(Map<String, Object> details) {
+    super(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, details);
+  }
 }

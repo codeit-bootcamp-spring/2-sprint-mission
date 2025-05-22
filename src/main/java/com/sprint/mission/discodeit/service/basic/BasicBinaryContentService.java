@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exceptions.ErrorCode;
 import com.sprint.mission.discodeit.exceptions.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
@@ -17,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +60,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public ResponseEntity<?> download(UUID binaryContentId) {
         log.debug("[BinaryContent][download] Calling binaryContentJPARepository.findById(): binaryContentId={}", binaryContentId);
         BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
-                .orElseThrow(() -> new BinaryContentNotFoundException(Instant.now(), ErrorCode.PROFILE_NOT_FOUND, Map.of("binaryContentId", binaryContentId)));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("binaryContentId", binaryContentId)));
         BinaryContentResponseDto response = responseMapStruct.toBinaryContentDto(findBinaryContent);
         log.debug("[BinaryContent][download] Calling binaryContentStorage.download()");
         ResponseEntity<?> downloadResponse = binaryContentStorage.download(response);
@@ -75,7 +73,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional(readOnly = true)
     public BinaryContentResponseDto find(UUID binaryContentId) {
         BinaryContent findBinaryContent = binaryContentJPARepository.findById(binaryContentId)
-                .orElseThrow(() -> new BinaryContentNotFoundException(Instant.now(), ErrorCode.PROFILE_NOT_FOUND, Map.of("binaryContentId", binaryContentId)));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("binaryContentId", binaryContentId)));
         return responseMapStruct.toBinaryContentDto(findBinaryContent);
     }
 
@@ -95,7 +93,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional
     public BinaryContentResponseDto updateByUserId(BinaryContentUpdateDto binaryContentUpdateDto) {
         BinaryContent matchingBinaryContent = binaryContentJPARepository.findById(binaryContentUpdateDto.Id())
-                .orElseThrow(() -> new BinaryContentNotFoundException(Instant.now(), ErrorCode.PROFILE_NOT_FOUND, Map.of("binaryContentId", binaryContentUpdateDto.Id())));
+                .orElseThrow(() -> new BinaryContentNotFoundException(Map.of("binaryContentId", binaryContentUpdateDto.Id())));
 
         String fileName = binaryContentUpdateDto.newFileName();
         byte[] bytes = binaryContentUpdateDto.newBytes();

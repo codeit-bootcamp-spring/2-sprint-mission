@@ -9,4 +9,8 @@ public class DuplicateReadStatusException extends ReadStatusException {
   public DuplicateReadStatusException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
+
+  public DuplicateReadStatusException(Map<String, Object> details) {
+    super(Instant.now(), ErrorCode.DUPLICATE_READ_STATUS,  details);
+  }
 }

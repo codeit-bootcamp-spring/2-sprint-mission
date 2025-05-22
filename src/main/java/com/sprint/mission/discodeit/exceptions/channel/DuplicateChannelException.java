@@ -9,4 +9,8 @@ public class DuplicateChannelException extends ChannelException {
   public DuplicateChannelException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
+
+  public DuplicateChannelException(Map<String, Object> details) {
+    super(Instant.now(), ErrorCode.DUPLICATE_CHANNEL, details);
+  }
 }

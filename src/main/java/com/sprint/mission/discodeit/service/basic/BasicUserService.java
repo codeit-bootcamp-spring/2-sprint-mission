@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exceptions.ErrorCode;
 import com.sprint.mission.discodeit.exceptions.user.DuplicateUserOrEmailException;
 import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
