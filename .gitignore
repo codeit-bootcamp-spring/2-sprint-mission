@@ -49,3 +49,9 @@ bin/
 
 ### 로깅 파일 ###
 *.log
+
+### 로컬 스토리지 파일 ###
+/local-storage
+
+### MapperImpl ###
+/src/main/generated
