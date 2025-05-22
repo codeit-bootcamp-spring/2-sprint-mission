@@ -2,6 +2,7 @@ FROM amazoncorretto:17 as build
 
 ARG PROJECT_NAME=2-sprint-mission
 ARG PROJECT_VERSION=1.2-M8
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 
 WORKDIR /workspace/app
 
@@ -10,9 +11,10 @@ COPY gradle gradle
 COPY gradlew .
 COPY build.gradle .
 COPY settings.gradle .
+COPY .env /app/.env
 
 # 의존성 설치
-RUN ./gradlew dependencies -q
+RUN ./gradlew dependencies -q --no-daemon
 
 # 소스 코드 복사 및 빌드
 COPY src src

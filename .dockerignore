@@ -1,1 +1,6 @@
-.env
+.DS_Store
+*.log
+*.jar
+.gradle
+build
+out
