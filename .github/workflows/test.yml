@@ -1,0 +1,41 @@
+name: CI - Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Convert gradlew to Unix line endings
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dos2unix
+          dos2unix gradlew
+
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./build/reports/jacoco/test/jacocoTestReport.xml
