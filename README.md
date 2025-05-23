@@ -11,4 +11,4 @@
 ### DiscodeitApplication
 
 - IoC 컨테이너 사용: 스프링의 IoC(Inversion of Control) 컨테이너를 사용하여 Service를 초기화.
-- 자동 의존성 관리: @SpringBootApplication 어노테이션을 사용하면 스프링이 자동으로 필요한 객체를 Bean으로 등록하고, 의존성을 관리해서 코드가 간결함.
+- 자동 의존성 관리: @SpringBootApplication 어노테이션을 사용하면 스프링이 자동으로 필요한 객체를 Bean으로 등록하고, 의존성을 관리해서 코드가 간결함..
