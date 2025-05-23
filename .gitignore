@@ -40,3 +40,6 @@ out/
 ### VS Code ###
 .vscode/
 /storage/
+/node_modules/
+/package.json
+/package-lock.json
