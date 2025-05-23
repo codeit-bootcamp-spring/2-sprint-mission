@@ -20,6 +20,12 @@ EXPOSE 80
 
 COPY --from=build /workspace/app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
+# entrypoint 복사
 COPY entrypoint.sh /entrypoint.sh
+
+# **CR 제거 + 실행권한**
+RUN sed -i 's/\r$//' /entrypoint.sh
+
 RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
