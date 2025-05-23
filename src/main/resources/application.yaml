@@ -15,8 +15,6 @@ discodeit:
   repository:
     file-directory: ./discodeit-files/
 
-server:
-  port: 8080
 
 springdoc:
   api-docs:
