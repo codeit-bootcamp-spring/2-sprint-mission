@@ -11,7 +11,6 @@ COPY gradle gradle
 COPY gradlew .
 COPY build.gradle .
 COPY settings.gradle .
-COPY .env /app/.env
 
 # 의존성 설치
 RUN ./gradlew dependencies -q --no-daemon
