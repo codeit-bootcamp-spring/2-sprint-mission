@@ -17,6 +17,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test
+
       - name: Build Docker image
         run: docker build -t discodeit:latest .
 
