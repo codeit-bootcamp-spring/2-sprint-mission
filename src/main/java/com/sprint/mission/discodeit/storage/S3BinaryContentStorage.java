@@ -79,7 +79,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .header(HttpHeaders.LOCATION, presignedUrl).build();
   }
 
-  private S3Client getS3Client() {
+  protected S3Client getS3Client() {
     AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
     return S3Client.builder()
         .region(Region.of(region))
@@ -87,7 +87,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .build();
   }
 
-  private String generatePresignedUrl(String key, String contentType) {
+  protected String generatePresignedUrl(String key, String contentType) {
     S3Presigner presigner = S3Presigner.builder()
         .region(Region.of(region))
         .credentialsProvider(StaticCredentialsProvider.create(
