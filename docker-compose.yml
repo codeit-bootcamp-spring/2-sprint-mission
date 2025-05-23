@@ -3,14 +3,35 @@ services:
     image: postgres:15
     container_name: discodeit
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     environment:
-      POSTGRES_DB: discodeit
-      POSTGRES_USER: discodeit_user
-      POSTGRES_PASSWORD: discodeit1234
+      POSTGRES_DB: "${POSTGRES_DB}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    restart: unless-stopped
+      - postgres-data:/var/lib/postgresql/data # 데이터 영속화
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro # 최초 실행 시, sql이 자동으로 실행(읽기 전용)(:ro)
+    restart: unless-stopped # 재시작 되어도 BinaryContentStorage 데이터가 유지되도록 한다.
+    env_file: [ .env ] # 환경 변수 분리
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile # Dockerfile 사용한다는 뜻
+    container_name: discodeit-app
+    env_file: [ .env ] # .env 전체 주입한다는 뜻
+    environment:
+      SPRING_PROFILES_ACTIVE: "${SPRING_PROFILES_ACTIVE}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:${POSTGRES_PORT}/${POSTGRES_DB}"
+      SPRING_DATASOURCE_USERNAME: "${POSTGRES_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD}"
+      BINARY_CONTENT_PATH: "${BINARY_CONTENT_PATH}"
+    depends_on:
+      - db
+    ports:
+      - "8081:80" # host:container
+    volumes:
+      - binary-content:${BINARY_CONTENT_PATH}
 volumes:
   postgres-data:
+  binary-content:

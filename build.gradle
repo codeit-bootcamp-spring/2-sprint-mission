@@ -6,6 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
+// api-doc version에 mission8을 의미
 version = '1.2-M8'
 
 java {
