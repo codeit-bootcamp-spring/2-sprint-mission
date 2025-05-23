@@ -1,9 +1,9 @@
 spring:
   config.activate.on-profile: prod
   datasource:
-    url: jdbc:postgresql://${RDS_ENDPOINT:host.docker.internal}:${DB_PORT:5432}/${DB_NAME:discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
+    url: jdbc:postgresql://${RDS_ENDPOINT:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

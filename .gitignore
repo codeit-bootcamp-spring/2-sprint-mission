@@ -6,8 +6,6 @@ build/
 !**/src/test/**/build/
 *.env
 
-application-dev.yaml
-
 ### STS ###
 .apt_generated
 .classpath
