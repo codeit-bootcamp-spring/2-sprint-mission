@@ -1,0 +1,25 @@
+# Gradle 빌드 디렉토리
+build/
+
+# IDE 설정
+.idea/
+*.iml
+
+# Git 정보
+.git
+.gitignore
+
+# 테스트 코드
+test/
+**/test/**
+
+# OS/에디터 임시 파일
+.DS_Store
+*.swp
+
+# 로그 파일
+*.log
+
+# 기타
+docker-compose.yml
+.env

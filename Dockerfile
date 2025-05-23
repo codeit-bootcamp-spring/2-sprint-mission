@@ -29,9 +29,10 @@ WORKDIR /app
 ENV PROJECT_NAME=discodeit
 ENV PROJECT_VERSION=1.2-M8
 ENV JVM_OPTS=""
+ENV SPRING_PROFILES_ACTIVE=prod
 
 # 빌드된 JAR 복사
-COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar /app/app.jar
+COPY --from=builder /app/build/libs/2-sprint-mission-1.2.-M8.jar /app/app.jar
 
 # 포트 노출
 EXPOSE 80
