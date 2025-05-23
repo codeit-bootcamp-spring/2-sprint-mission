@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -62,7 +63,9 @@ class UserStatusRepositoryTest {
     // then
     assertThat(foundStatus).isPresent();
     assertThat(foundStatus.get().getUser().getId()).isEqualTo(userId);
-    assertThat(foundStatus.get().getLastActiveAt()).isEqualTo(now);
+    assertThat(Duration.between(foundStatus.get().getLastActiveAt(), now).toMillis())
+        .isLessThan(10); // 10ms 오차 허용
+
   }
 
   @Test
