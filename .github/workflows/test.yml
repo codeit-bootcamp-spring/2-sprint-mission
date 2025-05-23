@@ -27,7 +27,7 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew test
+          ./gradlew test jacocoTestReport
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
