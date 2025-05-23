@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.content.usecase;
+package com.sprint.mission.discodeit.core.storage.usecase;
 
 import java.util.UUID;
 

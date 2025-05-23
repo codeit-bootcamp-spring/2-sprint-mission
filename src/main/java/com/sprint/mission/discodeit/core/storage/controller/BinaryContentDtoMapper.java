@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.core.content.controller;
+package com.sprint.mission.discodeit.core.storage.controller;
 
-import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 
 public final class BinaryContentDtoMapper {
 

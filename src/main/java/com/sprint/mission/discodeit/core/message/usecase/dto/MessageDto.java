@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.message.usecase.dto;
 
-import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;

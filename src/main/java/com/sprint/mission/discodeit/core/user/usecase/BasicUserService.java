@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.core.user.usecase;
 
 
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
+import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusCreateCommand;

@@ -1,11 +1,11 @@
-package com.sprint.mission.discodeit.core.content.controller;
+package com.sprint.mission.discodeit.core.storage.controller;
 
-import static com.sprint.mission.discodeit.core.content.controller.BinaryContentDtoMapper.toCreateResponse;
+import static com.sprint.mission.discodeit.core.storage.controller.BinaryContentDtoMapper.toCreateResponse;
 
-import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
-import com.sprint.mission.discodeit.core.content.usecase.BinaryContentService;
+import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
 import com.sprint.mission.discodeit.swagger.BinaryContentApi;
 import java.util.List;
 import java.util.UUID;

@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.core.content.repository;
+package com.sprint.mission.discodeit.core.storage.repository;
 
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;

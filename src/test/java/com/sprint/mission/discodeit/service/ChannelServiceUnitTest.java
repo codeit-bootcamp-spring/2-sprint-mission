@@ -19,7 +19,7 @@ import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;

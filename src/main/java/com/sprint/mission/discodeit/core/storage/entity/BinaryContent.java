@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.content.entity;
+package com.sprint.mission.discodeit.core.storage.entity;
 
 import com.sprint.mission.discodeit.core.BaseEntity;
 import jakarta.persistence.Column;

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageDeleteResponse;

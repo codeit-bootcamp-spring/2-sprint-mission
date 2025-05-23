@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.core.content.usecase;
+package com.sprint.mission.discodeit.core.storage.usecase;
 
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import java.util.List;
 import java.util.UUID;
 
