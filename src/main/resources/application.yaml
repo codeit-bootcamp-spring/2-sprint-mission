@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev   # 어떤 프로파일을 쓸지 지정 (global, 최상단에만 위치)
+    active: prod   # 어떤 프로파일을 쓸지 지정 (global, 최상단에만 위치)
 
 discodeit:
   storage:
