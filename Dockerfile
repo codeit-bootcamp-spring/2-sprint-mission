@@ -26,4 +26,6 @@ EXPOSE 80
 
 COPY --from=build /workspace/app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
-ENTRYPOINT exec java $JVM_OPTS -jar "/app/${PROJECT_NAME}-${PROJECT_VERSION}.jar"
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
