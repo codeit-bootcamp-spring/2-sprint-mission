@@ -1,0 +1,22 @@
+# Gradle 캐시 및 빌드 아티팩트
+.gradle
+build
+
+# IDE 설정
+.idea
+*.iml
+
+# OS / 기타 불필요 파일
+.DS_Store
+*.log
+
+# Git 관련
+.git
+.gitignore
+
+# 문서 파일
+README.md
+HELP.md
+
+# 기타
+api-docs_1.2.json
