@@ -34,8 +34,11 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      # 바인드 마운트
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+      # 볼륨 마운트
       - pgdata:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
 volumes:
   binary-content:
