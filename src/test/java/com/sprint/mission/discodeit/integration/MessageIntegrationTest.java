@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageResponseDTO;
+import com.sprint.mission.discodeit.storage.s3.S3Config;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,9 @@ public class MessageIntegrationTest {
 
   @Autowired
   private TestRestTemplate restTemplate;
+
+  @MockitoBean
+  private S3Config s3Config;
 
   @Autowired
   private ObjectMapper objectMapper;

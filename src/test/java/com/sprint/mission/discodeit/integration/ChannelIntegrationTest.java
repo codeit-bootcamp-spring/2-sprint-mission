@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.controller.channel.CreatePublicChannelRequestDTO;
 import com.sprint.mission.discodeit.dto.service.channel.CreatePublicChannelResult;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.storage.s3.S3Config;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -37,6 +39,9 @@ public class ChannelIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockitoBean
+  private S3Config s3Config;
 
   @Autowired
   private UserRepository userRepository;
