@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
   // 예상하지 못한 예외만 error 로그 남김 (+ stack trace)
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ResponseErrorBody> handleUnexpectedException(Exception e) {
-    log.error("User unexpectedException handled: ", e);
+    log.error("UnexpectedException handled: ", e);
     ResponseErrorBody errorBody = new ResponseErrorBody(
         Instant.now(),
         HttpStatus.INTERNAL_SERVER_ERROR.name(),

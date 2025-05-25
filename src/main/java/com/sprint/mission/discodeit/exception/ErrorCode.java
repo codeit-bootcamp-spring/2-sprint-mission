@@ -31,14 +31,19 @@ public enum ErrorCode implements Code {
   // File
   FILE_NOT_FOUND(404, "File not found"),
   DUPLICATE_FILE_PATH(409, "FilePath exists already"),
-  FILE_READ_ERROR(500, "File reading fails"),
-  FILE_WRITE_ERROR(500, "File writing fails"),
-  FILE_DELETE_ERROR(500, "File deleting fails"),
-  INIT_DIRECTORY_ERROR(500, "Init directory fails"),
-  FILE_DOWNLOAD_ERROR(500, "File download fails"),
+  FILE_READ_ERROR(500, "File reading failed"),
+  FILE_WRITE_ERROR(500, "File writing failed"),
+  FILE_DELETE_ERROR(500, "File deleting failed"),
+  INIT_DIRECTORY_ERROR(500, "Init directory failed"),
+  FILE_DOWNLOAD_ERROR(500, "File download failed"),
   UNSUPPORTED_PROFILE_MEDIA_TYPE(415,
       "Unsupported profile mediaType (allow: jpg, jpeg, gif, webp, png)"),
-  INVALID_MEDIA_TYPE(415, "invalid media type");
+  INVALID_MEDIA_TYPE(415, "invalid media type"),
+
+  // S3
+  S3_UPLOAD_FAILED(500, "S3 upload failed"),
+  S3_DOWNLOAD_FAILED(500, "S3 download failed"),
+  S3_DELETE_FAILED(500, "S3 delete failed");
 
 
   private final int status;
