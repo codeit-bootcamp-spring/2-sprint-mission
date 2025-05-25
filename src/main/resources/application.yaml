@@ -4,6 +4,9 @@ spring:
   profiles:
     active: dev
 
+server:
+  port: 80
+  
 discodeit:
   storage:
     type: local
