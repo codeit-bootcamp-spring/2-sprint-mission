@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.storage.s3;
 
-import com.sprint.mission.discodeit.config.EnvLoader;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.storage.BinaryStorageDownloadException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -8,9 +7,9 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Properties;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -37,20 +36,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    private static final String BUCKET_NAME;
-    private static final long PRESIGED_URL_EXPIRATION;
+    @Value("${discodeit.storage.s3.bucket}")
+    private String BUCKET_NAME;
 
-    static {
-        try {
-            Properties props = EnvLoader.loadEnv(".env");
-            BUCKET_NAME = props.getProperty("AWS_S3_BUCKET");
-            PRESIGED_URL_EXPIRATION = Long.parseLong(
-                props.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION"));
-
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to load AWS_S3_BUCKET from .env", e);
-        }
-    }
+    @Value("${discodeit.storage.s3.presigned-url-expiration}")
+    private long PRESIGED_URL_EXPIRATION;
 
     @Override
     public UUID put(UUID id, byte[] bytes) {
