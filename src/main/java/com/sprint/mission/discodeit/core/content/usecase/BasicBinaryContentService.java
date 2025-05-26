@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.core.content.usecase;
 
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.content.repository.JpaBinaryContentRepository;
-import com.sprint.mission.discodeit.core.content.repository.LocalBinaryContentStorage;
 import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final JpaBinaryContentRepository binaryContentMetaRepository;
-  private final LocalBinaryContentStorage binaryContentStorage;
+  private final BinaryContentStoragePort binaryContentStorage;
 
   @Override
   @Transactional
