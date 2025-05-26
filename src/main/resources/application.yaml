@@ -1,20 +1,6 @@
 spring:
   profiles:
-    active: prod   # 어떤 프로파일을 쓸지 지정 (global, 최상단에만 위치)
-
-discodeit:
-  storage:
-    type: ${STORAGE_TYPE:local}
-    local:
-      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
-    s3:
-      access-key: ${AWS_S3_ACCESS_KEY}
-      secret-key: ${AWS_S3_SECRET_KEY}
-      region: ${AWS_S3_REGION}
-      bucket: ${AWS_S3_BUCKET}
-  repository:
-    file-directory: ./discodeit-files/
-
+    active: dev   # 어떤 프로파일을 쓸지 지정 (global, 최상단에만 위치)
 
 springdoc:
   api-docs:
