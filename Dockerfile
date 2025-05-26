@@ -16,4 +16,5 @@ ENV PROJECT_NAME=discodeit \
 EXPOSE 80
 
 # ✅ 애플리케이션 실행 명령어
-CMD ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+

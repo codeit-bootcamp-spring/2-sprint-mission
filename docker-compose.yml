@@ -8,6 +8,8 @@ services:
     container_name: discodeit-app
     ports:
       - "8081:80"
+    env_file:
+      - discodeit.env
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       STORAGE_TYPE: ${STORAGE_TYPE}
