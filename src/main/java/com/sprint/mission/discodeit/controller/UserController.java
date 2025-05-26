@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentProcessingException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
@@ -46,13 +45,14 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("[USER] 생성 요청 - 이름: {}", userCreateRequest.username());
+    log.info("사용자 생성 요청: {}", userCreateRequest);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
-    log.info("[USER] 생성 성공 - 이름: {}, ID: {}", createdUser.username(), createdUser.id());
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    log.debug("사용자 생성 응답: {}", createdUser);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdUser);
   }
 
   @PatchMapping(
@@ -65,39 +65,43 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("[USER] 수정 요청 - ID: {}", userId);
+    log.info("사용자 수정 요청: id={}, request={}", userId, userUpdateRequest);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
-
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-    log.info("[USER] 수정 성공 - ID: {}, 프로필 이미지 변경: {}",
-        updatedUser.id(), profileRequest.isPresent());
-    return ResponseEntity.ok(updatedUser);
+    log.debug("사용자 수정 응답: {}", updatedUser);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUser);
   }
 
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
-    log.warn("[USER] 삭제 요청 - ID: {}", userId);
     userService.delete(userId);
-    log.info("[USER] 삭제 완료 - ID: {}", userId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    // ResponseEntity.noContent().build();
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @GetMapping
   @Override
   public ResponseEntity<List<UserDto>> findAll() {
     List<UserDto> users = userService.findAll();
-    return ResponseEntity.status(HttpStatus.OK).body(users);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(users);
   }
 
   @PatchMapping(path = "{userId}/userStatus")
   @Override
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
+      @PathVariable("userId") UUID userId,
       @RequestBody @Valid UserStatusUpdateRequest request) {
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
-    return ResponseEntity.status(HttpStatus.OK).body(updatedUserStatus);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedUserStatus);
   }
 
   private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
@@ -112,7 +116,7 @@ public class UserController implements UserApi {
         );
         return Optional.of(binaryContentCreateRequest);
       } catch (IOException e) {
-        throw new BinaryContentProcessingException(profileFile.getOriginalFilename());
+        throw new RuntimeException(e);
       }
     }
   }

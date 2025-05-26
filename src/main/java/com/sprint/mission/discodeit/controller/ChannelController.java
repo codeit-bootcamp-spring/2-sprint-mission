@@ -33,9 +33,9 @@ public class ChannelController implements ChannelApi {
 
   @PostMapping(path = "public")
   public ResponseEntity<ChannelDto> create(@RequestBody @Valid PublicChannelCreateRequest request) {
-    log.info("[CHANNEL] PUBLIC 생성 요청 - 이름: {}", request.name());
+    log.info("공개 채널 생성 요청: {}", request);
     ChannelDto createdChannel = channelService.create(request);
-    log.info("[CHANNEL] PUBLIC 생성 성공");
+    log.debug("공개 채널 생성 응답: {}", createdChannel);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdChannel);
@@ -44,20 +44,21 @@ public class ChannelController implements ChannelApi {
   @PostMapping(path = "private")
   public ResponseEntity<ChannelDto> create(
       @RequestBody @Valid PrivateChannelCreateRequest request) {
-    log.info("[CHANNEL] PRIVATE 생성 요청");
+    log.info("비공개 채널 생성 요청: {}", request);
     ChannelDto createdChannel = channelService.create(request);
-    log.info("[CHANNEL] PRIVATE 생성 성공");
+    log.debug("비공개 채널 생성 응답: {}", createdChannel);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdChannel);
   }
 
   @PatchMapping(path = "{channelId}")
-  public ResponseEntity<ChannelDto> update(@PathVariable("channelId") UUID channelId,
+  public ResponseEntity<ChannelDto> update(
+      @PathVariable("channelId") UUID channelId,
       @RequestBody @Valid PublicChannelUpdateRequest request) {
-    log.info("[CHANNEL] 수정 요청 - ID: {}", channelId);
+    log.info("채널 수정 요청: id={}, request={}", channelId, request);
     ChannelDto updatedChannel = channelService.update(channelId, request);
-    log.info("[CHANNEL] 수정 성공 - ID: {}", channelId);
+    log.debug("채널 수정 응답: {}", updatedChannel);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedChannel);
@@ -65,9 +66,9 @@ public class ChannelController implements ChannelApi {
 
   @DeleteMapping(path = "{channelId}")
   public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
-    log.warn("[CHANNEL] 삭제 요청 - ID: {}", channelId);
+    log.info("채널 삭제 요청: id={}", channelId);
     channelService.delete(channelId);
-    log.info("[CHANNEL] 삭제 완료 - ID: {}", channelId);
+    log.debug("채널 삭제 완료");
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -75,7 +76,9 @@ public class ChannelController implements ChannelApi {
 
   @GetMapping
   public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
+    log.info("사용자별 채널 목록 조회 요청: userId={}", userId);
     List<ChannelDto> channels = channelService.findAllByUserId(userId);
+    log.debug("사용자별 채널 목록 조회 응답: count={}", channels.size());
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(channels);
