@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.config;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "aws.s3")
+@Component
+@ConfigurationProperties(prefix = "discodeit.storage.s3")
 public class AWSS3Properties {
 
   private String accessKey;

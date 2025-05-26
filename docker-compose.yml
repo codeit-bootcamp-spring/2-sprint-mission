@@ -17,7 +17,7 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
     volumes:
-      - binary-storage:/app/.discodeit/storage
+      - binary-storage:.discodeit/storage
   
   postgres:
     image: postgres:15
