@@ -1,4 +1,4 @@
-FROM amazoncorretto:17 as build
+FROM amazoncorretto:17 AS build
 # docker 컨테이너 내부의 /app에 저장하라는 겨.
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN chmod +x ./gradlew && ./gradlew dependencies
 COPY src src
 RUN ./gradlew build -x test
 
-FROM amazoncorretto:17
+FROM amazoncorretto:17 AS runtime
 WORKDIR /app
 VOLUME /tmp
 
