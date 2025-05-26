@@ -1,16 +1,48 @@
-version: '3'
+version: '3.8'
+
 services:
-  postgres-db:
+  db:
     image: postgres:15
-    container_name: discodeit
-    environment:
-      POSTGRES_USER: discodeit_user
-      POSTGRES_PASSWORD: discodeit1234
-      POSTGRES_DB: discodeit
+    container_name: discodeit-db
+    env_file: .env
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+      - ./initdb/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-app
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+    ports:
+      - "8081:80"
+    volumes:
+      - binary_content_storage:/app/data
+    networks:
+      - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
-  db_data:
+  pgdata:
+  binary_content_storage:
+
+networks:
+  app-network:
+    driver: bridge
