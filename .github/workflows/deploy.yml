@@ -13,6 +13,10 @@ env:
   ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
 
 jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
   build-and-push:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
