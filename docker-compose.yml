@@ -11,5 +11,18 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  postgres-prod: # prod용 별도 컨테이너
+    image: postgres:15
+    container_name: prod_postgres
+    environment:
+      POSTGRES_USER: discodeit_user_prod
+      POSTGRES_PASSWORD: discodeit1234
+      POSTGRES_DB: discodeit_prod
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data_prod:/var/lib/postgresql/data
+
 volumes:
   db_data: { }
+  db_data_prod: { }

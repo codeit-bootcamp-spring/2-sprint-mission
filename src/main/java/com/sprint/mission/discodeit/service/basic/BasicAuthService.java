@@ -1,32 +1,44 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.auth.AuthWrongPasswordException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
+  @Transactional(readOnly = true)
   @Override
-  public User login(LoginRequest request) {
-    User matchedUser = userRepository.findAll().stream()
-        .filter(user -> user.getUsername().equals(request.username()))
-        .filter((user -> user.getPassword().equals(request.password())))
-        .findFirst()
-        .orElse(null);
+  public UserDto login(LoginRequest loginRequest) {
+    String username = loginRequest.username();
+    String password = loginRequest.password();
 
-    if (matchedUser == null) {
-      throw new IllegalArgumentException("[Error] matchedUser is null");
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> {
+          Map<String, Object> details = new HashMap<>();
+          details.put("username", username);
+          return new UserNotFoundException(details);
+        });
+
+    if (!user.getPassword().equals(password)) {
+      throw new AuthWrongPasswordException();
     }
 
-    return matchedUser;
+    return userMapper.toDto(user);
   }
-
-
 }
