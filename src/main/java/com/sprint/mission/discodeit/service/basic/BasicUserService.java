@@ -7,8 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.user.EmailAlreadyExistException;
-import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -49,13 +48,13 @@ public class BasicUserService implements UserService {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
-        if (userRepository.existsByUsername(username)) {
-            log.warn("Username {} already exists", username);
-            throw new UserAlreadyExistException(username);
-        }
         if (userRepository.existsByEmail(email)) {
             log.warn("Email {} already exists", email);
-            throw new EmailAlreadyExistException(email);
+            throw UserAlreadyExistsException.withEmail(email);
+        }
+        if (userRepository.existsByUsername(username)) {
+            log.warn("Username {} already exists", username);
+            throw UserAlreadyExistsException.withUsername(username);
         }
 
         BinaryContent profile = profileCreateRequest
@@ -77,7 +76,6 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = new UserStatus(user, Instant.now());
         userRepository.save(user);
-        userStatusRepository.save(userStatus);
 
         log.info("User created successfully: username = {}", username);
 
@@ -109,14 +107,13 @@ public class BasicUserService implements UserService {
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
 
-        if (!newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
-            log.warn("Username {} already exists", newUsername);
-            throw new UserAlreadyExistException(newUsername);
-        }
-
         if (!newEmail.equals(user.getEmail()) && userRepository.existsByEmail(newEmail)) {
             log.warn("Email {} already exists", newEmail);
-            throw new EmailAlreadyExistException(newEmail);
+            throw UserAlreadyExistsException.withEmail(newEmail);
+        }
+        if (!newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
+            log.warn("Username {} already exists", newUsername);
+            throw UserAlreadyExistsException.withUsername(newUsername);
         }
 
         BinaryContent profile = profileCreateRequest
@@ -147,8 +144,10 @@ public class BasicUserService implements UserService {
 
         log.info("Deleting user : id = {}", userId);
 
-        User user = getUser(userId);
-        userRepository.delete(user);
+        if (!userRepository.existsById(userId)) {
+            throw UserNotFoundException.withId(userId);
+        }
+        userRepository.deleteById(userId);
 
         log.info("User deleted successfully : id = {}", userId);
     }
@@ -157,7 +156,7 @@ public class BasicUserService implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("User with id {} not found", userId);
-                    return new UserNotFoundException(userId);
+                    return UserNotFoundException.withId(userId);
                 });
     }
 

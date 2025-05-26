@@ -54,15 +54,15 @@ public class BasicMessageService implements MessageService {
         UUID channelId = messageCreateRequest.channelId();
         UUID authorId = messageCreateRequest.authorId();
 
-        User author = userRepository.findById(authorId)
-                .orElseThrow(() -> {
-                    log.warn("Author not found : id = {}", authorId);
-                    return new UserNotFoundException(authorId);
-                });
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("Channel not found : id = {}", channelId);
-                    return new ChannelNotFoundException(channelId);
+                    return ChannelNotFoundException.withId(channelId);
+                });
+        User author = userRepository.findById(authorId)
+                .orElseThrow(() -> {
+                    log.warn("Author not found : id = {}", authorId);
+                    return UserNotFoundException.withId(authorId);
                 });
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
@@ -134,18 +134,20 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID messageId) {
         log.info("Deleting message : id = {}", messageId);
 
-        Message message = getMessage(messageId);
+        if (!messageRepository.existsById(messageId)) {
+            throw MessageNotFoundException.withId(messageId);
+        }
 
-        messageRepository.delete(message);
+        messageRepository.deleteById(messageId);
 
-        log.info("Message deleted successfully : id = {}", message.getId());
+        log.info("Message deleted successfully : id = {}", messageId);
     }
 
     private Message getMessage(UUID messageId) {
         return messageRepository.findById(messageId)
                 .orElseThrow(() -> {
                     log.warn("Message not found : id = {}", messageId);
-                    return new MessageNotFoundException(messageId);
+                    return MessageNotFoundException.withId(messageId);
                 });
     }
 }

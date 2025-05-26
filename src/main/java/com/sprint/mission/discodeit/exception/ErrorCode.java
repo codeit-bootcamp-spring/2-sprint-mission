@@ -1,42 +1,39 @@
 package com.sprint.mission.discodeit.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
 public enum ErrorCode {
-    // User 관련
-    USER_NOT_FOUND("USER_NOT_FOUND", "사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    USER_ALREADY_EXISTS("USER_ALREADY_EXISTS", "이미 존재하는 사용자입니다.", HttpStatus.CONFLICT),
-    EMAIL_ALREADY_EXISTS("EMAIL_ALREADY_EXISTS", "이미 사용 중인 이메일입니다.", HttpStatus.CONFLICT),
-    WRONG_PASSWORD("WRONG_PASSWORD","비밀번호가 올바르지 않습니다.", HttpStatus.UNAUTHORIZED),
+    // User 관련 에러 코드
+    USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
+    DUPLICATE_USER("이미 존재하는 사용자입니다."),
+    INVALID_USER_CREDENTIALS("잘못된 사용자 인증 정보입니다."),
 
-    // Channel 관련
-    CHANNEL_NOT_FOUND("CHANNEL_NOT_FOUND", "채널을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED("PRIVATE_CHANNEL_UPDATE_NOT_ALLOWED", "비공개 채널은 수정할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    // Channel 관련 에러 코드
+    CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다."),
+    PRIVATE_CHANNEL_UPDATE("비공개 채널은 수정할 수 없습니다."),
 
-    // Message 관련
-    MESSAGE_NOT_FOUND("MESSAGE_NOT_FOUND", "메시지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    // Message 관련 에러 코드
+    MESSAGE_NOT_FOUND("메시지를 찾을 수 없습니다."),
 
-    // 파일/BinaryContent 관련
-    BINARY_CONTENT_NOT_FOUND("BINARY_CONTENT_NOT_FOUND", "파일을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    INVALID_FILE_TYPE("INVALID_FILE_TYPE", "잘못된 파일 형식입니다.", HttpStatus.BAD_REQUEST),
+    // BinaryContent 관련 에러 코드
+    BINARY_CONTENT_NOT_FOUND("바이너리 컨텐츠를 찾을 수 없습니다."),
 
-    // ReadStatus 관련
-    READ_STATUS_NOT_FOUND("READ_STATUS_NOT_FOUND", "읽음 상태 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    READ_STATUS_ALREADY_EXISTS("READ_STATUS_ALREADY_EXISTS", "이미 존재하는 읽음 상태입니다.", HttpStatus.CONFLICT),
+    // ReadStatus 관련 에러 코드
+    READ_STATUS_NOT_FOUND("읽음 상태를 찾을 수 없습니다."),
+    DUPLICATE_READ_STATUS("이미 존재하는 읽음 상태입니다."),
 
-    // UserStatus 관련
-    USER_STATUS_NOT_FOUND("USER_STATUS_NOT_FOUND", "사용자 상태 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    USER_STATUS_ALREADY_EXISTS("USER_STATUS_ALREADY_EXISTS", "이미 존재하는 사용자 상태입니다.", HttpStatus.CONFLICT),
+    // UserStatus 관련 에러 코드
+    USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다."),
+    DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다."),
 
-    // 공통
-    INVALID_INPUT_VALUE("INVALID_INPUT_VALUE", "잘못된 입력 값입니다.", HttpStatus.BAD_REQUEST),
-    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    // Server 에러 코드
+    INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
+    INVALID_REQUEST("잘못된 요청입니다.");
 
-    private final String code;
     private final String message;
-    private final HttpStatus httpStatus;
+
+    ErrorCode(String message) {
+        this.message = message;
+    }
 }
