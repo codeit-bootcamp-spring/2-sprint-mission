@@ -63,8 +63,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   public ResponseEntity<?> download(BinaryContentDto metaData) {
     String key = metaData.id().toString();
     String contentType = metaData.contentType();
+    String fileName = metaData.fileName();
 
-    String presignedUrl = generatePresignedUrl(key, contentType);
+    String presignedUrl = generatePresignedUrl(key, contentType, fileName);
 
     return ResponseEntity.status(HttpStatus.SEE_OTHER)
         .header(HttpHeaders.LOCATION, presignedUrl)
@@ -83,12 +84,18 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     log.info("S3 객체 삭제 완료: {}", key);
   }
 
-  private String generatePresignedUrl(String key, String contentType) {
-    GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucket).key(key)
-        .responseContentType(contentType).build();
+  private String generatePresignedUrl(String key, String contentType, String fileName) {
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+        .bucket(bucket)
+        .key(key)
+        .responseContentType(contentType)
+        .responseContentDisposition("attachment; filename=\"" + fileName + "\"")
+        .build();
 
     GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-        .getObjectRequest(getObjectRequest).signatureDuration(Duration.ofMinutes(5)).build();
+        .getObjectRequest(getObjectRequest)
+        .signatureDuration(Duration.ofMinutes(5))
+        .build();
 
     return s3Presigner.presignGetObject(presignRequest).url().toString();
   }
