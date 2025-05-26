@@ -1,0 +1,14 @@
+.idea/
+*.iml
+
+.gradle/
+build/
+.logs/
+*.log
+
+.git/
+.github/
+.gitignore
+
+.env
+.DS_Store
