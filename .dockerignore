@@ -6,6 +6,7 @@ build
 .idea
 .git
 .env
+discodeit.env
 .gitignore
 Dockerfile
 README.md

@@ -1,20 +1,19 @@
-# ✅ Amazon Corretto 17 이미지 사용
-FROM amazoncorretto:17
-
-# ✅ 작업 디렉토리 설정
+# 1단계: 빌드용 이미지
+FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 
-# ✅ 빌드된 JAR 파일만 복사 (불필요한 전체 복사 X)
-COPY build/libs/discodeit-1.2-M8.jar ./app.jar
+COPY build.gradle settings.gradle ./
+COPY gradle ./gradle
+RUN gradle build --no-daemon -x test || return 0
 
-# ✅ 환경 변수 설정 (기본값 또는 실행 시 설정됨)
-ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M8 \
-    JVM_OPTS=""
+COPY . .
+RUN gradle clean bootJar
 
-# ✅ 80 포트 노출
-EXPOSE 80
+# 2단계: 실행용 슬림 이미지
+FROM eclipse-temurin:17-jre-alpine AS runtime
+WORKDIR /app
 
-# ✅ 애플리케이션 실행 명령어
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+COPY --from=build /app/build/libs/*.jar app.jar
 
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
