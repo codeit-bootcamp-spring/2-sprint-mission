@@ -6,6 +6,7 @@ build/
 uploads
 .logs/
 .env
+.discodeit
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
