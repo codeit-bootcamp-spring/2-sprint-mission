@@ -1,0 +1,1027 @@
+25-05-12 11:23:47.753 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest     
+        [ |  | ] - Starting ChannelControllerTest using Java 17.0.14 with PID 25480 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:23:47.757 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest     
+        [ |  | ] - The following 1 profile is active: "test"
+25-05-12 11:23:52.577 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping
+        [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-05-12 11:23:53.641 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration
+        [ |  | ] - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+25-05-12 11:23:53.769 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext
+        [ |  | ] - Initializing Spring TestDispatcherServlet ''
+25-05-12 11:23:53.770 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet     
+        [ |  | ] - Initializing Servlet ''
+25-05-12 11:23:53.774 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet     
+        [ |  | ] - Completed initialization in 2 ms
+25-05-12 11:23:53.857 [Test worker] INFO  c.s.m.d.c.ChannelControllerTest     
+        [ |  | ] - Started ChannelControllerTest in 8.21 seconds (process running for 12.662)
+25-05-12 11:23:54.512 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.DiscodeitApplicationTests]: DiscodeitApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:23:54.534 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.DiscodeitApplicationTests
+25-05-12 11:23:54.648 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests   
+        [ |  | ] - Starting DiscodeitApplicationTests using Java 17.0.14 with PID 25480 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:23:54.648 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests   
+        [ |  | ] - The following 1 profile is active: "dev"
+25-05-12 11:23:57.206 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-12 11:23:57.442 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Finished Spring Data repository scanning in 207 ms. Found 6 JPA repository interfaces.
+25-05-12 11:23:58.954 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-1 - Starting...
+25-05-12 11:23:59.554 [Test worker] INFO  com.zaxxer.hikari.pool.HikariPool   
+        [ |  | ] - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@4ead0ae1
+25-05-12 11:23:59.561 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-1 - Start completed.
+25-05-12 11:23:59.997 [Test worker] INFO  o.h.jpa.internal.util.LogHelper     
+        [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-12 11:24:00.343 [Test worker] INFO  org.hibernate.Version               
+        [ |  | ] - HHH000412: Hibernate ORM core version 6.5.2.Final
+25-05-12 11:24:00.525 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator      
+        [ |  | ] - HHH000026: Second-level cache disabled
+25-05-12 11:24:01.208 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo 
+        [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-12 11:24:01.668 [Test worker] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry     
+        [ |  | ] - addDescriptor(2003, org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@29295f4e) replaced previous registration(org.hibernate.type.descriptor.sql.internal.ArrayDdlTypeImpl@febc56f)
+25-05-12 11:24:01.669 [Test worker] DEBUG o.h.t.d.sql.spi.DdlTypeRegistry     
+        [ |  | ] - addDescriptor(6, org.hibernate.type.descriptor.sql.internal.CapacityDependentDdlType@3005644e) replaced previous registration(org.hibernate.type.descriptor.sql.internal.DdlTypeImpl@10c4eb9a)
+25-05-12 11:24:04.433 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator  
+        [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-12 11:24:04.669 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:24:05.609 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory
+        [ |  | ] - Hibernate is in classpath; If applicable, HQL parser will be used.
+25-05-12 11:24:08.320 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping
+        [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-05-12 11:24:08.669 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration
+        [ |  | ] - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+25-05-12 11:24:09.755 [Test worker] INFO  o.s.b.a.e.web.EndpointLinksResolver 
+        [ |  | ] - Exposing 4 endpoints beneath base path '/actuator'
+25-05-12 11:24:09.879 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests   
+        [ |  | ] - Started DiscodeitApplicationTests in 15.333 seconds (process running for 28.684)
+25-05-12 11:24:09.977 [registrationTask1] ERROR o.s.s.s.TaskUtils$LoggingErrorHandler
+        [ |  | ] - Unexpected error occurred in scheduled task
+java.lang.IllegalStateException: couldn't determine local port. Please set spring.boot.admin.client.instance.service-base-url.
+	at de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getLocalServerPort(DefaultApplicationFactory.java:205)
+	at de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getServiceBaseUrl(DefaultApplicationFactory.java:109)
+	at de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getServiceUrl(ServletApplicationFactory.java:62)
+	at de.codecentric.boot.admin.client.registration.ServletApplicationFactory.getManagementBaseUrl(ServletApplicationFactory.java:77)
+	at de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.getHealthUrl(DefaultApplicationFactory.java:165)
+	at de.codecentric.boot.admin.client.registration.DefaultApplicationFactory.createApplication(DefaultApplicationFactory.java:80)
+	at de.codecentric.boot.admin.client.registration.DefaultApplicationRegistrator.register(DefaultApplicationRegistrator.java:56)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:305)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+25-05-12 11:24:09.987 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.controller.MessageControllerTest]: MessageControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:10.018 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.controller.MessageControllerTest
+25-05-12 11:24:10.074 [Test worker] INFO  c.s.m.d.c.MessageControllerTest     
+        [ |  | ] - Starting MessageControllerTest using Java 17.0.14 with PID 25480 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:24:10.075 [Test worker] INFO  c.s.m.d.c.MessageControllerTest     
+        [ |  | ] - The following 1 profile is active: "test"
+25-05-12 11:24:10.512 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping
+        [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-05-12 11:24:10.575 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration
+        [ |  | ] - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+25-05-12 11:24:10.585 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext
+        [ |  | ] - Initializing Spring TestDispatcherServlet ''
+25-05-12 11:24:10.586 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet     
+        [ |  | ] - Initializing Servlet ''
+25-05-12 11:24:10.587 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet     
+        [ |  | ] - Completed initialization in 1 ms
+25-05-12 11:24:10.595 [Test worker] INFO  c.s.m.d.c.MessageControllerTest     
+        [ |  | ] - Started MessageControllerTest in 0.569 seconds (process running for 29.401)
+25-05-12 11:24:10.646 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.controller.UserControllerTest]: UserControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:10.665 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.controller.UserControllerTest
+25-05-12 11:24:10.710 [Test worker] INFO  c.s.m.d.c.UserControllerTest        
+        [ |  | ] - Starting UserControllerTest using Java 17.0.14 with PID 25480 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:24:10.711 [Test worker] INFO  c.s.m.d.c.UserControllerTest        
+        [ |  | ] - The following 1 profile is active: "test"
+25-05-12 11:24:10.981 [Test worker] WARN  o.s.w.c.s.GenericWebApplicationContext
+        [ |  | ] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'userController' defined in file [C:\Users\dlwns\2-sprint-mission\build\classes\java\main\com\sprint\mission\discodeit\controller\UserController.class]: Unsatisfied dependency expressed through constructor parameter 1: No qualifying bean of type 'com.sprint.mission.discodeit.service.UserStatusService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+25-05-12 11:24:10.989 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger
+        [ |  | ] - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+25-05-12 11:24:11.055 [Test worker] ERROR o.s.b.d.LoggingFailureAnalysisReporter
+        [ |  | ] - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 1 of constructor in com.sprint.mission.discodeit.controller.UserController required a bean of type 'com.sprint.mission.discodeit.service.UserStatusService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.sprint.mission.discodeit.service.UserStatusService' in your configuration.
+
+25-05-12 11:24:11.070 [Test worker] WARN  o.s.test.context.TestContextManager 
+        [ |  | ] - Caught exception while allowing TestExecutionListener [org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener] to prepare test instance [com.sprint.mission.discodeit.controller.UserControllerTest@3196000e]
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@26b7a8a1 testClass = com.sprint.mission.discodeit.controller.UserControllerTest, locations = [], classes = [com.sprint.mission.discodeit.DiscodeitApplication], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@2f5b8250, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@3a4bc562, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@449a5f12, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1d805aa1, [ImportsContextCustomizer@6287e13 key = [org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, com.sprint.mission.discodeit.exception.GlobalExceptionHandler, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@a96d56c, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@1fdca564, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@e86b2d2e, org.springframework.boot.test.context.SpringBootTestAnnotation@d06731dd], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.postProcessFields(MockitoTestExecutionListener.java:122)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.injectFields(MockitoTestExecutionListener.java:106)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.prepareTestInstance(MockitoTestExecutionListener.java:63)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:163)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:378)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:735)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:290)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:279)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:278)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:106)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:105)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
+	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:121)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'userController' defined in file [C:\Users\dlwns\2-sprint-mission\build\classes\java\main\com\sprint\mission\discodeit\controller\UserController.class]: Unsatisfied dependency expressed through constructor parameter 1: No qualifying bean of type 'com.sprint.mission.discodeit.service.UserStatusService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1357)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1194)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:975)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:962)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:624)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:137)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1463)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:553)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:137)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:108)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 88 common frames omitted
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.sprint.mission.discodeit.service.UserStatusService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1880)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1406)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782)
+	... 112 common frames omitted
+25-05-12 11:24:11.083 [Test worker] WARN  o.s.test.context.TestContextManager 
+        [ |  | ] - Caught exception while allowing TestExecutionListener [org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener] to prepare test instance [com.sprint.mission.discodeit.controller.UserControllerTest@73badcbd]
+java.lang.IllegalStateException: ApplicationContext failure threshold (1) exceeded: skipping repeated attempt to load context for [WebMergedContextConfiguration@26b7a8a1 testClass = com.sprint.mission.discodeit.controller.UserControllerTest, locations = [], classes = [com.sprint.mission.discodeit.DiscodeitApplication], contextInitializerClasses = [], activeProfiles = ["test"], propertySourceDescriptors = [], propertySourceProperties = ["org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.autoconfigure.OverrideAutoConfigurationContextCustomizerFactory$DisableAutoConfigurationContextCustomizer@2f5b8250, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.filter.TypeExcludeFiltersContextCustomizer@3a4bc562, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@449a5f12, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@1d805aa1, [ImportsContextCustomizer@6287e13 key = [org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration, org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.HttpEncodingAutoConfiguration, org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration, org.springframework.boot.autoconfigure.context.MessageSourceAutoConfiguration, org.springframework.boot.autoconfigure.hateoas.HypermediaAutoConfiguration, org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration, org.springframework.boot.autoconfigure.data.web.SpringDataWebAutoConfiguration, org.springframework.boot.test.autoconfigure.web.reactive.WebTestClientAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcAutoConfiguration, com.sprint.mission.discodeit.exception.GlobalExceptionHandler, org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration, org.springframework.boot.autoconfigure.http.HttpMessageConvertersAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcSecurityConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebDriverAutoConfiguration, org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration, org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration, org.springframework.boot.autoconfigure.jsonb.JsonbAutoConfiguration, org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration, org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration, org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration, org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration, org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration, org.springframework.boot.autoconfigure.mustache.MustacheAutoConfiguration]], org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@a96d56c, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@1fdca564, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@e86b2d2e, org.springframework.boot.test.context.SpringBootTestAnnotation@d06731dd], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:145)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.postProcessFields(MockitoTestExecutionListener.java:122)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.injectFields(MockitoTestExecutionListener.java:106)
+	at org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener.prepareTestInstance(MockitoTestExecutionListener.java:63)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:163)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:378)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.StreamSpliterators$WrappingSpliterator.forEachRemaining(StreamSpliterators.java:310)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:735)
+	at java.base/java.util.stream.Streams$ConcatSpliterator.forEachRemaining(Streams.java:734)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:762)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:290)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:279)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:278)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:106)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:105)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:123)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:90)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:124)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:99)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:94)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:63)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:92)
+	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:200)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:132)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:121)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:71)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+25-05-12 11:24:11.099 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.integration.ChannelApiIntegrationTest]: ChannelApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:11.123 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.integration.ChannelApiIntegrationTest
+25-05-12 11:24:11.205 [Test worker] INFO  c.s.m.d.i.ChannelApiIntegrationTest 
+        [ |  | ] - Starting ChannelApiIntegrationTest using Java 17.0.14 with PID 25480 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:24:11.206 [Test worker] INFO  c.s.m.d.i.ChannelApiIntegrationTest 
+        [ |  | ] - The following 1 profile is active: "test"
+25-05-12 11:24:11.970 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-12 11:24:12.052 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Finished Spring Data repository scanning in 81 ms. Found 6 JPA repository interfaces.
+25-05-12 11:24:12.250 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-2 - Starting...
+25-05-12 11:24:12.982 [Test worker] INFO  com.zaxxer.hikari.pool.HikariPool   
+        [ |  | ] - HikariPool-2 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+25-05-12 11:24:12.982 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-2 - Start completed.
+25-05-12 11:24:13.152 [Test worker] INFO  o.h.jpa.internal.util.LogHelper     
+        [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-12 11:24:13.159 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator      
+        [ |  | ] - HHH000026: Second-level cache disabled
+25-05-12 11:24:13.186 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo 
+        [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-12 11:24:13.485 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator  
+        [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-12 11:24:13.507 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists binary_contents cascade 
+25-05-12 11:24:13.516 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists channels cascade 
+25-05-12 11:24:13.519 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists message_attachments cascade 
+25-05-12 11:24:13.521 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists messages cascade 
+25-05-12 11:24:13.524 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists read_statuses cascade 
+25-05-12 11:24:13.527 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists user_statuses cascade 
+25-05-12 11:24:13.531 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists users cascade 
+25-05-12 11:24:13.548 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-12 11:24:13.551 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+25-05-12 11:24:13.554 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+25-05-12 11:24:13.558 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+25-05-12 11:24:13.561 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+25-05-12 11:24:13.565 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-12 11:24:13.569 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-12 11:24:13.574 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-12 11:24:13.579 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-12 11:24:13.582 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-12 11:24:13.584 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-12 11:24:13.588 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-12 11:24:13.592 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-12 11:24:13.595 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-12 11:24:13.598 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-12 11:24:13.611 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:24:14.143 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping
+        [ |  | ] - Adding welcome page: class path resource [static/index.html]
+25-05-12 11:24:14.356 [Test worker] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration
+        [ |  | ] - Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+25-05-12 11:24:14.747 [Test worker] INFO  o.s.b.a.h.H2ConsoleAutoConfiguration
+        [ |  | ] - H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+25-05-12 11:24:14.792 [Test worker] INFO  o.s.b.t.m.w.SpringBootMockServletContext
+        [ |  | ] - Initializing Spring TestDispatcherServlet ''
+25-05-12 11:24:14.792 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet     
+        [ |  | ] - Initializing Servlet ''
+25-05-12 11:24:14.798 [Test worker] INFO  o.s.b.a.e.web.EndpointLinksResolver 
+        [ |  | ] - Exposing 4 endpoints beneath base path '/actuator'
+25-05-12 11:24:14.810 [Test worker] INFO  o.s.t.w.s.TestDispatcherServlet     
+        [ |  | ] - Completed initialization in 18 ms
+25-05-12 11:24:14.835 [Test worker] INFO  c.s.m.d.i.ChannelApiIntegrationTest 
+        [ |  | ] - Started ChannelApiIntegrationTest in 3.703 seconds (process running for 33.642)
+25-05-12 11:24:15.117 [Test worker] DEBUG org.hibernate.SQL                   
+        [26c1c0e9 | PATCH | /api/channels/5b750218-bb76-483e-939c-3cea0c15f803] - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.id=?
+25-05-12 11:24:15.165 [Test worker] WARN  c.s.m.d.s.basic.BasicChannelService 
+        [26c1c0e9 | PATCH | /api/channels/5b750218-bb76-483e-939c-3cea0c15f803] - 채널 업데이트 실패 - 존재하지 않음: id=5b750218-bb76-483e-939c-3cea0c15f803
+25-05-12 11:24:15.388 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService 
+        [8398385d | POST | /api/channels/public] - 공개 채널 생성 완료: id=c4fb0846-8fa0-43ff-8b3c-72f1e6f493e2
+25-05-12 11:24:15.494 [Test worker] DEBUG org.hibernate.SQL                   
+        [8398385d | POST | /api/channels/public] - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-05-12 11:24:15.525 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.integration.MessageApiIntegrationTest]: MessageApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:15.529 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.integration.MessageApiIntegrationTest
+25-05-12 11:24:15.557 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.integration.UserApiIntegrationTest]: UserApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:15.562 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.integration.UserApiIntegrationTest
+25-05-12 11:24:15.678 [Test worker] DEBUG org.hibernate.SQL                   
+        [47c5b64a | DELETE | /api/users/50de97b4-3482-4784-8a3b-35c9aea0d881] - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-12 11:24:15.696 [Test worker] DEBUG org.hibernate.SQL                   
+        [47c5b64a | DELETE | /api/users/50de97b4-3482-4784-8a3b-35c9aea0d881] - 
+    select
+        count(*) 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-05-12 11:24:15.718 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService    
+        [47c5b64a | DELETE | /api/users/50de97b4-3482-4784-8a3b-35c9aea0d881] - 사용자 삭제 완료: id=50de97b4-3482-4784-8a3b-35c9aea0d881
+25-05-12 11:24:15.754 [Test worker] DEBUG org.hibernate.SQL                   
+        [465922a7 | DELETE | /api/users/58f1b2c2-c521-4eff-8bb3-9e07553d1736] - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-12 11:24:15.756 [Test worker] DEBUG org.hibernate.SQL                   
+        [465922a7 | DELETE | /api/users/58f1b2c2-c521-4eff-8bb3-9e07553d1736] - 
+    select
+        count(*) 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+25-05-12 11:24:15.758 [Test worker] WARN  c.s.m.d.s.basic.BasicUserService    
+        [465922a7 | DELETE | /api/users/58f1b2c2-c521-4eff-8bb3-9e07553d1736] - 삭제 실패 - 존재하지 않는 사용자: id=58f1b2c2-c521-4eff-8bb3-9e07553d1736
+25-05-12 11:24:15.862 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.repository.ChannelRepositoryTest]: ChannelRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:15.897 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.repository.ChannelRepositoryTest
+25-05-12 11:24:15.973 [Test worker] INFO  c.s.m.d.r.ChannelRepositoryTest     
+        [ |  | ] - Starting ChannelRepositoryTest using Java 17.0.14 with PID 25480 (started by dlwns in C:\Users\dlwns\2-sprint-mission)
+25-05-12 11:24:15.974 [Test worker] INFO  c.s.m.d.r.ChannelRepositoryTest     
+        [ |  | ] - The following 1 profile is active: "test"
+25-05-12 11:24:16.240 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+25-05-12 11:24:16.317 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate
+        [ |  | ] - Finished Spring Data repository scanning in 76 ms. Found 6 JPA repository interfaces.
+25-05-12 11:24:16.339 [Test worker] INFO  o.s.b.t.a.j.TestDatabaseAutoConfiguration$EmbeddedDataSourceBeanFactoryPostProcessor
+        [ |  | ] - Replacing 'dataSource' DataSource bean with embedded version
+25-05-12 11:24:16.379 [Test worker] INFO  o.s.j.d.e.EmbeddedDatabaseFactory   
+        [ |  | ] - Starting embedded database: url='jdbc:h2:mem:77b1167e-2548-41e6-a1ba-2fcd572316c0;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false', username='sa'
+25-05-12 11:24:16.467 [Test worker] INFO  o.h.jpa.internal.util.LogHelper     
+        [ |  | ] - HHH000204: Processing PersistenceUnitInfo [name: default]
+25-05-12 11:24:16.475 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator      
+        [ |  | ] - HHH000026: Second-level cache disabled
+25-05-12 11:24:16.499 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo 
+        [ |  | ] - No LoadTimeWeaver setup: ignoring JPA class transformer
+25-05-12 11:24:16.766 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator  
+        [ |  | ] - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+25-05-12 11:24:16.767 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists binary_contents cascade 
+25-05-12 11:24:16.770 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists channels cascade 
+25-05-12 11:24:16.772 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists message_attachments cascade 
+25-05-12 11:24:16.775 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists messages cascade 
+25-05-12 11:24:16.777 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists read_statuses cascade 
+25-05-12 11:24:16.779 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists user_statuses cascade 
+25-05-12 11:24:16.782 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists users cascade 
+25-05-12 11:24:16.785 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table binary_contents (
+        created_at timestamp with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+25-05-12 11:24:16.790 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table channels (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+25-05-12 11:24:16.795 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+25-05-12 11:24:16.798 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table messages (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text not null,
+        primary key (id)
+    )
+25-05-12 11:24:16.801 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table read_statuses (
+        created_at timestamp with time zone not null,
+        last_read_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id),
+        unique (user_id, channel_id)
+    )
+25-05-12 11:24:16.805 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table user_statuses (
+        created_at timestamp with time zone not null,
+        last_active_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+25-05-12 11:24:16.807 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    create table users (
+        created_at timestamp with time zone not null,
+        updated_at timestamp with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+25-05-12 11:24:16.812 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+25-05-12 11:24:16.816 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+25-05-12 11:24:16.822 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+25-05-12 11:24:16.826 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+25-05-12 11:24:16.830 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+25-05-12 11:24:16.834 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+25-05-12 11:24:16.837 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+25-05-12 11:24:16.841 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+25-05-12 11:24:16.845 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Initialized JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:24:17.011 [Test worker] INFO  c.s.m.d.r.ChannelRepositoryTest     
+        [ |  | ] - Started ChannelRepositoryTest in 1.104 seconds (process running for 35.817)
+25-05-12 11:24:17.057 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?)
+25-05-12 11:24:17.092 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.099 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.103 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    select
+        c1_0.id,
+        c1_0.created_at,
+        c1_0.description,
+        c1_0.name,
+        c1_0.type,
+        c1_0.updated_at 
+    from
+        channels c1_0 
+    where
+        c1_0.type=? 
+        or c1_0.id in (?)
+25-05-12 11:24:17.118 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.repository.MessageRepositoryTest]: MessageRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:17.122 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.repository.MessageRepositoryTest
+25-05-12 11:24:17.189 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.191 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.195 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.209 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    select
+        m1_0.created_at 
+    from
+        messages m1_0 
+    where
+        m1_0.channel_id=? 
+    order by
+        m1_0.created_at desc 
+    fetch
+        first 1 rows only
+25-05-12 11:24:17.239 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        channels
+        (created_at, description, name, type, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.243 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.245 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        messages
+        (author_id, channel_id, content, created_at, updated_at, id) 
+    values
+        (?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.254 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    select
+        m1_0.id,
+        a1_0.id,
+        a1_0.created_at,
+        a1_0.email,
+        a1_0.password,
+        p1_0.id,
+        p1_0.content_type,
+        p1_0.created_at,
+        p1_0.file_name,
+        p1_0.size,
+        s1_0.id,
+        s1_0.created_at,
+        s1_0.last_active_at,
+        s1_0.updated_at,
+        s1_0.user_id,
+        a1_0.updated_at,
+        a1_0.username,
+        m1_0.channel_id,
+        m1_0.content,
+        m1_0.created_at,
+        m1_0.updated_at 
+    from
+        messages m1_0 
+    left join
+        users a1_0 
+            on a1_0.id=m1_0.author_id 
+    join
+        user_statuses s1_0 
+            on a1_0.id=s1_0.user_id 
+    left join
+        binary_contents p1_0 
+            on p1_0.id=a1_0.profile_id 
+    where
+        m1_0.channel_id=? 
+        and m1_0.created_at<? 
+    offset
+        ? rows 
+    fetch
+        first ? rows only
+25-05-12 11:24:17.276 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils
+        [ |  | ] - Could not detect default configuration classes for test class [com.sprint.mission.discodeit.repository.UserRepositoryTest]: UserRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+25-05-12 11:24:17.279 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper
+        [ |  | ] - Found @SpringBootConfiguration com.sprint.mission.discodeit.DiscodeitApplication for test class com.sprint.mission.discodeit.repository.UserRepositoryTest
+25-05-12 11:24:17.299 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.email=? 
+    fetch
+        first ? rows only
+25-05-12 11:24:17.329 [Test worker] WARN  o.h.a.i.UnresolvedEntityInsertActions
+        [ |  | ] - HHH000437: Attempting to save one or more entities that have a non-nullable association with an unsaved transient entity. The unsaved transient entity must be saved in an operation prior to saving these dependent entities.
+	Unsaved transient entity: ([com.sprint.mission.discodeit.entity.User#<null>])
+	Dependent entities: ([[com.sprint.mission.discodeit.entity.UserStatus#071eabde-48f5-4a6c-a67a-35a7905c026b]])
+	Non-nullable association(s): ([com.sprint.mission.discodeit.entity.UserStatus.user])
+25-05-12 11:24:17.364 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    insert 
+    into
+        users
+        (created_at, email, password, profile_id, updated_at, username, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?)
+25-05-12 11:24:17.375 [Test worker] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.password,
+        u1_0.profile_id,
+        u1_0.updated_at,
+        u1_0.username 
+    from
+        users u1_0 
+    where
+        u1_0.username=?
+25-05-12 11:24:18.267 [Test worker] WARN  c.s.m.d.s.basic.BasicChannelService 
+        [ |  | ] - 비공개 채널은 수정 불가: id=87c40861-4be8-47a9-9611-0ad17f4eb4a0
+25-05-12 11:24:18.923 [Test worker] WARN  c.s.m.d.s.basic.BasicMessageService 
+        [ |  | ] - 메시지 생성 실패 - 채널 없음: 0be7dd3d-5e5c-48b1-975a-0eee4f5be6d3
+25-05-12 11:24:18.939 [Test worker] WARN  c.s.m.d.s.basic.BasicUserService    
+        [ |  | ] - 중복된 이메일로 사용자 생성 시도: dup@email.com
+25-05-12 11:24:18.947 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService    
+        [ |  | ] - 새 사용자 생성 완료: id=null, username=john
+25-05-12 11:24:19.015 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:24:19.021 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-1 - Shutdown initiated...
+25-05-12 11:24:19.713 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-1 - Shutdown completed.
+25-05-12 11:24:19.719 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:24:19.722 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists binary_contents cascade 
+25-05-12 11:24:19.723 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists channels cascade 
+25-05-12 11:24:19.725 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists message_attachments cascade 
+25-05-12 11:24:19.726 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists messages cascade 
+25-05-12 11:24:19.727 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists read_statuses cascade 
+25-05-12 11:24:19.729 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists user_statuses cascade 
+25-05-12 11:24:19.732 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists users cascade 
+25-05-12 11:24:19.736 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-2 - Shutdown initiated...
+25-05-12 11:24:19.743 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource  
+        [ |  | ] - HikariPool-2 - Shutdown completed.
+25-05-12 11:24:19.744 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean
+        [ |  | ] - Closing JPA EntityManagerFactory for persistence unit 'default'
+25-05-12 11:24:19.745 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists binary_contents cascade 
+25-05-12 11:24:19.746 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists channels cascade 
+25-05-12 11:24:19.748 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists message_attachments cascade 
+25-05-12 11:24:19.749 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists messages cascade 
+25-05-12 11:24:19.750 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists read_statuses cascade 
+25-05-12 11:24:19.753 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists user_statuses cascade 
+25-05-12 11:24:19.755 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL                   
+        [ |  | ] - 
+    drop table if exists users cascade 
