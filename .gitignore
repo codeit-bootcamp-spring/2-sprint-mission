@@ -34,9 +34,10 @@ out/
 /.nb-gradle/
 
 ### files ###
-/upload
 .logs
 .env
+.discodeit
+discodeit.env
 
 ### VS Code ###
 .vscode/

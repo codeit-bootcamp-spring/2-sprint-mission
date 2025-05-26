@@ -19,4 +19,5 @@ RUN ./gradlew build -x test
 FROM amazoncorretto:17
 COPY --from=build /app/build/libs/*.jar /${PROJECT_NAME}-${PROJECT_VERSION}.jar
 
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar /${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
+EXPOSE 80
+ENTRYPOINT ["sh", "-c", "java ${JVM__OPTS} -jar /${PROJECT_NAME}-${PROJECT_VERSION}.jar"]

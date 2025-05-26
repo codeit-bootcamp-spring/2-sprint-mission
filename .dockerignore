@@ -6,3 +6,4 @@ tmp
 *.log
 .idea
 .vscode
+discodeit.env
