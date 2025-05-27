@@ -10,7 +10,7 @@ services:
       - "8081:80"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      JVM_OPTS: "-Xmx512m"
+      JVM_OPTS: ${JVM_OPTS}
 
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}

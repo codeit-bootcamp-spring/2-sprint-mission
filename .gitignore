@@ -20,7 +20,7 @@ data
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
-
+discodeit.env
 ### IntelliJ IDEA ###
 .idea
 *.iws
