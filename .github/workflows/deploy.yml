@@ -75,4 +75,4 @@ jobs:
         run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --desired-count 0
 
       - name: Deploy new task definition
-        run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ env.TASK_DEF_ARN }} --desired-count 1
+        run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ env.TASK_DEF_ARN }} --desired-count 1 --force-new-deployment
