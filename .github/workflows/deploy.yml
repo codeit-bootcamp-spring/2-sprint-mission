@@ -3,7 +3,7 @@ name: CD
 on:
   push:
     branches:
-      - part3-최규원-sprint8
+      - main
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}
@@ -58,10 +58,21 @@ jobs:
             --query "taskDefinition" > task-definition.json
 
       # 이미지 URI 변경
-      - name: Replace image URI in task definition
+      - name: Replace image URI and clean task definition
         run: |
-          IMAGE_URI="$ECR_REPOSITORY_URI:${{ steps.vars.outputs.sha_short }}"
-          jq '.containerDefinitions[0].image = env.IMAGE_URI' task-definition.json > new-task-def.json
+          IMAGE_URI="${ECR_REPOSITORY_URI}:${{ steps.vars.outputs.sha_short }}"
+
+          cat task-definition.json \
+          | jq 'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy
+            ) | .containerDefinitions[0].image = env.IMAGE_URI' \
+          > new-task-def.json
 
       # 태스크 정의 등록
       - name: Register new task definition
