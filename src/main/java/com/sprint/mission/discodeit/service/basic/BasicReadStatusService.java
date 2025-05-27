@@ -41,12 +41,17 @@ public class BasicReadStatusService implements ReadStatusService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(userId));
 
+    if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
+      return findReadStatusByUserIdAndChannelId(userId, channelId);
+    }
+
     ReadStatus readStatus = readStatusRepository.save(
         ReadStatus.builder()
             .channel(channel)
             .user(user)
             .lastReadAt(request.lastReadAt())
             .build());
+
     return readStatusMapper.toDto(readStatus);
   }
 

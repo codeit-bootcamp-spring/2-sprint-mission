@@ -1,0 +1,19 @@
+# IDE & Git
+.idea
+*.iml
+.git
+.gitattributes
+.github
+
+# Gradle build cache
+.gradle
+build
+
+# 환경 템플릿
+.env.template
+
+# 문서
+*.md
+
+# 로그
+*.log

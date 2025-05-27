@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
@@ -7,6 +10,14 @@ spring:
     hikari:
       maximum-pool-size: 50
       minimum-idle: 10
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: ./uploads
+  repository:
+    file-directory: ./discodeit-files/
 
   jpa:
     hibernate:

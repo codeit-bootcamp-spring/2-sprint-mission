@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     log.error("Error message: {}, detail: {}", e.getMessage(), e.details);
 
     ErrorResponse errorResponse = ErrorResponse.of(
-        e.getErrorCode().name(),
-        e.getMessage(),
+        e.getErrorCode().getStatus().name(),
+        e.getErrorCode().getMessage(),
         e.getDetails(),
         e.getClass().getSimpleName(),
         e.getErrorCode().getStatus().value()

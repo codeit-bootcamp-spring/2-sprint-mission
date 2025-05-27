@@ -2,10 +2,12 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'jacoco'
 }
 
 group = 'com.sprint.mission'
-version = '0.0.1-SNAPSHOT'
+version = '1.2-M8'
+
 
 java {
     toolchain {
@@ -21,6 +23,10 @@ configurations {
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = "0.8.8" //추가: 버전 명시
 }
 
 dependencies {
@@ -59,6 +65,9 @@ dependencies {
     // 비밀번호 암호화용
     implementation 'org.mindrot:jbcrypt:0.4'
 
+
+    implementation 'software.amazon.awssdk:s3:2.31.7'
+
     // 테스트 관련
     testImplementation 'org.springframework.boot:spring-boot-starter-web'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -72,8 +81,23 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-parameters"
+}
+
+jacocoTestReport {
+    dependsOn test // tast 실행 전에 수행될 task
+    reports { // 어떤 파일을 생성할지/생성하지 않을지
+        xml.required = true
+        html.required = true
+        csv.required = false
+        // 기본 경로 $buildDir/reports/jacoco/test
+
+        // 리포트 타입마다 destination file 옵션으로 경로 변경 가능
+        //  html.destination file("$buildDir/jacocoHtml")
+        //  xml.destination file("$buildDir/jacoco.xml")
+    }
 }

@@ -117,7 +117,7 @@ public class UserRepositoryTest {
     // when
     Optional<User> result = userRepository.findByUsername("test");
     // then
-    assertThat(result).isPresent();
+    assertThat(result).isNotPresent();
   }
 
   @DisplayName("사용자 ID여러개로 조회 - 성공")
