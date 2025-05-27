@@ -1,0 +1,78 @@
+name: CD - Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [ release ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: Build, Push to Public ECR, and Deploy to ECS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials for Public ECR
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR Public
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build, tag, and push image to Amazon ECR Public
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ vars.ECR_REPOSITORY_URI }}:latest
+            ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+
+      - name: Configure AWS credentials for ECS Region
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Download current task definition template
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ vars.ECS_TASK_DEFINITION_FAMILY }} --query taskDefinition > task-definition-template.json
+          echo "Task definition template downloaded as task-definition-template.json"
+
+      - name: Render new task definition with updated image
+        id: render-task-def # 이 스텝의 ID
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition-template.json
+          container-name: ${{ vars.ECS_CONTAINER_NAME }}
+          image: ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+
+
+      - name: Print new task definition file path (for debugging)
+        run: |
+          echo "Rendered task definition file is at: ${{ steps.render-task-def.outputs.task-definition }}"
+          cat ${{ steps.render-task-def.outputs.task-definition }}
+
+      - name: Deploy new task definition to Amazon ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1 # 또는 @v2
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ vars.ECS_SERVICE }}
+          cluster: ${{ vars.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          force-new-deployment: true
