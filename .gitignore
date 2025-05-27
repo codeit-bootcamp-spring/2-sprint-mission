@@ -45,7 +45,9 @@ bin/
 ### 숨김 파일 ###
 .*
 !.gitignore
-+.github/
++.github
++.github/workflows
++.github/workflows/*.yml
 .env
 *.db
 *.swp
