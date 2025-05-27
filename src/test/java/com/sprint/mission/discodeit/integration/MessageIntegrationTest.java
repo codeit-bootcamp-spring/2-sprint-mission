@@ -20,9 +20,14 @@ import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +60,16 @@ public class MessageIntegrationTest {
   @Autowired
   private ObjectMapper objectMapper;
 
+  @BeforeAll
+  static void loadEnv() throws IOException {
+    Properties props = new Properties();
+    props.load(Files.newBufferedReader(Paths.get(".env")));
+
+    props.forEach((key, value) -> {
+      System.setProperty((String) key, (String) value);
+    });
+  }
+
   @Test
   @DisplayName("Create Message_성공")
   void createMessage_Success() throws Exception {
@@ -66,9 +81,9 @@ public class MessageIntegrationTest {
     ChannelDto channel = channelService.createPublicChannel(channelRequest);
 
     UserCreateRequest userRequest = new UserCreateRequest(
-        "messageuser",
         "messageuser@example.com",
-        "Password1!"
+        "Password1!",
+        "messageuser"
     );
     UserDto user = userService.createUser(userRequest, Optional.empty());
 
@@ -137,9 +152,9 @@ public class MessageIntegrationTest {
     ChannelDto channel = channelService.createPublicChannel(channelRequest);
 
     UserCreateRequest userRequest = new UserCreateRequest(
-        "messageuser",
         "messageuser@example.com",
-        "Password1!"
+        "Password1!",
+        "messageuser"
     );
     UserDto user = userService.createUser(userRequest, Optional.empty());
 
@@ -180,9 +195,9 @@ public class MessageIntegrationTest {
     ChannelDto channel = channelService.createPublicChannel(channelRequest);
 
     UserCreateRequest userRequest = new UserCreateRequest(
-        "messageuser",
         "messageuser@example.com",
-        "Password1!"
+        "Password1!",
+        "messageuser"
     );
     UserDto user = userService.createUser(userRequest, Optional.empty());
 
@@ -240,9 +255,9 @@ public class MessageIntegrationTest {
     ChannelDto channel = channelService.createPublicChannel(channelRequest);
 
     UserCreateRequest userRequest = new UserCreateRequest(
-        "messageuser",
         "messageuser@example.com",
-        "Password1!"
+        "Password1!",
+        "messageuser"
     );
     UserDto user = userService.createUser(userRequest, Optional.empty());
 

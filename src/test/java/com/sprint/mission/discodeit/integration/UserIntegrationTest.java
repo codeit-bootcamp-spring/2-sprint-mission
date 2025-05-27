@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,18 +10,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.domain.Channel;
-import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +48,16 @@ class UserIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @BeforeAll
+  static void loadEnv() throws IOException {
+    Properties props = new Properties();
+    props.load(Files.newBufferedReader(Paths.get(".env")));
+
+    props.forEach((key, value) -> {
+      System.setProperty((String) key, (String) value);
+    });
+  }
 
   @Test
   @DisplayName("Create User_성공")
@@ -111,15 +121,15 @@ class UserIntegrationTest {
   void findAllUsers_Success() throws Exception {
     // given
     UserCreateRequest userRequest1 = new UserCreateRequest(
-        "user1",
-        "user1@example.com",
-        "Password1!"
+        "user1@example.comuser1",
+        "Password1!",
+        "user1Password1!"
     );
 
     UserCreateRequest userRequest2 = new UserCreateRequest(
-        "user2",
         "user2@example.com",
-        "Password1!"
+        "Password1!",
+        "user2"
     );
 
     userService.createUser(userRequest1, Optional.empty());
@@ -141,9 +151,9 @@ class UserIntegrationTest {
   void updateUser_Success() throws Exception {
     // given
     UserCreateRequest createRequest = new UserCreateRequest(
-        "originaluser",
-        "original@example.com",
-        "Password1!"
+        "original@example.comoriginaluser",
+        "Password1!",
+        "originaluser"
     );
     UserDto createdUser = userService.createUser(createRequest, Optional.empty());
     UUID userId = createdUser.id();
@@ -221,9 +231,9 @@ class UserIntegrationTest {
   void deleteUser_Success() throws Exception {
     // given
     UserCreateRequest createRequest = new UserCreateRequest(
-        "deleteuser",
         "delete@example.com",
-        "Password1!"
+        "Password1!",
+        "deleteuser"
     );
 
     UserDto createdUser = userService.createUser(createRequest, Optional.empty());
@@ -258,9 +268,9 @@ class UserIntegrationTest {
   void updateUserStatus_Success() throws Exception {
     // given
     UserCreateRequest createRequest = new UserCreateRequest(
-        "statususer",
         "status@example.com",
-        "Password1!"
+        "Password1!",
+        "statususer"
     );
     UserDto createdUser = userService.createUser(createRequest, Optional.empty());
     UUID userId = createdUser.id();
