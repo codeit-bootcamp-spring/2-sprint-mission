@@ -28,4 +28,8 @@ logging:
         orm.jdbc.bind: trace
 
 server:
-  port: 8080
+  port: 8081
+
+discodeit:
+  storage:
+    type: s3
