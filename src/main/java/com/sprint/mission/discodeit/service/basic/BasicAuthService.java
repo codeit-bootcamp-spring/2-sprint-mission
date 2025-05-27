@@ -1,68 +1,42 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.code.ResultCode;
-import com.sprint.mission.discodeit.dto2.request.UserLoginRequest;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.RestException;
+import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.util.LogUtils;
-import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
-  @Override
   @Transactional(readOnly = true)
-  public User login(UserLoginRequest loginRequest) {
-    String traceId = MDC.get("traceId");
+  @Override
+  public UserDto login(LoginRequest loginRequest) {
+    log.debug("로그인 시도: username={}", loginRequest.username());
+    
     String username = loginRequest.username();
     String password = loginRequest.password();
 
-    // 시작 로그
-    log.info("[LOGIN] status=START, username={}, traceId={}",
-        log.isDebugEnabled() ? username : LogUtils.mask(username), traceId);
-
     User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> {
-          log.warn("[LOGIN] User not found: username={}, traceId={}",
-              LogUtils.mask(username), traceId);
-          return new RestException(ResultCode.USER_NOT_FOUND);
-        });
+        .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
     if (!user.getPassword().equals(password)) {
-      log.warn("[LOGIN] Invalid password for user: username={}, traceId={}",
-          LogUtils.mask(username), traceId);
-      throw new RestException(ResultCode.INVALID_PASSWORD);
+      throw InvalidCredentialsException.wrongPassword();
     }
 
-    // 로그인 시 상태 갱신
-    if (user.getStatus() == null) {
-      userStatusRepository.save(new UserStatus(user, Instant.now()));
-      log.info("[LOGIN] User status created: userId={}, traceId={}",
-          LogUtils.maskUUID(user.getId()), traceId);
-    } else {
-      user.getStatus().setOnline();
-      log.info("[LOGIN] User set to online: userId={}, traceId={}",
-          LogUtils.maskUUID(user.getId()), traceId);
-    }
-
-    // 성공 로그
-    log.info("[LOGIN] status=SUCCESS, userId={}, traceId={}",
-        LogUtils.maskUUID(user.getId()), traceId);
-    return user;
+    log.info("로그인 성공: userId={}, username={}", user.getId(), username);
+    return userMapper.toDto(user);
   }
-
 }

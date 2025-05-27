@@ -1,167 +1,105 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.code.ResultCode;
-import com.sprint.mission.discodeit.dto2.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto2.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.RestException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.util.LogUtils;
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+  private final ReadStatusMapper readStatusMapper;
 
-
-  @Override
   @Transactional
-  public ReadStatus create(ReadStatusCreateRequest request) {
-    String traceId = MDC.get("traceId");
+  @Override
+  public ReadStatusDto create(ReadStatusCreateRequest request) {
+    log.debug("읽음 상태 생성 시작: userId={}, channelId={}", request.userId(), request.channelId());
+
     UUID userId = request.userId();
     UUID channelId = request.channelId();
 
-    // 시작 로그
-    log.info("[CREATE] status=START, userId={}, channelId={}, traceId={}",
-        log.isDebugEnabled() ? userId : LogUtils.maskUUID(userId),
-        log.isDebugEnabled() ? channelId : LogUtils.maskUUID(channelId),
-        traceId);
-
-    // 관련된 User와 Channel이 존재하는지 확인
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("[CREATE] User not found: userId={}, traceId={}",
-              LogUtils.maskUUID(userId), traceId);
-          return new RestException(ResultCode.USER_NOT_FOUND);
-        });
-
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> {
-          log.warn("[CREATE] Channel not found: channelId={}, traceId={}",
-              LogUtils.maskUUID(channelId), traceId);
-          return new RestException(ResultCode.CHANNEL_NOT_FOUND);
-        });
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
 
-    ReadStatus newReadStatus = ReadStatus.builder()
-        .user(user)
-        .channel(channel)
-        .lastReadAt(request.lastReadAt())
-        .build();
+    if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
+      throw DuplicateReadStatusException.withUserIdAndChannelId(userId, channelId);
+    }
 
-    readStatusRepository.save(newReadStatus);
+    Instant lastReadAt = request.lastReadAt();
+    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
+    readStatusRepository.save(readStatus);
 
-    // 성공 로그
-    log.info("[CREATE] status=SUCCESS, readStatusId={}, traceId={}",
-        newReadStatus.getId(), traceId);
-    return newReadStatus;
+    log.info("읽음 상태 생성 완료: id={}, userId={}, channelId={}", 
+        readStatus.getId(), userId, channelId);
+    return readStatusMapper.toDto(readStatus);
   }
 
-  // ID로 ReadStatus 조회
   @Override
-  @Transactional(readOnly = true)
-  public ReadStatus findById(UUID readStatusId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND] status=START, readStatusId={}, traceId={}",
-        log.isDebugEnabled() ? readStatusId : LogUtils.maskUUID(readStatusId), traceId);
-
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> {
-          log.warn("[FIND] ReadStatus not found: readStatusId={}, traceId={}",
-              LogUtils.maskUUID(readStatusId), traceId);
-          return new RestException(ResultCode.READ_STATUS_NOT_FOUND);
-        });
-
-    // 성공 로그
-    log.info("[FIND] status=SUCCESS, readStatusId={}, traceId={}",
-        LogUtils.maskUUID(readStatusId), traceId);
-    return readStatus;
+  public ReadStatusDto find(UUID readStatusId) {
+    log.debug("읽음 상태 조회 시작: id={}", readStatusId);
+    ReadStatusDto dto = readStatusRepository.findById(readStatusId)
+        .map(readStatusMapper::toDto)
+        .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
+    log.info("읽음 상태 조회 완료: id={}", readStatusId);
+    return dto;
   }
 
-  // 사용자의 Id로 조회
   @Override
-  @Transactional(readOnly = true)
-  public List<ReadStatus> findAllByUserId(UUID userId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND_ALL] status=START, userId={}, traceId={}",
-        log.isDebugEnabled() ? userId : LogUtils.maskUUID(userId), traceId);
-
-    List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
-
-    // 성공 로그
-    log.info("[FIND_ALL] status=SUCCESS, userId={}, readStatusCount={}, traceId={}",
-        LogUtils.maskUUID(userId), readStatuses.size(), traceId);
-    return readStatuses;
+  public List<ReadStatusDto> findAllByUserId(UUID userId) {
+    log.debug("사용자별 읽음 상태 목록 조회 시작: userId={}", userId);
+    List<ReadStatusDto> dtos = readStatusRepository.findAllByUserId(userId).stream()
+        .map(readStatusMapper::toDto)
+        .toList();
+    log.info("사용자별 읽음 상태 목록 조회 완료: userId={}, 조회된 항목 수={}", userId, dtos.size());
+    return dtos;
   }
 
-  // ReadStatus 업데이트
-  @Override
   @Transactional
-  public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[UPDATE] status=START, readStatusId={}, traceId={}",
-        log.isDebugEnabled() ? readStatusId : LogUtils.maskUUID(readStatusId), traceId);
-
-    Instant newLastReadAt = request.newLastReadAt();
+  @Override
+  public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    log.debug("읽음 상태 수정 시작: id={}, newLastReadAt={}", readStatusId, request.newLastReadAt());
+    
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> {
-          log.warn("[UPDATE] ReadStatus not found: readStatusId={}, traceId={}",
-              LogUtils.maskUUID(readStatusId), traceId);
-          return new RestException(ResultCode.READ_STATUS_NOT_FOUND);
-        });
-
-    readStatus.updateReadStatus(newLastReadAt);
-
-    // 성공 로그
-    log.info("[UPDATE] status=SUCCESS, readStatusId={}, traceId={}",
-        LogUtils.maskUUID(readStatusId), traceId);
-    return readStatus;
+        .orElseThrow(() -> ReadStatusNotFoundException.withId(readStatusId));
+    readStatus.update(request.newLastReadAt());
+    
+    log.info("읽음 상태 수정 완료: id={}", readStatusId);
+    return readStatusMapper.toDto(readStatus);
   }
 
-  // ReadStatus 삭제
-  @Override
   @Transactional
+  @Override
   public void delete(UUID readStatusId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[DELETE] status=START, readStatusId={}, traceId={}",
-        log.isDebugEnabled() ? readStatusId : LogUtils.maskUUID(readStatusId), traceId);
-
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> {
-          log.warn("[DELETE] ReadStatus not found: readStatusId={}, traceId={}",
-              LogUtils.maskUUID(readStatusId), traceId);
-          return new RestException(ResultCode.READ_STATUS_NOT_FOUND);
-        });
-
-    readStatusRepository.delete(readStatus);
-
-    // 성공 로그
-    log.info("[DELETE] status=SUCCESS, readStatusId={}, traceId={}",
-        LogUtils.maskUUID(readStatusId), traceId);
+    log.debug("읽음 상태 삭제 시작: id={}", readStatusId);
+    if (!readStatusRepository.existsById(readStatusId)) {
+      throw ReadStatusNotFoundException.withId(readStatusId);
+    }
+    readStatusRepository.deleteById(readStatusId);
+    log.info("읽음 상태 삭제 완료: id={}", readStatusId);
   }
 }

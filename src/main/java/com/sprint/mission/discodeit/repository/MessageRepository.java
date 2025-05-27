@@ -1,24 +1,32 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
-
-import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Repository
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  List<Message> findByChannelId(UUID channelId);
+  @Query("SELECT m FROM Message m "
+      + "LEFT JOIN FETCH m.author a "
+      + "JOIN FETCH a.status "
+      + "LEFT JOIN FETCH a.profile "
+      + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
+  Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
+      @Param("createdAt") Instant createdAt,
+      Pageable pageable);
 
-  Slice<Message> findByChannelIdOrderByCreatedAtDesc(UUID channelId,
-      Pageable pageable); // Slice와 JPA를 통해 자동으로 LIMIT, OFFSET, ORDER BY 등을 포함한 쿼리 생성
 
-  Optional<Message> findFirstByChannelIdOrderByCreatedAtDesc(UUID channelId); // 가장 최근 메시지 반환
+  @Query("SELECT m.createdAt "
+      + "FROM Message m "
+      + "WHERE m.channel.id = :channelId "
+      + "ORDER BY m.createdAt DESC LIMIT 1")
+  Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 
+  void deleteAllByChannelId(UUID channelId);
 }
-

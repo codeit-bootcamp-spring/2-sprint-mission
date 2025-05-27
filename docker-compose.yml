@@ -13,6 +13,24 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: discodeit:local
+    container_name: discodeit-app
+    ports:
+      - "8081:80"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - ./storage:/app/.discodeit/storage
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:
+

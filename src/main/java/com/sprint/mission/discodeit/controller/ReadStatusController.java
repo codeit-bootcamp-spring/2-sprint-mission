@@ -1,87 +1,62 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto2.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto2.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
+import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.util.LogUtils;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/readStatuses")
-@RequiredArgsConstructor
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
 
-  // 1. 특정 채널의 메시지 수신 정보 생성
   @PostMapping
-  public ResponseEntity<ReadStatus> createReceipts(
-      @Valid @RequestBody ReadStatusCreateRequest request) {
-    String traceId = MDC.get("traceId");
-    UUID userId = request.userId();
-    UUID channelId = request.channelId();
-
-    // 시작 로그
-    log.info("[CREATE] status=START, userId={}, channelId={}, traceId={}",
-        log.isDebugEnabled() ? userId : LogUtils.maskUUID(userId),
-        log.isDebugEnabled() ? channelId : LogUtils.maskUUID(channelId),
-        traceId);
-
-    ReadStatus readStatus = readStatusService.create(request);
-
-    // 성공 로그
-    log.info("[CREATE] status=SUCCESS, readStatusId={}, traceId={}",
-        LogUtils.maskUUID(readStatus.getId()), traceId);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
+  public ResponseEntity<ReadStatusDto> create(@RequestBody @Valid ReadStatusCreateRequest request) {
+    log.info("읽음 상태 생성 요청: {}", request);
+    ReadStatusDto createdReadStatus = readStatusService.create(request);
+    log.debug("읽음 상태 생성 응답: {}", createdReadStatus);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
   }
 
-  // 2. 특정 채널의 메시지 수신 정보 수정
-  @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ReadStatus> updateReceipts(
-      @PathVariable UUID readStatusId,
-      @Valid @RequestBody ReadStatusUpdateRequest request) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[UPDATE] status=START, readStatusId={}, traceId={}",
-        log.isDebugEnabled() ? readStatusId : LogUtils.maskUUID(readStatusId), traceId);
-
-    ReadStatus updated = readStatusService.update(readStatusId, request);
-
-    // 성공 로그
-    log.info("[UPDATE] status=SUCCESS, readStatusId={}, traceId={}",
-        LogUtils.maskUUID(updated.getId()), traceId);
-
-    return ResponseEntity.ok(updated);
+  @PatchMapping(path = "{readStatusId}")
+  public ResponseEntity<ReadStatusDto> update(@PathVariable("readStatusId") UUID readStatusId,
+      @RequestBody @Valid ReadStatusUpdateRequest request) {
+    log.info("읽음 상태 수정 요청: id={}, request={}", readStatusId, request);
+    ReadStatusDto updatedReadStatus = readStatusService.update(readStatusId, request);
+    log.debug("읽음 상태 수정 응답: {}", updatedReadStatus);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedReadStatus);
   }
 
-  // 3. 특정 사용자의 메시지 수신 정보 조회
   @GetMapping
-  public ResponseEntity<List<ReadStatus>> getAllByUserId(@RequestParam UUID userId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND_ALL] status=START, userId={}, traceId={}",
-        log.isDebugEnabled() ? userId : LogUtils.maskUUID(userId), traceId);
-
-    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
-
-    // 성공 로그
-    log.info("[FIND_ALL] status=SUCCESS, userId={}, readStatusCount={}, traceId={}",
-        LogUtils.maskUUID(userId), readStatuses.size(), traceId);
-
-    return ResponseEntity.ok(readStatuses);
+  public ResponseEntity<List<ReadStatusDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    log.info("사용자별 읽음 상태 목록 조회 요청: userId={}", userId);
+    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
+    log.debug("사용자별 읽음 상태 목록 조회 응답: count={}", readStatuses.size());
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(readStatuses);
   }
 }

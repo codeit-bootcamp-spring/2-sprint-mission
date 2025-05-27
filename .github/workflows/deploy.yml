@@ -1,0 +1,69 @@
+name: CD Deploy
+
+on:
+  push:
+    branches: [release]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 코드 가져오기
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # AWS 인증 (ECR)
+      - name: Configure AWS credentials (ECR)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      # ECR 로그인
+      - name: Login to Amazon ECR
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+      # Dcoker 빌드, 후시
+      - name: Build and push Docker image
+        env:
+          ECR_URI: ${{ vars.ECR_REPOSITORY_URI }}
+          COMMIT_HASH: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_URI:latest -t $ECR_URI:$COMMIT_HASH .
+          docker push $ECR_URI:latest
+          docker push $ECR_URI:$COMMIT_HASH
+
+      # AWS 인증 (ECS)
+      - name: Configure AWS credentials for ECS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # ECS 태스크 정의 등록
+      - name: Register new task definition
+        id: task-def
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ vars.ECS_TASK_DEFINITION }} > task-def.json
+          sed -i "s|image\": \".*\"|image\": \"${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}\"|" task-def.json
+          echo '{"family":"${{ vars.ECS_TASK_DEFINITION }}","executionRoleArn":"${{ vars.ECS_TASK_EXECUTION_ROLE_ARN }}","containerDefinitions":'$(jq '.taskDefinition.containerDefinitions' task-def.json)'}' > new-task-def.json
+          aws ecs register-task-definition --cli-input-json file://new-task-def.json > output.json
+          echo "::set-output name=taskDefArn::$(jq -r '.taskDefinition.taskDefinitionArn' output.json)"
+
+      # ECS 서비스 일시 중단
+      - name: Stop current ECS service
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER }} --service ${{ vars.ECS_SERVICE }} --desired-count 0
+          sleep 30
+
+      # 새 태스크 정의로 서비스 재시작
+      - name: Deploy new ECS task
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --task-definition ${{ steps.task-def.outputs.taskDefArn }} \
+            --desired-count 1

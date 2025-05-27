@@ -1,43 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.BatchSize;
 
-@Getter
 @Entity
 @Table(name = "messages")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends BaseUpdatableEntity {
 
-  // 채널에 메시지를 보낼 수 있는 기능
-  // 해당 채널에 들어가면 "누구누구 : 메시지" 이런 식으로 대화가 표현되게
-  // 보낸 User의 정보와 Channel 정보 포함
+  @Column(columnDefinition = "text", nullable = false)
   private String content;
-
-  @ManyToOne
-  @JoinColumn(name = "channel_id", nullable = false, foreignKey = @ForeignKey(name = "fk_messages_channel"))
-  @OnDelete(action = OnDeleteAction.CASCADE)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
-
-  @ManyToOne
-  @JoinColumn(name = "author_id", foreignKey = @ForeignKey(name = "fk_messages_author"))
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", columnDefinition = "uuid")
   private User author;
-
-  @ManyToMany
+  @BatchSize(size = 100)
+  @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
   @JoinTable(
       name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
@@ -45,17 +40,16 @@ public class Message extends BaseUpdatableEntity {
   )
   private List<BinaryContent> attachments = new ArrayList<>();
 
-  @Builder
   public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
-    this.content = content;
     this.channel = channel;
+    this.content = content;
     this.author = author;
     this.attachments = attachments;
   }
 
-  // 메시지 수정 메서드
-  public void updateMessage(String content) {
-    this.content = content;
+  public void update(String newContent) {
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+    }
   }
-
 }

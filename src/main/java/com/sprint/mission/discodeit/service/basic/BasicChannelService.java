@@ -1,260 +1,118 @@
 package com.sprint.mission.discodeit.service.basic;
 
-
-import com.sprint.mission.discodeit.common.CodeitConstants;
-import com.sprint.mission.discodeit.common.code.ResultCode;
-import com.sprint.mission.discodeit.dto2.request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto2.request.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto2.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto2.response.ChannelResponse;
-import com.sprint.mission.discodeit.dto2.response.UserResponse;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.RestException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.util.LogUtils;
-import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-  private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
+  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
+  private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
-  private final UserMapper userMapper;
 
-  @Override
   @Transactional
-  public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
-    String traceId = MDC.get("traceId");
+  @Override
+  public ChannelDto create(PublicChannelCreateRequest request) {
+    log.debug("채널 생성 시작: {}", request);
+    String name = request.name();
+    String description = request.description();
+    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
-    // 시작 로그
-    log.info("[CREATE] status=START, participantIds={}, traceId={}",
-        log.isDebugEnabled() ? request.userIds() : LogUtils.maskUUIDList(request.userIds()),
-        traceId);
+    channelRepository.save(channel);
+    log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+    return channelMapper.toDto(channel);
+  }
 
-    Channel privateChannel = Channel.builder()
-        .type(ChannelType.PRIVATE)
-        .name(null)
-        .description(null)
-        .build();
-    channelRepository.save(privateChannel);
+  @Transactional
+  @Override
+  public ChannelDto create(PrivateChannelCreateRequest request) {
+    log.debug("채널 생성 시작: {}", request);
+    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    channelRepository.save(channel);
 
-    List<User> users = request.userIds().stream()
-        .map(userId -> userRepository.findById(userId)
-            .orElseThrow(() -> {
-              log.warn("[CREATE] User not found for private channel: userId={}, traceId={}",
-                  LogUtils.maskUUID(userId), traceId);
-              return new RestException(ResultCode.USER_NOT_FOUND);
-            }))
+    List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
+        .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
+        .toList();
+    readStatusRepository.saveAll(readStatuses);
+
+    log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+    return channelMapper.toDto(channel);
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public ChannelDto find(UUID channelId) {
+    return channelRepository.findById(channelId)
+        .map(channelMapper::toDto)
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
+  }
+
+  @Transactional(readOnly = true)
+  @Override
+  public List<ChannelDto> findAllByUserId(UUID userId) {
+    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+        .map(ReadStatus::getChannel)
+        .map(Channel::getId)
         .toList();
 
-    users.forEach(user -> {
-      ReadStatus readStatus = new ReadStatus(user, privateChannel, privateChannel.getCreatedAt());
-      readStatusRepository.save(readStatus);
-      log.info("[CREATE] ReadStatus created for user: userId={}, channelId={}, traceId={}",
-          LogUtils.maskUUID(user.getId()), LogUtils.maskUUID(privateChannel.getId()), traceId);
-    });
-
-    // 성공 로그
-    log.info("[CREATE] status=SUCCESS, channelId={}, traceId={}",
-        LogUtils.maskUUID(privateChannel.getId()), traceId);
-    return privateChannel;
-  }
-
-  @Override
-  @Transactional
-  public Channel createPublicChannel(PublicChannelCreateRequest request) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[CREATE] status=START, channelName={}, traceId={}",
-        log.isDebugEnabled() ? request.name() : LogUtils.mask(request.name()), traceId);
-
-    if (request.name().isBlank()) {
-      log.warn("[CREATE] Invalid Public Channel name: traceId={}", traceId);
-      throw new RestException(ResultCode.INVALID_CHANNEL_DATA);
-    }
-
-    Channel publicChannel = Channel.builder()
-        .type(ChannelType.PUBLIC)
-        .name(request.name())
-        .description(request.description())
-        .build();
-    channelRepository.save(publicChannel);
-
-    // 성공 로그
-    log.info("[CREATE] status=SUCCESS, channelId={}, traceId={}",
-        LogUtils.maskUUID(publicChannel.getId()), traceId);
-    return publicChannel;
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public Channel findById(UUID id) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND] status=START, channelId={}, traceId={}",
-        log.isDebugEnabled() ? id : LogUtils.maskUUID(id), traceId);
-
-    Channel channel = channelRepository.findById(id)
-        .orElseThrow(() -> {
-          log.warn("[FIND] Channel not found: channelId={}, traceId={}",
-              LogUtils.maskUUID(id), traceId);
-          return new RestException(ResultCode.CHANNEL_NOT_FOUND);
-        });
-
-    // 성공 로그
-    log.info("[FIND] status=SUCCESS, channelId={}, traceId={}",
-        LogUtils.maskUUID(id), traceId);
-    return channel;
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<Channel> findAllByUserId(UUID userId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND_ALL] status=START, userId={}, traceId={}",
-        log.isDebugEnabled() ? userId : LogUtils.maskUUID(userId), traceId);
-
-    List<Channel> channels = channelRepository.findAll().stream()
-        .filter(channel -> {
-          if (channel.getType() == ChannelType.PRIVATE) {
-            List<UUID> userIds = readStatusRepository.findUsersByChannelId(channel.getId());
-            return userIds.contains(userId); // PRIVATE이면 참가 여부 확인
-          }
-          return true; // PUBLIC이면 무조건 포함
-        })
+    return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
+        .stream()
+        .map(channelMapper::toDto)
         .toList();
-
-    // 성공 로그
-    log.info("[FIND_ALL] status=SUCCESS, userId={}, channelCount={}, traceId={}",
-        LogUtils.maskUUID(userId), channels.size(), traceId);
-    return channels;
   }
 
-  @Override
   @Transactional
-  public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[UPDATE] status=START, channelId={}, traceId={}",
-        log.isDebugEnabled() ? channelId : LogUtils.maskUUID(channelId), traceId);
-
+  @Override
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
+    log.debug("채널 수정 시작: id={}, request={}", channelId, request);
+    String newName = request.newName();
+    String newDescription = request.newDescription();
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> {
-          log.warn("[UPDATE] Channel not found: channelId={}, traceId={}",
-              LogUtils.maskUUID(channelId), traceId);
-          return new RestException(ResultCode.CHANNEL_NOT_FOUND);
-        });
-
-    if (channel.getType() == ChannelType.PRIVATE) {
-      throw new RestException(ResultCode.INVALID_CHANNEL_TYPE);
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      throw PrivateChannelUpdateException.forChannel(channelId);
     }
-
-    if (request.newName().isBlank()) {
-      throw new RestException(ResultCode.INVALID_CHANNEL_DATA);
-    }
-
-    // 변경 감지 방식 적용(Dirty Checking)
-    channel.updateChannel(ChannelType.PUBLIC, request.newName(), request.newDescription());
-
-    // 성공 로그
-    log.info("[UPDATE] status=SUCCESS, channelId={}, traceId={}",
-        LogUtils.maskUUID(channelId), traceId);
-    return channel;
+    channel.update(newName, newDescription);
+    log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
+    return channelMapper.toDto(channel);
   }
 
-  @Override
   @Transactional
-  public void delete(UUID id) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[DELETE] status=START, channelId={}, traceId={}",
-        log.isDebugEnabled() ? id : LogUtils.maskUUID(id), traceId);
-
-    Channel channel = channelRepository.findById(id)
-        .orElseThrow(() -> new RestException(ResultCode.CHANNEL_NOT_FOUND));
-
-    // 관련 도메인 같이 삭제
-    List<Message> messages = messageRepository.findByChannelId(id);
-
-    // cascade 없음을 가정 message, readstatus는 수동 삭제
-    messageRepository.deleteAll(messages);
-    readStatusRepository.deleteByChannelId(id);
-    channelRepository.delete(channel);
-
-    // 성공 로그
-    log.info("[DELETE] status=SUCCESS, channelId={}, traceId={}",
-        LogUtils.maskUUID(id), traceId);
-  }
-
   @Override
-  @Transactional(readOnly = true)
-  public ChannelResponse getChannelResponse(Channel channel) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[RESPONSE] status=START, channelId={}, traceId={}",
-        log.isDebugEnabled() ? channel.getId() : LogUtils.maskUUID(channel.getId()), traceId);
-
-    // 마지막 메시지 시간 조회
-    Instant lastMessageAt = messageRepository.findFirstByChannelIdOrderByCreatedAtDesc(
-            channel.getId())
-        .map(Message::getCreatedAt)
-        .orElse(null);
-
-    // PRIVATE 채널의 참여자 목록 조회
-    List<UserResponse> participants = List.of();
-    if (channel.getType() == ChannelType.PRIVATE) {
-      // 참여자 ID 목록 조회
-      List<UUID> userIds = readStatusRepository.findUsersByChannelId(channel.getId());
-
-      // 참여자 엔티티 일괄 조회 (일괄 조회로 N + 1 이슈 방지)
-      List<User> users = userRepository.findAllById(userIds);
-
-      // 온라인 상태 일괄 조회
-      Instant threshold = Instant.now().minusSeconds(CodeitConstants.ONLINE_THRESHOLD_SECONDS);
-      participants = users.stream()
-          .map(user -> {
-            boolean isOnline =
-                user.getLastActiveAt() != null && user.getLastActiveAt().isAfter(threshold);
-            return userMapper.toResponse(user, isOnline);
-          })
-          .toList();
+  public void delete(UUID channelId) {
+    log.debug("채널 삭제 시작: id={}", channelId);
+    if (!channelRepository.existsById(channelId)) {
+      throw ChannelNotFoundException.withId(channelId);
     }
 
-    // 성공 로그
-    log.info("[RESPONSE] status=SUCCESS, channelId={}, participantCount={}, traceId={}",
-        LogUtils.maskUUID(channel.getId()), participants.size(), traceId);
+    messageRepository.deleteAllByChannelId(channelId);
+    readStatusRepository.deleteAllByChannelId(channelId);
 
-    return channelMapper.toResponse(channel, lastMessageAt, participants);
+    channelRepository.deleteById(channelId);
+    log.info("채널 삭제 완료: id={}", channelId);
   }
-
 }

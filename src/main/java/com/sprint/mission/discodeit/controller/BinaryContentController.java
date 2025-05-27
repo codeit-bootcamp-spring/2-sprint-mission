@@ -1,93 +1,60 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto2.response.BinaryContentResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.util.LogUtils;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
-@RequiredArgsConstructor
-public class BinaryContentController {
+public class BinaryContentController implements BinaryContentApi {
 
   private final BinaryContentService binaryContentService;
-  private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
 
-  // 단일 파일 조회
-  @GetMapping("/{binaryContentId}")
-  public ResponseEntity<BinaryContentResponse> findFile(@PathVariable UUID binaryContentId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND] status=START, contentId={}, traceId={}",
-        log.isDebugEnabled() ? binaryContentId : LogUtils.maskUUID(binaryContentId), traceId);
-
-    BinaryContent content = binaryContentService.findById(binaryContentId);
-    BinaryContentResponse response = binaryContentMapper.toResponse(content);
-
-    // 성공 로그
-    log.info("[FIND] status=SUCCESS, contentId={}, traceId={}",
-        LogUtils.maskUUID(binaryContentId), traceId);
-
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+  @GetMapping(path = "{binaryContentId}")
+  public ResponseEntity<BinaryContentDto> find(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
+    log.info("바이너리 컨텐츠 조회 요청: id={}", binaryContentId);
+    BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
+    log.debug("바이너리 컨텐츠 조회 응답: {}", binaryContent);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContent);
   }
 
-  // 여러 파일 조회
   @GetMapping
-  public ResponseEntity<List<BinaryContentResponse>> findFiles(
+  public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[FIND_ALL] status=START, contentIds={}, traceId={}",
-        log.isDebugEnabled() ? binaryContentIds : LogUtils.maskUUIDList(binaryContentIds), traceId);
-
-    List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-    List<BinaryContentResponse> responses = binaryContents.stream()
-        .map(binaryContentMapper::toResponse)
-        .toList();
-
-    // 성공 로그
-    log.info("[FIND_ALL] status=SUCCESS, contentCount={}, traceId={}",
-        responses.size(), traceId);
-
-    return ResponseEntity.status(HttpStatus.OK).body(responses);
+    log.info("바이너리 컨텐츠 목록 조회 요청: ids={}", binaryContentIds);
+    List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+    log.debug("바이너리 컨텐츠 목록 조회 응답: count={}", binaryContents.size());
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(binaryContents);
   }
 
-  // 파일 다운로드
-  @GetMapping("{binaryContentId}/download")
-  public ResponseEntity<?> downloadFile(@PathVariable UUID binaryContentId) {
-    String traceId = MDC.get("traceId");
-
-    // 시작 로그
-    log.info("[DOWNLOAD] status=START, contentId={}, traceId={}",
-        log.isDebugEnabled() ? binaryContentId : LogUtils.maskUUID(binaryContentId), traceId);
-
-    BinaryContent content = binaryContentService.findById(binaryContentId);
-    BinaryContentResponse response = binaryContentMapper.toResponse(content);
-    ResponseEntity<?> downloadResponse = binaryContentStorage.download(response);
-
-    // 성공 로그
-    log.info("[DOWNLOAD] status=SUCCESS, contentId={}, traceId={}",
-        LogUtils.maskUUID(binaryContentId), traceId);
-
-    return downloadResponse;
+  @GetMapping(path = "{binaryContentId}/download")
+  public ResponseEntity<?> download(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
+    log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
+    BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+    ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}", 
+        response.getHeaders().getContentType(), response.getHeaders().getContentLength());
+    return response;
   }
 }
-
