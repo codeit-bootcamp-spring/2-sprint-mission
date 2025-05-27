@@ -22,7 +22,7 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew test
+          ./gradlew test -Dspring.profiles.active=test
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
