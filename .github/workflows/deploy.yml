@@ -1,0 +1,78 @@
+name: CD Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - release
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image to Public ECR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1  # Public ECR은 us-east-1에서 동작
+
+      - name: Login to Amazon ECR Public
+        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+      - name: Extract commit hash
+        id: vars
+        run: echo "COMMIT_HASH=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: docker build -t $ECR_REPOSITORY_URI:latest -t $ECR_REPOSITORY_URI:${{ env.COMMIT_HASH }} .
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:${{ env.COMMIT_HASH }}
+
+  deploy:
+    name: Deploy to Amazon ECS
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Register new task definition
+        id: register-task
+        run: |
+          TASK_DEF_JSON=$(aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION)
+          NEW_TASK_DEF=$(echo $TASK_DEF_JSON | jq '.taskDefinition' | \
+            jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          UPDATED_TASK_DEF=$(echo $NEW_TASK_DEF | jq --arg IMAGE "$ECR_REPOSITORY_URI:${{ env.COMMIT_HASH }}" \
+            '(.containerDefinitions[0].image) = $IMAGE')
+          echo "$UPDATED_TASK_DEF" > new-task-def.json
+          TASK_DEF_ARN=$(aws ecs register-task-definition --cli-input-json file://new-task-def.json | jq -r '.taskDefinition.taskDefinitionArn')
+          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+
+      - name: Stop running service (scale down to 0)
+        run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --desired-count 0
+
+      - name: Deploy new task definition
+        run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ env.TASK_DEF_ARN }} --desired-count 1
