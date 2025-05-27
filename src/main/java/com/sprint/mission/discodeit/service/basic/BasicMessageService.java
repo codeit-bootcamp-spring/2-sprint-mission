@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.Message;
 import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -22,15 +22,12 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,9 +53,9 @@ public class BasicMessageService implements MessageService {
     String content = messageCreateRequest.content();
 
     User author = userRepository.findById(authorId)
-        .orElseThrow(() -> new UserNotFoundException(authorId));
+        .orElseThrow(() -> UserNotFoundException.byId(authorId));
     Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new ChannelNotFoundException(channelId));
+        .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
@@ -82,9 +79,9 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   @Override
   public MessageDto findById(UUID id) {
-    Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new MessageNotFoundException(id));
-    return messageMapper.toDto(message);
+    return messageRepository.findById(id)
+        .map(messageMapper::toDto)
+        .orElseThrow(() -> MessageNotFoundException.byId(id));
   }
 
   @Transactional(readOnly = true)
@@ -124,7 +121,7 @@ public class BasicMessageService implements MessageService {
   public MessageDto updateMessage(UUID messageId, MessageUpdateRequest request) {
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException(messageId));
+        .orElseThrow(() -> MessageNotFoundException.byId(messageId));
 
     message.update(newContent);
     return messageMapper.toDto(message);
@@ -134,7 +131,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public void deleteMessage(UUID messageId) {
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new MessageNotFoundException(messageId));
+        .orElseThrow(() -> MessageNotFoundException.byId(messageId));
     checkUserExists(message.getAuthor().getId());
     ensureMessageBelongsToChannel(message, message.getChannel().getId());
 
@@ -160,8 +157,8 @@ public class BasicMessageService implements MessageService {
   }
 
   private void checkUserExists(UUID userId) {
-    if (userRepository.findById(userId).isEmpty()) {
-      throw new UserNotFoundException(userId);
+    if (!userRepository.existsById(userId)) {
+      throw UserNotFoundException.byId(userId);
     }
   }
 
