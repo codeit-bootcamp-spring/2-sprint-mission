@@ -1,0 +1,70 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - part2-양성준-sprint8
+
+jobs:
+  build-and-deploy:
+    name: build and deploy to production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+
+      - name: configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_DEPLOY_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_DEPLOY_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+      - name: set up docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: give authority to gradlew
+        run: chmod +x ./gradlew
+
+      - name: build and push docker image to ecr
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            public.ecr.aws/${{ secrets.ECR_ALIAS }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+            public.ecr.aws/${{ secrets.ECR_ALIAS }}/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+
+      - name: download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION_FAMILY }} --query taskDefinition > task-definition.json
+          echo "task definition downloaded"
+
+      - name: update task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ secrets.ECS_CONTAINER_NAME }}
+          image: public.ecr.aws/${{ secrets.ECR_ALIAS }}/${{ secrets.ECR_REPOSITORY_NAME }}:${{ github.sha }}
+          family: ${{ secrets.ECS_TASK_DEFINITION_FAMILY }}
+
+      - name: print task definition
+        run: |
+          echo ${{ steps.task-def.outputs.task-definition }}
+          cat ${{ steps.task-def.outputs.task-definition }}
+
+      - name: deploy to AWS ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE_NAME }}
+          cluster: ${{ secrets.ECS_CLUSTER_NAME }}
+          wait-for-service-stability: true
