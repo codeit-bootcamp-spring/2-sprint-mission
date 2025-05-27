@@ -23,12 +23,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @DataJpaTest
 @EnableJpaAuditing
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class MessageRepositoryTest {
 
   @Autowired
@@ -47,8 +49,7 @@ public class MessageRepositoryTest {
    * TestFixture: 사용자 생성
    */
   private User createTestUser(String username, String email) {
-    BinaryContent profile = BinaryContent.create("profile.jpg", 1024L, "image/jpeg");
-    User user = User.create(username, email, "password123!@#", profile);
+    User user = User.create(username, email, "password123!@#", null);
     UserStatus status = UserStatus.create(user, Instant.now());
     return userRepository.save(user);
   }
@@ -187,7 +188,7 @@ public class MessageRepositoryTest {
   }
 
   @Test
-  @DisplayName("채널의 모든 메시지를 삭제할 수 있다")
+  @DisplayName("Delete All Messages By ChannelId_성공")
   void deleteAllByChannelId_DeletesAllMessages() {
     // given
     User author = createTestUser("testUser", "test@example.com");

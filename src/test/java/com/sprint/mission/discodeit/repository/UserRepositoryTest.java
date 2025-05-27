@@ -26,6 +26,10 @@ public class UserRepositoryTest {
   private UserRepository userRepository;
 
   @Autowired
+  private BinaryContentRepository binaryContentRepository;
+
+
+  @Autowired
   private TestEntityManager entityManager;
 
   /**
@@ -33,6 +37,7 @@ public class UserRepositoryTest {
    */
   private User createTestUser(String username, String email) {
     BinaryContent profile = BinaryContent.create("profile.jpg", 1024L, "image/jpeg");
+    binaryContentRepository.save(profile);
     User user = User.create(username, email, "password123!@#", profile);
     // UserStatus 생성 및 연결
     UserStatus status = UserStatus.create(user, Instant.now());
@@ -122,7 +127,7 @@ public class UserRepositoryTest {
     // then
     assertThat(users).hasSize(2);
     assertThat(users).extracting("username").containsExactlyInAnyOrder("user1", "user2");
-    
+
     User foundUser1 = users.stream().filter(u -> u.getUsername().equals("user1")).findFirst()
         .orElseThrow();
     User foundUser2 = users.stream().filter(u -> u.getUsername().equals("user2")).findFirst()
