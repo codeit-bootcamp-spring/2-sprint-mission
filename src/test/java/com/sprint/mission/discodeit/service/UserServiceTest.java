@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -26,6 +28,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,22 +58,35 @@ public class UserServiceTest {
   @Mock
   private UserMapper userMapper;
 
+  private UUID userId;
+  private String username;
+  private String email;
+  private String password;
+  private User user;
+  private UserDto userDto;
+
+  @BeforeEach
+  void setUp() {
+    userId = UUID.randomUUID();
+    username = "testUser";
+    email = "test@example.com";
+    password = "password123";
+
+    user = User.create(username, email, password, null);
+    ReflectionTestUtils.setField(user, "id", userId);
+    userDto = new UserDto(userId, username, email, null, true);
+  }
+
   @Test
   @DisplayName("Create User_성공")
   void createUser_shouldReturnCreatedUser() {
     // given
-    UUID userId = UUID.randomUUID();
     UserCreateRequest request = new UserCreateRequest("bbori@dog.com", "bbori1234", "뽀리");
 
-    User savedUser = User.create(request.username(), request.email(), request.password(), null);
-    ReflectionTestUtils.setField(savedUser, "id", userId);
-
-    UserDto userDto = new UserDto(userId, request.username(), request.email(), null, true);
-
-    when(userRepository.save(any(User.class))).thenReturn(savedUser);
-    when(userRepository.existsByEmail(request.email())).thenReturn(false);
-    when(userRepository.existsByUsername(request.username())).thenReturn(false);
-    when(userMapper.toDto(savedUser, true)).thenReturn(userDto);
+    given(userRepository.save(any(User.class))).willReturn(user);
+    given(userRepository.existsByEmail(request.email())).willReturn(false);
+    given(userRepository.existsByUsername(request.username())).willReturn(false);
+    given(userMapper.toDto(user)).willReturn(userDto);
 
     // when
     UserDto result = userService.createUser(request, Optional.empty());
@@ -79,10 +95,10 @@ public class UserServiceTest {
     assertThat(result.username()).isEqualTo(request.username());
     assertThat(result.email()).isEqualTo(request.email());
 
-    verify(userRepository).save(any(User.class));
-    verify(userRepository).existsByEmail(request.email());
-    verify(userRepository).existsByUsername(request.username());
-    verify(userMapper).toDto(savedUser, true);
+    then(userRepository).should().save(any(User.class));
+    then(userRepository).should().existsByEmail(request.email());
+    then(userRepository).should().existsByUsername(request.username());
+    then(userMapper).should().toDto(user);
   }
 
   @Test
@@ -90,7 +106,8 @@ public class UserServiceTest {
   void createUser_shouldThrowException_whenEmailAlreadyExists() {
     // given
     UserCreateRequest request = new UserCreateRequest("bbori@dog.com", "bbori1234", "뽀리");
-    when(userRepository.existsByEmail(request.email())).thenReturn(Boolean.TRUE);
+
+    given(userRepository.existsByEmail(request.email())).willReturn(Boolean.TRUE);
 
     // when & then
     UserAlreadyExistException exception = assertThrows(UserAlreadyExistException.class,
@@ -99,9 +116,9 @@ public class UserServiceTest {
     assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATE_USER_EMAIL);
     assertThat(exception.getDetails().get("email")).isEqualTo(request.email());
 
-    verify(userRepository).existsByEmail(request.email());
-    verify(userRepository, never()).existsByUsername(any());
-    verify(userRepository, never()).save(any());
+    then(userRepository).should().existsByEmail(request.email());
+    then(userRepository).should(never()).existsByUsername(any());
+    then(userRepository).should(never()).save(any(User.class));
   }
 
   @Test
@@ -109,8 +126,9 @@ public class UserServiceTest {
   void createUser_shouldThrowException_whenUsernameAlreadyExists() {
     // given
     UserCreateRequest request = new UserCreateRequest("bbori@dog.com", "bbori1234", "뽀리");
-    when(userRepository.existsByEmail(request.email())).thenReturn(Boolean.FALSE);
-    when(userRepository.existsByUsername(request.username())).thenReturn(Boolean.TRUE);
+
+    given(userRepository.existsByEmail(request.email())).willReturn(Boolean.FALSE);
+    given(userRepository.existsByUsername(request.username())).willReturn(Boolean.TRUE);
 
     // when & then
     UserAlreadyExistException exception = assertThrows(UserAlreadyExistException.class,
@@ -119,31 +137,21 @@ public class UserServiceTest {
     assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATE_USER_USERNAME);
     assertThat(exception.getDetails().get("username")).isEqualTo(request.username());
 
-    verify(userRepository).existsByEmail(request.email());
-    verify(userRepository).existsByUsername(request.username());
-    verify(userRepository, never()).save(any());
+    then(userRepository).should().existsByEmail(request.email());
+    then(userRepository).should().existsByUsername(request.username());
+    then(userRepository).should(never()).save(any(User.class));
   }
 
   @Test
   @DisplayName("Update User_성공")
   void updateUser_shouldReturnUpdatedUser() {
     // given
-    UUID userId = UUID.randomUUID();
     UserUpdateRequest request = new UserUpdateRequest("new뽀리", "bbori@dog.net", "bbori4321@");
 
-    User user = User.create("뽀리", "bbori@dog.com", "bbori1234!", null);
-    ReflectionTestUtils.setField(user, "id", userId);
-
-    UserStatus status = UserStatus.create(user, Instant.now());
-    ReflectionTestUtils.setField(user, "status", status);
-
-    UserDto userDto = new UserDto(userId, request.newUsername(), request.newEmail(), null, true);
-
-    // Mock 설정
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(userRepository.existsByEmail(request.newEmail())).thenReturn(false);
-    when(userRepository.existsByUsername(request.newUsername())).thenReturn(false);
-    when(userMapper.toDto(user, true)).thenReturn(userDto);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
+    given(userRepository.existsByEmail(request.newEmail())).willReturn(false);
+    given(userRepository.existsByUsername(request.newUsername())).willReturn(false);
+    given(userMapper.toDto(user)).willReturn(userDto);
 
     // when
     UserDto result = userService.updateUser(userId, request, Optional.empty());
@@ -152,20 +160,19 @@ public class UserServiceTest {
     assertThat(result.username()).isEqualTo(request.newUsername());
     assertThat(result.email()).isEqualTo(request.newEmail());
 
-    verify(userRepository).findById(userId);
-    verify(userRepository).existsByEmail(request.newEmail());
-    verify(userRepository).existsByUsername(request.newUsername());
-    verify(userMapper).toDto(user, true);
+    then(userRepository).should().findById(userId);
+    then(userRepository).should().existsByEmail(request.newEmail());
+    then(userRepository).should().existsByUsername(request.newUsername());
+    then(userMapper).should().toDto(user);
   }
 
   @Test
   @DisplayName("Update User_실패_존재하지 않는 사용자")
   void updateUser_shouldThrowException_whenUserNotFound() {
     // given
-    UUID userId = UUID.randomUUID();
     UserUpdateRequest request = new UserUpdateRequest("new뽀리", "bbori@dog.net", "bbori4321@");
 
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
 
     // when & then
     UserNotFoundException exception = assertThrows(UserNotFoundException.class,
@@ -174,58 +181,49 @@ public class UserServiceTest {
     assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
     assertThat(exception.getDetails().get("userId")).isEqualTo(userId);
 
-    verify(userRepository).findById(userId);
-    verify(userRepository, never()).existsByEmail(any());
-    verify(userRepository, never()).existsByUsername(any());
+    then(userRepository).should().findById(userId);
+    then(userRepository).should(never()).existsByEmail(any());
+    then(userRepository).should(never()).existsByUsername(any());
   }
 
   @Test
   @DisplayName("Delete User_성공")
   void deleteUser() {
     // given
-    UUID userId = UUID.randomUUID();
     UUID profileId = UUID.randomUUID();
 
     BinaryContent profile = BinaryContent.create("bbori.png", 100L, "image/png");
     ReflectionTestUtils.setField(profile, "id", profileId);
 
-    User user = User.create("뽀리", "bbori@dog.com", "bbori1234!", profile);
-    ReflectionTestUtils.setField(user, "id", userId);
-
     UserStatus status = UserStatus.create(user, Instant.now());
     ReflectionTestUtils.setField(user, "status", status);
 
-    // Mock 설정
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(userStatusRepository.findByUserId(userId)).thenReturn(Optional.of(status));
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
+    given(userStatusRepository.findByUserId(userId)).willReturn(Optional.of(status));
 
     // when
     userService.deleteUser(userId);
 
     // then
-    verify(userRepository).findById(userId);
-    verify(userStatusRepository).findByUserId(userId);
-    verify(binaryContentStorage).deleteById(profileId);
-    verify(binaryContentRepository).deleteById(profileId);
-    verify(userStatusRepository).deleteById(status.getId());
-    verify(userRepository).deleteById(userId);
+    then(userRepository).should().findById(userId);
+    then(userStatusRepository).should().findByUserId(userId);
+    then(binaryContentStorage).should().deleteById(profileId);
+    then(binaryContentRepository).should().deleteById(profileId);
+    then(userStatusRepository).should().deleteById(status.getId());
+    then(userRepository).should().deleteById(userId);
   }
 
   @Test
   @DisplayName("Delete User_실패_사용자가 존재하지 않을 때")
   void deleteUser_shouldThrowException_whenUserNotFound() {
     // given
-    UUID userId = UUID.randomUUID();
     UUID profileId = UUID.randomUUID();
 
     BinaryContent profile = BinaryContent.create("bbori.png", 100L, "image/png");
     ReflectionTestUtils.setField(profile, "id", profileId);
 
-    User user = User.create("뽀리", "bbori@dog.com", "bbori1234!", profile);
-    ReflectionTestUtils.setField(user, "id", userId);
-
     // Mock 설정
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
 
     // when & then
     UserNotFoundException exception = assertThrows(UserNotFoundException.class,
@@ -234,8 +232,44 @@ public class UserServiceTest {
     assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
     assertThat(exception.getDetails().get("userId")).isEqualTo(userId);
 
-    verify(userRepository).findById(userId);
-    verify(userRepository, never()).deleteById(userId);
-    verifyNoMoreInteractions(userStatusRepository, binaryContentStorage, binaryContentRepository);
+    then(userRepository).should().findById(userId);
+    then(userRepository).should(never()).deleteById(userId);
+    then(userStatusRepository).shouldHaveNoMoreInteractions();
+    then(binaryContentStorage).shouldHaveNoMoreInteractions();
+    then(binaryContentRepository).shouldHaveNoMoreInteractions();
   }
+
+  @Test
+  @DisplayName("findById_성공")
+  void findById_success() {
+    // given
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
+    given(userMapper.toDto(user)).willReturn(userDto);
+
+    // when
+    UserDto result = userService.findById(userId);
+
+    // then
+    assertThat(result).isEqualTo(userDto);
+    then(userRepository).should().findById(userId);
+    then(userMapper).should().toDto(user);
+  }
+
+  @Test
+  @DisplayName("findById_실패_사용자가 존재하지 않을 때")
+  void findById_shouldThrowException_whenUserNotFound() {
+    // given
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+    // when & then
+    UserNotFoundException exception = assertThrows(UserNotFoundException.class,
+        () -> userService.deleteUser(userId));
+
+    assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
+    assertThat(exception.getDetails().get("userId")).isEqualTo(userId);
+
+    then(userRepository).should().findById(userId);
+    then(userMapper).should(never()).toDto(user);
+  }
+
 }

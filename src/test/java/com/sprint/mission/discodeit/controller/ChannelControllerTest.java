@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -13,7 +13,7 @@ import com.sprint.mission.discodeit.domain.ChannelType;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,7 @@ public class ChannelControllerTest {
   private MockMvc mockMvc;
 
   @MockitoBean
-  private BasicChannelService channelService;
+  private ChannelService channelService;
 
   @Test
   @DisplayName("Update Channel_성공")
@@ -46,7 +46,7 @@ public class ChannelControllerTest {
         List.of(), null);
 
     // when
-    when(channelService.updateChannel(channelId, publicChannelUpdateRequest)).thenReturn(
+    given(channelService.updateChannel(channelId, publicChannelUpdateRequest)).willReturn(
         channelDto);
 
     // then
@@ -55,7 +55,7 @@ public class ChannelControllerTest {
             .content(new ObjectMapper().writeValueAsString(publicChannelUpdateRequest)))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.id").value(channelDto.id().toString()))
+        .andExpect(jsonPath("$.id").value(channelId.toString()))
         .andExpect(jsonPath("$.name").value("수정된 채널 이름"))
         .andExpect(jsonPath("$.description").value("수정 테스트입니다."));
   }
@@ -69,13 +69,9 @@ public class ChannelControllerTest {
     PublicChannelUpdateRequest publicChannelUpdateRequest = new PublicChannelUpdateRequest(
         "수정된 채널 이름", "수정 테스트입니다.");
 
-    ChannelDto channelDto = new ChannelDto(invalidChannelId, ChannelType.PUBLIC, "수정된 채널 이름",
-        "수정 테스트입니다.",
-        List.of(), null);
-
     // when
-    when(channelService.updateChannel(eq(invalidChannelId), any()))
-        .thenThrow(new ChannelNotFoundException(invalidChannelId));
+    given(channelService.updateChannel(eq(invalidChannelId), any()))
+        .willThrow(ChannelNotFoundException.byId(invalidChannelId));
 
     // then
     mockMvc.perform(patch("/api/channels/{channelId}", invalidChannelId.toString())
