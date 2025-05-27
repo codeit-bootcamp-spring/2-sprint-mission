@@ -1,0 +1,64 @@
+package com.sprint.mission.discodeit.storage;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import com.sprint.mission.discodeit.storage.s3.AWSS3Test;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Properties;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
+
+@SpringBootTest
+@ActiveProfiles("test")
+class AWSS3TestTest {
+
+  @Autowired
+  private AWSS3Test awsS3Test;
+
+  @BeforeAll
+  static void loadEnv() throws IOException {
+    Properties props = new Properties();
+    props.load(Files.newBufferedReader(Paths.get(".env")));
+
+    props.forEach((key, value) -> {
+      System.setProperty((String) key, (String) value);
+    });
+  }
+
+  @Test
+  void testUpload() throws Exception {
+    String content = "Hello S3!";
+    MockMultipartFile mockFile = new MockMultipartFile(
+        "file", "test.txt", "text/plain", content.getBytes(StandardCharsets.UTF_8));
+
+    String uploadedUrl = awsS3Test.upload(mockFile);
+
+    assertNotNull(uploadedUrl);
+  }
+
+  @Test
+  void testDownload() {
+    String key = "d56ba30d-459b-46ae-a0c5-34b87fed7975-test.txt";
+
+    byte[] content = awsS3Test.download(key);
+
+    assertNotNull(content);
+  }
+
+  @Test
+  void testPresignedUrl() {
+    String key = "d56ba30d-459b-46ae-a0c5-34b87fed7975-test.txt";
+
+    String url = awsS3Test.generatePresignedUrl(key, Duration.ofMinutes(10));
+
+    assertNotNull(url);
+  }
+}
