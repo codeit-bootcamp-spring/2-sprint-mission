@@ -40,21 +40,14 @@ public class UserController {
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
-      @Valid @RequestPart("userCreateRequest") UserCreateRequest request,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("Received user creation request: {}", request.toString());
-    if (profile != null) {
-      log.info("Received profile file: name={}, size={} bytes", profile.getOriginalFilename(),
-          profile.getSize());
-    } else {
-      log.info("No profile image uploaded.");
-    }
-
+    log.info("사용자 생성 요청: {}", request);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(FileUtil::toBinaryRequest);
     UserDto createdUser = userService.createUser(request, profileRequest);
-    log.info("Created user with ID: {}", createdUser.id());
+    log.debug("사용자 생성 응답: {}", createdUser);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -63,32 +56,39 @@ public class UserController {
   @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest request,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    log.info("사용자 수정 요청: id={}, request={}", userId, request);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(FileUtil::toBinaryRequest);
     UserDto updatedUser = userService.updateUser(userId, request, profileRequest);
+    log.debug("사용자 수정 응답: {}", updatedUser);
     return ResponseEntity.ok(updatedUser);
   }
 
   @GetMapping
   public ResponseEntity<List<UserDto>> getAll() {
     List<UserDto> users = userService.findAll();
+    log.debug("사용자 목록 조회 응답: count={}", users.size());
     return ResponseEntity.ok(users);
   }
 
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @PathVariable("userId") UUID userId,
-      @RequestBody UserStatusUpdateRequest request) {
+      @RequestBody @Valid UserStatusUpdateRequest request) {
+    log.info("사용자 상태 조회: id={}, request={}", userId, request);
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
+    log.debug("사용자 상태 조회: {}", updatedUserStatus);
     return ResponseEntity.ok(updatedUserStatus);
   }
 
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
+    log.info("사용자 삭제 요청: id={}", userId);
     userService.deleteUser(userId);
+    log.debug("사용자 삭제 완료");
     return ResponseEntity.noContent().build();
   }
 
