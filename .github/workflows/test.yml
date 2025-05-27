@@ -22,7 +22,10 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew test -Dspring.profiles.active=test
+          ./gradlew test -Dspring.profiles.active=test --info
+
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
