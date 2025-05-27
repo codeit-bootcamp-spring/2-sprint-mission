@@ -106,7 +106,7 @@ public class MessageRepositoryTest {
     assertThat(messages.hasContent()).isTrue();
     assertThat(messages.getNumberOfElements()).isEqualTo(2);  // 페이지 크기 만큼만 반환
     assertThat(messages.hasNext()).isTrue();
-    assertThat(firstMessage.getContent()).isEqualTo("첫 번째 메시지");
+    assertThat(firstMessage.getContent()).isEqualTo("세 번째 메시지");
     assertThat(firstMessage.getChannel().getId()).isEqualTo(channel.getId());
     assertThat(firstMessage.getCreatedAt()).isAfterOrEqualTo(
         content.get(1).getCreatedAt()); // 정렬 기준 적용되었는지 확인
