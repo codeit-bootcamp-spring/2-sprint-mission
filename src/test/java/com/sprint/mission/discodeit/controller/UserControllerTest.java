@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -14,8 +13,6 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -70,8 +67,7 @@ class UserControllerTest {
     );
 
     UserDto userDto = new UserDto(userId, "testUser", "test@email.com", profileDto, true);
-
-    //
+    
     given(userService.createUser(any(UserCreateRequest.class), any(Optional.class))).willReturn(
         userDto);
 
