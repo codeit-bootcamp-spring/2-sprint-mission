@@ -14,11 +14,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   boolean existsByChannelId(UUID channelId);
 
-  @EntityGraph(attributePaths = {
-      "author",
-      "author.profile",
-      "author.status"
-  })
+  @EntityGraph(attributePaths = {"author"})
   @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId AND m.createdAt < :createdAt")
   Slice<Message> findAllByChannelId(
       UUID channelId,
