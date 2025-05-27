@@ -74,5 +74,8 @@ jobs:
       - name: Stop running service (scale down to 0)
         run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --desired-count 0
 
+      - name: Wait until service is fully stopped
+        run: aws ecs wait services-stable --cluster $ECS_CLUSTER --services $ECS_SERVICE
+
       - name: Deploy new task definition
         run: aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition ${{ env.TASK_DEF_ARN }} --desired-count 1 --force-new-deployment
