@@ -124,6 +124,3 @@ ALTER TABLE read_statuses
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
             ON DELETE CASCADE;
-
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
