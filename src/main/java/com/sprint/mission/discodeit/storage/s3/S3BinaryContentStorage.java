@@ -54,12 +54,15 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     @Override
     public ResponseEntity<?> download(BinaryContentDto dto) {
         String key = dto.id().toString();
+        String originalFileName = dto.fileName();
 
         // 1. Presigned URL 발급
         GetObjectRequest getReq = GetObjectRequest.builder()
             .bucket(bucket)
             .key(key)
+            .responseContentDisposition("attachment; filename=\"" + originalFileName + "\"")
             .build();
+
         PresignedGetObjectRequest presigned = s3Presigner.presignGetObject(
             GetObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofSeconds(presignedUrlExpiration))

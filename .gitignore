@@ -6,6 +6,7 @@ build/
 uploads
 .logs/
 .env
+discodeit.env
 .discodeit
 
 ### IntelliJ IDEA ###

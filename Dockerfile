@@ -38,4 +38,4 @@ COPY --from=builder /app/build/libs/2-sprint-mission-1.2.-M8.jar /app/app.jar
 EXPOSE 80
 
 # 실행 명령어 설정
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java -jar /app/app.jar"]
