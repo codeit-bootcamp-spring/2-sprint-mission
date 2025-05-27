@@ -13,7 +13,7 @@ spring:
     open-in-view: false
   profiles:
     active:
-      - prod
+      - dev
 
 management:
   endpoints:
@@ -50,10 +50,10 @@ discodeit:
     local:
       root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
     s3:
-      access-key: ${AWS_S3_ACCESS_KEY}
-      secret-key: ${AWS_S3_SECRET_KEY}
-      region: ${AWS_S3_REGION}
-      bucket: ${AWS_S3_BUCKET}
+      access-key: ${AWS_S3_ACCESS_KEY:your-access-key}
+      secret-key: ${AWS_S3_SECRET_KEY:your-secret-key}
+      region: ${AWS_S3_REGION:ap-northeast-2}
+      bucket: ${AWS_S3_BUCKET:your-bucket-name}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
 
 logging:

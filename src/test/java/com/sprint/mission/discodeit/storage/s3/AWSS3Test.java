@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.storage.s3;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.discodeit.config.AWSS3Properties;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -13,13 +14,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -30,12 +29,9 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 public class AWSS3Test {
-
-  @Autowired
-  private AWSS3Properties properties;
 
   @Mock
   private S3Client s3Client;
@@ -43,10 +39,7 @@ public class AWSS3Test {
   @Mock
   private S3Presigner s3Presigner;
 
-  @BeforeEach
-  void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
+  private final String bucket = "test";
 
   @Test
   @DisplayName("S3 파일 업로드 - putObject 호출 검증")
@@ -54,7 +47,7 @@ public class AWSS3Test {
     File file = new File("src/test/resources/sample.txt");
 
     PutObjectRequest request = PutObjectRequest.builder()
-        .bucket(properties.getBucket())
+        .bucket(bucket)
         .key("test/upload.txt")
         .contentType("text/plain")
         .build();
@@ -63,6 +56,9 @@ public class AWSS3Test {
         .thenReturn(PutObjectResponse.builder().eTag("mock-etag").build());
 
     s3Client.putObject(request, RequestBody.fromFile(file));
+
+    // 호출 검증
+    verify(s3Client).putObject(eq(request), any(RequestBody.class));
   }
 
   @Test
@@ -71,7 +67,7 @@ public class AWSS3Test {
     File file = new File("src/test/resources/download.txt");
 
     GetObjectRequest request = GetObjectRequest.builder()
-        .bucket(properties.getBucket())
+        .bucket(bucket)
         .key("test/upload.txt")
         .build();
 
@@ -82,6 +78,9 @@ public class AWSS3Test {
         });
 
     s3Client.getObject(request, file.toPath());
+
+    assertThat(file.exists()).isTrue();
+    assertThat(Files.readString(file.toPath())).isEqualTo("mock content");
   }
 
   @Test
@@ -90,7 +89,7 @@ public class AWSS3Test {
     URL mockUrl = new URL("https://mock-url.com/file");
 
     GetObjectRequest request = GetObjectRequest.builder()
-        .bucket(properties.getBucket())
+        .bucket(bucket)
         .key("test/upload.txt")
         .build();
 
@@ -107,6 +106,6 @@ public class AWSS3Test {
 
     URL url = s3Presigner.presignGetObject(presignRequest).url();
 
-    assertEquals(mockUrl, url);
+    assertThat(url).isEqualTo(mockUrl);
   }
 }
