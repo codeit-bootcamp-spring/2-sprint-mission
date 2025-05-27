@@ -1,5 +1,13 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.storage.S3BinaryContentStorage;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,7 +15,12 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -20,77 +33,75 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+@SpringBootTest(properties = {
+        "discodeit.storage.type=s3"
+})
+@ActiveProfiles("test")
 public class AWSS3Test {
 
-    private static S3Client s3Client;
-    private static S3Presigner s3Presigner;
-    private static String bucketName;
+    @Value("${discodeit.storage.s3.access-key}")
+    private String accessKey;
 
-    @BeforeAll
-    static void setup() throws IOException {
-        Properties props = new Properties();
-        try (InputStream input = new FileInputStream(".env")) {
-            props.load(input);
-        }
+    @Value("${discodeit.storage.s3.secret-key}")
+    private String secretKey;
 
-        String accessKey = props.getProperty("AWS_S3_ACCESS_KEY");
-        String secretKey = props.getProperty("AWS_S3_SECRET_KEY");
-        bucketName = props.getProperty("AWS_S3_BUCKET");
-        Region region = Region.of(props.getProperty("AWS_S3_REGION"));
+    @Value("${discodeit.storage.s3.region}")
+    private String region;
 
-        StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
-                AwsBasicCredentials.create(accessKey, secretKey)
-        );
+    @Value("${discodeit.storage.s3.bucket}")
+    private String bucket;
 
-        s3Client = S3Client.builder()
-                .region(region)
-                .credentialsProvider(credentialsProvider)
-                .build();
+    @Value("${discodeit.storage.s3.presigned-url-expiration}")
+    private int expiration;
 
-        s3Presigner = S3Presigner.builder()
-                .region(region)
-                .credentialsProvider(credentialsProvider)
-                .build();
+    private S3BinaryContentStorage storage;
+
+    @BeforeEach
+    void setup() throws Exception {
+        storage = new S3BinaryContentStorage(accessKey, secretKey, region, bucket, expiration);
     }
 
     @Test
-    void testUpload() throws IOException {
-        String key = "test/" + UUID.randomUUID() + ".txt";
-        String content = "Hello from S3 Test!";
-        s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(key)
-                        .build(),
-                RequestBody.fromString(content)
-        );
-        System.out.println("Upload success: " + key);
+    void testPutAndGet() throws IOException {
+        UUID id = UUID.randomUUID();
+        byte[] content = "Hello S3 Test".getBytes();
+
+        UUID storedId = storage.put(id, content);
+        assertEquals(id, storedId);
+
+        try (InputStream inputStream = storage.get(id)) {
+            assertNotNull(inputStream);
+            byte[] readBytes = inputStream.readAllBytes();
+            assertArrayEquals(content, readBytes);
+        }
     }
 
     @Test
     void testDownload() throws IOException {
-        String key = "test/b12e3242-df1a-4d6a-9564-a541ca5d22f9.txt";
-        ResponseInputStream<GetObjectResponse> response = s3Client.getObject(GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build());
+        UUID id = UUID.randomUUID();
+        byte[] content = "Download test".getBytes();
+        storage.put(id, content);
 
-        String downloaded = new String(response.readAllBytes());
-        System.out.println("Downloaded content: " + downloaded);
+        BinaryContentDto dto = new BinaryContentDto(id, "sample.txt", (long) content.length, "text/plain");
+        ResponseEntity<?> response = storage.download(dto);
+
+        assertEquals(302, response.getStatusCode().value());
+        assertNotNull(response.getHeaders().getLocation());
+        assertTrue(response.getHeaders().getLocation().toString().contains("amazonaws.com"));
     }
 
     @Test
-    void testGeneratePresignedUrl() {
-        String key = "test/b12e3242-df1a-4d6a-9564-a541ca5d22f9.txt";
+    void testDelete() {
+        UUID id = UUID.randomUUID();
+        byte[] content = "Delete test".getBytes();
+        storage.put(id, content);
 
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .build();
+        UUID deletedId = storage.delete(id);
+        assertEquals(id, deletedId);
 
-        PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(b -> b
-                .signatureDuration(Duration.ofMinutes(10))
-                .getObjectRequest(getObjectRequest));
-
-        System.out.println("Presigned URL: " + presignedRequest.url());
+        assertThrows(Exception.class, () -> {
+            try (InputStream ignored = storage.get(id)) {
+            }
+        });
     }
 }
