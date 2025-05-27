@@ -54,6 +54,10 @@ test {
     finalizedBy jacocoTestReport
 }
 
+jacoco {
+    toolVersion = '0.8.10'
+}
+
 jacocoTestReport {
     dependsOn test
     reports {
