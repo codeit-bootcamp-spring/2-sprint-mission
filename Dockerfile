@@ -11,6 +11,7 @@ COPY gradle gradle
 COPY gradlew .
 COPY build.gradle .
 COPY settings.gradle .
+COPY .env /app/.env
 
 # 의존성 설치
 RUN ./gradlew dependencies -q --no-daemon
@@ -19,7 +20,7 @@ RUN ./gradlew dependencies -q --no-daemon
 COPY src src
 RUN ./gradlew build -PprojectName=${PROJECT_NAME} -PprojectVersion=${PROJECT_VERSION} -x test -q
 
-FROM amazoncorretto:17-alpine-jdk
+FROM amazoncorretto:17
 
 ARG PROJECT_NAME=2-sprint-mission
 ARG PROJECT_VERSION=1.2-M8

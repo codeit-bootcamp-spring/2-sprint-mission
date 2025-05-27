@@ -77,6 +77,20 @@ jobs:
             SPRING_PROFILES_ACTIVE=dev
             HELLO=world
 
+      - name: Scale ECS Service to zero
+        run: |
+          aws ecs update-service \
+          --cluster discodeit-cluster \
+          --service discodeit-service \
+          --desired-count 0
+
+      - name: Scale ECS Service to 1
+        run: |
+          aws ecs update-service \
+          --cluster ${{ vars.ECS_CLUSTER }}\
+          --service ${{ vars.ECS_SERVICE }}\
+          --desired-count 1
+
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
