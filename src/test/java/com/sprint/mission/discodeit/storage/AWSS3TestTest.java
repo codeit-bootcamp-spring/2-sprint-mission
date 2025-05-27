@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.sprint.mission.discodeit.storage.s3.AWSS3Test;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -24,12 +25,15 @@ class AWSS3TestTest {
   private AWSS3Test awsS3Test;
 
   @BeforeAll
-  static void loadEnv() throws IOException {
-    Properties props = new Properties();
-    props.load(Files.newBufferedReader(Paths.get(".env")));
+  static void loadEnv() {
+    Dotenv dotenv = Dotenv.configure()
+        .ignoreIfMissing()
+        .load();
 
-    props.forEach((key, value) -> {
-      System.setProperty((String) key, (String) value);
+    dotenv.entries().forEach(entry -> {
+      if (System.getProperty(entry.getKey()) == null) {
+        System.setProperty(entry.getKey(), entry.getValue());
+      }
     });
   }
 

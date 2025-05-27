@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,12 +51,15 @@ class UserIntegrationTest {
   private ObjectMapper objectMapper;
 
   @BeforeAll
-  static void loadEnv() throws IOException {
-    Properties props = new Properties();
-    props.load(Files.newBufferedReader(Paths.get(".env")));
+  static void loadEnv() {
+    Dotenv dotenv = Dotenv.configure()
+        .ignoreIfMissing()
+        .load();
 
-    props.forEach((key, value) -> {
-      System.setProperty((String) key, (String) value);
+    dotenv.entries().forEach(entry -> {
+      if (System.getProperty(entry.getKey()) == null) {
+        System.setProperty(entry.getKey(), entry.getValue());
+      }
     });
   }
 

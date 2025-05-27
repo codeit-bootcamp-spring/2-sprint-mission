@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -40,14 +41,16 @@ class S3BinaryContentStorageTest {
     binaryContentDto = new BinaryContentDto(id, "s3test.txt", (long) content.length, "text/plain");
   }
 
-  // cf. ApplicationContextInitializer 사용
   @BeforeAll
-  static void loadEnv() throws IOException {
-    Properties props = new Properties();
-    props.load(Files.newBufferedReader(Paths.get(".env")));
+  static void loadEnv() {
+    Dotenv dotenv = Dotenv.configure()
+        .ignoreIfMissing()
+        .load();
 
-    props.forEach((key, value) -> {
-      System.setProperty((String) key, (String) value);
+    dotenv.entries().forEach(entry -> {
+      if (System.getProperty(entry.getKey()) == null) {
+        System.setProperty(entry.getKey(), entry.getValue());
+      }
     });
   }
 
