@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=PostgreSQL
+    url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
