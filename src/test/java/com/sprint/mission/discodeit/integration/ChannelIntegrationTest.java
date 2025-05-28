@@ -21,12 +21,8 @@ import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -111,15 +107,15 @@ class ChannelIntegrationTest {
   void createPrivateChannel_Success() throws Exception {
     // given
     UserCreateRequest userRequest1 = new UserCreateRequest(
-        "user1",
         "user1@example.com",
-        "Password1!"
+        "Password1!",
+        "user1"
     );
 
     UserCreateRequest userRequest2 = new UserCreateRequest(
-        "user2",
         "user2@example.com",
-        "Password1!"
+        "Password1!",
+        "user2"
     );
 
     UserDto user1 = userService.createUser(userRequest1, Optional.empty());
@@ -143,9 +139,9 @@ class ChannelIntegrationTest {
   void findAllChannelsByUserId_Success() throws Exception {
     // given
     UserCreateRequest userRequest = new UserCreateRequest(
-        "channeluser",
         "channeluser@example.com",
-        "Password1!"
+        "Password1!",
+        "channeluser"
     );
 
     UserDto user = userService.createUser(userRequest, Optional.empty());
@@ -161,9 +157,9 @@ class ChannelIntegrationTest {
 
     // 비공개 채널 생성
     UserCreateRequest otherUserRequest = new UserCreateRequest(
-        "otheruser",
         "otheruser@example.com",
-        "Password1!"
+        "Password1!",
+        "otheruser"
     );
 
     UserDto otherUser = userService.createUser(otherUserRequest, Optional.empty());
@@ -248,9 +244,9 @@ class ChannelIntegrationTest {
 
     // 삭제 확인 - 사용자로 채널 조회 시 삭제된 채널은 조회되지 않아야 함
     UserCreateRequest userRequest = new UserCreateRequest(
-        "testuser",
         "testuser@example.com",
-        "Password1!"
+        "Password1!",
+        "testuser"
     );
 
     UserDto user = userService.createUser(userRequest, Optional.empty());

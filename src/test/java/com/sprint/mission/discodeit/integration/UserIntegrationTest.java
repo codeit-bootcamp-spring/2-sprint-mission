@@ -125,9 +125,9 @@ class UserIntegrationTest {
   void findAllUsers_Success() throws Exception {
     // given
     UserCreateRequest userRequest1 = new UserCreateRequest(
-        "user1@example.comuser1",
+        "user1@example.com",
         "Password1!",
-        "user1Password1!"
+        "user1"
     );
 
     UserCreateRequest userRequest2 = new UserCreateRequest(

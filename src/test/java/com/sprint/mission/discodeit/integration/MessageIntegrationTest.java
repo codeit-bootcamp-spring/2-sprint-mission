@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,17 +22,15 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -48,6 +47,9 @@ public class MessageIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;
+
+  @Autowired
+  private EntityManager entityManager;
 
   @Autowired
   private MessageService messageService;
@@ -90,6 +92,8 @@ public class MessageIntegrationTest {
         "messageuser"
     );
     UserDto user = userService.createUser(userRequest, Optional.empty());
+    entityManager.flush();
+    entityManager.clear();
 
     MessageCreateRequest createRequest = new MessageCreateRequest(
         "테스트 메시지 내용입니다.",
@@ -113,6 +117,7 @@ public class MessageIntegrationTest {
     mockMvc.perform(multipart("/api/messages")
             .file(messageCreateRequestPart)
             .file(attachmentPart))
+        .andDo(print())
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", notNullValue()))
         .andExpect(jsonPath("$.content").value("테스트 메시지 내용입니다."))

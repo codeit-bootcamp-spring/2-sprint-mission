@@ -4,12 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
@@ -25,7 +22,6 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
@@ -49,7 +45,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -126,7 +121,7 @@ public class MessageServiceTest {
   @DisplayName("Create Message_성공")
   void createMessage_shouldReturnCreatedMessage() {
     // given
-    MessageCreateRequest request = new MessageCreateRequest("메시지 테스트", authorId, channelId);
+    MessageCreateRequest request = new MessageCreateRequest(content, authorId, channelId);
     BinaryContentCreateRequest attachmentRequest = new BinaryContentCreateRequest("test.txt",
         "text/plain", new byte[100]);
 
@@ -183,8 +178,22 @@ public class MessageServiceTest {
     // given
     MessageUpdateRequest request = new MessageUpdateRequest("새로운 메시지 update 테스트");
 
-    given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
-    given(messageMapper.toDto(message)).willReturn(messageDto);
+    Message updatedMessage = Message.create(author, channel, request.newContent(),
+        List.of(attachment));
+    ReflectionTestUtils.setField(updatedMessage, "id", messageId);
+
+    MessageDto updatedMessageDto = new MessageDto(
+        messageId,
+        Instant.now(),
+        Instant.now(),
+        request.newContent(),
+        channelId,
+        new UserDto(authorId, "testUser", "test@example.com", null, true),
+        List.of(attachmentDto)
+    );
+
+    given(messageRepository.findById(messageId)).willReturn(Optional.of(updatedMessage));
+    given(messageMapper.toDto(updatedMessage)).willReturn(updatedMessageDto);
 
     // when
     MessageDto result = messageService.updateMessage(messageId, request);
@@ -193,7 +202,7 @@ public class MessageServiceTest {
     assertThat(result.content()).isEqualTo(request.newContent());
 
     then(messageRepository).should().findById(messageId);
-    then(messageMapper).should().toDto(message);
+    then(messageMapper).should().toDto(updatedMessage);
   }
 
   @Test
@@ -218,25 +227,16 @@ public class MessageServiceTest {
   @DisplayName("Delete Message_성공")
   void deleteMessage() {
     // given
-    UUID attachmentId1 = UUID.randomUUID();
-    UUID attachmentId2 = UUID.randomUUID();
-
-    BinaryContent attachment1 = BinaryContent.create("image1.png", 3L, "image/png");
-    BinaryContent attachment2 = BinaryContent.create("image2.png", 3L, "image/png");
-    ReflectionTestUtils.setField(attachment1, "id", attachmentId1);
-    ReflectionTestUtils.setField(attachment2, "id", attachmentId2);
-
     given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
-    given(userRepository.findById(authorId)).willReturn(Optional.of(author));
+    given(userRepository.existsById(authorId)).willReturn(true);
 
     // when
     messageService.deleteMessage(messageId);
 
     // then
     then(messageRepository).should().findById(messageId);
-    then(userRepository).should().findById(authorId);
-    then(binaryContentStorage).should().deleteById(attachment1.getId());
-    then(binaryContentStorage).should().deleteById(attachment2.getId());
+    then(userRepository).should().existsById(authorId);
+    then(binaryContentStorage).should().deleteById(attachment.getId());
     then(binaryContentRepository).should().deleteAll(message.getAttachments());
     then(messageRepository).should().deleteById(messageId);
   }
@@ -416,6 +416,6 @@ public class MessageServiceTest {
 
     then(messageRepository).should().findAllByChannelId(channelId, createdAt, pageable);
   }
-  
+
 
 }

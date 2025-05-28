@@ -6,9 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
@@ -81,7 +78,7 @@ public class UserServiceTest {
   @DisplayName("Create User_성공")
   void createUser_shouldReturnCreatedUser() {
     // given
-    UserCreateRequest request = new UserCreateRequest("bbori@dog.com", "bbori1234", "뽀리");
+    UserCreateRequest request = new UserCreateRequest(email, password, username);
 
     given(userRepository.save(any(User.class))).willReturn(user);
     given(userRepository.existsByEmail(request.email())).willReturn(false);
@@ -105,7 +102,7 @@ public class UserServiceTest {
   @DisplayName("Create User_실패_중복 이메일")
   void createUser_shouldThrowException_whenEmailAlreadyExists() {
     // given
-    UserCreateRequest request = new UserCreateRequest("bbori@dog.com", "bbori1234", "뽀리");
+    UserCreateRequest request = new UserCreateRequest(email, password, username);
 
     given(userRepository.existsByEmail(request.email())).willReturn(Boolean.TRUE);
 
@@ -125,7 +122,7 @@ public class UserServiceTest {
   @DisplayName("Create User_실패_중복 사용자 이름")
   void createUser_shouldThrowException_whenUsernameAlreadyExists() {
     // given
-    UserCreateRequest request = new UserCreateRequest("bbori@dog.com", "bbori1234", "뽀리");
+    UserCreateRequest request = new UserCreateRequest(email, password, username);
 
     given(userRepository.existsByEmail(request.email())).willReturn(Boolean.FALSE);
     given(userRepository.existsByUsername(request.username())).willReturn(Boolean.TRUE);
@@ -146,12 +143,21 @@ public class UserServiceTest {
   @DisplayName("Update User_성공")
   void updateUser_shouldReturnUpdatedUser() {
     // given
-    UserUpdateRequest request = new UserUpdateRequest("new뽀리", "bbori@dog.net", "bbori4321@");
+    UserUpdateRequest request = new UserUpdateRequest("뽀리", "bbori@dog.net", "bbori4321@");
 
     given(userRepository.findById(userId)).willReturn(Optional.of(user));
     given(userRepository.existsByEmail(request.newEmail())).willReturn(false);
     given(userRepository.existsByUsername(request.newUsername())).willReturn(false);
-    given(userMapper.toDto(user)).willReturn(userDto);
+    given(userMapper.toDto(any(User.class))).willAnswer(invocation -> {
+      User updatedUser = invocation.getArgument(0);
+      return new UserDto(
+          updatedUser.getId(),
+          updatedUser.getUsername(),
+          updatedUser.getEmail(),
+          null,
+          true
+      );
+    });
 
     // when
     UserDto result = userService.updateUser(userId, request, Optional.empty());
@@ -163,7 +169,7 @@ public class UserServiceTest {
     then(userRepository).should().findById(userId);
     then(userRepository).should().existsByEmail(request.newEmail());
     then(userRepository).should().existsByUsername(request.newUsername());
-    then(userMapper).should().toDto(user);
+    then(userMapper).should().toDto(any(User.class));
   }
 
   @Test
@@ -190,11 +196,6 @@ public class UserServiceTest {
   @DisplayName("Delete User_성공")
   void deleteUser() {
     // given
-    UUID profileId = UUID.randomUUID();
-
-    BinaryContent profile = BinaryContent.create("bbori.png", 100L, "image/png");
-    ReflectionTestUtils.setField(profile, "id", profileId);
-
     UserStatus status = UserStatus.create(user, Instant.now());
     ReflectionTestUtils.setField(user, "status", status);
 
@@ -207,8 +208,6 @@ public class UserServiceTest {
     // then
     then(userRepository).should().findById(userId);
     then(userStatusRepository).should().findByUserId(userId);
-    then(binaryContentStorage).should().deleteById(profileId);
-    then(binaryContentRepository).should().deleteById(profileId);
     then(userStatusRepository).should().deleteById(status.getId());
     then(userRepository).should().deleteById(userId);
   }

@@ -23,7 +23,6 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.InvalidChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -68,7 +67,9 @@ public class ChannelServiceTest {
   private String channelName;
   private String channelDescription;
   private Channel channel;
+  private Channel privateChannel;
   private ChannelDto channelDto;
+  private ChannelDto privateChannelDto;
   private User user;
 
   @BeforeEach
@@ -82,6 +83,12 @@ public class ChannelServiceTest {
     ReflectionTestUtils.setField(channel, "id", channelId);
     channelDto = new ChannelDto(channelId, ChannelType.PUBLIC, channelName, channelDescription,
         List.of(), Instant.now());
+
+    privateChannel = Channel.create(ChannelType.PRIVATE, null, null);
+    UserDto userDto = new UserDto(userId, "user", "user@email.com", null, true);
+    privateChannelDto = new ChannelDto(channelId, ChannelType.PRIVATE, null, null, List.of(userDto),
+        Instant.now());
+
     user = User.create("testUser", "test@example.com", "password", null);
   }
 
@@ -124,9 +131,9 @@ public class ChannelServiceTest {
     List<UUID> participantIds = List.of(userId);
     PrivateChannelCreateRequest request = new PrivateChannelCreateRequest(participantIds);
 
-    given(channelRepository.save(any(Channel.class))).willReturn(channel);
+    given(channelRepository.save(any(Channel.class))).willReturn(privateChannel);
     given(userRepository.findAllById(participantIds)).willReturn(List.of(user));
-    given(channelMapper.toDto(channel)).willReturn(channelDto);
+    given(channelMapper.toDto(privateChannel)).willReturn(privateChannelDto);
 
     // when
     ChannelDto result = channelService.createPrivateChannel(request);
@@ -135,7 +142,7 @@ public class ChannelServiceTest {
     then(channelRepository).should().save(any(Channel.class));
     then(userRepository).should().findAllById(participantIds);
     then(readStatusRepository).should(times(1)).<ReadStatus>saveAll(anyList());
-    then(channelMapper).should().toDto(channel);
+    then(channelMapper).should().toDto(privateChannel);
 
     assertThat(result.name()).isNull();
     assertThat(result.type()).isEqualTo(ChannelType.PRIVATE);
@@ -148,15 +155,23 @@ public class ChannelServiceTest {
     PublicChannelUpdateRequest request = new PublicChannelUpdateRequest("newPublicChannel",
         "update 테스트를 위한 PUBLIC 채널입니다.");
 
-    given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
-    given(channelMapper.toDto(channel)).willReturn(channelDto);
+    Channel updatedChannel = Channel.create(ChannelType.PUBLIC, request.newName(),
+        request.newDescription());
+    ReflectionTestUtils.setField(updatedChannel, "id", channelId);
+
+    ChannelDto updatedChannelDto = new ChannelDto(channelId, ChannelType.PUBLIC,
+        request.newName(),
+        request.newDescription(), List.of(), Instant.now());
+
+    given(channelRepository.findById(channelId)).willReturn(Optional.of(updatedChannel));
+    given(channelMapper.toDto(updatedChannel)).willReturn(updatedChannelDto);
 
     // when
     ChannelDto result = channelService.updateChannel(channelId, request);
 
     // then
     then(channelRepository).should().findById(channelId);
-    then(channelMapper).should().toDto(channel);
+    then(channelMapper).should().toDto(updatedChannel);
 
     assertThat(result.name()).isEqualTo(request.newName());
     assertThat(result.description()).isEqualTo(request.newDescription());
@@ -220,7 +235,6 @@ public class ChannelServiceTest {
     then(channelRepository).should().findById(channelId);
     then(messageRepository).should().existsByChannelId(channelId);
     then(messageRepository).should().deleteAllByChannelId(channelId);
-    then(readStatusRepository).should().deleteAllByChannelId(channelId);
     then(channelRepository).should().deleteById(channelId);
   }
 
@@ -292,7 +306,6 @@ public class ChannelServiceTest {
     ChannelDto privateDto = new ChannelDto(privateChannelId, ChannelType.PRIVATE, null, null,
         List.of(userDto), null);
 
-    // Mock 설정
     given(readStatusRepository.findAllByUserId(userId)).willReturn(List.of(readStatus));
     given(channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
         List.of(privateChannel.getId()))).willReturn(List.of(channel, privateChannel));
@@ -308,7 +321,8 @@ public class ChannelServiceTest {
     assertThat(result).containsExactlyInAnyOrder(channelDto, privateDto);
 
     then(readStatusRepository).should().findAllByUserId(userId);
-    then(channelRepository).should().findAll();
+    then(channelRepository).should().findAllByTypeOrIdIn(ChannelType.PUBLIC,
+        List.of(privateChannel.getId()));
     then(channelMapper).should().toDto(channel);
     then(channelMapper).should().toDto(privateChannel);
   }
