@@ -22,7 +22,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import io.github.cdimascio.dotenv.Dotenv;
-import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,7 +29,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -47,9 +45,6 @@ public class MessageIntegrationTest {
 
   @Autowired
   private MockMvc mockMvc;
-
-  @Autowired
-  private EntityManager entityManager;
 
   @Autowired
   private MessageService messageService;
@@ -92,15 +87,13 @@ public class MessageIntegrationTest {
         "messageuser"
     );
     UserDto user = userService.createUser(userRequest, Optional.empty());
-    entityManager.flush();
-    entityManager.clear();
 
     MessageCreateRequest createRequest = new MessageCreateRequest(
         "테스트 메시지 내용입니다.",
-        channel.id(),
-        user.id()
+        user.id(),
+        channel.id()
     );
-    MockMultipartFile messageCreateRequestPart = new MockMultipartFile(
+    MockMultipartFile messageCreateRequest = new MockMultipartFile(
         "messageCreateRequest",
         "",
         MediaType.APPLICATION_JSON_VALUE,
@@ -115,7 +108,7 @@ public class MessageIntegrationTest {
 
     // when, then
     mockMvc.perform(multipart("/api/messages")
-            .file(messageCreateRequestPart)
+            .file(messageCreateRequest)
             .file(attachmentPart))
         .andDo(print())
         .andExpect(status().isCreated())
@@ -169,13 +162,13 @@ public class MessageIntegrationTest {
 
     MessageCreateRequest messageRequest1 = new MessageCreateRequest(
         "첫 번째 메시지 내용입니다.",
-        channel.id(),
-        user.id()
+        user.id(),
+        channel.id()
     );
     MessageCreateRequest messageRequest2 = new MessageCreateRequest(
         "두 번째 메시지 내용입니다.",
-        channel.id(),
-        user.id()
+        user.id(),
+        channel.id()
     );
     messageService.createMessage(messageRequest1, new ArrayList<>());
     messageService.createMessage(messageRequest2, new ArrayList<>());
@@ -212,8 +205,8 @@ public class MessageIntegrationTest {
 
     MessageCreateRequest createRequest = new MessageCreateRequest(
         "원본 메시지 내용입니다.",
-        channel.id(),
-        user.id()
+        user.id(),
+        channel.id()
     );
 
     MessageDto createdMessage = messageService.createMessage(createRequest, new ArrayList<>());
@@ -272,8 +265,8 @@ public class MessageIntegrationTest {
 
     MessageCreateRequest createRequest = new MessageCreateRequest(
         "삭제할 메시지 내용입니다.",
-        channel.id(),
-        user.id()
+        user.id(),
+        channel.id()
     );
     MessageDto createdMessage = messageService.createMessage(createRequest, new ArrayList<>());
     UUID messageId = createdMessage.id();
