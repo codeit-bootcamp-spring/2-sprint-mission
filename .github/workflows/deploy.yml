@@ -65,7 +65,6 @@ jobs:
         id: get-task-def
         run: |
           aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION > task-def.json
-          echo "task_def=$(cat task-def.json)" >> $GITHUB_OUTPUT
 
       - name: Create New Task Definition Revision
         id: new-task-def
