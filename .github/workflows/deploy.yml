@@ -95,8 +95,7 @@ jobs:
             --cluster $ECS_CLUSTER \
             --service $ECS_SERVICE \
             --task-definition ${{ steps.new-task-def.outputs.task_def_arn }} \
-            --desired-count 1   
-   
+            --desired-count 1
           
       
 
