@@ -71,10 +71,9 @@ jobs:
         run: |
           NEW_IMAGE="$ECR_REPOSITORY_URI:${{ needs.build-and-push.steps.vars.outputs.sha_short }}"
           CONTAINER_NAME=$(jq -r '.taskDefinition.containerDefinitions[0].name' task-def.json)
-          UPDATED_TASK_DEF=$(jq --arg IMAGE "$NEW_IMAGE" --arg NAME "$CONTAINER_NAME" \
-            '.taskDefinition |
-            {containerDefinitions: [.containerDefinitions[0] | .image = $IMAGE],
-            family, executionRoleArn, taskRoleArn, networkMode, requiresCompatibilities, cpu, memory}' task-def.json)
+          UPDATED_TASK_DEF=$(jq --arg IMAGE "$NEW_IMAGE" \
+            '.taskDefinition | {containerDefinitions: [.containerDefinitions[0] | .image = $IMAGE]}' \
+            task-def.json)
           echo "$UPDATED_TASK_DEF" > new-task-def.json
           aws ecs register-task-definition --cli-input-json file://new-task-def.json > new-task-out.json
           NEW_TASK_DEF_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' new-task-out.json)
