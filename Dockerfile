@@ -13,6 +13,7 @@ RUN ./gradlew dependencies
 
 # 전체 소스코드 복사 후 빌드
 COPY . .
+RUN chmod +x ./gradlew
 RUN ./gradlew build -x test
 
 # Stage 2: Runtime Stage
