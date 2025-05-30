@@ -11,6 +11,7 @@ env:
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}
   ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+  CONTAINER_NAME: ${{ vars.ECS_CONTAINER_NAME }}
 
 jobs:
   build-and-push:
@@ -64,20 +65,15 @@ jobs:
       - name: Get Current Task Definition
         id: get-task-def
         run: |
-          aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION > task-def.json
+          aws ecs describe-task-definition --task-definition $ECS_TASK_DEFINITION --query taskDefinition > task-def.json
 
-      - name: Create New Task Definition Revision
-        id: new-task-def
-        run: |
-          NEW_IMAGE="$ECR_REPOSITORY_URI:${{ needs.build-and-push.steps.vars.outputs.sha_short }}"
-          CONTAINER_NAME=$(jq -r '.taskDefinition.containerDefinitions[0].name' task-def.json)
-          UPDATED_TASK_DEF=$(jq --arg IMAGE "$NEW_IMAGE" \
-            '.taskDefinition | {containerDefinitions: [.containerDefinitions[0] | .image = $IMAGE]}' \
-            task-def.json)
-          echo "$UPDATED_TASK_DEF" > new-task-def.json
-          aws ecs register-task-definition --cli-input-json file://new-task-def.json > new-task-out.json
-          NEW_TASK_DEF_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' new-task-out.json)
-          echo "task_def_arn=$NEW_TASK_DEF_ARN" >> $GITHUB_OUTPUT
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ env.ECR_REPOSITORY_URI }}:${{ needs.build-and-push.outputs.sha_short }}
 
       - name: Scale Down Existing Service (Stop Running Tasks)
         run: |
@@ -85,14 +81,14 @@ jobs:
             --cluster $ECS_CLUSTER \
             --service $ECS_SERVICE \
             --desired-count 0
-          sleep 20  # give time for old tasks to stop
+          sleep 30
 
       - name: Update ECS Service with New Task Definition
         run: |
           aws ecs update-service \
             --cluster $ECS_CLUSTER \
             --service $ECS_SERVICE \
-            --task-definition ${{ steps.new-task-def.outputs.task_def_arn }} \
+            --task-definition ${{ steps.render-task-def.outputs.task-definition }} \
             --desired-count 1
           
       
