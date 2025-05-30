@@ -17,6 +17,8 @@ jobs:
   build-and-push:
     name: Build and Push Docker Image to ECR
     runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.vars.outputs.sha_short }}
 
     steps:
       - name: Checkout code
