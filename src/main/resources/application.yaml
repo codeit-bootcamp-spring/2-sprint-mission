@@ -8,10 +8,6 @@ management:
     health:
       show-details: always
 
-spring:
-  profiles:
-    active: dev
-
   application:
     name: discodeit
 
