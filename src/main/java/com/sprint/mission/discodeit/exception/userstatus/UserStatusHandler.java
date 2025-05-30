@@ -18,7 +18,7 @@ public class UserStatusHandler {
       UserStatusNotFoundException e) {
     log.warn("UserStatusNotFoundException handled: {}, details: {}", e.getMessage(),
         e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
+    return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ResponseErrorBody(e));
   }
 
 
@@ -27,7 +27,7 @@ public class UserStatusHandler {
       DuplicateUserStatusException e) {
     log.warn("DuplicateUserStatusException handled: {}, details: {}", e.getMessage(),
         e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
+    return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ResponseErrorBody(e));
   }
 
 }

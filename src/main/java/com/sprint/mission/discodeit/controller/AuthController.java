@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.aop.LogMasking;
 import com.sprint.mission.discodeit.dto.controller.auth.LoginRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.auth.LoginResponseDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginCommand;
@@ -28,10 +29,10 @@ public class AuthController implements AuthApi {
 
 
   @Override
+  @LogMasking
   @PostMapping("/login")
   public ResponseEntity<LoginResponseDTO> login(
       @RequestBody @Valid LoginRequestDTO loginRequest) {
-    log.info("Login request (username = {})", MaskingUtil.maskUsername(loginRequest.username()));
     LoginCommand loginCommand = authMapper.toLoginCommand(loginRequest);
     LoginResult loginResult = authService.login(loginCommand);
     LoginResponseDTO user = authMapper.toLoginResponseDTO(loginResult);

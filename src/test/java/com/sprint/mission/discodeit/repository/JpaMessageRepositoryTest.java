@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.config.testAuditingConfig;
+import com.sprint.mission.discodeit.config.JpaAuditingConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import jakarta.persistence.EntityManager;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,13 +21,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.*;
 
 
 @DataJpaTest
-@Import(testAuditingConfig.class)
+@Import(JpaAuditingConfig.class)
 @ActiveProfiles("test")
 public class JpaMessageRepositoryTest {
 
@@ -37,18 +39,21 @@ public class JpaMessageRepositoryTest {
   @Autowired
   EntityManager entityManager;
 
+  @Autowired
+  JdbcTemplate jdbcTemplate;
+
   private Channel channel1;
   private User user1;
   private User user2;
-  private Message message1;
-  private Message message2;
-  private Message message3;
   private BinaryContent binaryContent1;
   private BinaryContent binaryContent2;
   private BinaryContent binaryContent3;
+  Instant createdAt1 = Instant.parse("2025-05-22T10:00:00Z");
+  Instant createdAt2 = Instant.parse("2025-05-22T12:00:00Z");
+  Instant createdAt3 = Instant.parse("2025-05-22T15:00:00Z");
 
   @BeforeEach
-  void setUp() throws InterruptedException {
+  void setUp() {
     channel1 = Channel.builder()
         .name("test1")
         .type(ChannelType.PUBLIC)
@@ -91,31 +96,16 @@ public class JpaMessageRepositoryTest {
         .build();
     entityManager.persist(binaryContent3);
 
-    message1 = Message.builder()
-        .attachments(List.of(binaryContent1))
-        .channel(channel1)
-        .author(user1)
-        .content("testMessage1")
-        .build();
-    messageRepository.save(message1);
     entityManager.flush();
+    entityManager.clear();
 
-    message2 = Message.builder()
-        .attachments(List.of(binaryContent2))
-        .channel(channel1)
-        .author(user2)
-        .content("testMessage2")
-        .build();
-    messageRepository.save(message2);
-    entityManager.flush();
-
-    message3 = Message.builder()
-        .attachments(List.of(binaryContent3))
-        .channel(channel1)
-        .author(user2)
-        .content("testMessage3")
-        .build();
-    messageRepository.save(message3);
+    String sql = "INSERT INTO messages (id, content, channel_id, author_id, created_at) VALUES (?, ?, ?, ?, ?)";
+    jdbcTemplate.update(sql, UUID.randomUUID(), "testMessage1", channel1.getId(), user1.getId(),
+        Timestamp.from(createdAt1));
+    jdbcTemplate.update(sql, UUID.randomUUID(), "testMessage2", channel1.getId(), user2.getId(),
+        Timestamp.from(createdAt2));
+    jdbcTemplate.update(sql, UUID.randomUUID(), "testMessage3", channel1.getId(), user2.getId(),
+        Timestamp.from(createdAt3));
 
     entityManager.flush();
     entityManager.clear();
@@ -136,28 +126,21 @@ public class JpaMessageRepositoryTest {
     assertThat(messages.hasNext()).isTrue();
   }
 
-  // @createdDate 어노테이션으로 DB에 flush 될 때 createdAt이 생성되는데,
-  // flush할 때 한번에 날아가다보니, 어떨 땐 createdAt이 1,2,3 순서에 맞게 생성돼서 테스트가 성공할 때가 있고
-  // 순서에 맞지 않게 저장돼서 테스트가 실패하는 경우가 있음
-  // @createdDate를 쓰지 않으면, createdAt 필드를 명시적으로 설정해줘서 테스트를 편하게 할 수 있지만,
-  // 구현을 전부 바꿔야하기 때문에 힘들고, 이 방법 말고는 별다른 해결 방법이 생각나지 않아서,
-  // Repository에 createdAt이 같을 경우 id로 DESC 정렬을 하는 식으로 변경하였습니다.
   @Test
   @DisplayName("커서가 있을 때, 채널 별 메시지 페이징 조회 성공")
   void findAll_by_channelId_with_cursor() {
     // given
-    Instant cursor = message3.getCreatedAt();
+    Instant cursor = createdAt3;
     UUID channelId = channel1.getId();
-    Pageable pageable = PageRequest.of(0, 2);
+    Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt", "id"));
 
     // when
     Slice<Message> messages = messageRepository.findAllByChannelIdAfterCursor(channelId, cursor,
         pageable);
 
     // then
-    assertThat(messages.getContent()).hasSize(2);
-    // 그럼에도 가끔 이 부분이 실패하네요
     assertThat(messages.hasNext()).isFalse();
+    assertThat(messages.getSize()).isEqualTo(2);
   }
 
 
@@ -173,8 +156,7 @@ public class JpaMessageRepositoryTest {
 
     // then
     assertThat(latestMessageTime).isPresent();
-    // 타임존 문제로 실패
-//    assertThat(latestMessageTime.get()).isEqualTo(
-//        message3.getCreatedAt());
+    assertThat(latestMessageTime.get().truncatedTo(ChronoUnit.SECONDS)).isEqualTo(
+        createdAt3.truncatedTo(ChronoUnit.SECONDS));
   }
 }

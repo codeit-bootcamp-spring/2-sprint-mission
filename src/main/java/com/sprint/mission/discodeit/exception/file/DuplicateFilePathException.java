@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.exception.file;
 
-import com.sprint.mission.discodeit.exception.ResultCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.Map;
 
 public class DuplicateFilePathException extends FileException {
 
   public DuplicateFilePathException() {
-    super(ResultCode.DUPLICATE_FILE_PATH);
+    super(ErrorCode.DUPLICATE_FILE_PATH);
   }
 
   public DuplicateFilePathException(Map<String, Object> details) {
-    super(ResultCode.DUPLICATE_FILE_PATH, details);
+    super(ErrorCode.DUPLICATE_FILE_PATH, details);
   }
 }

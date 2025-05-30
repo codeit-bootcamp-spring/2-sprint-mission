@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.exception.file;
 
 import com.sprint.mission.discodeit.exception.RestException;
-import com.sprint.mission.discodeit.exception.ResultCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.Map;
 
 public class FileException extends RestException {
 
-  public FileException(ResultCode resultCode) {
-    super(resultCode);
+  public FileException(ErrorCode errorCode) {
+    super(errorCode);
   }
 
-  public FileException(ResultCode resultCode, Map<String, Object> details) {
-    super(resultCode, details);
+  public FileException(ErrorCode errorCode, Map<String, Object> details) {
+    super(errorCode, details);
   }
 }

@@ -17,7 +17,7 @@ public class ChannelExceptionHandler {
   public ResponseEntity<ResponseErrorBody> handleChannelNotFoundException(
       ChannelNotFoundException e) {
     log.warn("ChannelNotFoundException handled: {}, details: {}", e.getMessage(), e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
+    return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ResponseErrorBody(e));
   }
 
   @ExceptionHandler(PrivateChannelUpdateException.class)
@@ -25,6 +25,6 @@ public class ChannelExceptionHandler {
       PrivateChannelUpdateException e) {
     log.warn("PrivateChannelUpdateException handled: {}, details: {}", e.getMessage(),
         e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
+    return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ResponseErrorBody(e));
   }
 }

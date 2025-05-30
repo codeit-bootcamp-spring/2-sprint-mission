@@ -17,7 +17,6 @@ public class MessageExceptionHandler {
   public ResponseEntity<ResponseErrorBody> handleMessageNotFoundException(
       MessageNotFoundException e) {
     log.warn("MessageNotFoundException handled: {}, details: {}", e.getMessage(), e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
+    return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ResponseErrorBody(e));
   }
-
 }
