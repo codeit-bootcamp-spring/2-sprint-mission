@@ -1,5 +1,10 @@
--- binary_contents
-DROP TABLE IF EXISTS binary_contents CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS channels CASCADE;
+DROP TABLE IF EXISTS messages CASCADE;
+DROP TABLE IF EXISTS user_statuses CASCADE;
+DROP TABLE IF EXISTS read_statuses CASCADE;
+DROP TABLE IF EXISTS message_attachments CASCADE;
+DROP TABLE IF EXISTS binary_contents    CASCADE;
 
 CREATE TABLE binary_contents
 (
