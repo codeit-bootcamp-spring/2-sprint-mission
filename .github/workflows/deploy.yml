@@ -86,12 +86,19 @@ jobs:
         id: new-task-def
         run: |
           IMAGE_URI=${{ env.ECR_REPOSITORY_URI }}:${{ needs.build-and-push.outputs.image-tag }}
-          
-          cat task-def.json \
-            | jq '.
-              containerDefinitions[0].image = "'$IMAGE_URI'" |
-              del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
-            > new-task-def.json
+
+          jq --arg IMAGE "$IMAGE_URI" '
+            .containerDefinitions[0].image = $IMAGE |
+            del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy
+            )
+          ' task-def.json > new-task-def.json
 
       # 새로운 태스크 정의 등록
       - name: Register new task definition
