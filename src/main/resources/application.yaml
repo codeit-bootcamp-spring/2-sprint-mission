@@ -1,54 +1,61 @@
 spring:
   application:
     name: discodeit
-  profiles:
-    active: dev
-
+  servlet:
+    multipart:
+      maxFileSize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
   datasource:
-    url: jdbc:h2:mem:default;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
-
-  h2:
-    console:
-      enabled: true
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+      ddl-auto: validate
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  profiles:
+    active:
+      - dev
 
 management:
+  server:
+    base-path: /actuator/health
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
+        include: health,info,metrics,loggers
   endpoint:
     health:
       show-details: always
-  info:
-    java:
-      enabled: true
 
 info:
-  app:
-    name: Discodeit
-    version: 1.7.0
-    java:
-      version: 17
-    spring-boot:
-      version: 3.4.0
-  datasource:
-    url: ${spring.datasource.url}
-    driver-class-name: ${spring.datasource.driver-class-name}
-  jpa:
-    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  name: Discodeit
+  version: 1.7.0
+  java:
+    version: 17
+  spring-boot:
+    version: 3.4.0
+  config:
+    datasource:
+      url: ${spring.datasource.url}
+      driver-class-name: ${spring.datasource.driver-class-name}
+    jpa:
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+    storage:
+      type: ${discodeit.storage.type}
+      path: ${discodeit.storage.local.root-path}
+    multipart:
+      max-file-size: ${spring.servlet.multipart.maxFileSize}
+      max-request-size: ${spring.servlet.multipart.maxRequestSize}
+
+discodeit:
   storage:
-    type
+    type: local
+    local:
+      root-path: .discodeit/storage
+
+logging:
+  level:
+    root: info
