@@ -40,7 +40,6 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public ChannelDto create(PublicChannelCreateCommand command) {
-
     Channel channel = Channel.create(command.name(), command.description(),
         ChannelType.PUBLIC);
     channelRepository.save(channel);
@@ -60,16 +59,6 @@ public class BasicChannelService implements ChannelService {
 
     readStatusRepository.saveAll(readStatuses);
     log.info("Private Channel created {}", channel.getId());
-    return toChannelResult(channel);
-  }
-
-
-  @Override
-  @Transactional(readOnly = true)
-  public ChannelDto findByChannelId(UUID channelId) {
-    Channel channel = channelRepository.findById(channelId).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
-    );
     return toChannelResult(channel);
   }
 
@@ -94,11 +83,6 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(command.channelId()).orElseThrow(
         () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, command.channelId())
     );
-
-    if (channel.getType() == ChannelType.PRIVATE) {
-      throw new ChannelUnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR, channel.getId());
-    }
-
     channel.update(command.newName(), command.newDescription());
     channelRepository.save(channel);
 
@@ -108,21 +92,18 @@ public class BasicChannelService implements ChannelService {
   }
 
   private ChannelDto toChannelResult(Channel channel) {
-    Instant lastMessageAt = findLastMessageAt(channel);
+    Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId())
+        .orElse(Instant.MIN);
 
     List<UserDto> userIdList = new ArrayList<>();
     readStatusRepository.findAllByChannel_Id(channel.getId())
         .stream().map(readStatus -> {
           User user = readStatus.getUser();
-          return UserDto.create(user, user.getUserStatus().isOnline());
+          return UserDto.create(user);
         })
         .forEach(userIdList::add);
 
     return ChannelDto.create(channel, userIdList, lastMessageAt);
-  }
-
-  private Instant findLastMessageAt(Channel channel) {
-    return messageRepository.findLastMessageAtByChannelId(channel.getId()).orElse(Instant.MIN);
   }
 
   @Override
@@ -133,20 +114,12 @@ public class BasicChannelService implements ChannelService {
     );
 
     channelRepository.delete(channel);
-    deleteAllMessage(channelId);
-    deleteAllReadStatus(channelId);
-    log.info("Channel deleted {}", channelId);
-  }
-
-  private void deleteAllMessage(UUID channelId) {
     messageRepository.deleteAllByChannelId(channelId);
-  }
-
-  private void deleteAllReadStatus(UUID channelId) {
     List<ReadStatus> readStatusList = readStatusRepository.findAllByChannel_Id(channelId);
     for (ReadStatus status : readStatusList) {
       readStatusRepository.deleteById(status.getId());
       log.info("Read Status deleted {}", status.getId());
     }
+    log.info("Channel deleted {}", channelId);
   }
 }

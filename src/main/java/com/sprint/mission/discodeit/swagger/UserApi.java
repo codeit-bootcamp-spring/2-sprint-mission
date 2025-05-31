@@ -79,7 +79,7 @@ public interface UserApi {
           content = @Content(examples = @ExampleObject(value = "User with id {id} not found"))
       )
   })
-  ResponseEntity<UserDeleteResponse> delete(
+  ResponseEntity<Void> delete(
       @Parameter(description = "삭제할 User ID") UUID userId
   );
 

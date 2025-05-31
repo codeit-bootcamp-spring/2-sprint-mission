@@ -12,8 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
-import com.sprint.mission.discodeit.core.channel.usecase.CreateChannelUseCase;
-import com.sprint.mission.discodeit.core.content.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
@@ -24,7 +23,6 @@ import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateComman
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.user.usecase.CreateUserUseCase;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;

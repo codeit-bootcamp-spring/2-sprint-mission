@@ -213,8 +213,7 @@ public class UserControllerTest {
     UUID userId = UUID.randomUUID();
     // when & then
     mockMvc.perform(delete("/api/users/{userId}", userId))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.success").value(true));
+        .andExpect(status().isNoContent());
   }
 
   @Test

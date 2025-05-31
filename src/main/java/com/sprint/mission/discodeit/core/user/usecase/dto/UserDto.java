@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.core.user.usecase.dto;
 
-import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -25,20 +28,24 @@ public record UserDto(
     boolean online
 ) {
 
-  public static UserDto create(User user, boolean online) {
-    if (user.getProfile() == null) {
-      return UserDto.builder()
-          .id(user.getId())
-          .username(user.getName())
-          .email(user.getEmail())
-          .online(online).build();
-    } else {
-      return UserDto.builder()
-          .id(user.getId())
-          .username(user.getName())
-          .email(user.getEmail())
-          .profile(BinaryContentDto.create(user.getProfile()))
-          .online(online).build();
+  public static UserDto create(User user) {
+    UserStatus userStatus = user.getUserStatus();
+    boolean online = true;
+    if (userStatus != null) {
+      online = userStatus.isOnline();
     }
+    BinaryContent userProfile = user.getProfile();
+    BinaryContentDto binaryContentDto = null;
+    if (userProfile != null) {
+      binaryContentDto = BinaryContentDto.create(userProfile);
+    }
+
+    return UserDto.builder()
+        .id(user.getId())
+        .username(user.getName())
+        .email(user.getEmail())
+        .profile(binaryContentDto)
+        .online(online).build();
+
   }
 }
