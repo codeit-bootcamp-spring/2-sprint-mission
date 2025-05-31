@@ -91,9 +91,9 @@ public class UserController implements UserApi {
   }
 
   @DeleteMapping("/{userId}")
-  public ResponseEntity<UserDeleteResponse> delete(@PathVariable UUID userId) {
+  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
     userService.delete(userId);
-    return ResponseEntity.ok(new UserDeleteResponse(true));
+    return ResponseEntity.noContent().build();
   }
 
   @PatchMapping("/{userId}/userStatus")
@@ -102,9 +102,7 @@ public class UserController implements UserApi {
 
     UserStatusOnlineCommand command = UserStatusOnlineCommand.create(userId,
         requestBody);
-
-    UserStatusDto result = userService.online(command);
-
+    UserStatusDto result = userService.online(userId, requestBody);
     return ResponseEntity.ok(result);
   }
 }

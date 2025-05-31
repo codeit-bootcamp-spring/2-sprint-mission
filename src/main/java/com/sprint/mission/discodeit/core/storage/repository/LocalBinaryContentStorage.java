@@ -88,17 +88,19 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
-    InputStream inputStream = get(binaryContentDto.id());
+    try (InputStream inputStream = get(binaryContentDto.id())) {
+      InputStreamResource resource = new InputStreamResource(inputStream);
 
-    InputStreamResource resource = new InputStreamResource(inputStream);
+      HttpHeaders headers = new HttpHeaders();
 
-    HttpHeaders headers = new HttpHeaders();
-
-    headers.add(HttpHeaders.CONTENT_DISPOSITION,
-        "attachments; filename=\"" + binaryContentDto.fileName() + "\"");
-    headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
-    headers.setContentLength(binaryContentDto.size());
-    log.info("[LocalBinaryContentStorage] Image Download successfully");
-    return ResponseEntity.ok().headers(headers).body(resource);
+      headers.add(HttpHeaders.CONTENT_DISPOSITION,
+          "attachments; filename=\"" + binaryContentDto.fileName() + "\"");
+      headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
+      headers.setContentLength(binaryContentDto.size());
+      log.info("[LocalBinaryContentStorage] Image Download successfully");
+      return ResponseEntity.ok().headers(headers).body(resource);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

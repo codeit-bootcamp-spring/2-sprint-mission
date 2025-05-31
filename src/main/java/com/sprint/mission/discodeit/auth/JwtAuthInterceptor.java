@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.auth;
 
-import com.sprint.mission.discodeit.core.user.usecase.UserService;
+import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class JwtAuthInterceptor implements HandlerInterceptor {
 
   private final JwtUtil jwtUtil;
-  private final UserService userService;
+  private final JpaUserRepository userRepository;
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -41,7 +41,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
     if (jwtUtil.validateToken(jwt)) {
       // 사용자 존재 여부 확인
-      if (!userService.existsById(userId)) {
+      if (!userRepository.existsById(userId)) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.getWriter().write("{\"error\":\"User not found\"}");
         return false;

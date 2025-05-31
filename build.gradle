@@ -18,7 +18,6 @@ jacocoTestReport {
     }
 }
 
-
 group = 'com.sprint.mission'
 version = '1.2-M8'
 

@@ -27,7 +27,7 @@ public record MessageDto(
         .updatedAt(message.getUpdatedAt())
         .content(message.getContent())
         .channelId(message.getChannel().getId())
-        .author(UserDto.create(user, user.getUserStatus().isOnline()))
+        .author(UserDto.create(user))
         .attachments(
             message.getAttachment().stream().map(BinaryContentDto::create).toList())
         .build();

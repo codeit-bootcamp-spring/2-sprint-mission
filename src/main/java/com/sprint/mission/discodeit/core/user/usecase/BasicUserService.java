@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusCreateCommand;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
+import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
@@ -42,7 +43,14 @@ public class BasicUserService implements UserService {
   public UserDto create(UserCreateCommand command,
       Optional<BinaryContentCreateCommand> binaryContentDTO) {
     BinaryContent profile = null;
-    validateUser(command.username(), command.email());
+
+    if (userRepository.existsByName(command.username())) {
+      throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, command.username());
+    }
+
+    if (userRepository.existsByEmail(command.email())) {
+      throw new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, command.email());
+    }
 
     if (binaryContentDTO.isPresent()) {
       profile = binaryContentService.create(binaryContentDTO.orElse(null));
@@ -56,7 +64,7 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = userStatusService.create(statusCommand);
     user.setUserStatus(userStatus);
 
-    return UserDto.create(user, true);
+    return UserDto.create(user);
   }
 
   @Override
@@ -76,25 +84,7 @@ public class BasicUserService implements UserService {
         user.getName(),
         user.getPassword());
 
-    return UserDto.create(user, user.getUserStatus().isOnline());
-  }
-
-  private void validateUser(String name, String email) {
-    if (userRepository.existsByName(name)) {
-      throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, name);
-    }
-
-    if (userRepository.existsByEmail(email)) {
-      throw new UserAlreadyExistsException(ErrorCode.USER_EMAIL_ALREADY_EXISTS, email);
-    }
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public UserDto findById(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
-    return UserDto.create(user, user.getUserStatus().isOnline());
+    return UserDto.create(user);
   }
 
   @Override
@@ -102,10 +92,7 @@ public class BasicUserService implements UserService {
   public List<UserDto> findAll() {
     List<User> userList = userRepository.findAllWithProfileAndStatus();
 
-    return userList.stream().map(user -> UserDto.create(
-        user,
-        user.getUserStatus().isOnline())
-    ).toList();
+    return userList.stream().map(UserDto::create).toList();
   }
 
   @Override
@@ -122,15 +109,13 @@ public class BasicUserService implements UserService {
     }
     BinaryContent newProfile = binaryContentService.create(binaryContentDTO.orElse(null));
 
-    user.update(command.newName(), command.newEmail(), command.newPassword(),
-        newProfile);
+    user.update(command.newName(), command.newEmail(), command.newPassword(), newProfile);
     userRepository.save(user);
 
     log.info("[UserService] User Updated: username {}, email {}, password {}", user.getName(),
         user.getEmail(),
         user.getPassword());
-    boolean online = user.getUserStatus().isOnline();
-    return UserDto.create(user, online);
+    return UserDto.create(user);
   }
 
 
@@ -154,17 +139,12 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public boolean existsById(UUID userId) {
-    return userRepository.findById(userId).isPresent();
-  }
+  public UserStatusDto online(UUID userId, UserStatusRequest requestBody) {
+    User user = userRepository.findById(userId).orElseThrow(
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
 
-  @Override
-  public UserStatusDto online(UserStatusOnlineCommand command) {
-    User user = userRepository.findById(command.userId()).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.userId())
-    );
     UserStatus userStatus = user.getUserStatus();
-    userStatus.update(command.lastActiveAt());
+    userStatus.update(requestBody.newLastActiveAt());
     return UserStatusDto.create(userStatus);
   }
 }

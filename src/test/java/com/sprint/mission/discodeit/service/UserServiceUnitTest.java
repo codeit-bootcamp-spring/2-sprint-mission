@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,7 @@ import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
+import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
@@ -59,11 +61,13 @@ public class UserServiceUnitTest {
   private BasicUserService userService;
 
   private User user;
-  private UUID userId = UUID.randomUUID();
+  private UUID userId;
+  private BinaryContent oldProfile;
 
   @BeforeEach
   void setUp() {
-    BinaryContent oldProfile = BinaryContent.create("old.png", 0L, "image/png");
+    userId = UUID.randomUUID();
+    oldProfile = BinaryContent.create("old.png", 0L, "image/png");
     user = User.create("a", "a@email.com", "a", oldProfile);
     user.setUserStatus(UserStatus.create(user, Instant.now()));
   }
@@ -262,11 +266,10 @@ public class UserServiceUnitTest {
   void UserStatusOnline_Success() {
     // given
     Instant now = Instant.now();
-    UserStatusOnlineCommand userStatusOnlineCommand = new UserStatusOnlineCommand(userId,
-        now);
+    UserStatusRequest request = new UserStatusRequest(now);
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     // when
-    UserStatusDto online = userService.online(userStatusOnlineCommand);
+    UserStatusDto online = userService.online(userId, request);
     // then
     assertThat(online.lastActiveAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
   }
@@ -274,13 +277,11 @@ public class UserServiceUnitTest {
   @Test
   void UserStatusOnline_WithoutUser_ShouldThrowException() {
     // given
-    Instant now = Instant.now();
-    UserStatusOnlineCommand userStatusOnlineCommand = new UserStatusOnlineCommand(userId,
-        now);
+    UserStatusRequest request = mock(UserStatusRequest.class);
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     // when & then
     assertThrows(UserNotFoundException.class, () -> {
-      userService.online(userStatusOnlineCommand);
+      userService.online(userId, request);
     });
   }
 
