@@ -31,8 +31,9 @@ jobs:
           aws-region: us-east-1  # Public ECR 이기 때문에 us-east-1 임
 
       # 4) Amazon ECR 로그인
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
 
       # 5) Docker 이미지 빌드 및 태깅
       - name: Build and tag Docker image
