@@ -85,5 +85,5 @@ jobs:
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \
             --service ${{ vars.ECS_SERVICE }} \
-            --task-definition ${{ steps.render-task-def.outputs.task-definition-arn }} \
+            --task-definition ${{ steps.render-task-def.outputs.task-definition }} \
             --desired-count 1
