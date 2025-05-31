@@ -1,10 +1,10 @@
 name: CI Test
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
-    
+
 jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew test jacocoTestReport
 
       # 5) 생성된 커버리지 리포트를 Codecov로 업로드
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
