@@ -1,69 +1,75 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.dto.response.ErrorResponse;
-import com.sprint.mission.discodeit.exception.auth.AuthException;
-import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentException;
-import com.sprint.mission.discodeit.exception.channel.ChannelException;
-import com.sprint.mission.discodeit.exception.message.MessageException;
-import com.sprint.mission.discodeit.exception.readStatus.ReadStatusException;
-import com.sprint.mission.discodeit.exception.storage.StorageException;
-import com.sprint.mission.discodeit.exception.user.UserException;
-import com.sprint.mission.discodeit.exception.userStatus.UserStatusException;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.View;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  private final View error;
-
-  public GlobalExceptionHandler(View error) {
-    this.error = error;
-  }
-
-  @ExceptionHandler({
-      AuthException.class,
-      BinaryContentException.class,
-      ChannelException.class,
-      MessageException.class,
-      ReadStatusException.class,
-      StorageException.class,
-      UserException.class,
-      UserStatusException.class
-  })
-  public ResponseEntity<ErrorResponse> handleException(DiscodeitException e) {
-    ErrorResponse errorResponse = new ErrorResponse(
-        e.getTimestamp(),
-        e.getErrorCode().name(),
-        e.getErrorCode().getMessage(),
-        e.getDetails(),
-        e.getClass().getSimpleName(),
-        e.getErrorCode().getHttpStatus().value()
-    );
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
+    ErrorResponse errorResponse = new ErrorResponse(e, HttpStatus.INTERNAL_SERVER_ERROR.value());
     return ResponseEntity
-        .status(e.getErrorCode().getHttpStatus())
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(errorResponse);
   }
 
-  @ExceptionHandler({
-      MethodArgumentNotValidException.class
-  })
-  public ResponseEntity<ErrorResponse> handleNotValidException(MethodArgumentNotValidException e) {
-    ErrorResponse errorResponse = new ErrorResponse(
-        Instant.now(),
-        ErrorCode.NOT_VALID.name(),
-        e.getMessage(),
-        Map.of(),
-        ErrorCode.NOT_VALID.getHttpStatus().name(),
-        ErrorCode.NOT_VALID.getHttpStatus().value()
-    );
+  @ExceptionHandler(DiscodeitException.class)
+  public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException exception) {
+    log.error("커스텀 예외 발생: code={}, message={}", exception.getErrorCode(), exception.getMessage(), exception);
+    HttpStatus status = determineHttpStatus(exception);
+    ErrorResponse response = new ErrorResponse(exception, status.value());
     return ResponseEntity
-        .status(ErrorCode.NOT_VALID.getHttpStatus())
-        .body(errorResponse);
+        .status(status)
+        .body(response);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    log.error("요청 유효성 검사 실패: {}", ex.getMessage());
+    
+    Map<String, Object> validationErrors = new HashMap<>();
+    ex.getBindingResult().getAllErrors().forEach(error -> {
+      String fieldName = ((FieldError) error).getField();
+      String errorMessage = error.getDefaultMessage();
+      validationErrors.put(fieldName, errorMessage);
+    });
+    
+    ErrorResponse response = new ErrorResponse(
+        Instant.now(), 
+        "VALIDATION_ERROR",
+        "요청 데이터 유효성 검사에 실패했습니다",
+        validationErrors,
+        ex.getClass().getSimpleName(),
+        HttpStatus.BAD_REQUEST.value()
+    );
+    
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(response);
+  }
+
+  private HttpStatus determineHttpStatus(DiscodeitException exception) {
+    ErrorCode errorCode = exception.getErrorCode();
+    return switch (errorCode) {
+      case USER_NOT_FOUND, CHANNEL_NOT_FOUND, MESSAGE_NOT_FOUND, BINARY_CONTENT_NOT_FOUND, 
+           READ_STATUS_NOT_FOUND, USER_STATUS_NOT_FOUND -> HttpStatus.NOT_FOUND;
+      case DUPLICATE_USER, DUPLICATE_READ_STATUS, DUPLICATE_USER_STATUS -> HttpStatus.CONFLICT;
+      case INVALID_USER_CREDENTIALS -> HttpStatus.UNAUTHORIZED;
+      case PRIVATE_CHANNEL_UPDATE, INVALID_REQUEST -> HttpStatus.BAD_REQUEST;
+      case INTERNAL_SERVER_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
+    };
   }
 }

@@ -7,20 +7,14 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentResolveException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,16 +42,14 @@ public class UserController implements UserApi {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   @Override
   public ResponseEntity<UserDto> create(
-      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("User 생성 요청: {}", userCreateRequest);
-
+    log.info("사용자 생성 요청: {}", userCreateRequest);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto createdUser = userService.create(userCreateRequest, profileRequest);
-
-    log.info("User 생성 완료 - ID: {}", createdUser.id());
+    log.debug("사용자 생성 응답: {}", createdUser);
     return ResponseEntity
         .status(HttpStatus.CREATED)
         .body(createdUser);
@@ -69,17 +62,14 @@ public class UserController implements UserApi {
   @Override
   public ResponseEntity<UserDto> update(
       @PathVariable("userId") UUID userId,
-      @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
-    log.info("User 수정 요청 - ID: {}, 내용: {}", userId, userUpdateRequest);
-
+    log.info("사용자 수정 요청: id={}, request={}", userId, userUpdateRequest);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(this::resolveProfileRequest);
     UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
-
-    log.info("User 수정 완료: {}", updatedUser);
-
+    log.debug("사용자 수정 응답: {}", updatedUser);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(updatedUser);
@@ -88,13 +78,7 @@ public class UserController implements UserApi {
   @DeleteMapping(path = "{userId}")
   @Override
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
-
-    log.info("User 삭제 요청: {}", userId);
-
     userService.delete(userId);
-
-    log.info("User 삭제 완료: {}", userId);
-
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
@@ -111,8 +95,9 @@ public class UserController implements UserApi {
 
   @PatchMapping(path = "{userId}/userStatus")
   @Override
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-      @Valid @RequestBody UserStatusUpdateRequest request) {
+  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
+      @PathVariable("userId") UUID userId,
+      @RequestBody @Valid UserStatusUpdateRequest request) {
     UserStatusDto updatedUserStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -131,14 +116,7 @@ public class UserController implements UserApi {
         );
         return Optional.of(binaryContentCreateRequest);
       } catch (IOException e) {
-        log.error("프로필 파일 처리중 오류 발생: {}", e.getMessage());
-        Map<String, Object> details = new HashMap<>();
-        details.put("filename", profileFile.getOriginalFilename());
-        throw new BinaryContentResolveException(
-            Instant.now(),
-            ErrorCode.BINARYCONTENT_PROCESS_FAILD,
-            details
-        );
+        throw new RuntimeException(e);
       }
     }
   }

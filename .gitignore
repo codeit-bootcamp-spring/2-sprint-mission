@@ -44,3 +44,10 @@ bin/
 ### 숨김 파일 ###
 .*
 !.gitignore
+!.dockerignore
+!.github
+!.gitattributes
+
+### Discodeit ###
+.env
+discodeit.env
