@@ -1,58 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!-- 기본 설정 (profile이 설정되지 않았을 경우) -->
-  <springProfile name="default">
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} |
-          %X{requestMethod} | %X{requestUri}] - %msg%n
-        </pattern>
-      </encoder>
-    </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <!-- 공통 패턴 -->
+  <!-- @formatter:off -->
+  <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n"/>
+  <!-- @formatter:on -->
+
+  <!--Appender 공통 정의 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
       <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>logs/sprint.%d{yyyy-MM-dd}.log</fileNamePattern>
-        <maxHistory>30</maxHistory>
+         <fileNamePattern>.logs/dev/sprint.%d{yyyy-MM-dd}.log</fileNamePattern>
+         <maxHistory>30</maxHistory>
       </rollingPolicy>
       <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} |
-          %X{requestMethod} | %X{requestUri}] - %msg%n
-        </pattern>
+      <!-- @formatter:off -->
+        <pattern> ${LOG_PATTERN} </pattern>
+        <!-- @formatter:on -->
       </encoder>
     </appender>
 
+  <!-- 기본 설정 (profile이 설정되지 않았을 경우) -->
+  <springProfile name="default">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
     </root>
-
   </springProfile>
 
   <!-- dev 프로파일 -->
   <springProfile name="dev">
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} |
-          %X{requestMethod} | %X{requestUri}] - %msg%n
-        </pattern>
-      </encoder>
-    </appender>
-
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>logs/dev/sprint.log</file>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>logs/dev/sprint.%d{yyyy-MM-dd}.log</fileNamePattern>
-        <maxHistory>30</maxHistory>
-      </rollingPolicy>
-      <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} |
-          %X{requestMethod} | %X{requestUri}] - %msg%n
-        </pattern>
-      </encoder>
-    </appender>
-
-    <root level="DEBUG">
+    <logger name="com.sprint.mission.discodeit" level="DEBUG"/>
+    <root level="INFO">
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
     </root>
@@ -60,26 +44,16 @@
 
   <!-- prod 프로파일 -->
   <springProfile name="prod">
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} |
-          %X{requestMethod} | %X{requestUri}] - %msg%n
-        </pattern>
-      </encoder>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+           <fileNamePattern>.logs/prod/sprint.%d{yyyy-MM-dd}.log</fileNamePattern>
+           <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+          <pattern> ${LOG_PATTERN} </pattern>
+        </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-      <file>logs/prod/sprint.log</file>
-      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-        <fileNamePattern>logs/prod/sprint.%d{yyyy-MM-dd}.log</fileNamePattern>
-        <maxHistory>30</maxHistory>
-      </rollingPolicy>
-      <encoder>
-        <pattern>%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{36} [%X{requestId} |
-          %X{requestMethod} | %X{requestUri}] - %msg%n
-        </pattern>
-      </encoder>
-    </appender>
 
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>

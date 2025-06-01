@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.integration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.controller.user.CreateUserRequestDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.s3.S3Config;
 import jakarta.persistence.EntityManager;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -44,6 +43,9 @@ public class UserIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockitoBean
+  private S3Config s3Config;
 
   @Autowired
   private UserRepository userRepository;

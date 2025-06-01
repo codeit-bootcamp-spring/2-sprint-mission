@@ -46,3 +46,15 @@ bin/
 
 ### 직렬화된 파일 ###
 *.ser
+
+### 로깅 파일 ###
+*.log
+
+### env 파일 ###
+*.env
+
+### 로컬 스토리지 파일 ###
+/local-storage
+
+### MapperImpl ###
+/src/main/generated

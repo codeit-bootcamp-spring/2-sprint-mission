@@ -18,6 +18,6 @@ public class BinaryContentExceptionHandler {
       BinaryContentNotFoundException e) {
     log.warn("BinaryContentNotFoundException handled: {}, details: {}", e.getMessage(),
         e.getDetails());
-    return ResponseEntity.status(e.getResultCode().getStatus()).body(new ResponseErrorBody(e));
+    return ResponseEntity.status(e.getErrorCode().getStatus()).body(new ResponseErrorBody(e));
   }
 }

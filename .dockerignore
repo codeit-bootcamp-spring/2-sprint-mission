@@ -1,0 +1,14 @@
+# Git과 IDE 파일
+.git
+.idea
+*.iml
+
+# 빌드 디렉터리
+build/
+target/
+
+# 로그 파일
+*.log
+
+# 시스템 파일
+.DS_Store

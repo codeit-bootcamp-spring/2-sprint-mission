@@ -2,16 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.controller.user.CreateUserRequestDTO;
-import com.sprint.mission.discodeit.dto.controller.user.CreateUserResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.user.UpdateUserRequestDTO;
 import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.ResultCode;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapperImpl;
 import com.sprint.mission.discodeit.mapper.UserMapperImpl;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusMapperImpl;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -139,7 +137,7 @@ public class UserControllerTest {
             .file(requestPart)
             .file(profileImage)
             .contentType(MediaType.MULTIPART_FORM_DATA))
-        .andExpect(status().is(ResultCode.UNSUPPORTED_PROFILE_MEDIA_TYPE.getStatus()));
+        .andExpect(status().is(ErrorCode.UNSUPPORTED_PROFILE_MEDIA_TYPE.getStatus()));
   }
 
   @Test

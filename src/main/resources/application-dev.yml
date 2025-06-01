@@ -1,12 +1,8 @@
 spring:
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
   datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -15,18 +11,19 @@ spring:
 
   logging:
     level:
-      root: DEBUG
-      org:
-        hibernate:
-          SQL: DEBUG
-          orm.jdbc.bind: TRACE
-        springframework:
-          data: DEBUG
-          cache:
-            interceptor: DEBUG
-      com:
-        sprint:
-          mission: DEBUG
+      com.sprint.mission.discodeit: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
 
 
 
