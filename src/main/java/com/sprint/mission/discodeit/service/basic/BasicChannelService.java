@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -35,16 +35,16 @@ public class BasicChannelService implements ChannelService {
 
     @Transactional
     @Override
-    public ChannelDto createPrivate(ChannelCreatePrivateDto channelCreatePrivateDto) {
-        log.info("Creating private channel: {}", channelCreatePrivateDto);
+    public ChannelDto createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
+        log.info("Creating private channel: {}", privateChannelCreateRequest);
 
         Channel newChannel = Channel.createPrivate();
         channelRepository.save(newChannel);
 
-        channelCreatePrivateDto.participantIds().forEach(userId -> {
-            ReadStatusCreateDto readStatusCreateDto = new ReadStatusCreateDto(userId, newChannel.getId(),
+        privateChannelCreateRequest.participantIds().forEach(userId -> {
+            ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(userId, newChannel.getId(),
                     newChannel.getCreatedAt());
-            readStatusService.create(readStatusCreateDto);
+            readStatusService.create(readStatusCreateRequest);
             log.debug("ReadStatus created for userId {} in channelId {}", userId, newChannel.getId());
         });
 
@@ -54,15 +54,16 @@ public class BasicChannelService implements ChannelService {
 
     @Transactional
     @Override
-    public ChannelDto createPublic(ChannelCreatePublicDto channelCreatePublicDto) {
-        log.info("Creating public channel: {}", channelCreatePublicDto);
+    public ChannelDto createPublic(PublicChannelCreateRequest publicChannelCreateRequest) {
+        log.info("Creating public channel: {}", publicChannelCreateRequest);
 
-        if (channelRepository.existsByTypeAndName(ChannelType.PUBLIC, channelCreatePublicDto.name())) {
-            log.warn("Public channel name {} already exists", channelCreatePublicDto.name());
-            throw new ChannelExistsException(channelCreatePublicDto.name());
+        if (channelRepository.existsByTypeAndName(ChannelType.PUBLIC, publicChannelCreateRequest.name())) {
+            log.warn("Public channel name {} already exists", publicChannelCreateRequest.name());
+            throw new ChannelExistsException(publicChannelCreateRequest.name());
         }
 
-        Channel newChannel = Channel.createPublic(channelCreatePublicDto.name(), channelCreatePublicDto.description());
+        Channel newChannel = Channel.createPublic(publicChannelCreateRequest.name(),
+                publicChannelCreateRequest.description());
         channelRepository.save(newChannel);
 
         log.info("Public channel created successfully: channelId={}", newChannel.getId());
@@ -94,7 +95,7 @@ public class BasicChannelService implements ChannelService {
 
     @Transactional
     @Override
-    public ChannelDto update(UUID channelId, ChannelUpdateDto channelUpdateDto) {
+    public ChannelDto update(UUID channelId, ChannelUpdateRequest channelUpdateRequest) {
         log.info("Updating channel: channelId={}", channelId);
 
         Channel channel = channelRepository.findById(channelId)
@@ -108,7 +109,7 @@ public class BasicChannelService implements ChannelService {
             throw new PrivateChannelUpdateNotSupportedException(channelId);
         }
 
-        channel.update(channelUpdateDto.newName(), channelUpdateDto.newDescription());
+        channel.update(channelUpdateRequest.newName(), channelUpdateRequest.newDescription());
 
         log.info("Channel updated successfully: channelId={}", channelId);
         return channelMapper.toDto(channel);

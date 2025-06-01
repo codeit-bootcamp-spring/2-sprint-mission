@@ -7,10 +7,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -67,8 +67,8 @@ public class BasicMessageServiceTest {
         UUID channelId = UUID.randomUUID();
         String content = "Hello";
 
-        MessageCreateDto createDto = new MessageCreateDto(userId, channelId, content);
-        BinaryContentCreateDto fileDto = new BinaryContentCreateDto("file.png", "image/png", new byte[]{1, 2});
+        MessageCreateRequest createDto = new MessageCreateRequest(userId, channelId, content);
+        BinaryContentCreateRequest fileDto = new BinaryContentCreateRequest("file.png", "image/png", new byte[]{1, 2});
         User user = mock(User.class);
         Channel channel = mock(Channel.class);
         MessageDto expectedDto = mock(MessageDto.class);
@@ -92,7 +92,7 @@ public class BasicMessageServiceTest {
     void createMessage_fail_userNotFound() {
         // given
         UUID userId = UUID.randomUUID();
-        MessageCreateDto createDto = new MessageCreateDto(userId, UUID.randomUUID(), "Hi");
+        MessageCreateRequest createDto = new MessageCreateRequest(userId, UUID.randomUUID(), "Hi");
 
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
@@ -106,7 +106,7 @@ public class BasicMessageServiceTest {
     void updateMessage_success() {
         // given
         UUID messageId = UUID.randomUUID();
-        MessageUpdateDto updateDto = new MessageUpdateDto("updated");
+        MessageUpdateRequest updateDto = new MessageUpdateRequest("updated");
 
         Message message = mock(Message.class);
         MessageDto expectedDto = mock(MessageDto.class);
@@ -130,7 +130,7 @@ public class BasicMessageServiceTest {
         given(messageRepository.findById(messageId)).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> messageService.update(messageId, new MessageUpdateDto("text")))
+        assertThatThrownBy(() -> messageService.update(messageId, new MessageUpdateRequest("text")))
                 .isInstanceOf(MessageNotFoundException.class);
     }
 

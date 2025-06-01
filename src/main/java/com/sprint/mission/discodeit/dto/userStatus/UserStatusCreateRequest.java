@@ -2,9 +2,12 @@ package com.sprint.mission.discodeit.dto.userStatus;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.UUID;
 
-public record UserStatusUpdateDto(
+public record UserStatusCreateRequest(
         @NotNull
-        Instant newLastActiveAt
+        UUID userId,
+        @NotNull
+        Instant lastActiveAt
 ) {
 }

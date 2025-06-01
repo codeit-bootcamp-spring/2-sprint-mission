@@ -71,7 +71,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         }
     }
 
-    @Override
     public InputStream get(UUID binaryContentId) {
         try {
             Path filePath = resolvePath(binaryContentId);

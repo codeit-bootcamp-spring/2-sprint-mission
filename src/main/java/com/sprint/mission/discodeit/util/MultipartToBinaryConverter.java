@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.util;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public class MultipartToBinaryConverter {
-    public static BinaryContentCreateDto toBinaryContentCreateDto(MultipartFile file) {
+    public static BinaryContentCreateRequest toBinaryContentCreateDto(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return null;
         }
 
         try {
-            return new BinaryContentCreateDto(
+            return new BinaryContentCreateRequest(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()
@@ -22,7 +22,7 @@ public class MultipartToBinaryConverter {
         }
     }
 
-    public static List<BinaryContentCreateDto> toBinaryContentCreateDtos(List<MultipartFile> files) {
+    public static List<BinaryContentCreateRequest> toBinaryContentCreateDtos(List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
             return List.of();
         }

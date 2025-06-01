@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -29,16 +29,16 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Transactional
     @Override
-    public UserStatusDto create(UserStatusCreateDto userStatusCreateDto) {
+    public UserStatusDto create(UserStatusCreateRequest userStatusCreateRequest) {
 
-        User user = userRepository.findById(userStatusCreateDto.userId())
-                .orElseThrow(() -> new UserNotFoundException(userStatusCreateDto.userId()));
+        User user = userRepository.findById(userStatusCreateRequest.userId())
+                .orElseThrow(() -> new UserNotFoundException(userStatusCreateRequest.userId()));
 
-        if (userStatusRepository.findByUserId(userStatusCreateDto.userId()).isPresent()) {
-            throw new UserStatusExistsException(userStatusCreateDto.userId());
+        if (userStatusRepository.findByUserId(userStatusCreateRequest.userId()).isPresent()) {
+            throw new UserStatusExistsException(userStatusCreateRequest.userId());
         }
 
-        UserStatus newUserStatus = new UserStatus(user, userStatusCreateDto.lastActiveAt());
+        UserStatus newUserStatus = new UserStatus(user, userStatusCreateRequest.lastActiveAt());
         userStatusRepository.save(newUserStatus);
 
         return userStatusMapper.toDto(newUserStatus);
@@ -63,21 +63,21 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Transactional
     @Override
-    public UserStatusDto update(UUID userStatusId, UserStatusUpdateDto userStatusUpdateDto) {
+    public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> UserStatusNotFoundException.fromUserStatusId(userStatusId));
 
-        userStatus.update(userStatusUpdateDto.newLastActiveAt());
+        userStatus.update(userStatusUpdateRequest.newLastActiveAt());
 
         return userStatusMapper.toDto(userStatus);
     }
 
     @Transactional
     @Override
-    public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
+    public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> UserStatusNotFoundException.fromUserId(userId));
-        userStatus.update(userStatusUpdateByUserIdDto.newLastActiveAt());
+        userStatus.update(userStatusUpdateByUserIdRequest.newLastActiveAt());
 
         return userStatusMapper.toDto(userStatus);
     }

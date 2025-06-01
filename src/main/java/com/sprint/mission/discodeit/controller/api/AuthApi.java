@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
-import com.sprint.mission.discodeit.dto.auth.AuthLoginDto;
+import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +31,6 @@ public interface AuthApi {
             )
     })
     ResponseEntity<UserDto> login(
-            @Parameter(description = "로그인 정보") AuthLoginDto loginRequest
+            @Parameter(description = "로그인 정보") LoginRequest loginRequest
     );
 }

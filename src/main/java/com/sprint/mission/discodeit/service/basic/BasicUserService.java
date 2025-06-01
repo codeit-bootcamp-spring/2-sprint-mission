@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -35,32 +35,32 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public UserDto create(UserCreateDto userCreateDto, BinaryContentCreateDto binaryContentCreateDto) {
-        log.info("Creating user: {}", userCreateDto);
+    public UserDto create(UserCreateRequest userCreateRequest, BinaryContentCreateRequest binaryContentCreateRequest) {
+        log.info("Creating user: {}", userCreateRequest);
 
-        if (userRepository.existsByEmail(userCreateDto.email())) {
-            log.warn("User email {} already exists", userCreateDto.email());
-            throw new UserEmailExistsException(userCreateDto.email());
+        if (userRepository.existsByEmail(userCreateRequest.email())) {
+            log.warn("User email {} already exists", userCreateRequest.email());
+            throw new UserEmailExistsException(userCreateRequest.email());
         }
 
-        if (userRepository.existsByUsername(userCreateDto.username())) {
-            log.warn("User username {} already exists", userCreateDto.username());
-            throw new UserNameExistsException(userCreateDto.username());
+        if (userRepository.existsByUsername(userCreateRequest.username())) {
+            log.warn("User username {} already exists", userCreateRequest.username());
+            throw new UserNameExistsException(userCreateRequest.username());
         }
 
         BinaryContent nullableProfile = null;
 
-        if (binaryContentCreateDto != null) {
-            String fileName = binaryContentCreateDto.fileName();
-            String contentType = binaryContentCreateDto.contentType();
-            byte[] bytes = binaryContentCreateDto.bytes();
+        if (binaryContentCreateRequest != null) {
+            String fileName = binaryContentCreateRequest.fileName();
+            String contentType = binaryContentCreateRequest.contentType();
+            byte[] bytes = binaryContentCreateRequest.bytes();
             nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
             binaryContentRepository.save(nullableProfile);
             binaryContentStorage.put(nullableProfile.getId(), bytes);
             log.debug("Profile created: {}", nullableProfile);
         }
 
-        User newUser = new User(userCreateDto.username(), userCreateDto.email(), userCreateDto.password(),
+        User newUser = new User(userCreateRequest.username(), userCreateRequest.email(), userCreateRequest.password(),
                 nullableProfile);
         UserStatus status = new UserStatus(newUser, Instant.now());
         userRepository.save(newUser);
@@ -88,8 +88,8 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public UserDto update(UUID userId, UserUpdateDto userUpdateDto,
-                          BinaryContentCreateDto binaryContentCreateDto) {
+    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+                          BinaryContentCreateRequest binaryContentCreateRequest) {
         log.info("Updating user: userId={}", userId);
 
         User user = userRepository.findById(userId)
@@ -98,29 +98,29 @@ public class BasicUserService implements UserService {
                     return new UserNotFoundException(userId);
                 });
 
-        if (userRepository.existsByEmail(userUpdateDto.newEmail())) {
-            log.warn("User email {} already exists", userUpdateDto.newEmail());
-            throw new UserEmailExistsException(userUpdateDto.newEmail());
+        if (userRepository.existsByEmail(userUpdateRequest.newEmail())) {
+            log.warn("User email {} already exists", userUpdateRequest.newEmail());
+            throw new UserEmailExistsException(userUpdateRequest.newEmail());
         }
 
-        if (userRepository.existsByUsername(userUpdateDto.newUsername())) {
-            log.warn("User username {} already exists", userUpdateDto.newUsername());
-            throw new UserNameExistsException(userUpdateDto.newUsername());
+        if (userRepository.existsByUsername(userUpdateRequest.newUsername())) {
+            log.warn("User username {} already exists", userUpdateRequest.newUsername());
+            throw new UserNameExistsException(userUpdateRequest.newUsername());
         }
 
         BinaryContent nullableProfile = null;
 
-        if (binaryContentCreateDto != null) {
-            String fileName = binaryContentCreateDto.fileName();
-            String contentType = binaryContentCreateDto.contentType();
-            byte[] bytes = binaryContentCreateDto.bytes();
+        if (binaryContentCreateRequest != null) {
+            String fileName = binaryContentCreateRequest.fileName();
+            String contentType = binaryContentCreateRequest.contentType();
+            byte[] bytes = binaryContentCreateRequest.bytes();
             nullableProfile = new BinaryContent(fileName, (long) bytes.length, contentType);
             binaryContentRepository.save(nullableProfile);
             binaryContentStorage.put(nullableProfile.getId(), bytes);
             log.debug("Profile updated: {}", nullableProfile);
         }
 
-        user.update(userUpdateDto.newUsername(), userUpdateDto.newEmail(), userUpdateDto.newPassword(),
+        user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword(),
                 nullableProfile);
 
         log.info("User updated successfully: {}", user);

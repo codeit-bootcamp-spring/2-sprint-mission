@@ -42,3 +42,9 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### Log Files ###
+.logs/
+
+### .env Files ###
+.env
+discodeit.env

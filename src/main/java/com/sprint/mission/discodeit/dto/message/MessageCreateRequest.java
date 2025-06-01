@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
-public record MessageCreateDto(
+public record MessageCreateRequest(
         @NotNull
         UUID authorId,
         @NotNull

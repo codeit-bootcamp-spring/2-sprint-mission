@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.MultipartToBinaryConverter;
@@ -42,11 +42,12 @@ public class UserController {
 
     @Operation(summary = "User 등록")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") @Valid UserCreateDto userCreateDto,
-                                              @RequestPart(name = "profile", required = false) MultipartFile file) {
-        log.info("Received user create request: {}", userCreateDto);
-        BinaryContentCreateDto profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
-        UserDto createdUser = userService.create(userCreateDto, profileRequest);
+    public ResponseEntity<UserDto> createUser(
+            @RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
+            @RequestPart(name = "profile", required = false) MultipartFile file) {
+        log.info("Received user create request: {}", userCreateRequest);
+        BinaryContentCreateRequest profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
+        UserDto createdUser = userService.create(userCreateRequest, profileRequest);
         log.info("User created successfully: userId={}", createdUser.id());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
@@ -56,12 +57,12 @@ public class UserController {
     @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateUser(
             @PathVariable UUID userId,
-            @RequestPart("userUpdateRequest") @Valid UserUpdateDto userUpdateDto,
+            @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
             @RequestPart(name = "profile", required = false) MultipartFile file
     ) {
-        log.info("Received user update request: userId={}, updateDto={}", userUpdateDto, userUpdateDto);
-        BinaryContentCreateDto profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
-        UserDto updatedUser = userService.update(userId, userUpdateDto, profileRequest);
+        log.info("Received user update request: userId={}, updateDto={}", userUpdateRequest, userUpdateRequest);
+        BinaryContentCreateRequest profileRequest = MultipartToBinaryConverter.toBinaryContentCreateDto(file);
+        UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
         log.info("User updated successfully: userId={}", updatedUser.id());
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
@@ -86,8 +87,8 @@ public class UserController {
     @Operation(summary = "User 온라인 상태 업데이트")
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-                                                                  @RequestBody @Valid UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
-        UserStatusDto userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdDto);
+                                                                  @RequestBody @Valid UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
+        UserStatusDto userStatus = userStatusService.updateByUserId(userId, userStatusUpdateByUserIdRequest);
 
         return ResponseEntity.ok(userStatus);
     }

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -47,23 +47,24 @@ public class BasicMessageService implements MessageService {
 
     @Transactional
     @Override
-    public MessageDto create(MessageCreateDto messageCreateDto, List<BinaryContentCreateDto> binaryContentCreateDtos) {
-        log.info("Creating message: {}", messageCreateDto);
-        User user = userRepository.findById(messageCreateDto.authorId())
+    public MessageDto create(MessageCreateRequest messageCreateRequest,
+                             List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+        log.info("Creating message: {}", messageCreateRequest);
+        User user = userRepository.findById(messageCreateRequest.authorId())
                 .orElseThrow(() -> {
-                    log.warn("User not found: userId={}", messageCreateDto.authorId());
-                    return new UserNotFoundException(messageCreateDto.authorId());
+                    log.warn("User not found: userId={}", messageCreateRequest.authorId());
+                    return new UserNotFoundException(messageCreateRequest.authorId());
                 });
 
-        Channel channel = channelRepository.findById(messageCreateDto.channelId())
+        Channel channel = channelRepository.findById(messageCreateRequest.channelId())
                 .orElseThrow(() -> {
-                    log.warn("Channel not found: channelId={}", messageCreateDto.channelId());
-                    return new ChannelNotFoundException(messageCreateDto.channelId());
+                    log.warn("Channel not found: channelId={}", messageCreateRequest.channelId());
+                    return new ChannelNotFoundException(messageCreateRequest.channelId());
                 });
 
         List<BinaryContent> attachments = new ArrayList<>();
 
-        for (BinaryContentCreateDto dto : binaryContentCreateDtos) {
+        for (BinaryContentCreateRequest dto : binaryContentCreateRequests) {
             BinaryContent binaryContent = new BinaryContent(dto.fileName(), (long) dto.bytes().length,
                     dto.contentType());
             binaryContentRepository.save(binaryContent);
@@ -73,7 +74,7 @@ public class BasicMessageService implements MessageService {
         }
 
         Message newMessage = new Message(user, channel,
-                messageCreateDto.content(), attachments);
+                messageCreateRequest.content(), attachments);
         messageRepository.save(newMessage);
         log.info("Message created successfully: messageId={}", newMessage.getId());
 
@@ -106,15 +107,15 @@ public class BasicMessageService implements MessageService {
 
     @Transactional
     @Override
-    public MessageDto update(UUID messageId, MessageUpdateDto messageUpdateDto) {
-        log.info("Updating message: messageId={}, updateDto={}", messageId, messageUpdateDto);
+    public MessageDto update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+        log.info("Updating message: messageId={}, updateDto={}", messageId, messageUpdateRequest);
 
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> {
                     log.warn("Message not found: messageId={}", messageId);
                     return new MessageNotFoundException(messageId);
                 });
-        message.update(messageUpdateDto.newContent());
+        message.update(messageUpdateRequest.newContent());
         log.info("Message updated successfully: messageId={}", messageId);
 
         return messageMapper.toDto(message);
