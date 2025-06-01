@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -7,7 +8,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -17,10 +17,9 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import org.springframework.web.multipart.MultipartFile;
+import com.sprint.mission.discodeit.service.UserService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RequiredArgsConstructor
@@ -44,6 +44,19 @@ public class BasicUserService implements UserService {
     private final MessageRepository messageRepository;
     private final BinaryContentService binaryContentService;
 
+    private static Map<String, Object> getStringObjectMap(String v, String originalFilename,
+        Exception e, String userId) {
+        Map<String, Object> newDetails = new HashMap<>();
+        newDetails.put("operation", v);
+        newDetails.put("filePath", originalFilename != null ? originalFilename : "unknown");
+        newDetails.put("originalExceptionType", e.getClass().getName());
+        if (e.getMessage() != null) {
+            newDetails.put("originalExceptionMessage", e.getMessage());
+        }
+        newDetails.put("customMessageContext", userId);
+        return newDetails;
+    }
+
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest, MultipartFile profileImageFile) {
@@ -51,29 +64,9 @@ public class BasicUserService implements UserService {
         String email = userCreateRequest.email();
         validateUserDoesNotExist(username, email);
 
-        BinaryContent profileEntity = null;
-        if (profileImageFile != null && !profileImageFile.isEmpty()) {
-            try {
-                BinaryContentDto profileDto = binaryContentService.create(profileImageFile);
-                profileEntity = binaryContentRepository.findById(profileDto.id())
-                    .orElseThrow(() -> new FileProcessingCustomException("create-user-profile", 
-                                                                        profileImageFile.getOriginalFilename(), 
-                                                                        "저장된 프로필 이미지 메타데이터를 찾을 수 없습니다. ID: " + profileDto.id()));
-                log.info("프로필 이미지 저장 완료");
-            } catch (Exception e) {
-                log.error("프로필 이미지 처리 오류", e);
-                throw new FileProcessingCustomException("create-user-profile-processing",
-                    profileImageFile.getOriginalFilename(),
-                    "사용자 " + username + "의 프로필 이미지 처리 중 오류: " + e.getMessage());
-            }
-        }
+        BinaryContent profileEntity = processProfileImage(profileImageFile, username);
 
-        User user = new User(
-            username,
-            email,
-            userCreateRequest.password(),
-            profileEntity
-        );
+        User user = new User(username, email, userCreateRequest.password(), profileEntity);
         User createdUser = userRepository.save(user);
         log.info("사용자 정보 저장 완료");
 
@@ -85,6 +78,39 @@ public class BasicUserService implements UserService {
         UserDto userDto = userMapper.toDto(createdUser);
         log.info("사용자 생성 완료");
         return userDto;
+    }
+
+    private BinaryContent processProfileImage(MultipartFile profileImageFile, String username) {
+        if (profileImageFile == null || profileImageFile.isEmpty()) {
+            return null;
+        }
+
+        String originalFilename = profileImageFile.getOriginalFilename();
+        log.debug("Attempting to process profile image for user {}: {}", username,
+            originalFilename);
+        try {
+            BinaryContentDto profileDto = binaryContentService.create(profileImageFile);
+            log.debug("Profile DTO created: {}", profileDto);
+            return binaryContentRepository.findById(profileDto.id()).orElseThrow(() -> {
+                log.error("저장된 프로필 이미지 메타데이터를 찾을 수 없습니다. ID: {}", profileDto.id());
+                return new FileProcessingCustomException(
+                    Map.of("operation", "create-user-profile-lookup", "filePath",
+                        originalFilename != null ? originalFilename : "unknown",
+                        "customMessageContext",
+                        "저장된 프로필 이미지 메타데이터를 찾을 수 없습니다. ID: " + profileDto.id()));
+            });
+        } catch (Exception e) {
+            log.error("Profile image processing error for user {}, file {}: {}", username,
+                originalFilename, e.getMessage(), e);
+            if (e instanceof FileProcessingCustomException fe) {
+                throw new FileProcessingCustomException(new HashMap<>(fe.getDetails()));
+            } else {
+                Map<String, Object> newDetails = getStringObjectMap(
+                    "create-user-profile-general-error", originalFilename, e,
+                    "사용자 " + username + "의 프로필 이미지 처리 중 일반 오류 발생");
+                throw new FileProcessingCustomException(newDetails);
+            }
+        }
     }
 
     @Override
@@ -120,10 +146,11 @@ public class BasicUserService implements UserService {
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
 
-        if (newUsername != null && !newUsername.isEmpty() && !user.getUsername().equals(newUsername)) {
+        if (newUsername != null && !newUsername.isEmpty() && !user.getUsername()
+            .equals(newUsername)) {
             if (userRepository.existsByUsername(newUsername)) {
                 log.warn("사용자명 중복");
-                throw new UserAlreadyExistException(ErrorCode.USER_ALREADY_EXISTS, Map.of("username", newUsername));
+                throw new UserAlreadyExistException(Map.of("username", newUsername));
             }
             user.setUsername(newUsername);
             log.info("사용자명 변경 완료");
@@ -132,7 +159,7 @@ public class BasicUserService implements UserService {
         if (newEmail != null && !newEmail.isEmpty() && !user.getEmail().equals(newEmail)) {
             if (userRepository.existsByEmail(newEmail)) {
                 log.warn("이메일 중복");
-                throw new UserAlreadyExistException(ErrorCode.USER_ALREADY_EXISTS, Map.of("email", newEmail));
+                throw new UserAlreadyExistException(Map.of("email", newEmail));
             }
             user.setEmail(newEmail);
             log.info("이메일 변경 완료");
@@ -144,15 +171,17 @@ public class BasicUserService implements UserService {
         }
 
         BinaryContent oldProfile = user.getProfile();
-        BinaryContent newProfileEntity = null;
 
         if (profileImageFile != null && !profileImageFile.isEmpty()) {
+            String originalFilename = profileImageFile.getOriginalFilename();
             try {
                 BinaryContentDto newProfileDto = binaryContentService.create(profileImageFile);
-                newProfileEntity = binaryContentRepository.findById(newProfileDto.id())
-                    .orElseThrow(() -> new FileProcessingCustomException("update-user-profile", 
-                                                                        profileImageFile.getOriginalFilename(), 
-                                                                        "저장된 새 프로필 이미지 메타데이터를 찾을 수 없습니다. ID: " + newProfileDto.id()));
+                BinaryContent newProfileEntityFromDb = binaryContentRepository.findById(
+                    newProfileDto.id()).orElseThrow(() -> new FileProcessingCustomException(
+                    Map.of("operation", "update-user-profile-lookup", "filePath",
+                        originalFilename != null ? originalFilename : "unknown",
+                        "customMessageContext",
+                        "저장된 새 프로필 이미지 메타데이터를 찾을 수 없습니다. ID: " + newProfileDto.id())));
                 log.info("프로필 이미지 저장 완료");
 
                 if (oldProfile != null) {
@@ -160,20 +189,25 @@ public class BasicUserService implements UserService {
                         binaryContentService.delete(oldProfile.getId());
                         log.info("기존 프로필 이미지 삭제 완료");
                     } catch (Exception ex) {
-                        log.error("프로필 삭제 오류", ex);
+                        log.error("기존 프로필 이미지 삭제 중 오류 발생. ID: {}", oldProfile.getId(), ex);
                     }
                 }
-                user.setProfile(newProfileEntity);
+                user.setProfile(newProfileEntityFromDb);
             } catch (Exception e) {
-                log.error("프로필 이미지 처리 오류", e);
-                throw new FileProcessingCustomException("update-user-profile-processing",
-                    profileImageFile.getOriginalFilename(),
-                    "사용자 ID " + userId + "의 새 프로필 이미지 처리 중 오류: " + e.getMessage());
+                log.error("Update - Profile image processing error for user ID {}, file {}: {}",
+                    userId, originalFilename, e.getMessage(), e);
+                if (e instanceof FileProcessingCustomException fe) {
+                    throw new FileProcessingCustomException(new HashMap<>(fe.getDetails()));
+                } else {
+                    Map<String, Object> newDetails = getStringObjectMap(
+                        "update-user-profile-general-error", originalFilename, e,
+                        "사용자 ID " + userId + "의 새 프로필 이미지 처리 중 일반 오류 발생");
+                    throw new FileProcessingCustomException(newDetails);
+                }
             }
         }
 
         User updatedUser = userRepository.save(user);
-        log.info("사용자 정보 저장 완료");
 
         log.info("사용자 업데이트 완료");
         return userMapper.toDto(updatedUser);
@@ -202,7 +236,7 @@ public class BasicUserService implements UserService {
         } else {
             log.info("사용자 ID '{}'가 작성한 메시지가 없습니다.", userId);
         }
-        
+
         BinaryContent userProfile = user.getProfile();
         if (userProfile != null) {
             log.info("사용자 ID '{}'의 프로필 이미지 삭제 시도. 프로필 ID: {}", userId, userProfile.getId());
@@ -210,7 +244,8 @@ public class BasicUserService implements UserService {
                 binaryContentService.delete(userProfile.getId());
                 log.info("사용자 프로필 이미지 삭제 완료. 프로필 ID: {}", userProfile.getId());
             } catch (Exception e) {
-                log.error("사용자 ID '{}'의 프로필 이미지(ID: '{}') 삭제 중 오류 발생. 사용자 삭제는 계속 진행.", userId, userProfile.getId(), e);
+                log.error("사용자 ID '{}'의 프로필 이미지(ID: '{}') 삭제 중 오류 발생. 사용자 삭제는 계속 진행.", userId,
+                    userProfile.getId(), e);
             }
         }
 
@@ -222,11 +257,11 @@ public class BasicUserService implements UserService {
     private void validateUserDoesNotExist(String username, String email) {
         if (userRepository.existsByEmail(email)) {
             log.warn("유효성 검사 실패: 이메일 '{}'은(는) 이미 존재합니다.", email);
-            throw new UserAlreadyExistException(ErrorCode.USER_ALREADY_EXISTS, Map.of("email", email));
+            throw new UserAlreadyExistException(Map.of("email", email));
         }
         if (userRepository.existsByUsername(username)) {
             log.warn("유효성 검사 실패: 사용자명 '{}'은(는) 이미 존재합니다.", username);
-            throw new UserAlreadyExistException(ErrorCode.USER_ALREADY_EXISTS, Map.of("username", username));
+            throw new UserAlreadyExistException(Map.of("username", username));
         }
     }
 }

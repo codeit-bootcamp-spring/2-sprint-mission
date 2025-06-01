@@ -5,32 +5,32 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.Map;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -76,17 +76,17 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto create(PrivateChannelCreateRequest request) {
         validatePrivateChannelRequest(request);
 
+        List<User> participants = userRepository.findAllById(request.participantIds());
+
         Channel channel = new Channel(ChannelType.PRIVATE, request.channelName(), null);
         channelRepository.save(channel);
 
         log.info("비공개 채널 기본 정보 저장 완료");
 
-        List<User> participants = userRepository.findAllById(request.participantIds());
-        
         List<ReadStatus> readStatuses = participants.stream()
             .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
             .collect(Collectors.toList());
-        
+
         if (!readStatuses.isEmpty()) {
             readStatusRepository.saveAll(readStatuses);
             log.info("ReadStatus 저장 완료");
@@ -120,9 +120,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         List<UUID> subscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-            .map(ReadStatus::getChannel)
-            .map(Channel::getId)
-            .distinct()
+            .map(ReadStatus::getChannel).map(Channel::getId).distinct()
             .collect(Collectors.toList());
         log.info("사용자 채널 목록 확인 완료");
 
@@ -132,8 +130,9 @@ public class BasicChannelService implements ChannelService {
             log.info("공개 채널 조회 완료");
         } else {
             List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
-            List<Channel> subscribedPrivateChannels = channelRepository.findAllByIdInAndType(subscribedChannelIds, ChannelType.PRIVATE);
-            
+            List<Channel> subscribedPrivateChannels = channelRepository.findAllByIdInAndType(
+                subscribedChannelIds, ChannelType.PRIVATE);
+
             channelList = new ArrayList<>(publicChannels);
             subscribedPrivateChannels.forEach(spc -> {
                 if (publicChannels.stream().noneMatch(pc -> pc.getId().equals(spc.getId()))) {
@@ -143,10 +142,8 @@ public class BasicChannelService implements ChannelService {
 
             log.info("채널 조회 완료");
         }
-        
-        return channelList.stream()
-                          .map(channelMapper::toDto)
-                          .collect(Collectors.toList());
+
+        return channelList.stream().map(channelMapper::toDto).collect(Collectors.toList());
     }
 
     @Transactional
@@ -159,9 +156,6 @@ public class BasicChannelService implements ChannelService {
             throw new ChannelException(ErrorCode.PRIVATE_CHANNEL_UPDATE_DENIED,
                 Map.of("channelId", channelId.toString()));
         }
-
-        String oldName = channel.getName();
-        String oldDescription = channel.getDescription();
 
         boolean updated = channel.update(request.newName(), request.newDescription());
 
@@ -180,43 +174,29 @@ public class BasicChannelService implements ChannelService {
     public void delete(UUID channelId) {
         if (!channelRepository.existsById(channelId)) {
             log.warn("채널 없음");
-            throw new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
-                Map.of("channelId", channelId.toString()));
+            throw new ChannelNotFoundException(Map.of("channelId", channelId.toString()));
         }
 
         log.info("채널 메시지 삭제 완료");
         messageRepository.deleteAllByChannelId(channelId);
-        
+
         log.info("채널 ReadStatus 삭제 완료");
         readStatusRepository.deleteAllByChannelId(channelId);
-        
+
         channelRepository.deleteById(channelId);
         log.info("채널 삭제 완료");
     }
 
-    private User findUserByIdOrThrow(UUID userId, String userType) {
-        try {
-            return userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn("사용자 없음");
-                    return new UserNotFoundException(userId.toString());
-                });
-        } catch (NoSuchElementException e) {
-            throw new UserNotFoundException(userId.toString());
-        }
-    }
 
     private Channel findChannelByIdOrThrow(UUID channelId, String actionType) {
         try {
-            return channelRepository.findById(channelId)
-                .orElseThrow(() -> {
-                    log.warn("채널 없음");
-                    return new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
-                        Map.of("channelId", channelId.toString()));
-                });
+            return channelRepository.findById(channelId).orElseThrow(() -> {
+                log.warn("채널 없음");
+                return new ChannelNotFoundException(Map.of("channelId", channelId.toString()));
+            });
         } catch (NoSuchElementException e) {
-            throw new ChannelException(ErrorCode.CHANNEL_NOT_FOUND,
-                Map.of("channelId", channelId.toString()));
+            log.warn("채널을 찾지 못했습니다 (NoSuchElementException). Channel ID: {}", channelId, e);
+            throw new ChannelNotFoundException(Map.of("channelId", channelId.toString()));
         }
     }
 
@@ -231,7 +211,7 @@ public class BasicChannelService implements ChannelService {
 
     private void validatePrivateChannelRequest(PrivateChannelCreateRequest request) {
         if (request == null) {
-            log.warn("비공개 채널 생성 요청이 null입니다.");
+            log.warn("비공개 채널 생성 요청이 null 입니다.");
             throw new ChannelException(ErrorCode.INVALID_CHANNEL_INFORMATION,
                 Map.of("reason", "Request is null"));
         }
@@ -241,39 +221,14 @@ public class BasicChannelService implements ChannelService {
                 Map.of("reason", "Participant list is null or empty", "requestBody",
                     String.valueOf(request)));
         }
-        if (request.participantIds().size() != 2) {
-            log.warn("비공개 채널은 두 명의 참여자만 허용합니다 (1:1). 요청된 총 참여자 수: {}",
-                request.participantIds().size());
-            throw new ChannelException(ErrorCode.CHANNEL_OPERATION_NOT_PERMITTED,
-                Map.of("reason", "Private channels must have exactly two participants.",
-                    "actualParticipantCount", String.valueOf(request.participantIds().size())));
-        }
-        
-        // Verify all participants exist
-        List<User> participants = userRepository.findAllById(request.participantIds());
-        if (participants.size() != request.participantIds().size()) {
-            List<UUID> foundUserIds = participants.stream()
-                .map(User::getId)
-                .collect(Collectors.toList());
-            
-            List<UUID> notFoundUserIds = request.participantIds().stream()
-                .filter(id -> !foundUserIds.contains(id))
-                .collect(Collectors.toList());
-                
-            log.warn("비공개 채널 생성 실패: 존재하지 않는 사용자 ID가 포함되어 있습니다: {}", notFoundUserIds);
-            throw new UserNotFoundException(
-                Map.of("notFoundUserIds", notFoundUserIds.toString()));
+
+        List<UUID> requestedParticipantIds = request.participantIds();
+        for (UUID participantId : requestedParticipantIds) {
+            if (!userRepository.existsById(participantId)) {
+                log.warn("비공개 채널 생성 실패: 존재하지 않는 사용자 ID [{}] 포함.", participantId);
+                throw new UserNotFoundException(Map.of("userId", participantId.toString()));
+            }
         }
     }
 
-    private String generatePrivateChannelName(List<UUID> participantIds) {
-        if (CollectionUtils.isEmpty(participantIds)) {
-            log.warn("비공개 채널명 생성 시 참여자 ID 목록이 비어있어 기본 이름을 반환합니다.");
-            return "private_channel_empty_participants";
-        }
-        return participantIds.stream()
-            .map(UUID::toString)
-            .sorted()
-            .collect(Collectors.joining("_"));
-    }
 }
