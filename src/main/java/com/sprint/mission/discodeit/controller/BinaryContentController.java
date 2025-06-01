@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -52,9 +53,14 @@ public class BinaryContentController implements BinaryContentApi {
       @PathVariable("binaryContentId") UUID binaryContentId) {
     log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
-    ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
-    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
-        response.getHeaders().getContentType(), response.getHeaders().getContentLength());
-    return response;
+    try {
+      ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
+      log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+          response.getHeaders().getContentType(), response.getHeaders().getContentLength());
+      return response;
+    } catch (MalformedURLException e) {
+      log.error("다운로드 URL 생성 실패", e);
+      return ResponseEntity.badRequest().body("파일 다운로드 처리 중 오류 발생");
+    }
   }
 }

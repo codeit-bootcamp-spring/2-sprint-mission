@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 
@@ -11,5 +12,5 @@ public interface BinaryContentStorage {
 
   InputStream get(UUID binaryContentId);
 
-  ResponseEntity<?> download(BinaryContentDto metaData);
+  ResponseEntity<?> download(BinaryContentDto metaData) throws MalformedURLException;
 }

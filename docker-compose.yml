@@ -9,7 +9,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./initdb/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - app-network
     healthcheck:
@@ -31,7 +31,7 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE}
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
     ports:
-      - "8081:80"
+      - "8080:80"
     volumes:
       - binary_content_storage:/app/data
     networks:
