@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,8 +29,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,10 +45,12 @@ class ChannelApiIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    
+
     private String user1Id;
     private String user2Id;
 
-    private static final String PASSWORD = "123";
+    private static final String PASSWORD = "123456";
     private static final String USER1 = "user1";
     private static final String USER1_EMAIL = "user1@naver.com";
     private static final String USER2 = "user2";
@@ -129,11 +134,32 @@ class ChannelApiIntegrationTest {
 
         // then
         result.andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.VALIDATION_FAILED.name()))
+            .andExpect(jsonPath("$.code").value(ErrorCode.VALIDATION_FAILED.name()))
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.details.validationErrors").exists());
     }
 
+    @Test
+    @DisplayName("공개 채널 생성 실패 - 이름 중복")
+    @Transactional
+    void createPublicChannel_Fail_DuplicateName() throws Exception {
+        String duplicateChannelName = "Duplicate Public Channel";
+        // 먼저 해당 이름으로 채널 생성
+        createPublicChannel(duplicateChannelName, "Some description");
+
+        // 다시 같은 이름으로 채널 생성 시도
+        PublicChannelCreateRequest request = new PublicChannelCreateRequest(duplicateChannelName,
+            "Another description");
+
+        ResultActions result = mockMvc.perform(post("/api/channels/public")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)));
+
+        result.andExpect(status().isConflict()) // CHANNEL_ALREADY_EXISTS는 보통 409 Conflict
+            .andExpect(jsonPath("$.code").value(ErrorCode.CHANNEL_ALREADY_EXISTS.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.CHANNEL_ALREADY_EXISTS.getMessage()))
+            .andExpect(jsonPath("$.details.channelName").value(duplicateChannelName));
+    }
 
     @Test
     @DisplayName("비공개 채널 생성 성공")
@@ -172,12 +198,13 @@ class ChannelApiIntegrationTest {
         );
 
         ResultActions result = mockMvc.perform(post("/api/channels/private")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)));
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andDo(print());
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.USER_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.USER_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value("해당 사용자를 찾을 수 없습니다."))
             .andExpect(jsonPath("$.details.userId").value(nonExistentUserId));
     }
 
@@ -218,11 +245,41 @@ class ChannelApiIntegrationTest {
             .content(objectMapper.writeValueAsString(updateRequest)));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value("채널을 찾을 수 없습니다."))
             .andExpect(jsonPath("$.details.channelId").value(nonExistentChannelId));
     }
 
+    @Test
+    @DisplayName("채널 수정 실패 - 비공개 채널 수정 시도")
+    @Transactional
+    void updateChannel_Fail_PrivateChannelUpdateDenied() throws Exception {
+        // 비공개 채널 생성
+        PrivateChannelCreateRequest privateCreateRequest = new PrivateChannelCreateRequest(
+            Arrays.asList(UUID.fromString(user1Id), UUID.fromString(user2Id)),
+            "Test Private Channel for Update Denied"
+        );
+        MvcResult privateChannelResult = mockMvc.perform(post("/api/channels/private")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(privateCreateRequest)))
+            .andExpect(status().isCreated())
+            .andReturn();
+        String privateChannelId = objectMapper.readTree(
+            privateChannelResult.getResponse().getContentAsString()).get("id").asText();
+
+        // 해당 비공개 채널을 공개 채널 정보로 업데이트 시도
+        PublicChannelUpdateRequest updateRequest = new PublicChannelUpdateRequest(
+            "Attempt to Update Private", "Desc");
+
+        ResultActions result = mockMvc.perform(patch("/api/channels/" + privateChannelId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(updateRequest)));
+
+        result.andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value(ErrorCode.PRIVATE_CHANNEL_UPDATE_DENIED.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.PRIVATE_CHANNEL_UPDATE_DENIED.getMessage()))
+            .andExpect(jsonPath("$.details.channelId").value(privateChannelId));
+    }
 
     @Test
     @DisplayName("채널 삭제 성공")
@@ -246,8 +303,8 @@ class ChannelApiIntegrationTest {
         ResultActions result = mockMvc.perform(delete("/api/channels/" + nonExistentChannelId));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value("채널을 찾을 수 없습니다."))
             .andExpect(jsonPath("$.details.channelId").value(nonExistentChannelId));
     }
 
@@ -287,8 +344,8 @@ class ChannelApiIntegrationTest {
             .param("userId", nonExistentUserId));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.USER_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.USER_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value("해당 사용자를 찾을 수 없습니다."))
             .andExpect(jsonPath("$.details.userId").value(nonExistentUserId));
     }
 } 

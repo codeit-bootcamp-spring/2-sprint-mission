@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
@@ -34,7 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(value = UserController.class, excludeAutoConfiguration = JpaConfig.class)
+@ActiveProfiles("test")
+@WebMvcTest(value = UserController.class)
 class UserControllerTest {
 
     @Autowired
@@ -87,10 +91,16 @@ class UserControllerTest {
     @DisplayName("사용자 생성 - 성공 (프로필 이미지 포함)")
     void createUser_Success_WithProfile() throws Exception {
         // given
-        MockMultipartFile profileImage = new MockMultipartFile("profile", "profile.jpg",
+        UUID profileId = UUID.randomUUID();
+        String profileFileName = "profile.jpg";
+        BinaryContentDto profileDto = new BinaryContentDto(profileId, profileFileName, 100L, MediaType.IMAGE_JPEG_VALUE);
+        UserDto userDtoWithProfile = new UserDto(userId, "user", "test@naver.com", profileDto, true);
+
+        MockMultipartFile profileImage = new MockMultipartFile("profileImageFile", profileFileName,
             MediaType.IMAGE_JPEG_VALUE, "image_data".getBytes());
-        given(userService.create(any(UserCreateRequest.class),
-            any(MockMultipartFile.class))).willReturn(userDto);
+
+        given(userService.create(any(UserCreateRequest.class), any(MockMultipartFile.class)))
+            .willReturn(userDtoWithProfile);
 
         MockMultipartFile userCreateRequestPart = new MockMultipartFile(
             "userCreateRequest",
@@ -106,17 +116,24 @@ class UserControllerTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA))
             .andDo(print())
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id").value(userId.toString()));
+            .andExpect(jsonPath("$.id").value(userId.toString()))
+            .andExpect(jsonPath("$.username").value("user"))
+            .andExpect(jsonPath("$.email").value("test@naver.com"))
+            .andExpect(jsonPath("$.profile").exists())
+            .andExpect(jsonPath("$.profile.id", is(profileId.toString())))
+            .andExpect(jsonPath("$.profile.fileName", is(profileFileName)))
+            .andExpect(jsonPath("$.online").value(true));
     }
 
     @Test
     @DisplayName("사용자 생성 - 실패 (이메일 중복)")
     void createUser_Failure_EmailExists() throws Exception {
+        // details 맵 준비
+        Map<String, Object> expectedDetails = Collections.singletonMap("email",
+            userCreateRequest.email());
 
         given(userService.create(any(UserCreateRequest.class), eq(null)))
-            .willThrow(new UserAlreadyExistException(
-                com.sprint.mission.discodeit.exception.ErrorCode.USER_ALREADY_EXISTS,
-                Collections.singletonMap("email", userCreateRequest.email())));
+            .willThrow(new UserAlreadyExistException(expectedDetails));
 
         MockMultipartFile userCreateRequestPart = new MockMultipartFile(
             "userCreateRequest", "", MediaType.APPLICATION_JSON_VALUE,
@@ -125,8 +142,13 @@ class UserControllerTest {
         mockMvc.perform(multipart("/api/users")
                 .file(userCreateRequestPart)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
-            .andExpect(
-                status().isConflict());
+            .andDo(print())
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.code").value(
+                com.sprint.mission.discodeit.exception.ErrorCode.USER_ALREADY_EXISTS.name()))
+            .andExpect(jsonPath("$.message").value(
+                com.sprint.mission.discodeit.exception.ErrorCode.USER_ALREADY_EXISTS.getMessage()))
+            .andExpect(jsonPath("$.details.email").value(userCreateRequest.email()));
     }
 
     @Test

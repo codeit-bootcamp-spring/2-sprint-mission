@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.message.MessageException;
+import com.sprint.mission.discodeit.exception.message.MessageFileProcessingException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -21,6 +22,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -211,6 +214,32 @@ class BasicMessageServiceTest {
         assertThatThrownBy(
             () -> messageService.create(request, Collections.emptyList())).isInstanceOf(
             UserNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("메시지 생성 실패 (첨부파일 처리 중 오류)")
+    void createMessage_Failure_AttachmentProcessingError() {
+        // given
+        MessageCreateRequest request = new MessageCreateRequest(CREATE_MESSAGE_WITH_ATTACHMENTS, channelId, authorId);
+        List<MultipartFile> files = List.of(mockFile1); // 하나의 파일로 테스트 간소화
+
+        given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
+        given(userRepository.findById(authorId)).willReturn(Optional.of(author));
+        given(mockFile1.isEmpty()).willReturn(false);
+        given(mockFile1.getOriginalFilename()).willReturn(FILE1_NAME);
+
+        // FileProcessingCustomException 발생 시나리오
+        Map<String, Object> expectedDetails = Map.of("operation", "save-file", "fileName", FILE1_NAME);
+        given(binaryContentService.create(mockFile1))
+            .willThrow(new FileProcessingCustomException(expectedDetails));
+
+        // when & then
+        assertThatThrownBy(() -> messageService.create(request, files))
+            .isInstanceOf(MessageFileProcessingException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
+
+        // 추가 검증 (예: 메시지가 저장되지 않았는지 등)
+        verify(messageRepository, never()).save(any(Message.class));
     }
 
     @Test

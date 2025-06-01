@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,10 +22,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,7 +37,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class UserServiceTest {
 
     @Mock
@@ -40,10 +47,10 @@ class UserServiceTest {
 
     @Mock
     private BinaryContentRepository binaryContentRepository;
-    
+
     @Mock
     private UserStatusRepository userStatusRepository;
-    
+
     @Mock
     private MessageRepository messageRepository;
 
@@ -82,7 +89,8 @@ class UserServiceTest {
         user = new User(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD, null);
 
         userCreateRequest = new UserCreateRequest(TEST_USERNAME, TEST_EMAIL, TEST_PASSWORD);
-        userUpdateRequest = new UserUpdateRequest(UPDATED_USERNAME, UPDATED_EMAIL, UPDATED_PASSWORD);
+        userUpdateRequest = new UserUpdateRequest(UPDATED_USERNAME, UPDATED_EMAIL,
+            UPDATED_PASSWORD);
         userDto = new UserDto(userId, TEST_USERNAME, TEST_EMAIL, null, true);
     }
 
@@ -93,16 +101,19 @@ class UserServiceTest {
         given(userRepository.existsByUsername(userCreateRequest.username())).willReturn(false);
 
         UUID binaryContentId = UUID.randomUUID();
-        BinaryContentDto mockBinaryContentDto = new BinaryContentDto(binaryContentId, PROFILE_FILENAME, FILE_SIZE, IMAGE_MIME_TYPE);
-        
+        BinaryContentDto mockBinaryContentDto = new BinaryContentDto(binaryContentId,
+            PROFILE_FILENAME, FILE_SIZE, IMAGE_MIME_TYPE);
+
         when(mockFile.isEmpty()).thenReturn(false);
         given(binaryContentService.create(mockFile)).willReturn(mockBinaryContentDto);
-        
+
         BinaryContent mockBinaryContent = mock(BinaryContent.class);
         given(mockBinaryContent.getId()).willReturn(binaryContentId);
-        given(binaryContentRepository.findById(binaryContentId)).willReturn(Optional.of(mockBinaryContent));
+        given(binaryContentRepository.findById(binaryContentId)).willReturn(
+            Optional.of(mockBinaryContent));
 
-        User savedUser = new User(userCreateRequest.username(), userCreateRequest.email(), userCreateRequest.password(), mockBinaryContent);
+        User savedUser = new User(userCreateRequest.username(), userCreateRequest.email(),
+            userCreateRequest.password(), mockBinaryContent);
         given(userRepository.save(any(User.class))).willReturn(savedUser);
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
@@ -123,8 +134,10 @@ class UserServiceTest {
     void createUser_Failure_DuplicateEmail() {
         given(userRepository.existsByEmail(userCreateRequest.email())).willReturn(true);
 
+        Map<String, Object> expectedDetails = Map.of("email", userCreateRequest.email());
         assertThatThrownBy(() -> userService.create(userCreateRequest, mockFile))
-                .isInstanceOf(UserAlreadyExistException.class);
+            .isInstanceOf(UserAlreadyExistException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
     }
 
     @Test
@@ -133,8 +146,30 @@ class UserServiceTest {
         given(userRepository.existsByEmail(userCreateRequest.email())).willReturn(false);
         given(userRepository.existsByUsername(userCreateRequest.username())).willReturn(true);
 
+        Map<String, Object> expectedDetails = Map.of("username", userCreateRequest.username());
         assertThatThrownBy(() -> userService.create(userCreateRequest, mockFile))
-                .isInstanceOf(UserAlreadyExistException.class);
+            .isInstanceOf(UserAlreadyExistException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
+    }
+
+    @Test
+    @DisplayName("사용자 생성 실패 - 프로필 이미지 처리 오류")
+    void createUser_Failure_ProfileImageProcessingError() {
+        given(userRepository.existsByEmail(userCreateRequest.email())).willReturn(false);
+        given(userRepository.existsByUsername(userCreateRequest.username())).willReturn(false);
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getOriginalFilename()).thenReturn(PROFILE_FILENAME);
+
+        Map<String, Object> expectedDetails = Map.of("operation", "save-file", "fileName",
+            PROFILE_FILENAME);
+        given(binaryContentService.create(mockFile))
+            .willThrow(new FileProcessingCustomException(expectedDetails));
+
+        assertThatThrownBy(() -> userService.create(userCreateRequest, mockFile))
+            .isInstanceOf(FileProcessingCustomException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
+
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -145,16 +180,20 @@ class UserServiceTest {
         given(userRepository.existsByUsername(userUpdateRequest.newUsername())).willReturn(false);
         given(userRepository.existsByEmail(userUpdateRequest.newEmail())).willReturn(false);
         given(userRepository.save(any(User.class))).willReturn(existingUser);
-        
+
+        when(mockFile.isEmpty()).thenReturn(false);
         UUID binaryContentId = UUID.randomUUID();
-        BinaryContentDto mockBinaryContentDto = new BinaryContentDto(binaryContentId, UPDATED_PROFILE_FILENAME, FILE_SIZE, IMAGE_MIME_TYPE);
+        BinaryContentDto mockBinaryContentDto = new BinaryContentDto(binaryContentId,
+            UPDATED_PROFILE_FILENAME, FILE_SIZE, IMAGE_MIME_TYPE);
         given(binaryContentService.create(mockFile)).willReturn(mockBinaryContentDto);
-        
+
         BinaryContent mockBinaryContent = mock(BinaryContent.class);
         given(mockBinaryContent.getId()).willReturn(binaryContentId);
-        given(binaryContentRepository.findById(binaryContentId)).willReturn(Optional.of(mockBinaryContent));
-        
-        UserDto updatedDto = new UserDto(userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), null, true);
+        given(binaryContentRepository.findById(binaryContentId)).willReturn(
+            Optional.of(mockBinaryContent));
+
+        UserDto updatedDto = new UserDto(userId, userUpdateRequest.newUsername(),
+            userUpdateRequest.newEmail(), null, true);
         given(userMapper.toDto(any(User.class))).willReturn(updatedDto);
 
         UserDto resultDto = userService.update(userId, userUpdateRequest, mockFile);
@@ -170,12 +209,34 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("사용자 정보 수정 실패 - 프로필 이미지 처리 오류")
+    void updateUser_Failure_ProfileImageProcessingError() {
+        User existingUser = new User("oldUser", "old@naver.com", "oldPass", null);
+        given(userRepository.findById(userId)).willReturn(Optional.of(existingUser));
+        when(mockFile.isEmpty()).thenReturn(false);
+        when(mockFile.getOriginalFilename()).thenReturn(UPDATED_PROFILE_FILENAME);
+
+        Map<String, Object> expectedDetails = Map.of("operation", "save-file", "fileName",
+            UPDATED_PROFILE_FILENAME);
+        given(binaryContentService.create(mockFile))
+            .willThrow(new FileProcessingCustomException(expectedDetails));
+
+        assertThatThrownBy(() -> userService.update(userId, userUpdateRequest, mockFile))
+            .isInstanceOf(FileProcessingCustomException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
+
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
     @DisplayName("사용자 정보 수정 실패 - 존재하지 않는 사용자")
     void updateUser_Failure_UserNotFound() {
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
+        Map<String, Object> expectedDetails = Map.of("userId", userId.toString());
         assertThatThrownBy(() -> userService.update(userId, userUpdateRequest, mockFile))
-            .isInstanceOf(UserNotFoundException.class);
+            .isInstanceOf(UserNotFoundException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
     }
 
     @Test
@@ -185,8 +246,10 @@ class UserServiceTest {
         given(userRepository.findById(userId)).willReturn(Optional.of(existingUser));
         given(userRepository.existsByUsername(userUpdateRequest.newUsername())).willReturn(true);
 
+        Map<String, Object> expectedDetails = Map.of("username", userUpdateRequest.newUsername());
         assertThatThrownBy(() -> userService.update(userId, userUpdateRequest, mockFile))
-            .isInstanceOf(UserAlreadyExistException.class);
+            .isInstanceOf(UserAlreadyExistException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
     }
 
     @Test
@@ -197,8 +260,10 @@ class UserServiceTest {
         given(userRepository.existsByUsername(userUpdateRequest.newUsername())).willReturn(false);
         given(userRepository.existsByEmail(userUpdateRequest.newEmail())).willReturn(true);
 
+        Map<String, Object> expectedDetails = Map.of("email", userUpdateRequest.newEmail());
         assertThatThrownBy(() -> userService.update(userId, userUpdateRequest, mockFile))
-            .isInstanceOf(UserAlreadyExistException.class);
+            .isInstanceOf(UserAlreadyExistException.class)
+            .hasFieldOrPropertyWithValue("details", expectedDetails);
     }
 
     @Test
