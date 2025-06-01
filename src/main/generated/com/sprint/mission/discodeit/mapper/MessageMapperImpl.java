@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-09T10:41:21+0900",
+    date = "2025-05-20T19:10:10+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (JetBrains s.r.o.)"
 )
 @Component
@@ -34,6 +35,7 @@ public class MessageMapperImpl implements MessageMapper {
 
         List<BinaryContentDto> attachments = null;
         UserDto author = null;
+        UUID channelId = null;
         UUID id = null;
         Instant createdAt = null;
         Instant updatedAt = null;
@@ -41,12 +43,11 @@ public class MessageMapperImpl implements MessageMapper {
 
         attachments = binaryContentListToBinaryContentDtoList( message.getAttachments() );
         author = userMapper.toDto( message.getAuthor() );
+        channelId = messageChannelId( message );
         id = message.getId();
         createdAt = message.getCreatedAt();
         updatedAt = message.getUpdatedAt();
         content = message.getContent();
-
-        UUID channelId = null;
 
         MessageDto messageDto = new MessageDto( id, createdAt, updatedAt, content, channelId, author, attachments );
 
@@ -78,5 +79,20 @@ public class MessageMapperImpl implements MessageMapper {
         }
 
         return list1;
+    }
+
+    private UUID messageChannelId(Message message) {
+        if ( message == null ) {
+            return null;
+        }
+        Channel channel = message.getChannel();
+        if ( channel == null ) {
+            return null;
+        }
+        UUID id = channel.getId();
+        if ( id == null ) {
+            return null;
+        }
+        return id;
     }
 }

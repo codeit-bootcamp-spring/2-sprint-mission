@@ -1,0 +1,15 @@
+# Git
+.git
+.gitignore
+
+
+# IDE
+.idea/
+*.iml
+
+# Local environment
+.env
+
+# OS specific
+.DS_Store
+Thumbs.db

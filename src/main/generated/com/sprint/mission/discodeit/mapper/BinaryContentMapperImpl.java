@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-09T10:41:21+0900",
+    date = "2025-05-20T19:10:10+0900",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.14 (JetBrains s.r.o.)"
 )
 @Component
@@ -20,15 +20,15 @@ public class BinaryContentMapperImpl implements BinaryContentMapper {
             return null;
         }
 
-        UUID id = null;
         String fileName = null;
-        Long size = null;
         String contentType = null;
+        UUID id = null;
+        Long size = null;
 
-        id = binaryContent.getId();
         fileName = binaryContent.getFileName();
-        size = binaryContent.getSize();
         contentType = binaryContent.getContentType();
+        id = binaryContent.getId();
+        size = binaryContent.getSize();
 
         BinaryContentDto binaryContentDto = new BinaryContentDto( id, fileName, size, contentType );
 

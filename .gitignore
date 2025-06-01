@@ -37,9 +37,11 @@ bin/
 
 ### VS Code ###
 .vscode/
-
+./.logs
+/.idea_backup
+/data
 ### Mac OS ###
 .DS_Store
-
+.env
 ### Discodeit ###
 .discodeit
