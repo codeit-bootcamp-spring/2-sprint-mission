@@ -80,7 +80,7 @@ class UserRepositoryTest {
     @Test
     void 유저_이름_조회_테스트() {
         User user = userRepository.findByUsername("user1").orElseThrow();
-        assertThat(user.getUsername()).isEqualTo("user1@test.com");
+        assertThat(user.getEmail()).isEqualTo("user1@test.com");
         assertThat(user.getStatus()).isNotNull();
     }
 

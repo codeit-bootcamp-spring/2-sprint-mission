@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.discodeit.config.TestAuditingConfig;
 import com.sprint.mission.discodeit.constant.ChannelType;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
@@ -25,6 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(TestAuditingConfig.class)
 class MessageRepositoryTest {
 
     @Autowired
@@ -101,7 +104,8 @@ class MessageRepositoryTest {
 
     @Test
     void 채널_슬라이스_이전시간_조회_테스트() {
-        Instant cursor = message2.getCreatedAt(); // message2가 message1보다 나중에 생성되었다고 가정
+        Instant cursor = message2.getCreatedAt();
+
         PageRequest pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Slice<Message> slice = messageRepository.findSliceByChannelIdAndCreatedAtBefore(
@@ -109,7 +113,7 @@ class MessageRepositoryTest {
 
         List<Message> content = slice.getContent();
         assertThat(content).isNotEmpty();
-        assertThat(content).extracting("content").contains("테스트 메세지1"); // message1만 포함되어야 함
+        assertThat(content).extracting("content").contains("테스트 메세지1");
         assertThat(content).noneMatch(m -> m.getCreatedAt().isAfter(cursor));
     }
 }
