@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.s3;
 
 
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +32,7 @@ public class AWSS3Config {
 
     @Bean
     public AwsCredentialsProvider awsCredentialsProvider() {
-        return StaticCredentialsProvider.create(
-            AwsBasicCredentials.create(accessKey, secretKey)
-        );
+        return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
     }
 
     @Bean
@@ -45,17 +42,13 @@ public class AWSS3Config {
 
     @Bean
     public S3Client s3Client(AwsCredentialsProvider credentialsProvider, Region awsRegion) {
-        return S3Client.builder()
-            .credentialsProvider(credentialsProvider)
-            .region(awsRegion)
+        return S3Client.builder().credentialsProvider(credentialsProvider).region(awsRegion)
             .build();
     }
 
     @Bean
     public S3Presigner s3Presigner(AwsCredentialsProvider credentialsProvider, Region awsRegion) {
-        return S3Presigner.builder()
-            .region(awsRegion)
-            .credentialsProvider(credentialsProvider)
+        return S3Presigner.builder().region(awsRegion).credentialsProvider(credentialsProvider)
             .build();
     }
 

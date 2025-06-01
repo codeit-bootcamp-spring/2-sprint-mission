@@ -1,10 +1,12 @@
 CREATE TABLE binary_contents
 (
-    id           UUID PRIMARY KEY,
-    created_at   TIMESTAMP    NOT NULL,
-    file_name    VARCHAR(255) NOT NULL,
-    size         BIGINT       NOT NULL,
-    content_type VARCHAR(100) NOT NULL
+    id                  UUID PRIMARY KEY,
+    created_at          TIMESTAMP    NOT NULL,
+    file_name           VARCHAR(255) NOT NULL,
+    size                BIGINT       NOT NULL,
+    content_type        VARCHAR(100) NOT NULL,
+    binary_content_hash varchar(64)  NOT NULL UNIQUE,
+    s3key               varchar(100) NOT NULL UNIQUE
 );
 
 
