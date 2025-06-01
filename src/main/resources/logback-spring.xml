@@ -3,7 +3,7 @@
 
   <!-- 공통 로그 패턴 -->
   <property name="LOG_PATTERN"
-    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId}] [%X{requestMethod}] [%X{requestUrl}] %msg%n"/>
   <!-- 콘솔 로그: 모든 프로필에서 공통 -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
