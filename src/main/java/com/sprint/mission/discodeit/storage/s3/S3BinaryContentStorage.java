@@ -78,17 +78,28 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   @Override
   public ResponseEntity<?> download(BinaryContentDto binaryContentdto) {
     String key = binaryContentdto.id().toString();
+    String presignedUrl = generatePresignedUrl(key, "application/octet-stream");
 
-    try (S3Presigner presigner = S3Presigner.builder()
+    return ResponseEntity
+        .status(HttpStatus.FOUND)
+        .header(HttpHeaders.LOCATION, presignedUrl)
+        .build();
+  }
+
+  private S3Presigner getS3Presigner() {
+    return S3Presigner.builder()
         .region(Region.of(region))
         .credentialsProvider(
             StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-        .build()
-    ) {
+        .build();
+  }
 
+  private String generatePresignedUrl(String key, String contentType) {
+    try (S3Presigner presigner = getS3Presigner()) {
       GetObjectRequest getObjectRequest = GetObjectRequest.builder()
           .bucket(bucketName)
           .key(key)
+          .responseContentType(contentType)
           .build();
 
       GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -98,14 +109,12 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
       PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
 
-      log.info("Presigned URL: {}", presignedRequest.url());
+      log.info("Generated presigned URL: {}", presignedRequest.url());
 
-      return ResponseEntity
-          .status(HttpStatus.FOUND)
-          .header(HttpHeaders.LOCATION, presignedRequest.url().toString())
-          .build();
+      return presignedRequest.url().toString();
     }
   }
+
 
   @Override
   public void deleteById(UUID id) {
