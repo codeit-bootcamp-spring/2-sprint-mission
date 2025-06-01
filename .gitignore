@@ -9,6 +9,8 @@ build/
 *.iws
 *.iml
 *.ipr
+.env
+discodeit.env
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
