@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +18,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/binaryContents")
 
-public class BinaryContentController implements BinaryContentApi {
+public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
-    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentStorage s3binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
 
     @GetMapping(path = "{binaryContentId}")
@@ -45,11 +43,11 @@ public class BinaryContentController implements BinaryContentApi {
     }
 
     @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<Resource> download(
+    public ResponseEntity<Void> download(
         @PathVariable("binaryContentId") UUID binaryContentId) {
-        BinaryContent bc = binaryContentService.find(binaryContentId);
-        BinaryContentDto dto = binaryContentMapper.toDto(bc);
-        return (ResponseEntity<Resource>) binaryContentStorage.download(dto);
+        binaryContentService.find(binaryContentId);
+        s3binaryContentStorage.download(binaryContentId);
+        return null;
     }
 
     @PostMapping("/upload")

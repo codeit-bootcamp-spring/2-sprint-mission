@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.UserApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -24,18 +23,17 @@ import org.springframework.validation.annotation.Validated;
 @RestController
 @RequestMapping("/api/users")
 @Validated
-public class UserController implements UserApi {
+public class UserController {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Override
     public ResponseEntity<UserDto> create(
         @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-        @RequestPart(value = "profile", required = false) MultipartFile profile
+        @RequestPart(name = "profileImageFile", required = false) MultipartFile profileImageFile
     ) {
-        UserDto userDto = userService.create(userCreateRequest, profile);
+        UserDto userDto = userService.create(userCreateRequest, profileImageFile);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(userDto);
@@ -45,7 +43,6 @@ public class UserController implements UserApi {
         path = "{userId}",
         consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
-    @Override
     public ResponseEntity<UserDto> update(
         @PathVariable("userId") UUID userId,
         @Valid @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
@@ -58,7 +55,6 @@ public class UserController implements UserApi {
     }
 
     @DeleteMapping(path = "{userId}")
-    @Override
     public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity
@@ -75,7 +71,6 @@ public class UserController implements UserApi {
     }
 
     @PatchMapping(path = "{userId}/userStatus")
-    @Override
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
         @PathVariable("userId") UUID userId,
         @Valid @RequestBody UserStatusUpdateRequest request) {
