@@ -5,8 +5,7 @@ import java.util.Map;
 
 public class UserAlreadyExistException extends UserException {
 
-    public UserAlreadyExistException(ErrorCode errorCode, Map<String, Object> details) {
-        super(errorCode, details);
+    public UserAlreadyExistException(Map<String, Object> details) {
+        super(ErrorCode.USER_ALREADY_EXISTS, details);
     }
-
 }
