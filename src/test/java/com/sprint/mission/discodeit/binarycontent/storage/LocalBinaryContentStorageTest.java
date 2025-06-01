@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.storage;
+package com.sprint.mission.discodeit.binarycontent.storage;
 
 import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.UUID;
 
@@ -32,6 +33,14 @@ class BasicAuthServiceTest extends IntegrationTestSupport {
     void tearDown() {
         userStatusRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
+    }
+    @Value("${spring.datasource.url}")
+    String url;
+
+
+    @Test
+    void printDatasourceUrl() {
+        System.out.println("🔍 실제 연결된 DB URL: " + url);
     }
 
     @DisplayName("이름과 비밀번호로 로그인 합니다.")
