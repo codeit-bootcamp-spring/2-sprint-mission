@@ -2,6 +2,10 @@ server:
     port: 8082
 
 spring:
+    boot:
+        admin:
+            client:
+                url: http://localhost:9090
     datasource:
         url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:discodeit}
         username: ${DB_USERNAME:discodeit_user}
