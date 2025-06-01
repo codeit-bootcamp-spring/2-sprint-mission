@@ -46,6 +46,7 @@ bin/
 !.gitignore
 !.dockerignore
 !.github
+!.gitattributes
 
 ### Discodeit ###
 .env
