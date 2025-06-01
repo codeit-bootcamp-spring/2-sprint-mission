@@ -1,38 +1,34 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.WrongPasswordException;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
-@Controller
+@RestController
 @RequestMapping("/api/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
 
   private final AuthService authService;
 
-  @PostMapping(path = "/login")
-  public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-    try {
-      User user = authService.login(loginRequest);
-      UserDto userDto = UserDto.from(user);
-      return ResponseEntity.ok(userDto);
-    } catch (UserNotFoundException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body("User with username " + loginRequest.username() + " not found");
-    } catch (WrongPasswordException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Wrong password");
-    }
+  @PostMapping(path = "login")
+  public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest) {
+    log.info("로그인 요청: username={}", loginRequest.username());
+    UserDto user = authService.login(loginRequest);
+    log.debug("로그인 응답: {}", user);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(user);
   }
 }
