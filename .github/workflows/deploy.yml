@@ -1,0 +1,99 @@
+name: CD Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - part2-안재관-sprint8
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) 소스 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2) JDK 17 세팅 (AdoptOpenJDK/Temurin)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # 3) AWS 자격 증명 구성 (Public ECR용 us-east-1 리전)
+      - name: Configure AWS credentials (for ECR)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1  # Public ECR 이기 때문에 us-east-1 임
+
+      # 4) Amazon ECR 로그인
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+      # 5) Docker 이미지 빌드 및 태깅
+      - name: Build and tag Docker image
+        run: |
+          docker build -t ${{ vars.ECR_REPOSITORY_URI }}:latest .
+          docker tag ${{ vars.ECR_REPOSITORY_URI }}:latest ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+
+      # 6) Docker 이미지 푸시
+      - name: Push Docker image to ECR
+        run: |
+          docker push ${{ vars.ECR_REPOSITORY_URI }}:latest
+          docker push ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+
+      # 7) AWS 자격 증명 재설정 (ECS용 리전)
+      - name: Configure AWS credentials (for ECS)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # 8) 현재 태스크 정의 다운로드
+      - name: Download current ECS task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ vars.ECS_TASK_DEFINITION }} \
+            --query taskDefinition > task-definition.json
+
+      # 9) 새 이미지로 태스크 정의 수정
+      - name: Update ECS task definition with new image
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: discodeit-app
+          image: ${{ vars.ECR_REPOSITORY_URI }}:${{ github.sha }}
+
+      # 9.5) 새 태스크 정의 등록
+      - name: Register new task definition
+        id: register-task-def
+        run: |
+          new_task_def_arn=$(aws ecs register-task-definition \
+            --cli-input-json file://${{ steps.render-task-def.outputs.task-definition }} \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "taskDefinitionArn=$new_task_def_arn" >> $GITHUB_OUTPUT
+      
+      # 10) 기존 서비스 중단
+      - name: Stop old ECS service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --desired-count 0
+
+      # 11) 새 이미지로 서비스 재시작
+      - name: Deploy new task definition
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --task-definition ${{ steps.register-task-def.outputs.taskDefinitionArn }} \
+            --desired-count 1
