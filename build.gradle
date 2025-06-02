@@ -1,13 +1,22 @@
 plugins {
     id 'jacoco'
     id 'java'
-    id 'org.springframework.boot' version '3.3.1'
+    id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.5'
     id 'org.openapi.generator' version '7.0.0'
 }
 
-group = 'com.example'
-version = '0.0.1-SNAPSHOT'
+group = 'com.example' // optional
+version = '1.2-M8'
+
+jar {
+    enabled = false
+}
+
+bootJar {
+    archiveBaseName.set('discodeit')
+    archiveVersion.set('1.2-M8')
+}
 
 jacoco {
     toolVersion = "0.8.10" // 최신 버전 기준, 필요 시 생략 가능
@@ -75,10 +84,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+
     implementation 'de.codecentric:spring-boot-admin-starter-client:3.2.2'
     implementation 'org.hibernate.validator:hibernate-validator:6.2.0.Final'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
+
     // Map Struct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
@@ -86,14 +98,23 @@ dependencies {
     implementation 'org.glassfish:jakarta.el:3.0.3'  // 필요할 수도 있음
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
-    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    //implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+    compileOnly 'org.projectlombok:lombok:1.18.30' // 최신 버전 확인
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core'
-    testImplementation 'org.mockito:mockito-junit-jupiter'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+
+    // BOM으로 버전 통일
+    implementation platform("software.amazon.awssdk:bom:2.25.1")
+
+// 필요한 모듈만 선언
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:auth'
+
 }
 
 tasks.named('test') {
