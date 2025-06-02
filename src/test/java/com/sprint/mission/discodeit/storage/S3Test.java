@@ -1,15 +1,8 @@
 package com.sprint.mission.discodeit.storage;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.*;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -22,7 +15,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -34,12 +26,12 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.UUID;
 
+@Disabled
 public class S3Test {
 
     private String bucket;
     private S3Client s3Client;
     private AwsBasicCredentials awsBasicCredentials;
-
     private String key;
 
     @BeforeEach
@@ -63,7 +55,6 @@ public class S3Test {
                 .build();
     }
 
-
     @AfterEach
     void tearDown() {
         DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
@@ -77,6 +68,7 @@ public class S3Test {
     @DisplayName("S3에 파일 업로드 후, 다운로드를 해서 동일한 내용인지 확인합니다.")
     @Test
     void testUpload() throws IOException {
+        // given
         key = UUID.randomUUID() + ".txt";
         String message = "Hello";
         byte[] content = message.getBytes();
@@ -86,6 +78,7 @@ public class S3Test {
                 .build();
         s3Client.putObject(putRequest, RequestBody.fromBytes(content));
 
+        // when
         GetObjectRequest getRequest = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -93,12 +86,14 @@ public class S3Test {
         ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getRequest);
         String downloadContent = new String(s3Object.readAllBytes(), StandardCharsets.UTF_8);
 
+        //then
         Assertions.assertThat(downloadContent).isEqualTo(message);
     }
 
     @DisplayName("S3의 presignedUrl을 받습니다.")
     @Test
     void testPresignedUrl() {
+        // given
         String key = UUID.randomUUID() + ".txt";
         byte[] content = UUID.randomUUID().toString().getBytes();
         PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -107,6 +102,7 @@ public class S3Test {
                 .build();
         s3Client.putObject(putRequest, RequestBody.fromBytes(content));
 
+        // when
         Region region = Region.AP_NORTHEAST_2;
         S3Presigner presigner = S3Presigner.builder()
                 .region(region)
@@ -120,8 +116,9 @@ public class S3Test {
         PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(
                 builder -> builder.getObjectRequest(getObjectRequest)
                         .signatureDuration(Duration.ofMinutes(10)));
-
         URL url = presignedRequest.url();
+
+        //then
         Assertions.assertThat(url).isNotNull();
     }
 

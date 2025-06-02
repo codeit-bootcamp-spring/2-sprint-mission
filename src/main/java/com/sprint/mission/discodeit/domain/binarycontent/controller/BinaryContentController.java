@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentSt
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -57,8 +56,8 @@ public class BinaryContentController {
     @GetMapping("{binaryContentId}/download")
     public ResponseEntity<?> download(@PathVariable(value = "binaryContentId") UUID binaryContentId) {
         log.info("파일 다운로드 요청: binaryContentId={}", binaryContentId);
-        InputStreamResource download = binaryContentStorage.download(binaryContentId);
-        return ResponseEntity.ok(download);
+
+        return binaryContentStorage.download(binaryContentId);
     }
 
     @DeleteMapping("/{binaryContentId}")

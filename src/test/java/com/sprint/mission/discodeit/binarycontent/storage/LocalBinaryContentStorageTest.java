@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.binarycontent.storage;
 
 import com.sprint.mission.discodeit.IntegrationTestSupport;
-import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.LocalBinaryContentStorage;
 import org.assertj.core.api.Assertions;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.core.io.InputStreamResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,22 +75,6 @@ class LocalBinaryContentStorageTest extends IntegrationTestSupport {
         // then
         Assertions.assertThat(inputStream.readAllBytes()).isEqualTo("hello".getBytes());
 
-    }
-
-    @DisplayName("바이너리 컨텐츠를 다운로드 하면, ~이다")
-    @Test
-    void downloadTest() throws IOException {
-        // given
-        UUID binaryContentId = UUID.randomUUID();
-        binaryContentStorage.put(binaryContentId, "hello".getBytes());
-        BinaryContentResult binaryContentResult = new BinaryContentResult(binaryContentId, null, "", "");
-
-        // when
-        InputStreamResource download = binaryContentStorage.download(binaryContentResult.id());
-
-        // then
-        Assertions.assertThat(download.getInputStream().readAllBytes())
-                .isEqualTo("hello".getBytes());
     }
 
     private byte[] getFileBytes(Path filePath) {

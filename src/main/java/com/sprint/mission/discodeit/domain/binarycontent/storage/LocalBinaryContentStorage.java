@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.util.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -38,10 +39,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public InputStreamResource download(UUID binaryContentId) {
+    public ResponseEntity<?> download(UUID binaryContentId) {
         InputStream inputStream = get(binaryContentId);
 
-        return new InputStreamResource(inputStream);
+        return ResponseEntity.ok(new InputStreamResource(inputStream));
     }
 
     private void validateBytes(byte[] bytes) {
