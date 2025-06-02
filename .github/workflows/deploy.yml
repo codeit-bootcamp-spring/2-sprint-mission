@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - part3-강지훈-sprint8
+      - part3-강지훈-sprint
 
 jobs:
   build_and_AWS-push:
