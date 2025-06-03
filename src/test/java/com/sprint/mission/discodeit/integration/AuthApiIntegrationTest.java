@@ -10,9 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,6 +38,9 @@ class AuthApiIntegrationTest {
     @Autowired
     private UserService userService;
 
+    @Mock
+    private UserStatusService userStatusService;
+
     @Test
     @DisplayName("로그인 API 통합 테스트 - 성공")
     void login_Success() throws Exception {
@@ -46,15 +51,15 @@ class AuthApiIntegrationTest {
             "login@example.com",
             "Password1!"
         );
-        
+
         userService.create(userRequest, Optional.empty());
-        
+
         // 로그인 요청
         LoginRequest loginRequest = new LoginRequest(
             "loginuser",
             "Password1!"
         );
-        
+
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
         // When & Then
@@ -75,7 +80,7 @@ class AuthApiIntegrationTest {
             "nonexistentuser",
             "Password1!"
         );
-        
+
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
         // When & Then
@@ -95,15 +100,15 @@ class AuthApiIntegrationTest {
             "login2@example.com",
             "Password1!"
         );
-        
+
         userService.create(userRequest, Optional.empty());
-        
+
         // 잘못된 비밀번호로 로그인 시도
         LoginRequest loginRequest = new LoginRequest(
             "loginuser2",
             "WrongPassword1!"
         );
-        
+
         String requestBody = objectMapper.writeValueAsString(loginRequest);
 
         // When & Then
@@ -121,7 +126,7 @@ class AuthApiIntegrationTest {
             "", // 사용자 이름 비어있음 (NotBlank 위반)
             ""  // 비밀번호 비어있음 (NotBlank 위반)
         );
-        
+
         String requestBody = objectMapper.writeValueAsString(invalidRequest);
 
         // When & Then

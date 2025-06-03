@@ -41,6 +41,15 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // AWS S3 SDK 의존성 추가
+    implementation platform('software.amazon.awssdk:bom:2.25.61')
+    implementation 'software.amazon.awssdk:s3'
+    testImplementation 'software.amazon.awssdk:s3'
+
+    // AWSS3ENV - test
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'io.github.cdimascio:dotenv-java:3.2.0'
 }
 
 tasks.named('test') {
