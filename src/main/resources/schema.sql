@@ -52,6 +52,14 @@ CREATE TABLE messages
     FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE SET NULL
 );
 
+CREATE TABLE message_attachments
+(
+    message_id    UUID,
+    attachment_id UUID,
+    PRIMARY KEY (message_id, attachment_id),
+    FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+);
+
 CREATE TABLE read_statuses
 (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -64,3 +72,4 @@ CREATE TABLE read_statuses
     FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
     CONSTRAINT uq_read_status_user_channel UNIQUE (user_id, channel_id)
 );
+

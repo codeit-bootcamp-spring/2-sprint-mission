@@ -9,17 +9,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Getter
 @Entity
 @Table(
     name = "read_statuses",
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"})
 )
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 public class ReadStatus extends BaseUpdatableEntity {
 

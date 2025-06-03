@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.ChannelType;
-import com.sprint.mission.discodeit.domain.User;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -16,9 +16,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-@ActiveProfiles("test")
 @EnableJpaAuditing
-public class ChannelRepositoryTest {
+@ActiveProfiles("test")
+class ChannelRepositoryTest {
 
   @Autowired
   private ChannelRepository channelRepository;
@@ -26,27 +26,35 @@ public class ChannelRepositoryTest {
   @Autowired
   private TestEntityManager entityManager;
 
+  /**
+   * TestFixture: 채널 생성
+   */
+  private Channel createTestChannel(ChannelType type, String name, String description) {
+    Channel channel = Channel.create(type, name, description);
+    return channelRepository.save(channel);
+  }
+
   @Test
   @DisplayName("findAllByTypeOrIdIn_성공")
   void findAllByTypeOrIdIn_WithExistingIds_ShouldReturnChannelList() {
-    // TestEntityManager를 사용하여 테스트 데이터 생성
-    Channel channel1 = Channel.create(ChannelType.PUBLIC, "퍼블릭채널", "퍼블릭채널입니다.");
-    Channel channel2 = Channel.create(ChannelType.PRIVATE, null, null);
-    Channel channel3 = Channel.create(ChannelType.PRIVATE, null, null);
-    Channel excludedChannel = Channel.create(ChannelType.PRIVATE, null, null);
-    entityManager.persist(channel1);
-    entityManager.persist(channel2);
-    entityManager.persist(channel3);
+    // given
+    Channel channel1 = createTestChannel(ChannelType.PUBLIC, "퍼블릭채널", "퍼블릭채널입니다.");
+    Channel channel2 = createTestChannel(ChannelType.PRIVATE, null, null);
+    Channel channel3 = createTestChannel(ChannelType.PRIVATE, null, null);
+    Channel excludedChannel = createTestChannel(ChannelType.PRIVATE, null, null);
+
+    channelRepository.saveAll(Arrays.asList(channel1, channel2, channel3));
+
     entityManager.persist(excludedChannel);
     entityManager.flush();
+    entityManager.clear();
 
+    // when
     List<UUID> privateChannelIds = List.of(channel2.getId(), channel3.getId());
-
-    // 테스트 대상 메서드 실행
     List<Channel> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
         privateChannelIds);
 
-    // 검증
+    // then
     assertThat(channels).hasSize(3);
     assertThat(channels).extracting("id").containsExactlyInAnyOrder(
         channel1.getId(), channel2.getId(), channel3.getId()
@@ -57,14 +65,15 @@ public class ChannelRepositoryTest {
   @DisplayName("findAllByTypeOrIdIn_실패_조건에 맞는 채널 없을 때")
   void findAllByTypeOrIdIn_WithNoMatchingConditions_ShouldReturnEmptyList() {
     // given
-    Channel privateChannel1 = Channel.create(ChannelType.PRIVATE, null, null);
-    Channel privateChannel2 = Channel.create(ChannelType.PRIVATE, null, null);
-    entityManager.persist(privateChannel1);
-    entityManager.persist(privateChannel2);
+    Channel privateChannel1 = createTestChannel(ChannelType.PRIVATE, null, null);
+    Channel privateChannel2 = createTestChannel(ChannelType.PRIVATE, null, null);
 
-    List<UUID> nonMatchingIds = List.of(UUID.randomUUID(), UUID.randomUUID());
+    channelRepository.saveAll(Arrays.asList(privateChannel1, privateChannel2));
 
     entityManager.flush();
+    entityManager.clear();
+
+    List<UUID> nonMatchingIds = List.of(UUID.randomUUID(), UUID.randomUUID());
 
     // when
     List<Channel> result = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,

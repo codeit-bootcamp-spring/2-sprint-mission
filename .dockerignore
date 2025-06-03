@@ -1,0 +1,10 @@
+.gradle
+build/
+out/
+*.iml
+.idea/
+*.log
+Dockerfile
+docker-compose.yml
+.env
+discodeit.env

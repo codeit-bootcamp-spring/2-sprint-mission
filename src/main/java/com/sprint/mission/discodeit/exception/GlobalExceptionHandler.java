@@ -44,11 +44,11 @@ public class GlobalExceptionHandler {
     HttpStatus status = ex.getErrorCode().getStatus();
     ErrorResponse errorResponse = new ErrorResponse(
         ex.getTimestamp(),
-        ex.getErrorCode().name(),                    // "USER_NOT_FOUND" 등
-        ex.getMessage(),                             // ErrorCode에서 가져온 메시지
-        ex.getDetails(),                             // Map<String, Object>
-        ex.getClass().getSimpleName(),               // 예: UserNotFoundException
-        status.value()               // 예: 상황에 따라 바꿀 수 있음
+        ex.getErrorCode().name(),
+        ex.getMessage(),
+        ex.getDetails(),
+        ex.getClass().getSimpleName(),
+        status.value()
     );
     return ResponseEntity.status(status).body(errorResponse);
   }

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -11,8 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,10 +31,10 @@ class UserControllerTest {
   private MockMvc mockMvc;
 
   @MockitoBean
-  private BasicUserService userService;
+  private UserService userService;
 
   @MockitoBean
-  private BasicUserStatusService userStatusService;
+  private UserStatusService userStatusService;
 
   @Test
   @DisplayName("Create User_성공")
@@ -66,11 +67,11 @@ class UserControllerTest {
     );
 
     UserDto userDto = new UserDto(userId, "testUser", "test@email.com", profileDto, true);
+    
+    given(userService.createUser(any(UserCreateRequest.class), any(Optional.class))).willReturn(
+        userDto);
 
-    // when
-    when(userService.createUser(any(), any())).thenReturn(userDto);
-
-    // then
+    // when, then
     mockMvc.perform(multipart("/api/users")
             .file(userPart)
             .file(profile)
@@ -82,7 +83,9 @@ class UserControllerTest {
         .andExpect(jsonPath("$.email").value("test@email.com"))
         .andExpect(jsonPath("$.profile.fileName").value("profile.png"))
         .andExpect(jsonPath("$.profile.size").value(3L))
-        .andExpect(jsonPath("$.profile.contentType").value("image/png"));
+        .andExpect(jsonPath("$.profile.contentType").value("image/png"))
+        .andExpect(jsonPath("$.online").value(true));
+
   }
 
   @Test

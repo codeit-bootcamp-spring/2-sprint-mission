@@ -17,12 +17,19 @@ public enum ErrorCode {
   DUPLICATE_USER("이미 존재하는 사용자입니다.", HttpStatus.CONFLICT),
   DUPLICATE_USER_EMAIL("이미 존재하는 이메일입니다.", HttpStatus.CONFLICT),
   DUPLICATE_USER_USERNAME("이미 존재하는 이름입니다.", HttpStatus.CONFLICT),
+  WRONG_PASSWORD("잘못된 비밀번호입니다.", HttpStatus.CONFLICT),
 
   CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   INVALID_CHANNEL_TYPE("PRIVATE 채널은 수정할 수 없습니다.", HttpStatus.BAD_REQUEST),
 
-  MESSAGE_NOT_FOUND("메시지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+  MESSAGE_NOT_FOUND("메시지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
+  BINARY_CONTENT_NOT_FOUND("바이너리 컨텐츠를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+  READ_STATUS_NOT_FOUND("읽음 상태를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+  USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+  DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다.", HttpStatus.CONFLICT);
 
   private final String message;
   private final HttpStatus status;

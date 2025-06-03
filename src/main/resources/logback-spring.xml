@@ -37,32 +37,10 @@
     </encoder>
   </appender>
 
-  <!--  <root level="OFF"/>-->
-  <!--  <root level="ERROR">-->
-  <!--    <appender-ref ref="CONSOLE"/>-->
-  <!--    <appender-ref ref="FILE"/>-->
-  <!--  </root>-->
-
-  <!-- 내 프로젝트 패키지에는 DEBUG 적용 -->
-  <logger name="com.sprint.mission" level="DEBUG" additivity="false">
+  <!-- 루트 로거 설정 - 레벨은 application.yaml에서 관리 -->
+  <root>
     <appender-ref ref="CONSOLE"/>
     <appender-ref ref="FILE"/>
-  </logger>
-
-  <!--  &lt;!&ndash; 개발 환경: DEBUG &ndash;&gt;-->
-  <!--  <springProfile name="dev">-->
-  <!--    <root level="DEBUG">-->
-  <!--      <appender-ref ref="CONSOLE"/>-->
-  <!--      <appender-ref ref="FILE"/>-->
-  <!--    </root>-->
-  <!--  </springProfile>-->
-
-  <!--  &lt;!&ndash; 운영 환경: INFO &ndash;&gt;-->
-  <!--  <springProfile name="prod">-->
-  <!--    <root level="INFO">-->
-  <!--      <appender-ref ref="CONSOLE"/>-->
-  <!--      <appender-ref ref="FILE"/>-->
-  <!--    </root>-->
-  <!--  </springProfile>-->
+  </root>
 
 </configuration>

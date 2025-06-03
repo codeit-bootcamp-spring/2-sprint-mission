@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +27,7 @@ public class MessageControllerTest {
   private MockMvc mockMvc;
 
   @MockitoBean
-  private BasicMessageService messageService;
+  private MessageService messageService;
 
   @Test
   @DisplayName("delete_성공")
@@ -32,8 +35,7 @@ public class MessageControllerTest {
     // given
     UUID messageId = UUID.randomUUID();
 
-    // when
-    doNothing().when(messageService).deleteMessage(messageId);
+    willDoNothing().given(messageService).deleteMessage(messageId);
 
     // when, then
     mockMvc.perform(MockMvcRequestBuilders.delete("/api/messages/{messageId}", messageId)
@@ -48,11 +50,10 @@ public class MessageControllerTest {
     // given
     UUID invalidMessageId = UUID.randomUUID();
 
-    // when
-    doThrow(new MessageNotFoundException(invalidMessageId))
-        .when(messageService).deleteMessage(invalidMessageId);
+    willThrow(MessageNotFoundException.byId(invalidMessageId))
+        .given(messageService).deleteMessage(invalidMessageId);
 
-    // then
+    // when, then
     mockMvc.perform(MockMvcRequestBuilders.delete("/api/messages/{messageId}", invalidMessageId)
             .contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isNotFound())

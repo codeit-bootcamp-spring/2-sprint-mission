@@ -6,12 +6,12 @@ import java.util.Map;
 
 public abstract class UserException extends DiscodeitException {
 
-  protected UserException(ErrorCode errorCode, Map<String, Object> details) {
-    super(errorCode, details);
+  protected UserException(ErrorCode errorCode) {
+    super(errorCode);
   }
 
-//  protected UserException(ErrorCode errorCode, Map<String, Object> details, Throwable cause) {
-//    super(errorCode, details, cause);
-//  }
+  protected UserException(ErrorCode errorCode, Throwable cause) {
+    super(errorCode, cause);
+  }
 
 }

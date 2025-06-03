@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: Set environment variables from secrets
+        run: |
+          echo "STORAGE_TYPE=${{ secrets.STORAGE_TYPE }}" >> $GITHUB_ENV
+          echo "AWS_S3_ACCESS_KEY=${{ secrets.AWS_S3_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_S3_SECRET_KEY=${{ secrets.AWS_S3_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> $GITHUB_ENV
+          echo "AWS_S3_REGION=${{ secrets.AWS_S3_REGION }}" >> $GITHUB_ENV
+          echo "AWS_S3_BASE_URL=${{ secrets.AWS_S3_BASE_URL }}" >> $GITHUB_ENV
+          echo "AWS_S3_PRESIGNED_URL_EXPIRATION=${{ secrets.AWS_S3_PRESIGNED_URL_EXPIRATION }}" >> $GITHUB_ENV
+
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew test -Dspring.profiles.active=test --info
+
+      - name: Run tests with coverage
+        run: ./gradlew test jacocoTestReport
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

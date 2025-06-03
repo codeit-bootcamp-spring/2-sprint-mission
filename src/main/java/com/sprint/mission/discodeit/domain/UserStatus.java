@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain;
 
+import static lombok.AccessLevel.PROTECTED;
+
 import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,10 +15,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Getter
 @Entity
 @Table(name = "user_statuses")
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = PROTECTED)
 @SuperBuilder
 public class UserStatus extends BaseUpdatableEntity {
 
