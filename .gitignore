@@ -17,6 +17,7 @@ bin/
 !**/src/test/**/bin/
 
 ### IntelliJ IDEA ###
+.idea
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
@@ -52,3 +53,13 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Discodeit ###
+.discodeit
+
+### 숨김 파일 ###
+.*
+!.gitignore
+
+.env
+discodeit.env

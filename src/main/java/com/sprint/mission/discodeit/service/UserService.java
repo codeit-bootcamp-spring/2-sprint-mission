@@ -11,11 +11,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
-    UserDto find(UUID userId);
-    List<UserDto> findAll();
-    User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
-    void delete(UUID userId);
-    void updateUserStatus(UUID userId, boolean online);
-    String login(String username, String password);
+
+  UserDto create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
+
+  UserDto find(UUID userId);
+
+  List<UserDto> findAll();
+
+  UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
+
+  void delete(UUID userId);
 }
