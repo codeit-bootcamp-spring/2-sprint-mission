@@ -41,3 +41,8 @@ out/
 REQUIREMENT.md
 
 .discodeit
+
+.logs
+
+.env
+discodeit.env

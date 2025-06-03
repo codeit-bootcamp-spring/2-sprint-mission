@@ -1,0 +1,128 @@
+name: Run Deploy
+
+on:
+  push:
+    branches:
+      - part3-선혜린-sprint8
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+
+jobs:
+  build-and-push:
+    name: build & push Docker Image
+    runs-on: ubuntu-latest
+
+    # 두 개의 job 간에 이미지 태그 값을 공유하기 위해 사용.
+    outputs:
+      image-tag: ${{ steps.set-image-tag.outputs.image-tag }}
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      # 커밋 해시 기반의 이미지 태그 설정
+      - name: Set image tag
+        id: set-image-tag
+        run: |
+          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-8)
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "image-tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # AWS 자격 증명 설정 (us-east-1)
+      - name: Configure AWS credentionals
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      # ECR 로그인
+      - name: Login to Public ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+      # Docker 이미지 빌드 - 멀티 플랫폼 X
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ env.ECR_REPOSITORY_URI }}:latest \
+            -t ${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG .
+
+      # Docker 이미지 푸쉬 (latest + 커밋 해시 태그)
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.ECR_REPOSITORY_URI }}:latest
+          docker push ${{ env.ECR_REPOSITORY_URI }}:$IMAGE_TAG
+
+  deploy:
+    name: Deploy to ECS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      # AWS 자격 증명 재설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 기존 태스크 정의 JSON 가져오기
+      - name: Get current task definition
+        id: task-def
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.ECS_TASK_DEFINITION }} \
+            --query taskDefinition > task-def.json
+
+      # 태스크 정의 수정 (이미지 태그만 변경)
+      - name: Modify task definition with new image
+        id: new-task-def
+        run: |
+          IMAGE_URI=${{ env.ECR_REPOSITORY_URI }}:${{ needs.build-and-push.outputs.image-tag }}
+
+          jq --arg IMAGE "$IMAGE_URI" '
+            .containerDefinitions[0].image = $IMAGE |
+            del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy
+            )
+          ' task-def.json > new-task-def.json
+
+      # 새로운 태스크 정의 등록
+      - name: Register new task definition
+        id: register-task-def
+        run: |
+          NEW_TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-def.json \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
+
+      # 비용 절감을 위해 서비스 중단 (0으로 설정)
+      - name: Stop current ECS service (desiredCount = 0)
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --desired-count 0
+
+      # 새로운 태스크 정의를 사용해 서비스 재시작
+      - name: Update ECS service with new task definition
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_SERVICE }} \
+            --task-definition $NEW_TASK_DEF_ARN \
+            --desired-count 1

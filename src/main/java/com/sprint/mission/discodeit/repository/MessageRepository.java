@@ -12,28 +12,21 @@ import org.springframework.data.repository.query.Param;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-  @Query(
-      "select m "
-          + "from Message m "
-          + "left join fetch m.author a "
-          + "left join fetch a.profile "
-          + "join fetch a.userStatus "
-          + "where m.channel.id = :channelId "
-          + "and m.createdAt < :createdAt "
-          + "order by m.createdAt desc")
-  Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId, @Param("createdAt") Instant createdAt, Pageable pageable);
+  @Query("SELECT m FROM Message m "
+      + "LEFT JOIN FETCH m.author a "
+      + "JOIN FETCH a.status "
+      + "LEFT JOIN FETCH a.profile "
+      + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
+  Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,
+      @Param("createdAt") Instant createdAt,
+      Pageable pageable);
 
-  @Query(
-      "select m from Message m "
-          + "left join fetch m.author a "
-          + "join fetch a.userStatus "
-          + "left join fetch a.profile "
-          + "left join fetch m.attachments "
-          + "where m.id = :id")
-  Optional<Message> findByIdWithAuthorAndAttachments(@Param("id") UUID id);
 
-  @Query("select max(m.createdAt) from Message m where m.channel.id = :channelId")
-  Instant findLastMessageTimeByChannelId(@Param("channelId") UUID channelId);
+  @Query("SELECT m.createdAt "
+      + "FROM Message m "
+      + "WHERE m.channel.id = :channelId "
+      + "ORDER BY m.createdAt DESC LIMIT 1")
+  Optional<Instant> findLastMessageAtByChannelId(@Param("channelId") UUID channelId);
 
   void deleteAllByChannelId(UUID channelId);
 }

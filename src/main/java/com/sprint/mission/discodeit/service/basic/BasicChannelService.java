@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.service.channel.ChannelDto;
-import com.sprint.mission.discodeit.dto.service.channel.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.service.channel.PrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.service.channel.PublicChannelRequest;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -18,93 +18,100 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  private final UserRepository userRepository;
+  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
+  private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
 
-  @Override
   @Transactional
-  public ChannelDto create(PrivateChannelRequest privateRequest) {
-    log.debug("비공개 채널 생성 시작: {}", privateRequest);
+  @Override
+  public ChannelDto create(PublicChannelCreateRequest request) {
+    log.debug("채널 생성 시작: {}", request);
+    String name = request.name();
+    String description = request.description();
+    Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+
+    channelRepository.save(channel);
+    log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+    return channelMapper.toDto(channel);
+  }
+
+  @Transactional
+  @Override
+  public ChannelDto create(PrivateChannelCreateRequest request) {
+    log.debug("채널 생성 시작: {}", request);
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
 
-    List<UUID> participantIds = privateRequest.participantIds();
-    List<ReadStatus> readStatusList = userRepository.findAllById(participantIds).stream()
+    List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
         .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
-    readStatusRepository.saveAll(readStatusList);
-    log.info("비공개 채널 생성 완료: id={}", channel.getId());
+    readStatusRepository.saveAll(readStatuses);
+
+    log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
     return channelMapper.toDto(channel);
   }
 
-  @Override
-  @Transactional
-  public ChannelDto create(PublicChannelRequest publicRequest) {
-    log.debug("공개 채널 생성 시작: {}", publicRequest);
-    Channel channel = new Channel(ChannelType.PUBLIC, publicRequest.name(),
-        publicRequest.description());
-    channelRepository.save(channel);
-    log.info("공개 채널 생성 완료: id={}", channel.getId());
-    return channelMapper.toDto(channel);
-  }
-
-  @Override
   @Transactional(readOnly = true)
+  @Override
   public ChannelDto find(UUID channelId) {
-    Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(() -> new ChannelNotFoundException().notFoundWithId(channelId));
-
-    return channelMapper.toDto(channel);
+    return channelRepository.findById(channelId)
+        .map(channelMapper::toDto)
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
   }
 
-  @Override
   @Transactional(readOnly = true)
+  @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    List<UUID> joinedChannelIds = readStatusRepository.findAllChannelIdByUserId(userId);
+    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+        .map(ReadStatus::getChannel)
+        .map(Channel::getId)
+        .toList();
 
-    List<Channel> channelList = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
-        joinedChannelIds);
-    return channelMapper.toDtoList(channelList);
+    return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
+        .stream()
+        .map(channelMapper::toDto)
+        .toList();
   }
 
-  @Override
   @Transactional
-  public ChannelDto update(UUID id, ChannelUpdateRequest updateRequest) {
-    log.debug("채널 수정 시작: id={}, {}", id, updateRequest);
-    Channel channel = channelRepository.findById(id)
-        .orElseThrow(() -> new ChannelNotFoundException().notFoundWithId(id));
-    if (channel.getType() == ChannelType.PRIVATE) {
-      throw new PrivateChannelUpdateException().privateChannelUpdateWithId(id);
+  @Override
+  public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
+    log.debug("채널 수정 시작: id={}, request={}", channelId, request);
+    String newName = request.newName();
+    String newDescription = request.newDescription();
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      throw PrivateChannelUpdateException.forChannel(channelId);
     }
-    String newName = updateRequest.newName();
-    String newDescription = updateRequest.newDescription();
-
     channel.update(newName, newDescription);
-    log.info("채널 수정 완료: id={}", channel.getId());
+    log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
     return channelMapper.toDto(channel);
   }
 
-  @Override
   @Transactional
+  @Override
   public void delete(UUID channelId) {
     log.debug("채널 삭제 시작: id={}", channelId);
     if (!channelRepository.existsById(channelId)) {
-      throw new ChannelNotFoundException().notFoundWithId(channelId);
+      throw ChannelNotFoundException.withId(channelId);
     }
+
     messageRepository.deleteAllByChannelId(channelId);
     readStatusRepository.deleteAllByChannelId(channelId);
+
     channelRepository.deleteById(channelId);
     log.info("채널 삭제 완료: id={}", channelId);
   }
