@@ -1,3 +1,14 @@
+CREATE TABLE binary_contents
+(
+    id           UUID PRIMARY KEY,
+    created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
+    file_name    VARCHAR(255)             NOT NULL,
+    size         BIGINT                   NOT NULL,
+    content_type VARCHAR(100)             NOT NULL
+--    ,bytes        BYTEA                    NOT NULL
+
+);
+
 CREATE TABLE users
 (
     id         UUID PRIMARY KEY,
@@ -10,17 +21,6 @@ CREATE TABLE users
     FOREIGN KEY (profile_id)
         REFERENCES binary_contents (id)
         ON DELETE SET NULL
-);
-
-CREATE TABLE binary_contents
-(
-    id           UUID PRIMARY KEY,
-    created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
-    file_name    VARCHAR(255)             NOT NULL,
-    size         BIGINT                   NOT NULL,
-    content_type VARCHAR(100)             NOT NULL,
---    bytes        BYTEA                    NOT NULL
-
 );
 
 CREATE TABLE user_statuses
@@ -51,7 +51,7 @@ CREATE TABLE messages
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE,
     content    text,
-    channel_id UUID        NOT NULL,
+    channel_id UUID                     NOT NULL,
     author_id  UUID,
     FOREIGN KEY (channel_id)
         REFERENCES channels (id)

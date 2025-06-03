@@ -71,14 +71,12 @@ public class BasicChannelService implements ChannelService {
     @Transactional(readOnly = true)
     @Override
     public List<ChannelDto> findAllChannelsByUserId(UUID userId) {
-        List<UUID> subscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
+        List<UUID> subscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
                 .map(readStatus -> readStatus.getChannel().getId())
                 .toList();
 
-        return channelRepository.findAll().stream()
-                .filter(channel -> channel.getType().equals(ChannelType.PUBLIC)
-                        || subscribedChannelIds.contains(channel.getId())
-                )
+        return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, subscribedChannelIds)
+                .stream()
                 .map(channelMapper::toDto)
                 .toList();
     }
@@ -93,7 +91,7 @@ public class BasicChannelService implements ChannelService {
 
         if (channel.getType() == ChannelType.PRIVATE) {
             log.warn("Cannot update private channel: id = {}", channelId);
-            throw new PrivateChannelUpdateException(channelId);
+            throw PrivateChannelUpdateException.forChannel(channelId);
         }
 
         channel.updateChannel(newName, newDescription);
@@ -108,13 +106,14 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         log.info("Deleting channel : id = {}", channelId);
 
-        Channel channel = getChannel(channelId);
+        if (!channelRepository.existsById(channelId)) {
+            throw ChannelNotFoundException.withId(channelId);
+        }
 
-        messageRepository.deleteAllByChannelId(channel.getId());
-        readStatusRepository.deleteAllByChannelId(channel.getId());
+        messageRepository.deleteAllByChannelId(channelId);
+        readStatusRepository.deleteAllByChannelId(channelId);
 
-        channelRepository.delete(channel);
-
+        channelRepository.deleteById(channelId);
         log.info("Channel deleted successfully : id = {}", channelId);
     }
 
@@ -122,7 +121,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.findById(channelId)
                 .orElseThrow(() -> {
                     log.warn("Channel with id {} not found", channelId);
-                    return new ChannelNotFoundException(channelId);
+                    return ChannelNotFoundException.withId(channelId);
                 });
     }
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-    List<ReadStatus> findAllByUser_Id(UUID userId);
+    List<ReadStatus> findAllByUserId(UUID userId);
 
     @Query("SELECT r FROM ReadStatus r "
             + "JOIN FETCH r.user u "

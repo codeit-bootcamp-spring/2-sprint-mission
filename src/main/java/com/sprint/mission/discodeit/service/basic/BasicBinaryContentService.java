@@ -53,7 +53,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContentDto find(UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new BinaryContentNotFoundException(binaryContentId));
+                .orElseThrow(() -> BinaryContentNotFoundException.withId(binaryContentId));
         return binaryContentMapper.toDto(binaryContent);
     }
 
@@ -71,7 +71,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         if (!binaryContentRepository.existsById(binaryContentId)) {
             log.warn("BinaryContent not found : id = {}", binaryContentId);
-            throw new BinaryContentNotFoundException(binaryContentId);
+            throw BinaryContentNotFoundException.withId(binaryContentId);
         }
         binaryContentRepository.deleteById(binaryContentId);
 
