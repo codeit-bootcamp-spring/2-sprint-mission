@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -23,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @RequiredArgsConstructor
@@ -47,8 +49,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public UUID put(UUID uuid, byte[] bytes) {
-        System.out.println(uuid);
-
         try {
             Path filePath = resolvePath(uuid);
             Files.write(filePath, bytes);
