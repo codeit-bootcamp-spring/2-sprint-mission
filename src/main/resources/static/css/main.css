@@ -1,0 +1,66 @@
+/* 전체 배경과 폰트 */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 40px;
+    color: #333;
+}
+
+/* 제목 스타일 */
+h1 {
+    color: #343a40;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 리스트 스타일 */
+ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+
+li {
+    margin: 15px 0;
+}
+
+/* 버튼처럼 보이게 하는 링크 */
+a {
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    font-weight: bold;
+}
+
+/* 일반 링크 hover 효과 */
+a:hover {
+    background-color: #0056b3;
+}
+
+/* 맨 아래 홈 버튼 */
+a[href="/"] {
+    background-color: #6c757d;
+    margin-top: 40px;
+}
+
+a[href="/"]:hover {
+    background-color: #5a6268;
+}
+
+/* 서버 관리 버튼 wrapper */
+#serverLinkWrapper {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#serverLinkWrapper a {
+    background-color: #28a745;
+}
+
+#serverLinkWrapper a:hover {
+    background-color: #218838;
+}
