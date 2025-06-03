@@ -1,0 +1,101 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+
+jobs:
+  deploy:
+    name: Build, Push to ECR, and Deploy to ECS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # AWS CLI 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ECR 로그인 (프라이빗 ECR)
+      - name: Login to Amazon ECR (private)
+        run: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
+
+      # Git 커밋 해시 추출
+      - name: Extract Git commit SHA
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      # Docker 이미지 빌드 및 태깅
+      - name: Build Docker image
+        run: |
+          docker build -t $ECR_REPOSITORY_URI:latest .
+          docker tag $ECR_REPOSITORY_URI:latest $ECR_REPOSITORY_URI:${{ steps.vars.outputs.sha_short }}
+
+      # ECR로 이미지 푸시
+      - name: Push Docker image to ECR
+        run: |
+          docker push $ECR_REPOSITORY_URI:latest
+          docker push $ECR_REPOSITORY_URI:${{ steps.vars.outputs.sha_short }}
+
+      # 현재 태스크 정의 가져오기
+      - name: Download current task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $ECS_TASK_DEFINITION \
+            --query "taskDefinition" > task-definition.json
+
+      # 이미지 URI 변경
+      - name: Replace image URI and clean task definition
+        run: |
+          IMAGE_URI="${ECR_REPOSITORY_URI}:${{ steps.vars.outputs.sha_short }}"
+
+          cat task-definition.json \
+          | jq 'del(
+              .taskDefinitionArn,
+              .revision,
+              .status,
+              .requiresAttributes,
+              .compatibilities,
+              .registeredAt,
+              .registeredBy
+            ) | .containerDefinitions[0].image = env.IMAGE_URI' \
+          > new-task-def.json
+
+      # 태스크 정의 등록
+      - name: Register new task definition
+        id: task
+        run: |
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-def.json \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+
+      # 서비스 중단 (프리티어 절약)
+      - name: Stop existing ECS service (set desired count to 0)
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --desired-count 0
+
+      # 서비스 재시작 (새 태스크 정의로)
+      - name: Update ECS service with new task definition
+        run: |
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition ${{ steps.task.outputs.TASK_DEF_ARN }} \
+            --desired-count 1
