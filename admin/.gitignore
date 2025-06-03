@@ -33,11 +33,5 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### files ###
-.logs
-.env
-.discodeit
-discodeit.env
-
 ### VS Code ###
 .vscode/

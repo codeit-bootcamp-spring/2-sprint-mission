@@ -1,31 +1,35 @@
 server:
-  port: 8081
+    port: 80
 
 spring:
-  datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 60000
-  jpa:
-    hibernate:
-      ddl-auto: update
-    defer-datasource-initialization: true
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-  sql:
-    init:
-      mode: always
+    boot:
+        admin:
+            client:
+                url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
+    datasource:
+        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/discodeit}
+        username: ${SPRING_DATASOURCE_USERNAME:postgres}
+        password: ${SPRING_DATASOURCE_PASSWORD:1234}
+        driver-class-name: org.postgresql.Driver
+        hikari:
+            maximum-pool-size: 10
+            minimum-idle: 5
+            idle-timeout: 60000
+    jpa:
+        hibernate:
+            ddl-auto: update
+        defer-datasource-initialization: true
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
+                use_sql_comments: true
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+        open-in-view: false
+    sql:
+        init:
+            mode: always
 
 logging:
-  level:
-    root: info
+    level:
+        root: info
