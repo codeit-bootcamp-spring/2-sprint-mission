@@ -4,8 +4,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-
-#application-dev.yaml
+*.env
 
 ### STS ###
 .apt_generated
@@ -39,3 +38,6 @@ out/
 ### VS Code ###
 .vscode/
 /storage/
+/node_modules/
+/package.json
+/package-lock.json

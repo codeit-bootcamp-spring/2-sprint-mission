@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.user.entity;
 
 import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
