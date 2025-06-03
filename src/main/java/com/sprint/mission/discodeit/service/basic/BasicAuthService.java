@@ -3,43 +3,40 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-    @Transactional(readOnly = true)
-    @Override
-    public UserDto login(LoginRequest loginRequest) {
-        String username = loginRequest.username();
-        String password = loginRequest.password();
+  @Transactional(readOnly = true)
+  @Override
+  public UserDto login(LoginRequest loginRequest) {
+    log.debug("로그인 시도: username={}", loginRequest.username());
+    
+    String username = loginRequest.username();
+    String password = loginRequest.password();
 
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(
-                // userId를 건네준다면 UserNotFoungException을 활용했을 것이다
-                () -> new DiscodeitException(ErrorCode.USER_NOT_FOUND,
-                    Map.of("username", username)));
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
-        if (!user.getPassword().equals(password)) {
-            // 이 부분은 password용으로 ErrorCode를 만들어야할지 고민.
-            throw new DiscodeitException(ErrorCode.INVALID_REQUEST,
-                Map.of("Password 불일치", password));
-        }
-
-        return userMapper.toDto(user);
+    if (!user.getPassword().equals(password)) {
+      throw InvalidCredentialsException.wrongPassword();
     }
+
+    log.info("로그인 성공: userId={}, username={}", user.getId(), username);
+    return userMapper.toDto(user);
+  }
 }
