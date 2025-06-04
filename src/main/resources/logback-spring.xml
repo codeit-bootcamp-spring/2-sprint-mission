@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <property name="LOGS_PATH" value="./.logs"/>
+  <property name="LOG_PATTERN"
+    value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %.36logger{36} - %msg%n"/>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+  </appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOGS_PATH}/discodeit.log</file>
+    <encoder>
+      <pattern>${LOG_PATTERN}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOGS_PATH}/discodeit_%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>30</maxHistory>
+      <totalSizeCap>3GB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
+
+  <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </logger>
+  <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
+  </logger>
+  <springProfile name="dev">
+    <logger name="com.sprint.mission.discodeit" level="DEBUG" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="prod">
+    <logger name="com.sprint.mission.discodeit" level="INFO" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="!dev &amp; !prod">
+    <logger name="com.sprint.mission.discodeit" level="info" additivity="false">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </logger>
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+</configuration>
