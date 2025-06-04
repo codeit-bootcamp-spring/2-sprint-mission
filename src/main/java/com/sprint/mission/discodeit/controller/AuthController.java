@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -16,7 +15,7 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController implements AuthApi {
+public class AuthController {
 
     private final AuthService authService;
 

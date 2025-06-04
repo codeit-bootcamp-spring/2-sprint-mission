@@ -9,5 +9,8 @@ public class UserNotFoundException extends UserException {
         super(ErrorCode.USER_NOT_FOUND,
             Map.of("userId", userId));
     }
-
+    
+    public UserNotFoundException(Map<String, Object> additionalInfo) {
+        super(ErrorCode.USER_NOT_FOUND, additionalInfo);
+    }
 }

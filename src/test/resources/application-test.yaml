@@ -1,0 +1,53 @@
+spring:
+  # 테스트용 H2 데이터베이스 설정
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 테스트 시작 시 스키마를 새로 생성
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        show_sql: true
+  h2:
+    console:
+      enabled: true
+  sql:
+    init:
+      mode: never #테스트 중에는 sql파일 실행 x
+  # 빈 재정의 허용 설정 추가
+  main:
+    allow-bean-definition-overriding: true
+
+# Actuator 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+# 애플리케이션 정보 설정
+info:
+  application:
+    name: DiscoDeIt Chat API
+    description: A RESTful API for the DiscoDeIt chat application
+    version: 1.0.0
+
+# 로깅 설정
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace 
+

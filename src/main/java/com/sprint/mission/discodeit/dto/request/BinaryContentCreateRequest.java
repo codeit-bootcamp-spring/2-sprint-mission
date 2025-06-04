@@ -13,8 +13,8 @@ public record BinaryContentCreateRequest(
     String contentType,
 
     @NotNull(message = "파일 내용은 필수입니다.")
-    @Size(min = 1, message = "파일 내용이 비어있을 수 없습니다.") // Ensure bytes array is not empty, though @NotNull checks for null array itself.
-    byte[] bytes
+    @Size(min = 1, message = "파일 내용이 비어있을 수 없습니다.")
+    Long size
 ) {
 
 }

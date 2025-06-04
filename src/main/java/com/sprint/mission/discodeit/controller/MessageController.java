@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.MessageApi;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
@@ -22,11 +21,11 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/messages")
 @Validated
-public class MessageController implements MessageApi {
+public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageDto> create(
         @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
@@ -34,6 +33,7 @@ public class MessageController implements MessageApi {
         MessageDto createdMessage = messageService.create(messageCreateRequest, attachments);
         return ResponseEntity
             .status(HttpStatus.CREATED)
+            .contentType(MediaType.APPLICATION_JSON)
             .body(createdMessage);
     }
 

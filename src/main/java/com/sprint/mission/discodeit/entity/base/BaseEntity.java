@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.base;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
+@ToString(callSuper = true)
 public abstract class BaseEntity {
 
     @Id

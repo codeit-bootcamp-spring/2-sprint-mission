@@ -1,9 +1,18 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-
-import com.sprint.mission.discodeit.service.BinaryContentStorage;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
+import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
+import com.sprint.mission.discodeit.service.LocalBinaryContentStorage;
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,34 +20,21 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
-
-import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
-import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
-
 @jakarta.annotation.Resource
 
 @Service
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
-public class LocalBinaryContentStorage implements BinaryContentStorage {
+public class LocalBinaryContentStorageImpi implements LocalBinaryContentStorage {
 
     private static final Logger log = LoggerFactory.getLogger(LocalBinaryContentStorage.class);
     private final Path rootPath;
 
-    public LocalBinaryContentStorage(
+    public LocalBinaryContentStorageImpi(
         @Value("${discodeit.storage.local.root-path}") String rootPathValue) {
         this.rootPath = Paths.get(rootPathValue).toAbsolutePath().normalize();
 
@@ -51,7 +47,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             log.info("저장소 디렉토리 생성 완료: {}", rootPath);
         } catch (IOException e) {
             log.error("저장소 디렉토리 생성 실패: {}", rootPath, e);
-            throw new FileProcessingCustomException("initialize storage", rootPath.toString(), "저장소 디렉토리 생성 실패");
+            throw new FileProcessingCustomException(
+                Map.of("operation", "initialize-storage", "filePath", rootPath.toString(),
+                    "customMessageContext", "저장소 디렉토리 생성 실패: " + e.getMessage()));
         }
     }
 
@@ -75,7 +73,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             return id;
         } catch (IOException e) {
             log.error("파일 저장 실패: {}", destinationPath, e);
-            throw new FileProcessingCustomException("save", destinationPath.toString(), "파일 저장 실패");
+            throw new FileProcessingCustomException(
+                Map.of("operation", "save-file", "filePath", destinationPath.toString(),
+                    "customMessageContext", "파일 저장 실패: " + e.getMessage()));
         }
     }
 
@@ -84,14 +84,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         Path filePath = resolvePath(id);
         if (!Files.exists(filePath)) {
             log.warn("요청한 파일을 찾을 수 없음: {}", filePath);
-            throw new FileNotFoundCustomException(filePath.toString(), "요청한 파일을 찾을 수 없음");
+            throw new FileNotFoundCustomException(
+                Map.of("filePath", filePath.toString(), "customMessageContext",
+                    "요청한 파일을 찾을 수 없습니다."));
         }
         try {
             log.debug("파일 스트림 열기 시도: {}", filePath);
             return Files.newInputStream(filePath);
         } catch (IOException e) {
             log.error("파일 읽기 실패: {}", filePath, e);
-            throw new FileProcessingCustomException("read", filePath.toString(), "파일 읽기 실패");
+            throw new FileProcessingCustomException(
+                Map.of("operation", "read-file", "filePath", filePath.toString(),
+                    "customMessageContext", "파일 읽기 실패: " + e.getMessage()));
         }
     }
 
@@ -100,7 +104,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         Path filePath = resolvePath(id);
         if (!Files.exists(filePath)) {
             log.warn("삭제할 파일을 찾을 수 없음: {}", filePath);
-            throw new FileNotFoundCustomException(filePath.toString(), "삭제할 파일을 찾을 수 없음");
+            throw new FileNotFoundCustomException(
+                Map.of("filePath", filePath.toString(), "customMessageContext",
+                    "삭제할 파일을 찾을 수 없습니다."));
         }
 
         try {
@@ -109,7 +115,9 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             log.info("파일 삭제 성공: {}", filePath);
         } catch (IOException e) {
             log.error("파일 삭제 실패: {}", filePath, e);
-            throw new FileProcessingCustomException("delete", filePath.toString(), "파일 삭제 실패");
+            throw new FileProcessingCustomException(
+                Map.of("operation", "delete-file", "filePath", filePath.toString(),
+                    "customMessageContext", "파일 삭제 실패: " + e.getMessage()));
         }
     }
 
@@ -125,29 +133,35 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             Resource resource = new InputStreamResource(inputStream);
 
             String originalFileName =
-                binaryContentDto.fileName() != null ? binaryContentDto.fileName()
-                    : id.toString();
+                binaryContentDto.fileName() != null ? binaryContentDto.fileName() : id.toString();
             String encodedFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
             String contentDisposition = "attachment; filename=\"" + encodedFileName + "\"";
 
             return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(binaryContentDto.contentType()))
                 .contentLength(binaryContentDto.size())
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-                .body(resource);
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition).body(resource);
 
         } catch (FileNotFoundCustomException e) {
-            log.warn("다운로드 실패 (파일 없음): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage());
+            log.warn("다운로드 실패 (파일 없음): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(),
+                e.getMessage());
             throw e;
         } catch (FileProcessingCustomException e) {
-            log.error("다운로드 실패 (파일 처리 오류): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage(), e);
+            log.error("다운로드 실패 (파일 처리 오류): ID {} (파일명: {}). 상세: {}", id,
+                binaryContentDto.fileName(), e.getMessage(), e);
             throw e;
         } catch (IOException e) {
-            log.error("다운로드 실패 (IOException): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage(), e);
-            throw new FileProcessingCustomException("download-io", id.toString(), "다운로드 준비 중 IOException 발생");
+            log.error("다운로드 실패 (IOException): ID {} (파일명: {}). 상세: {}", id,
+                binaryContentDto.fileName(), e.getMessage(), e);
+            throw new FileProcessingCustomException(
+                Map.of("operation", "download-io", "filePath", id.toString(),
+                    "customMessageContext", "다운로드 준비 중 IOException 발생: " + e.getMessage()));
         } catch (Exception e) {
-            log.error("다운로드 실패 (예상치 못한 오류): ID {} (파일명: {}). 상세: {}", id, binaryContentDto.fileName(), e.getMessage(), e);
-            throw new FileProcessingCustomException("download-unexpected", id.toString(), "다운로드 중 예상치 못한 오류 발생");
+            log.error("다운로드 실패 (예상치 못한 오류): ID {} (파일명: {}). 상세: {}", id,
+                binaryContentDto.fileName(), e.getMessage(), e);
+            throw new FileProcessingCustomException(
+                Map.of("operation", "download-unexpected", "filePath", id.toString(),
+                    "customMessageContext", "다운로드 중 예상치 못한 오류 발생: " + e.getMessage()));
         }
     }
 

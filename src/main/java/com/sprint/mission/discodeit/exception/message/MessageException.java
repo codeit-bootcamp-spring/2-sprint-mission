@@ -7,11 +7,9 @@ import java.util.Map; // java.util.* 대신 명시적으로 Map만 import 할 �
 
 public class MessageException extends DiscodeitException {
 
-    // public MessageException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
-    //     super(timestamp, errorCode, details);
-    // }
+
     public MessageException(ErrorCode errorCode, Map<String, Object> details) {
-        super(errorCode, details); // DiscodeitException이 timestamp를 내부적으로 처리
+        super(errorCode, details);
     }
 
 }

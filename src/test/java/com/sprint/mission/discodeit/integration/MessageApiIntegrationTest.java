@@ -9,6 +9,11 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,16 +23,28 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.Map;
+import java.util.List;
+import java.util.Collections;
+import java.util.Optional;
+import java.time.OffsetDateTime;
+import java.time.Instant;
+import org.mockito.Mockito;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,13 +57,19 @@ class MessageApiIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockitoBean
+    private BinaryContentService binaryContentService;
+
+    @MockitoBean
+    private BinaryContentRepository binaryContentRepository;
+
     private String testUserId;
     private String testChannelId;
 
     private static final String MESSAGE = "test message";
     private static final String USERNAME = "user";
     private static final String EMAIL = "user@naver.com";
-    private static final String PASSWORD = "123";
+    private static final String PASSWORD = "123456";
     private static final String CHANNEL_NAME = "Channel";
     private static final String CHANNEL_DESCRIPTION = "test messages";
 
@@ -163,6 +186,7 @@ class MessageApiIntegrationTest {
         String messageContent = "Image attached";
         String attachmentName = "test.txt";
         String attachmentContent = "test content";
+        UUID attachmentId = UUID.randomUUID();
 
         MessageCreateRequest createRequest = new MessageCreateRequest(
             messageContent,
@@ -183,6 +207,25 @@ class MessageApiIntegrationTest {
             MediaType.TEXT_PLAIN_VALUE,
             attachmentContent.getBytes()
         );
+
+        // Mocking BinaryContentService
+        BinaryContentDto mockAttachmentDto = new BinaryContentDto(
+            attachmentId,
+            attachmentName,
+            (long) attachmentContent.getBytes().length,
+            MediaType.TEXT_PLAIN_VALUE
+        );
+        when(binaryContentService.create(any(MockMultipartFile.class))).thenReturn(mockAttachmentDto);
+
+        // Mocking BinaryContentRepository
+        BinaryContent mockPersistedBinaryContent = Mockito.mock(BinaryContent.class);
+        when(mockPersistedBinaryContent.getId()).thenReturn(attachmentId);
+        when(mockPersistedBinaryContent.getFileName()).thenReturn(attachmentName);
+        when(mockPersistedBinaryContent.getContentType()).thenReturn(MediaType.TEXT_PLAIN_VALUE);
+        when(mockPersistedBinaryContent.getSize()).thenReturn((long) attachmentContent.getBytes().length);
+        when(mockPersistedBinaryContent.getCreatedAt()).thenReturn(Instant.now());
+
+        when(binaryContentRepository.findById(eq(attachmentId))).thenReturn(Optional.of(mockPersistedBinaryContent));
 
         ResultActions result = mockMvc.perform(multipart("/api/messages")
             .file(requestJson)
@@ -219,9 +262,76 @@ class MessageApiIntegrationTest {
             .contentType(MediaType.MULTIPART_FORM_DATA));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value("채널을 찾을 수 없습니다."))
             .andExpect(jsonPath("$.details.channelId").value(nonExistentChannelId));
+    }
+
+    @Test
+    @DisplayName("메시지 생성 실패 - 작성자 찾을 수 없음")
+    @Transactional
+    void createMessage_Fail_AuthorNotFound() throws Exception {
+        String nonExistentAuthorId = UUID.randomUUID().toString();
+        MessageCreateRequest createRequest = new MessageCreateRequest(
+            "Test Message",
+            UUID.fromString(testChannelId),
+            UUID.fromString(nonExistentAuthorId)
+        );
+
+        MockMultipartFile requestJson = new MockMultipartFile(
+            "messageCreateRequest",
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(createRequest)
+        );
+
+        ResultActions result = mockMvc.perform(multipart("/api/messages")
+            .file(requestJson)
+            .contentType(MediaType.MULTIPART_FORM_DATA));
+
+        result.andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.code").value(ErrorCode.USER_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.USER_NOT_FOUND.getMessage()))
+            .andExpect(jsonPath("$.details.userId").value(nonExistentAuthorId));
+    }
+
+    @Test
+    @DisplayName("메시지 생성 실패 - 첨부파일 업로드 오류")
+    @Transactional
+    void createMessage_Fail_AttachmentError() throws Exception {
+        MessageCreateRequest createRequest = new MessageCreateRequest(
+            "Message with failing attachment",
+            UUID.fromString(testChannelId),
+            UUID.fromString(testUserId)
+        );
+        MockMultipartFile requestJson = new MockMultipartFile(
+            "messageCreateRequest",
+            "",
+            "application/json",
+            objectMapper.writeValueAsBytes(createRequest)
+        );
+        MockMultipartFile attachment = new MockMultipartFile(
+            "attachments",
+            "error_file.txt",
+            MediaType.TEXT_PLAIN_VALUE,
+            "error content".getBytes()
+        );
+
+        Map<String, Object> expectedDetails = Map.of("operation", "save-file", "fileName",
+            "error_file.txt");
+        when(binaryContentService.create(attachment)).thenThrow(
+            new FileProcessingCustomException(expectedDetails));
+
+        ResultActions result = mockMvc.perform(multipart("/api/messages")
+            .file(requestJson)
+            .file(attachment)
+            .contentType(MediaType.MULTIPART_FORM_DATA));
+
+        result.andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.code").value(ErrorCode.FILE_PROCESSING_ERROR.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.FILE_PROCESSING_ERROR.getMessage()))
+            .andExpect(jsonPath("$.details.operation").value("save-file"))
+            .andExpect(jsonPath("$.details.fileName").value("error_file.txt"));
     }
 
     @Test
@@ -255,8 +365,8 @@ class MessageApiIntegrationTest {
             .content(objectMapper.writeValueAsString(updateRequest)));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.MESSAGE_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.MESSAGE_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.MESSAGE_NOT_FOUND.getMessage()))
             .andExpect(jsonPath("$.details.messageId").value(nonExistentMessageId));
     }
 
@@ -281,8 +391,8 @@ class MessageApiIntegrationTest {
         ResultActions result = mockMvc.perform(delete("/api/messages/" + nonExistentMessageId));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.MESSAGE_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.MESSAGE_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.MESSAGE_NOT_FOUND.getMessage()))
             .andExpect(jsonPath("$.details.messageId").value(nonExistentMessageId));
     }
 
@@ -313,13 +423,12 @@ class MessageApiIntegrationTest {
     void findAllMessagesByChannelId_Fail_ChannelNotFound() throws Exception {
         String nonExistentChannelId = UUID.randomUUID().toString();
 
-        ResultActions result = mockMvc.perform(get("/api/messages")
-            .param("channelId", nonExistentChannelId)
-            .param("size", "10"));
+        ResultActions result = mockMvc.perform(
+            get("/api/messages").param("channelId", nonExistentChannelId));
 
         result.andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
-            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.code").value(ErrorCode.CHANNEL_NOT_FOUND.name()))
+            .andExpect(jsonPath("$.message").value(ErrorCode.CHANNEL_NOT_FOUND.getMessage()))
             .andExpect(jsonPath("$.details.channelId").value(nonExistentChannelId));
     }
 }

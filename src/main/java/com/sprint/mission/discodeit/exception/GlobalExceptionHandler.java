@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.exception.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
 import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import com.sprint.mission.discodeit.exception.message.MessageException;
-import com.sprint.mission.discodeit.exception.user.InvalidUserStatusUpdateException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserOperationRestrictedException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,9 +23,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserException(UserNotFoundException ex) {
@@ -34,7 +36,6 @@ public class GlobalExceptionHandler {
             ex.getErrorCode().getStatus(),
             ex.getDetails()
         );
-
         return ResponseEntity
             .status(ex.getErrorCode().getStatus())
             .body(body);
@@ -69,19 +70,6 @@ public class GlobalExceptionHandler {
             .body(body);
     }
 
-    @ExceptionHandler(InvalidUserStatusUpdateException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidUserStatusUpdateException(
-        InvalidUserStatusUpdateException ex) {
-        ErrorResponse body = ErrorResponse.of(
-            ex,
-            ex.getErrorCode(),
-            ex.getErrorCode().getStatus(),
-            ex.getDetails()
-        );
-        return ResponseEntity
-            .status(ex.getErrorCode().getStatus())
-            .body(body);
-    }
 
     @ExceptionHandler(ChannelException.class)
     public ResponseEntity<ErrorResponse> handleChannelException(ChannelException ex) {
@@ -139,7 +127,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ReadStatusNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleReadStatusNotFoundException(ReadStatusNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleReadStatusNotFoundException(
+        ReadStatusNotFoundException ex) {
         ErrorResponse body = ErrorResponse.of(
             ex,
             ex.getErrorCode(),
@@ -152,7 +141,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+        MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -177,7 +167,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+    public ResponseEntity<ErrorResponse> handleConstraintViolationExceptions(
+        ConstraintViolationException ex) {
         Map<String, String> errors = new HashMap<>();
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             String fieldName = violation.getPropertyPath().toString();
@@ -202,7 +193,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+        MissingServletRequestParameterException ex) {
         Map<String, Object> details = new HashMap<>();
         details.put("missingParameter", ex.getParameterName());
         details.put("parameterType", ex.getParameterType());

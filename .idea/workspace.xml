@@ -5,56 +5,79 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3b3e1724-c9dd-42c9-8f3f-a6d5572ecd20" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.logs/discodeit.log" beforeDir="false" afterPath="$PROJECT_DIR$/.logs/discodeit.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/BinaryContentMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/BinaryContentMapperImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ChannelMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ChannelMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/MessageMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/MessageMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/PageResponseMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/PageResponseMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ReadStatusMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/ReadStatusMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserStatusMapperImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/generated/com/sprint/mission/discodeit/mapper/UserStatusMapperImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/BinaryContentController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ChannelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ChannelController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ReadStatusController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/ReadStatusController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/MessageApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/MessageApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/UserApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/UserApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/ChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/data/ChannelDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/AuthApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/BinaryContentApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/ChannelApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/MessageApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/ReadStatusApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/api/UserApi.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/ErrorResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/ErrorResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/BinaryContentCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/BinaryContentCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/LoginRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/LoginRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/MessageCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/MessageCreateRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PrivateChannelCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PrivateChannelCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PublicChannelCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/PublicChannelCreateRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserCreateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/dto/request/UserUpdateRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/UserChannel.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/ErrorCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/ErrorCode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/DiscodeitException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/DiscodeitException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/ChannelMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/ChannelMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ChannelRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ChannelRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/MessageRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/ReadStatusRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/BinaryContentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/BinaryContentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicAuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicAuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicBinaryContentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicChannelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicReadStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicReadStatusService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/basic/BasicUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/channel/PrivateChannelNotUpdate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/channel/PrivateChannelNotUpdate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/CustomFileException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileAlreadyException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileAlreadyException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileNotFoundCustomException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileNotFoundCustomException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileProcessingCustomException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/file/FileProcessingCustomException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/message/MessageException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/message/MessageException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserAlreadyExistException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserAlreadyExistException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserNotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserNotFoundException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserOperationRestrictedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/exception/user/UserOperationRestrictedException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/BinaryContentMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/BinaryContentMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/MessageMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/MessageMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/UserMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/mapper/UserMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/s3/AWSS3Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/s3/AWSS3Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/s3/S3Uploader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/s3/S3Uploader.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/schema.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/controller/MessageControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/controller/MessageControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/controller/UserControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/controller/UserControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/ChannelApiIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/ChannelApiIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/MessageApiIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/MessageApiIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/UserApiIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/UserApiIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/BasicMessageServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/BasicMessageServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/ChannelServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/ChannelServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/UserServiceTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="repository" />
+    </option>
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -85,8 +108,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Record" />
-        <option value="Class" />
+        <option value="Dockerfile" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -122,9 +146,40 @@
     &quot;Docker.discodeit: Compose 배포.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose.yml.postgres-db: Compose 배포.executor&quot;: &quot;Run&quot;,
     &quot;Docker.docker-compose.yml: Compose 배포.executor&quot;: &quot;Run&quot;,
+    &quot;Downloaded.Files.Path.Enabled&quot;: &quot;false&quot;,
     &quot;Gradle.2-sprint-mission [dependencies].executor&quot;: &quot;Run&quot;,
     &quot;Gradle.2-sprint-mission 빌드.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.Gradle 종속성 빌드 중.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.AWSS3Test.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.BasicMessageServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelApiIntegrationTest.createPrivateChannel_Fail_InvalidParticipant.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelApiIntegrationTest.createPrivateChannel_Success.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelApiIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelApiIntegrationTest.findAllChannelsByUserId_Fail_UserNotFound.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelApiIntegrationTest.updateChannel_Fail_NotFound.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.createPrivateChannel_Success.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ChannelServiceTest.findAllByUserId_Success_WithSubscribedPrivateChannel.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DiscodeitApplicationTests.contextLoads.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.LocalStackDockerExtensionTest.test.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageApiIntegrationTest.createMessage_Success_TextOnly.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageApiIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageApiIntegrationTest.findAllMessagesByChannelId_Fail_ChannelNotFound.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.MessageRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserApiIntegrationTest.createUser_Fail_DuplicateEmail.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserApiIntegrationTest.createUser_Fail_ProfileImageError.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserApiIntegrationTest.createUser_Success.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserApiIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserControllerTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.createUser_Failure_ProfileImageProcessingError.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.UserServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;Repository.Attach.Annotations&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.JavaDocs&quot;: &quot;false&quot;,
+    &quot;Repository.Attach.Sources&quot;: &quot;false&quot;,
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
     &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
@@ -144,17 +199,21 @@
     &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
     &quot;DatabaseDriversLRU&quot;: [
       &quot;postgresql&quot;
+    ],
+    &quot;com.intellij.ide.scratch.LRUPopupBuilder$1/SQL 파생 언어&quot;: [
+      &quot;PostgreSQL&quot;
     ]
   }
 }</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.sprint.mission.discodeit.service.basic" />
       <recent name="com.sprint.mission.discodeit.service" />
       <recent name="com.sprint.mission.discodeit.mapper" />
     </key>
@@ -192,6 +251,67 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
+    <configuration name="AWSS3Test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.discodeit.stoarge.s3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.discodeit.stoarge.s3" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.stoarge.s3.AWSS3Test" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ChannelApiIntegrationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.discodeit.integration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.discodeit.integration" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.integration.ChannelApiIntegrationTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LocalStackDockerExtensionTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.discodeit.stoarge.s3.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.discodeit.stoarge.s3" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.stoarge.s3.LocalStackDockerExtensionTest" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserControllerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="discodeit.test" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.sprint.mission.discodeit.controller.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.sprint.mission.discodeit.controller" />
+      <option name="MAIN_CLASS_NAME" value="com.sprint.mission.discodeit.controller.UserControllerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="DiscodeitApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="discodeit.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.sprint.mission.discodeit.DiscodeitApplication" />
@@ -205,41 +325,13 @@
       </deployment>
       <method v="2" />
     </configuration>
-    <configuration name="discodeit: Compose 배포" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="sourceFilePath" value="src/main/java/com/sprint/mission/discodeit/docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="docker-compose.yml: Compose 배포" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="sourceFilePath" value="docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
-    <configuration name="docker-compose.yml.postgres-db: Compose 배포" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
-      <deployment type="docker-compose.yml">
-        <settings>
-          <option name="services">
-            <list>
-              <option value="postgres-db" />
-            </list>
-          </option>
-          <option name="sourceFilePath" value="docker-compose.yml" />
-        </settings>
-      </deployment>
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.2-sprint-mission [dependencies]" />
-        <item itemvalue="Docker.docker-compose.yml: Compose 배포" />
-        <item itemvalue="Docker.docker-compose.yml.postgres-db: Compose 배포" />
-        <item itemvalue="Docker.discodeit: Compose 배포" />
+        <item itemvalue="JUnit.ChannelApiIntegrationTest" />
+        <item itemvalue="JUnit.UserControllerTest" />
+        <item itemvalue="JUnit.LocalStackDockerExtensionTest.test" />
+        <item itemvalue="JUnit.AWSS3Test" />
       </list>
     </recent_temporary>
   </component>
@@ -324,6 +416,36 @@
       <workItem from="1746709161807" duration="101000" />
       <workItem from="1746750442909" duration="20763000" />
       <workItem from="1746872511209" duration="113000" />
+      <workItem from="1746872737946" duration="588000" />
+      <workItem from="1747023791196" duration="637000" />
+      <workItem from="1747112503770" duration="4351000" />
+      <workItem from="1747118049378" duration="709000" />
+      <workItem from="1747119009145" duration="1745000" />
+      <workItem from="1747120896257" duration="755000" />
+      <workItem from="1747148158081" duration="3002000" />
+      <workItem from="1747152144804" duration="2843000" />
+      <workItem from="1747222928808" duration="3754000" />
+      <workItem from="1747230990859" duration="2252000" />
+      <workItem from="1747271565824" duration="87000" />
+      <workItem from="1747557330862" duration="770000" />
+      <workItem from="1747568475163" duration="1809000" />
+      <workItem from="1747577283514" duration="606000" />
+      <workItem from="1747630096318" duration="14000" />
+      <workItem from="1747630128767" duration="16000" />
+      <workItem from="1747646028968" duration="6483000" />
+      <workItem from="1747717881013" duration="10415000" />
+      <workItem from="1747728487355" duration="6698000" />
+      <workItem from="1747752047012" duration="2152000" />
+      <workItem from="1747840741418" duration="1423000" />
+      <workItem from="1747873807498" duration="8309000" />
+      <workItem from="1747886679704" duration="9061000" />
+      <workItem from="1747898687741" duration="5037000" />
+      <workItem from="1748437438964" duration="3000" />
+      <workItem from="1748477874936" duration="328000" />
+      <workItem from="1748491367650" duration="9207000" />
+      <workItem from="1748563442261" duration="173000" />
+      <workItem from="1748565840894" duration="2533000" />
+      <workItem from="1748770639038" duration="15417000" />
     </task>
     <servers />
   </component>
@@ -353,8 +475,65 @@
       </map>
     </option>
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/ChannelServiceTest.java</url>
+          <line>325</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/ChannelApiIntegrationTest.java</url>
+          <line>38</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/service/ChannelServiceTest.java</url>
+          <line>324</line>
+          <properties class="com.sprint.mission.discodeit.service.ChannelServiceTest" method="findAllByUserId_Success_WithSubscribedPrivateChannel">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/controller/ChannelControllerTest.java</url>
+          <line>83</line>
+          <properties class="com.sprint.mission.discodeit.controller.ChannelControllerTest" method="createPublicChannel_Success">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/UserApiIntegrationTest.java</url>
+          <line>148</line>
+          <properties class="com.sprint.mission.discodeit.integration.UserApiIntegrationTest" method="createUser_Fail_DuplicateEmail">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/test/java/com/sprint/mission/discodeit/integration/UserApiIntegrationTest.java</url>
+          <line>200</line>
+          <properties class="com.sprint.mission.discodeit.integration.UserApiIntegrationTest" method="createUser_Fail_ProfileImageError">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/discodeit$MessageApiIntegrationTest.ic" NAME="MessageApiIntegrationTest 커버리지 결과" MODIFIED="1747154029384" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="true">
+      <FILTER>com.sprint.mission.discodeit.integration.*</FILTER>
+    </SUITE>
   </component>
 </project>
