@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exceptions.Auth.AuthFailException;
-import com.sprint.mission.discodeit.exceptions.ErrorCode;
 import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserJPARepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.Map;
 
 @Service
@@ -24,9 +22,9 @@ public class BasicAuthService implements AuthService {
     @Transactional(readOnly = true)
     public User login(AuthServiceLoginDto authServiceLoginDto) {
         User matchingUserUser = userJpaRepository.findByUsername(authServiceLoginDto.username())
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userName", authServiceLoginDto.username() )));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userName", authServiceLoginDto.username() )));
         if (!matchingUserUser.getPassword().equals(authServiceLoginDto.password())) {
-            throw new AuthFailException(Instant.now(), ErrorCode.AUTHENTICATION_FAILED, Map.of("userId", matchingUserUser.getId()));
+            throw new AuthFailException(Map.of("userId", matchingUserUser.getId()));
         }
         return matchingUserUser;
     }

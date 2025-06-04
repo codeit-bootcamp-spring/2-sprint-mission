@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exceptions.ErrorCode;
 import com.sprint.mission.discodeit.exceptions.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exceptions.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.ResponseMapStruct;
@@ -36,7 +35,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public UserStatusResponseDto create(UserStatusCreateDto userStatusCreateDto) {
         User matchingUser = userJPARepository.findById(userStatusCreateDto.userId())
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", userStatusCreateDto.userId())));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userStatusCreateDto.userId())));
 
         Instant currentTime = Instant.now();
         UserStatus userStatus = new UserStatus(matchingUser, currentTime);
@@ -50,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional(readOnly = true)
     public UserStatusResponseDto find(UUID userId) {
         UserStatus userStatus = userStatusJPARepository.findByUser_Id(userId)
-                .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userId", userId)));
+                .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", userId)));
         return responseMapStruct.toUserStatusDto(userStatus);
     }
 
@@ -70,7 +69,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public UserStatusResponseDto updateByUserId(UUID userId, UserStatusUpdateDto userStatusUpdateRequest) {
         UserStatus matchingUserStatus = userStatusJPARepository.findByUser_Id(userId)
-                .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userId", userId)));
+                .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", userId)));
 
         Instant currentTime = userStatusUpdateRequest.newLastActiveAt();
         matchingUserStatus.updateLastConnectionTime(currentTime);
@@ -83,7 +82,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public void delete(UUID userId) {
         UserStatus matchingUserStatus = userStatusJPARepository.findByUser_Id(userId)
-                .orElseThrow(() -> new UserStatusNotFoundException(Instant.now(), ErrorCode.USER_STATUS_NOT_FOUND, Map.of("userId", userId)));
+                .orElseThrow(() -> new UserStatusNotFoundException(Map.of("userId", userId)));
         userStatusJPARepository.delete(matchingUserStatus);
     }
 }

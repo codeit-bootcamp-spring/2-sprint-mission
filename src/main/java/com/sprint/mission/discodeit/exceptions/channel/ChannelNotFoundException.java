@@ -9,4 +9,8 @@ public class ChannelNotFoundException extends ChannelException {
   public ChannelNotFoundException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
+
+  public ChannelNotFoundException(Map<String, Object> details) {
+    super(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, details);
+  }
 }

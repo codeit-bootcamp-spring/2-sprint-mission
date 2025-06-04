@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exceptions.ErrorCode;
 import com.sprint.mission.discodeit.exceptions.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exceptions.readstatus.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.exceptions.readstatus.ReadStatusNotFoundException;
@@ -43,13 +42,13 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusResponseDto create(ReadStatusCreateDto readStatusCreateDto) {
         User matchingUser = userJpaRepository.findById(readStatusCreateDto.userId())
-                .orElseThrow(() -> new UserNotFoundException(Instant.now(), ErrorCode.USER_NOT_FOUND, Map.of("userId", readStatusCreateDto.userId())));
+                .orElseThrow(() -> new UserNotFoundException(Map.of("userId", readStatusCreateDto.userId())));
 
         Channel matchingChannel = channelJpaRepository.findById(readStatusCreateDto.channelId())
-                .orElseThrow(() -> new ChannelNotFoundException(Instant.now(), ErrorCode.CHANNEL_NOT_FOUND, Map.of("channelId", readStatusCreateDto.channelId())));
+                .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", readStatusCreateDto.channelId())));
 
         if (readStatusJpaRepository.existsByUser_IdAndChannel_Id(matchingUser.getId(), matchingChannel.getId())) {
-            throw new DuplicateReadStatusException(Instant.now(), ErrorCode.DUPLICATE_READ_STATUS, Map.of("userId", matchingUser.getId(), "channelId", matchingChannel.getId()));
+            throw new DuplicateReadStatusException(Map.of("userId", matchingUser.getId(), "channelId", matchingChannel.getId()));
         }
 
         Instant lastReadAt = readStatusCreateDto.lastReadAt();
@@ -65,7 +64,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional(readOnly = true)
     public ReadStatusResponseDto find(ReadStatusFindDto readStatusFindDto) {
         ReadStatus readStatus = readStatusJpaRepository.findById(readStatusFindDto.Id())
-                .orElseThrow(() -> new ReadStatusNotFoundException(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND, Map.of("readStatusId", readStatusFindDto.Id())));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusFindDto.Id())));
 
         return responseMapStruct.toReadStatusDto(readStatus);
     }
@@ -86,7 +85,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public ReadStatusResponseDto update(UUID readStatusId, ReadStatusUpdateDto readStatusUpdateDto) {
         ReadStatus matchingReadStatus = readStatusJpaRepository.findById(readStatusId)
-                .orElseThrow(() -> new ReadStatusNotFoundException(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND, Map.of("readStatusId", readStatusId)));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId)));
 
         matchingReadStatus.readStatusUpdate(readStatusUpdateDto.newLastReadAt());
         readStatusJpaRepository.save(matchingReadStatus);
@@ -98,7 +97,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     public void delete(ReadStatusDeleteDto readStatusDeleteDto) {
         ReadStatus matchingReadStatus = readStatusJpaRepository.findById(readStatusDeleteDto.Id())
-                .orElseThrow(() -> new ReadStatusNotFoundException(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND, Map.of("readStatusId", readStatusDeleteDto.Id())));
+                .orElseThrow(() -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusDeleteDto.Id())));
         readStatusJpaRepository.delete(matchingReadStatus);
     }
 }

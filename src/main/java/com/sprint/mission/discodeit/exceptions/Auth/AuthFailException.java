@@ -9,4 +9,8 @@ public class AuthFailException extends AuthException {
     public AuthFailException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
         super(timestamp, errorCode, details);
     }
+
+    public AuthFailException(Map<String, Object> details) {
+        super(Instant.now(), ErrorCode.AUTHENTICATION_FAILED, details);
+    }
 }

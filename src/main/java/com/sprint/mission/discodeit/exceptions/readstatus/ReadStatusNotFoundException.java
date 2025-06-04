@@ -9,4 +9,8 @@ public class ReadStatusNotFoundException extends ReadStatusException {
   public ReadStatusNotFoundException(Instant timestamp, ErrorCode errorCode, Map<String, Object> details) {
     super(timestamp, errorCode, details);
   }
+
+  public ReadStatusNotFoundException(Map<String, Object> details) {
+    super(Instant.now(), ErrorCode.READ_STATUS_NOT_FOUND, details);
+  }
 }
