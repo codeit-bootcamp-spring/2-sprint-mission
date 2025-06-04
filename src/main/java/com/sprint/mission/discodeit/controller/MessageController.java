@@ -6,22 +6,33 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,73 +41,76 @@ import java.util.UUID;
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
-  private final MessageMapper messageMapper;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-          @Valid @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
-          @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
-    log.info("▶▶ [API] Creating message - channelId: {}, authorId: {}",
-            messageCreateRequest.channelId(), messageCreateRequest.authorId());
-
+    log.info("메시지 생성 요청: request={}, attachmentCount={}", 
+        messageCreateRequest, attachments != null ? attachments.size() : 0);
+    
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-            .map(files -> files.stream()
-                    .map(file -> {
-                      try {
-                        log.debug("▶▶ [API] Processing attachment - fileName: {}", file.getOriginalFilename());
-                        return new BinaryContentCreateRequest(
-                                file.getOriginalFilename(),
-                                file.getContentType(),
-                                file.getBytes()
-                        );
-                      } catch (IOException e) {
-                        log.error("◀◀ [API] Failed to process attachment - fileName: {}", file.getOriginalFilename(), e);
-                        throw new RuntimeException(e);
-                      }
-                    })
-                    .toList())
-            .orElse(new ArrayList<>());
-
+        .map(files -> files.stream()
+            .map(file -> {
+              try {
+                return new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+                );
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+            })
+            .toList())
+        .orElse(new ArrayList<>());
     MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
-    log.info("◀◀ [API] Message created - id: {}", createdMessage.id());
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
+    log.debug("메시지 생성 응답: {}", createdMessage);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdMessage);
   }
 
   @PatchMapping(path = "{messageId}")
-  public ResponseEntity<MessageDto> update(@PathVariable("messageId") UUID messageId,
-                                           @Valid @RequestBody MessageUpdateRequest request) {
-    log.info("▶▶ [API] Updating message - id: {}", messageId);
+  public ResponseEntity<MessageDto> update(
+      @PathVariable("messageId") UUID messageId,
+      @RequestBody @Valid MessageUpdateRequest request) {
+    log.info("메시지 수정 요청: id={}, request={}", messageId, request);
     MessageDto updatedMessage = messageService.update(messageId, request);
-    log.info("◀◀ [API] Message updated - id: {}", messageId);
-    return ResponseEntity.status(HttpStatus.OK).body(updatedMessage);
+    log.debug("메시지 수정 응답: {}", updatedMessage);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(updatedMessage);
   }
 
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
-    log.info("▶▶ [API] Deleting message - id: {}", messageId);
+    log.info("메시지 삭제 요청: id={}", messageId);
     messageService.delete(messageId);
-    log.info("◀◀ [API] Message deleted - id: {}", messageId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    log.debug("메시지 삭제 완료");
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
   }
 
   @GetMapping
-  public ResponseEntity<List<MessageDto>> findAllByChannelId(
-          @RequestParam("channelId") UUID channelId) {
-    log.info("▶▶ [API] Fetching messages for channel - channelId: {}", channelId);
-    List<MessageDto> messages = messageService.findAllByChannelId(channelId);
-    log.info("◀◀ [API] Found {} messages for channel - channelId: {}", messages.size(), channelId);
-    return ResponseEntity.status(HttpStatus.OK).body(messages);
-  }
-
-  @GetMapping("/channel/{channelId}")
-  public ResponseEntity<PageResponse<MessageDto>> getMessagesByChannelIdWithPaging(
-          @PathVariable UUID channelId,
-          @RequestParam(defaultValue = "0") int page) {
-    log.info("▶▶ [API] Fetching paged messages - channelId: {}, page: {}", channelId, page);
-    PageResponse<MessageDto> response = messageService.findAllByChannelIdWithPaging(channelId, page);
-    log.info("◀◀ [API] Returning {} messages (page {}) - channelId: {}",
-            response.content().size(), page, channelId);
-    return ResponseEntity.ok(response);
+  public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+      @RequestParam("channelId") UUID channelId,
+      @RequestParam(value = "cursor", required = false) Instant cursor,
+      @PageableDefault(
+          size = 50,
+          page = 0,
+          sort = "createdAt",
+          direction = Direction.DESC
+      ) Pageable pageable) {
+    log.info("채널별 메시지 목록 조회 요청: channelId={}, cursor={}, pageable={}", 
+        channelId, cursor, pageable);
+    PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
+        pageable);
+    log.debug("채널별 메시지 목록 조회 응답: totalElements={}", messages.totalElements());
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(messages);
   }
 }

@@ -1,19 +1,25 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Repository
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
-    List<ReadStatus> findAllByUser_Id(UUID userId);
-    List<ReadStatus> findAllByChannel_Id(UUID channelId);
-    List<ReadStatus> findAllByUser(User user);
-    List<ReadStatus> findAllByChannel(Channel channel);
-    void deleteAllByChannel(Channel channel);
+
+
+  List<ReadStatus> findAllByUserId(UUID userId);
+
+  @Query("SELECT r FROM ReadStatus r "
+      + "JOIN FETCH r.user u "
+      + "JOIN FETCH u.status "
+      + "LEFT JOIN FETCH u.profile "
+      + "WHERE r.channel.id = :channelId")
+  List<ReadStatus> findAllByChannelIdWithUser(@Param("channelId") UUID channelId);
+
+  Boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
+
+  void deleteAllByChannelId(UUID channelId);
 }

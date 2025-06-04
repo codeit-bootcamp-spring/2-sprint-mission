@@ -37,3 +37,14 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+.env
+
+# 모든 .log 파일 무시
+*.log
+
+# 모든 .txt 파일 무시
+*.txt
+
+# 모든 MapperImpl 파일 무시 (예: UserMapperImpl.java)
+*MapperImpl.*
