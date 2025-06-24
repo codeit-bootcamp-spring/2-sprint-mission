@@ -16,7 +16,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/csrf-token").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/actuator/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/actuator/**", "/api/users").permitAll()
                         .requestMatchers("/api/**").authenticated()
                 )
                 .csrf(csrf -> csrf
