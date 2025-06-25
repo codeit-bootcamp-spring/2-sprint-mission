@@ -12,12 +12,10 @@ spring:
       ddl-auto: validate
     open-in-view: false
   profiles:
-    active: dev
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
+    active:
+      - dev
+  config:
+    import: optional:file:.env[.properties]
 
 management:
   endpoints:

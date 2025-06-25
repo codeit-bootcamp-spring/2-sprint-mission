@@ -1,7 +1,35 @@
 version: '3.8'
 
 services:
-  postgres-db:
+  app:
+    image: discodeit:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit
+    ports:
+      - "8081:80"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/discodeit
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - STORAGE_TYPE=s3
+      - STORAGE_LOCAL_ROOT_PATH=.discodeit/storage
+      - STORAGE_TYPE=s3
+      - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
+      - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
+      - AWS_S3_REGION=${AWS_S3_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_S3_PRESIGNED_URL_EXPIRATION=600
+    depends_on:
+      - db
+    volumes:
+      - binary-storage:/storage:/app/.discodeit/storage
+    networks:
+      - discodeit-network
+
+  db:
     image: postgres:15
     container_name: discodeit-postgres
     environment:
@@ -13,37 +41,12 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: discodeit-app
-    ports:
-      - "8081:80"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      PROJECT_NAME: ${PROJECT_NAME}
-      PROJECT_VERSION: ${PROJECT_VERSION}
-      JVM_OPTS: ${JVM_OPTS}
-
-      STORAGE_TYPE: s3
-      AWS_S3_ACCESS_KEY: ${AWS_S3_ACCESS_KEY}
-      AWS_S3_SECRET_KEY: ${AWS_S3_SECRET_KEY}
-      AWS_S3_REGION: ${AWS_S3_REGION}
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
-      AWS_S3_PRESIGNED_URL_EXPIRATION: ${AWS_S3_PRESIGNED_URL_EXPIRATION}
-
-    env_file:
-      - .env
-
-    depends_on:
-      - postgres-db
-    volumes:
-      - binary-storage:/storage
-
+    networks:
+      - discodeit-network
 volumes:
-  pgdata:
-  binary-storage:
+  postgres-data:
+  binary-content-storage:
+
+networks:
+  discodeit-network:
+    driver: bridge
