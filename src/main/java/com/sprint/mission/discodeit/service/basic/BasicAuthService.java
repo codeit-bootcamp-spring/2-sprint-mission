@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -28,7 +30,7 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findByUsername(loginRequest.username())
             .orElseThrow(() -> UserNotFoundException.forUsername(loginRequest.username()));
 
-        if (!user.getPassword().equals(loginRequest.password())) {
+        if (!passwordEncoder.matches(loginRequest.password(), user.getPassword())) {
             throw new UserWrongPasswordException();
         }
 

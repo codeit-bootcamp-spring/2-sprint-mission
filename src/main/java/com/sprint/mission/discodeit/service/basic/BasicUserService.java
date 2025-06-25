@@ -14,12 +14,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +34,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -56,9 +59,11 @@ public class BasicUserService implements UserService {
             binaryContent = extractBinaryContent(profile);
         }
 
+        String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
+
         User user = new User(
             userCreateRequest.username(),
-            userCreateRequest.password(),
+            encodedPassword,
             userCreateRequest.email(),
             binaryContent);
 
