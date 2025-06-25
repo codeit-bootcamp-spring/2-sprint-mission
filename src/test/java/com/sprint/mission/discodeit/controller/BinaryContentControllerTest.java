@@ -22,7 +22,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(BinaryContentController.class)
@@ -34,10 +34,10 @@ class BinaryContentControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @MockBean
+  @MockitoBean
   private BinaryContentService binaryContentService;
 
-  @MockBean
+  @MockitoBean
   private BinaryContentStorage binaryContentStorage;
 
   @Test
