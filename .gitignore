@@ -45,5 +45,6 @@ bin/
 .*
 !.gitignore
 
-.env
-discodeit.env
+
+### Github Actions ###
+!.github/

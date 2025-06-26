@@ -1,16 +1,12 @@
 server:
-  port: 8287
+  port: 8080
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
   jpa:
-    hibernate:
-      ddl-auto: update
-      dialect: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         format_sql: true
@@ -28,9 +24,3 @@ management:
   info:
     env:
       enabled: true
-
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: .discodeit/storage
