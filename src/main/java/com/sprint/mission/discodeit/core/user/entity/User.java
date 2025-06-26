@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -31,6 +33,10 @@ public class User extends BaseUpdatableEntity {
   @Column(name = "password", length = 60, nullable = false)
   private String password;
 
+  @Column(name = "role")
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
   @Setter
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
   private UserStatus userStatus;
@@ -39,18 +45,27 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  private User(String name, String email, String password, BinaryContent profile) {
+  private User(String name, String email, String password, BinaryContent profile, Role role) {
     super();
     this.profile = profile;
     this.name = name;
     this.email = email;
     this.password = password;
+    this.role = role;
   }
 
   public static User create(String name, String email, String password, BinaryContent profile) {
     Validator.validate(name, email, password);
-    return new User(name, email, password, profile);
+    return new User(name, email, password, profile, Role.USER);
   }
+
+
+  public static User createAdmin(String name, String email, String password,
+      BinaryContent profile) {
+    Validator.validate(name, email, password);
+    return new User(name, email, password, profile, Role.ADMIN);
+  }
+
 
   public void update(String newUserName, String newEmail, String newPassword,
       BinaryContent newProfile) {

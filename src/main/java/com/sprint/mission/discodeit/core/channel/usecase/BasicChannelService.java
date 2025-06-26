@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.core.channel.usecase;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
@@ -14,7 +13,6 @@ import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository
 import com.sprint.mission.discodeit.core.status.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.status.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -99,7 +97,7 @@ public class BasicChannelService implements ChannelService {
     readStatusRepository.findAllByChannel_Id(channel.getId())
         .stream().map(readStatus -> {
           User user = readStatus.getUser();
-          return UserDto.create(user);
+          return UserDto.from(user);
         })
         .forEach(userIdList::add);
 

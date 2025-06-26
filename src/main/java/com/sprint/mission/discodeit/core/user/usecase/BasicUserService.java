@@ -7,16 +7,13 @@ import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreate
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.status.usecase.user.UserStatusService;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusCreateCommand;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
 import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
-import com.sprint.mission.discodeit.core.user.exception.UserLoginFailedException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -26,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class BasicUserService implements UserService {
 
+  private final PasswordEncoder passwordEncoder;
   private final JpaUserRepository userRepository;
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
@@ -55,8 +54,8 @@ public class BasicUserService implements UserService {
     if (binaryContentDTO.isPresent()) {
       profile = binaryContentService.create(binaryContentDTO.orElse(null));
     }
-
-    User user = User.create(command.username(), command.email(), command.password(), profile);
+    String encode = passwordEncoder.encode(command.password());
+    User user = User.create(command.username(), command.email(), encode, profile);
     userRepository.save(user);
     log.info("[UserService] User registered: id {}, name {}", user.getId(), user.getName());
 
@@ -64,35 +63,16 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = userStatusService.create(statusCommand);
     user.setUserStatus(userStatus);
 
-    return UserDto.create(user);
+    return UserDto.from(user);
   }
 
-  @Override
-  @Transactional
-  public UserDto login(UserLoginCommand command) {
-    User user = userRepository.findByName(command.username()).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
-    );
-
-    if (!command.password().equals(user.getPassword())) {
-      throw new UserLoginFailedException(ErrorCode.LOGIN_FAILED, user.getId(), "Password mismatch");
-    }
-
-    user.getUserStatus().updateTime(Instant.now());
-
-    log.info("[UserService] User login: id {}, username {}, password  {}", user.getId(),
-        user.getName(),
-        user.getPassword());
-
-    return UserDto.create(user);
-  }
 
   @Override
   @Transactional(readOnly = true)
   public List<UserDto> findAll() {
     List<User> userList = userRepository.findAllWithProfileAndStatus();
 
-    return userList.stream().map(UserDto::create).toList();
+    return userList.stream().map(UserDto::from).toList();
   }
 
   @Override
@@ -115,7 +95,7 @@ public class BasicUserService implements UserService {
     log.info("[UserService] User Updated: username {}, email {}, password {}", user.getName(),
         user.getEmail(),
         user.getPassword());
-    return UserDto.create(user);
+    return UserDto.from(user);
   }
 
 

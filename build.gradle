@@ -19,7 +19,7 @@ jacocoTestReport {
 }
 
 group = 'com.sprint.mission'
-version = '1.2-M8'
+version = '2.0-M9'
 
 java {
     toolchain {
@@ -38,9 +38,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    //security 설치
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     //AWS SDK 설치
     implementation 'software.amazon.awssdk:s3:2.31.7'
@@ -53,12 +53,6 @@ dependencies {
 
     //테스트용 H2 DB 설치
     runtimeOnly 'com.h2database:h2'
-
-    // BCrypt 암호화를 위한 의존성
-    implementation 'org.mindrot:jbcrypt:0.4'
-
-    //JSON 설치
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 
     //MapStruct
     implementation 'org.mapstruct:mapstruct:1.6.3'

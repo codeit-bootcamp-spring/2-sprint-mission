@@ -3,9 +3,9 @@ package com.sprint.mission.discodeit.core.user.usecase.dto;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.user.entity.Role;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -24,11 +24,13 @@ public record UserDto(
     @Schema(description = "User 프로필")
     BinaryContentDto profile,
 
+    Role role,
+
     @Schema(description = "User 온라인 상태", example = "true")
     boolean online
 ) {
 
-  public static UserDto create(User user) {
+  public static UserDto from(User user) {
     UserStatus userStatus = user.getUserStatus();
     boolean online = true;
     if (userStatus != null) {
@@ -45,7 +47,7 @@ public record UserDto(
         .username(user.getName())
         .email(user.getEmail())
         .profile(binaryContentDto)
+        .role(user.getRole())
         .online(online).build();
-
   }
 }

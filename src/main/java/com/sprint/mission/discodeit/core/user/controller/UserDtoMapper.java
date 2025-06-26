@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.user.controller;
 
 import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserLoginRequest;
+import com.sprint.mission.discodeit.security.dto.LoginRequest;
 import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
 import com.sprint.mission.discodeit.core.user.usecase.dto.UserLoginCommand;
@@ -18,7 +18,7 @@ public final class UserDtoMapper {
         requestBody.password());
   }
 
-  public static UserLoginCommand toLoginUserCommand(UserLoginRequest requestBody) {
+  public static UserLoginCommand toLoginUserCommand(LoginRequest requestBody) {
     return new UserLoginCommand(requestBody.username(), requestBody.password());
   }
 
