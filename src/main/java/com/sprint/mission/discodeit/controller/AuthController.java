@@ -4,15 +4,17 @@ import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,6 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController implements AuthApi {
 
   private final AuthService authService;
+
+  @GetMapping(path = "/csrf-token")
+  public Map<String, String> getCsrfToken(HttpServletRequest request) {
+    CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+    Map<String, String> tokenMap = new HashMap<>();
+    tokenMap.put("csrfToken", csrfToken.getToken());
+    return tokenMap;
+  }
+
 
   @PostMapping(path = "login")
   public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest) {
