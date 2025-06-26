@@ -33,7 +33,7 @@ public class AuthController implements AuthApi {
   }
 
 
-  @PostMapping(path = "login")
+  @PostMapping(path = "/login")
   public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest) {
     log.info("로그인 요청: username={}", loginRequest.username());
     UserDto user = authService.login(loginRequest);
