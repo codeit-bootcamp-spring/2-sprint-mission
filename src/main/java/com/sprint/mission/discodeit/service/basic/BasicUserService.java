@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class BasicUserService implements UserService {
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.debug("사용자 생성 시작: {}", userCreateRequest);
-
+    
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
@@ -100,7 +100,7 @@ public class BasicUserService implements UserService {
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
-
+    
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
           UserNotFoundException exception = UserNotFoundException.withId(userId);
@@ -109,11 +109,11 @@ public class BasicUserService implements UserService {
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
-
+    
     if (userRepository.existsByEmail(newEmail)) {
       throw UserAlreadyExistsException.withEmail(newEmail);
     }
-
+    
     if (userRepository.existsByUsername(newUsername)) {
       throw UserAlreadyExistsException.withUsername(newUsername);
     }
@@ -143,7 +143,7 @@ public class BasicUserService implements UserService {
   @Override
   public void delete(UUID userId) {
     log.debug("사용자 삭제 시작: id={}", userId);
-
+    
     if (!userRepository.existsById(userId)) {
       throw UserNotFoundException.withId(userId);
     }

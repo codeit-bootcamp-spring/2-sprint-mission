@@ -9,9 +9,9 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class BasicAuthService implements AuthService {
   @Override
   public UserDto login(LoginRequest loginRequest) {
     log.debug("로그인 시도: username={}", loginRequest.username());
-
+    
     String username = loginRequest.username();
     String password = loginRequest.password();
 

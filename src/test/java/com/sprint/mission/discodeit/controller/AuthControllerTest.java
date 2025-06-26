@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -117,4 +118,4 @@ class AuthControllerTest {
             .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isBadRequest());
   }
-}
+} 
