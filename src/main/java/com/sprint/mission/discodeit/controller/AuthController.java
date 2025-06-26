@@ -3,9 +3,12 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.mapper.UserDtoMapper;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -18,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +35,7 @@ public class AuthController implements AuthApi {
 
   private final AuthService authService;
   private final UserDtoMapper userDtoMapper;
+  private final UserService userService;
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> me(Authentication authentication) {
@@ -46,6 +51,12 @@ public class AuthController implements AuthApi {
   public CsrfToken csrfToken(HttpServletRequest request) {
     // Spring Security가 자동으로 CsrfToken을 request attribute에 넣어줌
     return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+  }
+
+  @PutMapping("/role")
+  public ResponseEntity<UserDto> updateUserRole(@RequestBody RoleUpdateRequest request) {
+    UserDto updated = userService.updateUserRole(request);
+    return ResponseEntity.ok(updated);
   }
 
   @PostMapping("/logout")

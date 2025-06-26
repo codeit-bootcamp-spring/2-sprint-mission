@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
@@ -20,6 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +41,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
   @Transactional
   @Override
@@ -69,6 +75,7 @@ public class BasicUserService implements UserService {
     String hashedPassword = passwordEncoder.encode(userCreateRequest.password());
 
     User user = new User(username, email, hashedPassword, nullableProfile);
+    user.setRoles(Role.ROLE_USER.name());
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
@@ -143,6 +150,19 @@ public class BasicUserService implements UserService {
   }
 
   @Transactional
+  public UserDto updateUserRole(RoleUpdateRequest request) {
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    user.setRoles(request.newRole().name());
+
+    // 로그인된 세션이 있으면 강제 만료
+    expireUserSessions(user.getUsername());
+
+    return userMapper.toDto(user);
+  }
+
+  @Transactional
   @Override
   public void delete(UUID userId) {
     log.debug("사용자 삭제 시작: id={}", userId);
@@ -153,5 +173,18 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+  }
+
+  private void expireUserSessions(String username) {
+    sessionRegistry.getAllPrincipals().stream()
+        .filter(principal -> principal instanceof UserDetails)
+        .map(UserDetails.class::cast)
+        .filter(userDetails -> userDetails.getUsername().equals(username))
+        .forEach(userDetails -> {
+          List<SessionInformation> sessions = sessionRegistry.getAllSessions(userDetails, false);
+          for (SessionInformation session : sessions) {
+            session.expireNow(); // 로그아웃 처리
+          }
+        });
   }
 }

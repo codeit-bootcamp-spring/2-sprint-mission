@@ -8,8 +8,11 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,6 +20,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -66,15 +71,31 @@ public class SecurityConfig {
                 "/v3/api-docs/**",
                 "/actuator/**",
                 "/favicon.ico",
+                "api/auth/login",
+                "api/auth/register",
                 "/css/**", "/js/**", "/images/**"
             ).permitAll()
             // /api/** 요청은 인증 필요
 
+            .requestMatchers("/", "/home", "/about").permitAll()
             .anyRequest().authenticated()
+            // 관리자 페이지: ROLE_ADMIN만 접근 가능
+            .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasRole("ADMIN")
+
+            // 채널 매니저 페이지: ROLE_CHANNEL_MANAGER 이상 접근 가능
+            // (ADMIN도 계층에 의해 포함됨)
+            .requestMatchers("/api/channels/public/").hasRole("CHANNEL_MANAGER")
+
+            // 일반 사용자 페이지: ROLE_USER 이상 접근 가능
+            // (CHANNEL_MANAGER, ADMIN도 접근 가능)
+
+            .anyRequest().hasRole("USER")
         )
         .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .maximumSessions(-1)
+            .sessionRegistry(sessionRegistry())
         )
         .securityContext(securityContext -> securityContext
             .securityContextRepository(new HttpSessionSecurityContextRepository())
@@ -87,6 +108,19 @@ public class SecurityConfig {
     chain.getFilters().removeIf(filter -> filter instanceof LogoutFilter);
 
     return chain;
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+    hierarchy.setHierarchy("ROLE_ADMIN > ROLE_CHANNEL_MANAGER \n ROLE_CHANNEL_MANAGER > ROLE_USER");
+    return hierarchy;
+  }
+
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
   }
 
   private AuthenticationSuccessHandler successHandler() {
