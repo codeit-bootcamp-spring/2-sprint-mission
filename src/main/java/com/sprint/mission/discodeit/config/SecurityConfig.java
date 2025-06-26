@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import java.util.Map;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,10 +26,13 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
@@ -40,6 +44,7 @@ public class SecurityConfig {
   private final UserDetailsService userDetailsService;
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
+  private final DataSource dataSource;
 
   @Bean
   public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
@@ -76,7 +81,8 @@ public class SecurityConfig {
                 "/css/**", "/js/**", "/images/**"
             ).permitAll()
             // /api/** 요청은 인증 필요
-
+            .requestMatchers("/sensitive/**").
+            access(new WebExpressionAuthorizationManager("isFullyAuthenticated()"))
             .requestMatchers("/", "/home", "/about").permitAll()
             .anyRequest().authenticated()
             // 관리자 페이지: ROLE_ADMIN만 접근 가능
@@ -94,11 +100,25 @@ public class SecurityConfig {
         .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-            .maximumSessions(-1)
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(false)
             .sessionRegistry(sessionRegistry())
         )
         .securityContext(securityContext -> securityContext
             .securityContextRepository(new HttpSessionSecurityContextRepository())
+        )
+        .rememberMe(remember -> remember
+            .useSecureCookie(true)   // HTTPS에서만 전송
+            .tokenRepository(persistentTokenRepository())
+            .tokenValiditySeconds(1814400)  // 3주
+            .userDetailsService(userDetailsService)
+            .rememberMeCookieName("remember-me")
+            .rememberMeCookieDomain(".example.com")
+            .alwaysRemember(false))      // 명시적 선택 시에만 활성화
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .deleteCookies("JSESSIONID", "remember-me") // 쿠키 삭제
+            .invalidateHttpSession(true) // 세션 만료
         )
         .httpBasic(Customizer.withDefaults());
 
@@ -108,6 +128,13 @@ public class SecurityConfig {
     chain.getFilters().removeIf(filter -> filter instanceof LogoutFilter);
 
     return chain;
+  }
+
+  @Bean
+  public PersistentTokenRepository persistentTokenRepository() {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+    return tokenRepository;
   }
 
   @Bean

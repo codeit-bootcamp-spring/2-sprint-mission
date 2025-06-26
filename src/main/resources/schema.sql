@@ -32,6 +32,15 @@ CREATE TABLE user_statuses
     last_active_at timestamp with time zone NOT NULL
 );
 
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
+);
+
+
 -- Channel
 CREATE TABLE channels
 (
