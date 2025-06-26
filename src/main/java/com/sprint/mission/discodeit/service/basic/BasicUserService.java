@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class BasicUserService implements UserService {
+
     private final UserRepository userRepository;
 
     private final UserStatusRepository userStatusRepository;
@@ -37,11 +39,12 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
 
     private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
-                          Optional<BinaryContentCreateRequest> profileCreateRequest) {
+        Optional<BinaryContentCreateRequest> profileCreateRequest) {
 
         log.info("Creating user");
 
@@ -58,19 +61,19 @@ public class BasicUserService implements UserService {
         }
 
         BinaryContent profile = profileCreateRequest
-                .map(request -> {
-                    String fileName = request.fileName();
-                    String contentType = request.contentType();
-                    byte[] bytes = request.bytes();
-                    log.debug("Profile image bytes processed: size = {} bytes", bytes.length);
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-                            contentType);
-                    binaryContentRepository.save(binaryContent);
-                    binaryContentStorage.put(binaryContent.getId(), bytes);
-                    return binaryContent;
-                })
-                .orElse(null);
-        String password = userCreateRequest.password();
+            .map(request -> {
+                String fileName = request.fileName();
+                String contentType = request.contentType();
+                byte[] bytes = request.bytes();
+                log.debug("Profile image bytes processed: size = {} bytes", bytes.length);
+                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+                    contentType);
+                binaryContentRepository.save(binaryContent);
+                binaryContentStorage.put(binaryContent.getId(), bytes);
+                return binaryContent;
+            })
+            .orElse(null);
+        String password = passwordEncoder.encode(userCreateRequest.password());
 
         User user = new User(username, email, password, profile);
 
@@ -91,14 +94,15 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll()
-                .stream()
-                .map(userMapper::toDto)
-                .toList();
+            .stream()
+            .map(userMapper::toDto)
+            .toList();
     }
 
     @Transactional
     @Override
-    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+        Optional<BinaryContentCreateRequest> profileCreateRequest) {
 
         log.info("Updating user : id = {}", userId);
 
@@ -111,26 +115,29 @@ public class BasicUserService implements UserService {
             log.warn("Email {} already exists", newEmail);
             throw UserAlreadyExistsException.withEmail(newEmail);
         }
-        if (!newUsername.equals(user.getUsername()) && userRepository.existsByUsername(newUsername)) {
+        if (!newUsername.equals(user.getUsername()) && userRepository.existsByUsername(
+            newUsername)) {
             log.warn("Username {} already exists", newUsername);
             throw UserAlreadyExistsException.withUsername(newUsername);
         }
 
         BinaryContent profile = profileCreateRequest
-                .map(request -> {
-                    String fileName = request.fileName();
-                    String contentType = request.contentType();
-                    byte[] bytes = request.bytes();
-                    log.debug("Updated profile image bytes: size = {} bytes", bytes.length);
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-                            contentType);
-                    binaryContentRepository.save(binaryContent);
-                    binaryContentStorage.put(binaryContent.getId(), bytes);
-                    return binaryContent;
-                })
-                .orElse(null);
-
+            .map(request -> {
+                String fileName = request.fileName();
+                String contentType = request.contentType();
+                byte[] bytes = request.bytes();
+                log.debug("Updated profile image bytes: size = {} bytes", bytes.length);
+                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+                    contentType);
+                binaryContentRepository.save(binaryContent);
+                binaryContentStorage.put(binaryContent.getId(), bytes);
+                return binaryContent;
+            })
+            .orElse(null);
         String newPassword = userUpdateRequest.newPassword();
+        if (newPassword != null && !newPassword.isBlank()) {
+            newPassword = passwordEncoder.encode(newPassword);
+        }
         user.updateUser(newUsername, newEmail, newPassword, profile);
 
         log.info("User updated successfully: username = {}", newUsername);
@@ -154,10 +161,10 @@ public class BasicUserService implements UserService {
 
     private User getUser(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.warn("User with id {} not found", userId);
-                    return UserNotFoundException.withId(userId);
-                });
+            .orElseThrow(() -> {
+                log.warn("User with id {} not found", userId);
+                return UserNotFoundException.withId(userId);
+            });
     }
 
 

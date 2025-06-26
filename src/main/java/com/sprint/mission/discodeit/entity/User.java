@@ -50,7 +50,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
         if (newEmail != null && !newEmail.equals(this.email)) {
             this.email = newEmail;
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
+        if (newPassword != null) {
             this.password = newPassword;
         }
         if (newProfile != this.profile) {
