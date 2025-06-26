@@ -39,4 +39,18 @@ public class AuthController implements AuthApi {
                 .status(HttpStatus.OK)
                 .body(csrfToken);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> me(Authentication authentication) {
+        log.info("현재 사용자 조회 요청");
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            log.warn("현재 사용자 정보 없음 (비로그인 상태)");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserDto userDto = authService.getCurrentUser(authentication);
+        log.debug("현재 사용자 정보 반환: {}", userDto);
+        return ResponseEntity.ok(userDto);
+    }
 }

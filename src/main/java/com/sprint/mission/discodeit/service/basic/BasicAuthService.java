@@ -25,13 +25,16 @@ public class BasicAuthService implements AuthService {
     @Override
     public UserDto getCurrentUser(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return getCurrentUserByUsername(userDetails.getUsername());
+    }
 
-        log.info("인증된 사용자 조회: username={}", userDetails.getUsername());
+    private UserDto getCurrentUserByUsername(String username) {
+        log.info("사용자 이름으로 조회: username={}", username);
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> UserNotFoundException.withUsername(userDetails.getUsername()));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
-        log.debug("사용자 정보: id={}, username={}", user.getId(), user.getUsername());
+        log.debug("조회된 사용자 정보: id={}, username={}", user.getId(), user.getUsername());
 
         return userMapper.toDto(user);
     }
