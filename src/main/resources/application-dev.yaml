@@ -31,12 +31,13 @@ spring:
         url: http://localhost:9090
 
 server:
-  port: 80
+  port: 8080
 
 logging:
   level:
     root: info
     com.sprint.mission.discodeit: debug
+    org.springframework.security: trace
 
 management:
   endpoints:

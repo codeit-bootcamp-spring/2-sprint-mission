@@ -38,6 +38,9 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.10.2'
     implementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.h2database:h2'
 
