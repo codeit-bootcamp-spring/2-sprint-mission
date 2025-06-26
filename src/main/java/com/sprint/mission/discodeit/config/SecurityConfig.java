@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,10 +42,12 @@ public class SecurityConfig {
                 )
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .ignoringRequestMatchers("/api/auth/logout")
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(authenticationManager),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
