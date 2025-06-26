@@ -29,6 +29,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,6 +49,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final PasswordEncoder passwordEncoder;
 
 
   @Override
@@ -73,8 +75,12 @@ public class BasicUserService implements UserService {
             "filename", multipartFile.getOriginalFilename()));
       }
     }
+    CreateUserCommand encodedUserCommand = new CreateUserCommand(
+        createUserCommand.username(),
+        passwordEncoder.encode(createUserCommand.password()),
+        createUserCommand.email());
 
-    User user = createUserEntity(createUserCommand, binaryContent);
+    User user = createUserEntity(encodedUserCommand, binaryContent);
     userRepository.save(user);
 
     // GenerationType.UUID의 경우, save()만 해줘도 User의 id를 DB가 아닌 자바에서 직접 생성
