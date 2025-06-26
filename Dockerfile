@@ -1,5 +1,5 @@
 #빌드 스테이지
-FROM amazoncorretto:17 AS build
+FROM amazoncorretto:17 AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
@@ -26,7 +26,7 @@ WORKDIR /app
 
 # 환경 변수 설정
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M8 \
+    PROJECT_VERSION=2.0-M9 \
     JVM_OPTS=""
 
 # 빌드 스테이지에서 jar 파일만 복사
