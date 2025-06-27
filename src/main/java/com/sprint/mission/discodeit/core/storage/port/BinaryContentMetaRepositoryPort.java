@@ -11,9 +11,5 @@ public interface BinaryContentMetaRepositoryPort {
 
   Optional<BinaryContent> findById(UUID binaryId);
 
-  List<BinaryContent> findAllByIdIn(List<UUID> ids);
-
-  boolean existsId(UUID binaryId);
-
   void delete(UUID binaryId);
 }

@@ -1,17 +1,13 @@
 package com.sprint.mission.discodeit.core.user.controller;
 
 
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserDeleteResponse;
-import com.sprint.mission.discodeit.core.user.usecase.UserService;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.core.user.service.UserService;
+import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
 import com.sprint.mission.discodeit.swagger.UserApi;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -42,31 +38,20 @@ public class UserController implements UserApi {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> create(
-      @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile file
-  ) {
+  ) throws IOException {
 
-    Optional<BinaryContentCreateCommand> binaryContentRequest = Optional.ofNullable(file)
-        .flatMap(this::resolveProfileRequest);
+    Optional<BinaryContentCreateRequest> optional = Optional.empty();
 
-    UserCreateCommand command = UserDtoMapper.toCreateUserCommand(requestBody);
-    UserDto result = userService.create(command, binaryContentRequest);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
-  }
-
-  private Optional<BinaryContentCreateCommand> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        BinaryContentCreateCommand binaryContentCreateRequest = BinaryContentCreateCommand.create(
-            profileFile);
-        return Optional.of(binaryContentCreateRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    if (!file.isEmpty()) {
+      BinaryContentCreateRequest binaryRequest = BinaryContentCreateRequest.create(file);
+      optional = Optional.of(binaryRequest);
     }
+
+    UserDto userDto = userService.create(request, optional);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @GetMapping
@@ -79,15 +64,17 @@ public class UserController implements UserApi {
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest requestBody,
-      @RequestPart(value = "profile", required = false) MultipartFile file) {
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile file) throws IOException {
+    Optional<BinaryContentCreateRequest> optional = Optional.empty();
 
-    Optional<BinaryContentCreateCommand> binaryContentRequest = Optional.ofNullable(file)
-        .flatMap(this::resolveProfileRequest);
-    UserUpdateCommand command = UserDtoMapper.toUpdateUserCommand(userId, requestBody);
+    if (!file.isEmpty()) {
+      BinaryContentCreateRequest binaryRequest = BinaryContentCreateRequest.create(file);
+      optional = Optional.of(binaryRequest);
+    }
 
-    UserDto result = userService.update(command, binaryContentRequest);
-    return ResponseEntity.ok(result);
+    UserDto userDto = userService.update(userId, request, optional);
+    return ResponseEntity.ok(userDto);
   }
 
   @DeleteMapping("/{userId}")
@@ -98,11 +85,8 @@ public class UserController implements UserApi {
 
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @RequestBody UserStatusRequest requestBody) {
-
-    UserStatusOnlineCommand command = UserStatusOnlineCommand.create(userId,
-        requestBody);
-    UserStatusDto result = userService.online(userId, requestBody);
+      @RequestBody UserStatusRequest request) {
+    UserStatusDto result = userService.online(userId, request);
     return ResponseEntity.ok(result);
   }
 }

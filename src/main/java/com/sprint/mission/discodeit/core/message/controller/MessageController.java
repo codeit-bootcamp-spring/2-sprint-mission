@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.controller.dto.MessageDeleteResponse;
@@ -51,11 +51,11 @@ public class MessageController implements MessageApi {
       @RequestPart("messageCreateRequest") @Valid MessageCreateRequest requestBody,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-    List<BinaryContentCreateCommand> attachmentRequests = Optional.ofNullable(attachments)
+    List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
             .map(file -> {
               try {
-                return BinaryContentCreateCommand.create(file);
+                return BinaryContentCreateRequest.create(file);
               } catch (IOException e) {
                 throw new RuntimeException(e);
               }

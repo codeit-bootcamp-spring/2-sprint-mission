@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.core.storage.usecase;
 
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 
 public interface CreateBinaryContentUseCase {
 
-  BinaryContent create(BinaryContentCreateCommand binaryContentCreateCommand);
+  BinaryContent create(BinaryContentCreateRequest binaryContentCreateRequest);
 
 }

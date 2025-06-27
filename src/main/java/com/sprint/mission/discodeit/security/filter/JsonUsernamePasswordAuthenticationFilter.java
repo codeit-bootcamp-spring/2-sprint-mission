@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.security.dto.LoginRequest;
+import com.sprint.mission.discodeit.core.auth.dto.LoginRequest;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.handler.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.handler.CustomLoginSuccessHandler;

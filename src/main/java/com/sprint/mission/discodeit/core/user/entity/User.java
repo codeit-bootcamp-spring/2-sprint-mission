@@ -2,9 +2,6 @@ package com.sprint.mission.discodeit.core.user.entity;
 
 import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ToString
 @Getter
@@ -34,6 +32,7 @@ public class User extends BaseUpdatableEntity {
   private String password;
 
   @Column(name = "role")
+  @Setter
   @Enumerated(EnumType.STRING)
   private Role role;
 
@@ -55,63 +54,34 @@ public class User extends BaseUpdatableEntity {
   }
 
   public static User create(String name, String email, String password, BinaryContent profile) {
-    Validator.validate(name, email, password);
     return new User(name, email, password, profile, Role.USER);
   }
 
 
   public static User createAdmin(String name, String email, String password,
       BinaryContent profile) {
-    Validator.validate(name, email, password);
     return new User(name, email, password, profile, Role.ADMIN);
   }
 
-
-  public void update(String newUserName, String newEmail, String newPassword,
-      BinaryContent newProfile) {
-    if (newUserName != null && !newUserName.equals(this.name)) {
-      Validator.validateName(newUserName);
-      this.name = newUserName;
-    }
-    if (newEmail != null && !newEmail.equals(this.email)) {
-      Validator.validateEmail(newEmail);
-      this.email = newEmail;
-    }
-    if (newPassword != null && !newPassword.equals(this.password)) {
-      Validator.validatePassword(newPassword);
-      this.password = newPassword;
-    }
-    if (newProfile != null && !newProfile.equals(this.profile)) {
-      this.profile = newProfile;
+  private <T> T updateFiled(T target, T replace) {
+    if (replace != null && !replace.equals(target)) {
+      return replace;
+    } else {
+      return target;
     }
   }
 
-  private static class Validator {
-
-    //TODO 정규패턴을 사용해서 유효성 검증할 예정 => 이름 조건, 비밀번호 조건, 이메일 조건 등
-    public static void validate(String name, String password, String email) {
-      validateName(name);
-      validatePassword(password);
-      validateEmail(email);
+  public void updatePassword(PasswordEncoder passwordEncoder, String newPassword) {
+    if (passwordEncoder.matches(newPassword, this.password)) {
+      this.password = passwordEncoder.encode(newPassword);
     }
-
-    public static void validateName(String name) {
-      if (name == null || name.isBlank() || name.length() > 50) {
-        throw new UserInvalidRequestException(ErrorCode.USER_INVALID_REQUEST, name);
-      }
-    }
-
-    public static void validatePassword(String password) {
-      if (password == null || password.isBlank() || password.length() > 50) {
-        throw new UserInvalidRequestException(ErrorCode.USER_INVALID_REQUEST, password);
-      }
-    }
-
-    public static void validateEmail(String email) {
-      if (email == null || email.isBlank() || email.length() > 50) {
-        throw new UserInvalidRequestException(ErrorCode.USER_INVALID_REQUEST, email);
-      }
-    }
-
   }
+
+  public void update(String newUserName, String newEmail, BinaryContent newProfile) {
+    this.name = updateFiled(this.name, newUserName);
+    this.email = updateFiled(this.email, newEmail);
+    this.profile = updateFiled(this.profile, newProfile);
+  }
+
+
 }

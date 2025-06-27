@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.core.message.usecase.dto;
 
-import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

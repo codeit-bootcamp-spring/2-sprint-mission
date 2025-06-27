@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundExcept
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
@@ -40,7 +40,7 @@ public class BasicMessageService implements MessageService {
   @Override
   @Transactional
   public MessageDto create(MessageCreateCommand command,
-      List<BinaryContentCreateCommand> binaryContentCommands) {
+      List<BinaryContentCreateRequest> binaryContentCommands) {
     User user = userRepository.findById(command.authorId()).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.authorId())
     );

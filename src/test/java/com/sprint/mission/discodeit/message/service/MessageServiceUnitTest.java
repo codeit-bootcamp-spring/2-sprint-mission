@@ -13,7 +13,7 @@ import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundExcept
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
@@ -21,7 +21,7 @@ import com.sprint.mission.discodeit.core.message.usecase.BasicMessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
@@ -52,7 +52,7 @@ public class MessageServiceUnitTest {
 
   User user;
   Channel channel;
-  BinaryContentCreateCommand binaryCommand;
+  BinaryContentCreateRequest binaryCommand;
 
   @BeforeEach
   void setUp() {
@@ -69,7 +69,7 @@ public class MessageServiceUnitTest {
     MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
 
     BinaryContent dummyContent = mock(BinaryContent.class);
-    binaryCommand = mock(BinaryContentCreateCommand.class);
+    binaryCommand = mock(BinaryContentCreateRequest.class);
     when(dummyContent.getId()).thenReturn(UUID.randomUUID());
     when(binaryContentService.create(binaryCommand)).thenReturn(dummyContent);
 
@@ -88,7 +88,7 @@ public class MessageServiceUnitTest {
     UUID channelId = UUID.randomUUID();
 
     MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
-    BinaryContentCreateCommand binaryCommand = mock(BinaryContentCreateCommand.class);
+    BinaryContentCreateRequest binaryCommand = mock(BinaryContentCreateRequest.class);
 
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     // when & then
@@ -106,7 +106,7 @@ public class MessageServiceUnitTest {
     UUID channelId = UUID.randomUUID();
 
     MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
-    BinaryContentCreateCommand binaryCommand = mock(BinaryContentCreateCommand.class);
+    BinaryContentCreateRequest binaryCommand = mock(BinaryContentCreateRequest.class);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(channelRepository.findById(channelId)).thenReturn(Optional.empty());

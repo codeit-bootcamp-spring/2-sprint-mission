@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.swagger;
 
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserDeleteResponse;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -15,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.MediaType;
@@ -44,7 +44,7 @@ public interface UserApi {
           description = "User 프로필 이미지",
           content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
       ) MultipartFile profile
-  );
+  ) throws IOException;
 
   @Operation(summary = "User 정보 수정")
   @ApiResponses(value = {
@@ -65,7 +65,7 @@ public interface UserApi {
       @Parameter(description = "수정할 User ID") UUID userId,
       @Parameter(description = "수정할 User 정보") UserUpdateRequest userUpdateRequest,
       @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
-  );
+  ) throws IOException;
 
   @Operation(summary = "User 삭제")
   @ApiResponses(value = {

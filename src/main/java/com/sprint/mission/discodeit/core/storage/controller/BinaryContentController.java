@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.core.storage.controller;
 
-import static com.sprint.mission.discodeit.core.storage.controller.BinaryContentDtoMapper.toCreateResponse;
-
-import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
@@ -29,21 +27,21 @@ public class BinaryContentController implements BinaryContentApi {
   public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
     List<BinaryContent> allByIdIn = binaryContentService.findAllByIdIn(binaryContentIds);
-    return ResponseEntity.ok(allByIdIn.stream()
-        .map(BinaryContentDtoMapper::toCreateResponse).toList());
+
+    return ResponseEntity.ok(allByIdIn.stream().map(BinaryContentDto::create).toList());
   }
 
   @GetMapping("/{binaryContentId}")
   public ResponseEntity<BinaryContentDto> find(
       @PathVariable UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-    return ResponseEntity.ok(toCreateResponse(binaryContent));
+
+    return ResponseEntity.ok(BinaryContentDto.create(binaryContent));
   }
 
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-    BinaryContentDto response = toCreateResponse(binaryContent);
-    return binaryContentStorage.download(response);
+    return binaryContentStorage.download(BinaryContentDto.create(binaryContent));
   }
 }

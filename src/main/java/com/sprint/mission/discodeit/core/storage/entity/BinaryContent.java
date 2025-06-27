@@ -32,7 +32,6 @@ public class BinaryContent extends BaseEntity {
     this.fileName = fileName;
     this.contentType = contentType;
     this.extension = extractExtension(fileName);
-
     this.size = size;
   }
 
@@ -46,17 +45,6 @@ public class BinaryContent extends BaseEntity {
       return "." + nameSplit[1].toLowerCase();
     } else {
       return "";
-    }
-  }
-
-  private static class Validator {
-
-    public void validate(String fileName) {
-      validateFileName(fileName);
-    }
-
-    public void validateFileName(String fileName) {
-
     }
   }
 }

@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.core.storage.usecase;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.storage.repository.JpaBinaryContentRepository;
-import com.sprint.mission.discodeit.core.storage.repository.LocalBinaryContentStorage;
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
@@ -24,12 +23,14 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional
-  public BinaryContent create(BinaryContentCreateCommand command) {
-    if (command != null) {
-      BinaryContent binaryContent = BinaryContent.create(command.fileName(),
-          (long) command.bytes().length, command.contentType());
+  public BinaryContent create(BinaryContentCreateRequest request) {
+    if (request != null) {
+      BinaryContent binaryContent = BinaryContent.create(request.fileName(),
+          (long) request.bytes().length, request.contentType());
+
       binaryContentMetaRepository.save(binaryContent);
-      binaryContentStorage.put(binaryContent.getId(), command.bytes());
+      binaryContentStorage.put(binaryContent.getId(), request.bytes());
+
       log.info("[BinaryContentService] Binary Content Created: {}", binaryContent.getId());
       return binaryContent;
     }

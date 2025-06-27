@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.storage.repository;
 
-import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,6 +25,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
+@RequiredArgsConstructor
 @Component
 @Slf4j
 public class S3BinaryContentStorage implements BinaryContentStoragePort {
@@ -37,16 +39,6 @@ public class S3BinaryContentStorage implements BinaryContentStoragePort {
   private final S3Client s3Client;
   private final S3Presigner s3Presigner;
   private final JpaBinaryContentRepository binaryContentRepository;
-
-  public S3BinaryContentStorage(
-      S3Client s3Client,
-      S3Presigner s3Presigner,
-      JpaBinaryContentRepository binaryContentRepository
-  ) {
-    this.s3Client = s3Client;
-    this.s3Presigner = s3Presigner;
-    this.binaryContentRepository = binaryContentRepository;
-  }
 
   @Override
   public UUID put(UUID id, byte[] bytes) {

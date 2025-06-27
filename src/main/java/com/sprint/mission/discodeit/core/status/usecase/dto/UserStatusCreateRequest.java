@@ -1,0 +1,11 @@
+package com.sprint.mission.discodeit.core.status.usecase.dto;
+
+import com.sprint.mission.discodeit.core.user.entity.User;
+import java.time.Instant;
+
+public record UserStatusCreateRequest(
+    User user,
+    Instant lastActiveAt
+) {
+
+}

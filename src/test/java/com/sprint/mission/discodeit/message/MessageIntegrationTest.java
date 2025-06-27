@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
@@ -20,7 +20,7 @@ import com.sprint.mission.discodeit.core.message.usecase.MessageService;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
@@ -100,13 +100,13 @@ public class MessageIntegrationTest {
   void Create_WithImage() {
     // given
     MessageCreateCommand createCommand = new MessageCreateCommand(userId, channelId, "test");
-    BinaryContentCreateCommand binaryContentCreateCommand1 = new BinaryContentCreateCommand(
+    BinaryContentCreateRequest binaryContentCreateRequest1 = new BinaryContentCreateRequest(
         "test1.png", "image/png", new byte[0]);
-    BinaryContentCreateCommand binaryContentCreateCommand2 = new BinaryContentCreateCommand(
+    BinaryContentCreateRequest binaryContentCreateRequest2 = new BinaryContentCreateRequest(
         "test2.png", "image/png", new byte[0]);
     // when
     MessageDto messageDto = messageService.create(createCommand,
-        List.of(binaryContentCreateCommand1, binaryContentCreateCommand2));
+        List.of(binaryContentCreateRequest1, binaryContentCreateRequest2));
     // then
     assertNotNull(messageDto.id());
     assertEquals(userId, messageDto.author().id());
@@ -116,7 +116,7 @@ public class MessageIntegrationTest {
 
     assertThat(messageDto.attachments()).hasSize(2);
     assertThat(messageDto.attachments().get(0).fileName()).isEqualTo(
-        binaryContentCreateCommand1.fileName());
+        binaryContentCreateRequest1.fileName());
 
     Optional<Message> optionalMessage = messageRepository.findById(messageDto.id());
     assertTrue(optionalMessage.isPresent());

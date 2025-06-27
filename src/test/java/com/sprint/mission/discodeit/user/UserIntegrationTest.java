@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
-import com.sprint.mission.discodeit.core.status.entity.UserStatus;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.user.usecase.UserService;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
+import com.sprint.mission.discodeit.core.user.service.UserService;
+import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -77,10 +75,10 @@ public class UserIntegrationTest {
     // given
     UserCreateCommand createCommand = new UserCreateCommand("c", "c@c.com", "c");
 
-    BinaryContentCreateCommand binaryContentCreateCommand = new BinaryContentCreateCommand(
+    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
         "test.png", "image/png", new byte[0]);
     // when
-    UserDto userDto = userService.create(createCommand, Optional.of(binaryContentCreateCommand));
+    UserDto userDto = userService.create(createCommand, Optional.of(binaryContentCreateRequest));
     // then
     assertNotNull(userDto.id());
     assertNotNull(userDto.profile());
@@ -108,10 +106,10 @@ public class UserIntegrationTest {
   void update_WithProfile() {
     // given
     UserUpdateCommand updateCommand = new UserUpdateCommand(u2Id, "aaa", "bbb@bbb.com", "ccc");
-    BinaryContentCreateCommand binaryContentCreateCommand = new BinaryContentCreateCommand(
+    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
         "test123.png", "image/png", new byte[1]);
     // when
-    UserDto userDto = userService.update(updateCommand, Optional.of(binaryContentCreateCommand));
+    UserDto userDto = userService.update(updateCommand, Optional.of(binaryContentCreateRequest));
     // then
     assertNotNull(userDto.id());
     assertNotNull(userDto.profile());

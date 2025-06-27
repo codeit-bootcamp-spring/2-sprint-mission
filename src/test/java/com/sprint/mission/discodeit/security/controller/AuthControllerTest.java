@@ -6,17 +6,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.core.auth.controller.AuthController;
 import com.sprint.mission.discodeit.core.user.entity.Role;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
 import com.sprint.mission.discodeit.security.config.SecurityConfig;
-import com.sprint.mission.discodeit.security.entity.CustomUserDetails;
+import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,7 +36,7 @@ class AuthControllerTest {
 
   @MockitoBean
   UserDetailsService userDetailsService;
-  
+
   @MockitoBean
   PasswordEncoder passwordEncoder;
 

@@ -9,10 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.user.entity.Role;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
-import com.sprint.mission.discodeit.security.dto.LoginRequest;
-import com.sprint.mission.discodeit.security.entity.CustomUserDetails;
-import com.sprint.mission.discodeit.security.service.CustomUserDetailsService;
+import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
+import com.sprint.mission.discodeit.core.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
+import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
