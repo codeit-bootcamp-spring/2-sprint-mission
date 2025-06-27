@@ -5,4 +5,5 @@ import com.sprint.mission.discodeit.dto.request.LoginRequest;
 
 public interface AuthService {
 
+  public boolean isUserLoggedIn();
 }

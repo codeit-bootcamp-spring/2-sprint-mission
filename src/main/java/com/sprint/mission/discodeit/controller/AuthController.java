@@ -70,4 +70,10 @@ public class AuthController implements AuthApi {
 
     return ResponseEntity.ok().build();
   }
+
+  @GetMapping("/is-logged-in")
+  public ResponseEntity<Boolean> isLoggedIn() {
+    boolean loggedIn = authService.isUserLoggedIn();
+    return ResponseEntity.ok(loggedIn);
+  }
 }

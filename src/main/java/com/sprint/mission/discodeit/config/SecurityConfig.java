@@ -20,6 +20,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.SessionFixationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
@@ -100,6 +101,7 @@ public class SecurityConfig {
         .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            .sessionFixation(SessionFixationConfigurer::migrateSession)
             .maximumSessions(1)
             .maxSessionsPreventsLogin(false)
             .sessionRegistry(sessionRegistry())
