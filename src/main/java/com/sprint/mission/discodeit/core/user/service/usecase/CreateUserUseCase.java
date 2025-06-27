@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.core.user.service.usecase;
 
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import java.util.Optional;
 
 public interface CreateUserUseCase {

@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.core.user.controller;
 
 
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.service.UserService;
-import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.swagger.UserApi;
 import jakarta.validation.Valid;
 import java.io.IOException;

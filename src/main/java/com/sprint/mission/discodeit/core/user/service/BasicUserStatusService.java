@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.core.user.service;
 
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserStatusRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.UserException;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +42,7 @@ public class BasicUserStatusService implements UserStatusService {
     UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(
         () -> new UserNotFoundException(ErrorCode.USER_STATUS_NOT_FOUND, userId)
     );
-    userStatusRepository.deleteById(userStatus.getId());
+    userStatusRepository.delete(userStatus);
     log.info("[UserStatusService] User Status deleted : id {}", userStatus.getId());
   }
 

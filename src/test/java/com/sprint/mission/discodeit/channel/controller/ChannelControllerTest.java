@@ -15,17 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.channel.controller.ChannelController;
-import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
-import com.sprint.mission.discodeit.core.channel.usecase.BasicChannelService;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
+import com.sprint.mission.discodeit.core.channel.service.BasicChannelService;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;

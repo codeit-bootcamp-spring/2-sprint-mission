@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.auth.controller.AuthController;
 import com.sprint.mission.discodeit.core.user.entity.Role;
-import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.security.config.SecurityConfig;
 import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import java.util.UUID;

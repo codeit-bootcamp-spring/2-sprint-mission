@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.swagger;
 
 import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelDeleteResponse;
-import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
+import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -73,7 +73,7 @@ public interface ChannelApi {
           content = @Content(examples = @ExampleObject(value = "Channel with id {channelId} not found"))
       )
   })
-  ResponseEntity<ChannelDeleteResponse> delete(
+  ResponseEntity<Void> delete(
       @Parameter(description = "삭제할 Channel ID") UUID channelId
   );
 

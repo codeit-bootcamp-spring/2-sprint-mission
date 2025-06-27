@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.core.auth.entity;
 
-import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

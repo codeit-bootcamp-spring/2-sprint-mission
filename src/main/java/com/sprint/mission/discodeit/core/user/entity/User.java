@@ -26,13 +26,15 @@ public class User extends BaseUpdatableEntity {
 
   @Column(name = "username", length = 50, unique = true, nullable = false)
   private String name;
+
   @Column(name = "email", length = 100, unique = true, nullable = false)
   private String email;
+
   @Column(name = "password", length = 60, nullable = false)
   private String password;
 
-  @Column(name = "role")
   @Setter
+  @Column(name = "role")
   @Enumerated(EnumType.STRING)
   private Role role;
 

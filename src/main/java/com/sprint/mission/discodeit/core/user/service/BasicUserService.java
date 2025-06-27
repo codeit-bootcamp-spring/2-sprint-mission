@@ -2,11 +2,11 @@ package com.sprint.mission.discodeit.core.user.service;
 
 
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
+import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.core.user.dto.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
@@ -14,7 +14,7 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.user.dto.response.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;
 import java.util.List;
@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
   public UserDto create(UserCreateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) {
     if (userRepository.existsByNameOrEmail(request.username(), request.email())) {
-      throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS, request.username());
+      throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS);
     }
 
     BinaryContent profile = null;
@@ -106,7 +106,7 @@ public class BasicUserService implements UserService {
     }
 
     userStatusService.delete(id);
-    userRepository.deleteById(id);
+    userRepository.delete(user);
 
     log.info("[UserService] User deleted {}", userId);
   }

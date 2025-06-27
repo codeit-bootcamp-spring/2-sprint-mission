@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.core.storage.repository;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.exception.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.io.InputStream;
 import java.net.URI;

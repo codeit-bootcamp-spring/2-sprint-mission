@@ -16,12 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.message.controller.MessageController;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
-import com.sprint.mission.discodeit.core.message.usecase.MessageService;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
+import com.sprint.mission.discodeit.core.message.service.MessageService;
+import com.sprint.mission.discodeit.core.message.dto.MessageDto;
 import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.time.Instant;

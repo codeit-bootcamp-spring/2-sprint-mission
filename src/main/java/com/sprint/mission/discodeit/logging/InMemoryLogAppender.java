@@ -17,11 +17,4 @@ public class InMemoryLogAppender extends AppenderBase<ILoggingEvent> {
     LOGS.add(event.getFormattedMessage());
   }
 
-  public static List<String> getLogs() {
-    return List.copyOf(LOGS);
-  }
-
-  public static void clearLogs() {
-    LOGS.clear();
-  }
 }

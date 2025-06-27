@@ -1,14 +1,10 @@
 package com.sprint.mission.discodeit.core.channel.controller;
 
-import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.controller.dto.ChannelDeleteResponse;
-import com.sprint.mission.discodeit.core.channel.usecase.ChannelService;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelDto;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.PrivateChannelCreateCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.PublicChannelCreateCommand;
-import com.sprint.mission.discodeit.core.channel.usecase.dto.ChannelUpdateCommand;
+import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
+import com.sprint.mission.discodeit.core.channel.service.ChannelService;
 import com.sprint.mission.discodeit.swagger.ChannelApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,22 +31,17 @@ public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
 
-
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> create(
-      @RequestBody @Valid PublicChannelCreateRequest requestBody) {
-    PublicChannelCreateCommand command = ChannelDtoMapper.toCreatePublicChannelCommand(
-        requestBody);
-    ChannelDto result = channelService.create(command);
+      @RequestBody @Valid PublicChannelCreateRequest request) {
+    ChannelDto result = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> create(
-      @RequestBody @Valid PrivateChannelCreateRequest requestBody) {
-    PrivateChannelCreateCommand command = ChannelDtoMapper.toCreatePrivateChannelCommand(
-        requestBody);
-    ChannelDto result = channelService.create(command);
+      @RequestBody @Valid PrivateChannelCreateRequest request) {
+    ChannelDto result = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
@@ -62,15 +53,14 @@ public class ChannelController implements ChannelApi {
 
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
-      @RequestBody @Valid ChannelUpdateRequest requestBody) {
-    ChannelUpdateCommand command = ChannelDtoMapper.toUpdateChannelCommand(channelId, requestBody);
-    ChannelDto result = channelService.update(command);
+      @RequestBody @Valid ChannelUpdateRequest request) {
+    ChannelDto result = channelService.update(channelId, request);
     return ResponseEntity.ok(result);
   }
 
   @DeleteMapping("/{channelId}")
-  public ResponseEntity<ChannelDeleteResponse> delete(@PathVariable UUID channelId) {
+  public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
     channelService.delete(channelId);
-    return ResponseEntity.ok(new ChannelDeleteResponse(true));
+    return ResponseEntity.noContent().build();
   }
 }

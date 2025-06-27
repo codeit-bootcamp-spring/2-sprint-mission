@@ -1,14 +1,11 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageDeleteResponse;
-import com.sprint.mission.discodeit.core.message.controller.dto.PageResponse;
-import com.sprint.mission.discodeit.core.message.usecase.MessageService;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageCreateCommand;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageUpdateCommand;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.core.message.dto.PageResponse;
+import com.sprint.mission.discodeit.core.message.service.MessageService;
+import com.sprint.mission.discodeit.core.message.dto.MessageDto;
 import com.sprint.mission.discodeit.swagger.MessageApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,7 +45,7 @@ public class MessageController implements MessageApi {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
-      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest requestBody,
+      @RequestPart("messageCreateRequest") @Valid MessageCreateRequest request,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
@@ -63,12 +60,9 @@ public class MessageController implements MessageApi {
             .toList())
         .orElse(new ArrayList<>());
 
-    MessageCreateCommand command = MessageDtoMapper.toCreateMessageCommand(requestBody);
+    MessageDto result = messageService.create(request, attachmentRequests);
 
-    MessageDto result = messageService.create(command, attachmentRequests);
-
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(result);
+    return ResponseEntity.status(HttpStatus.CREATED).body(result);
   }
 
   @GetMapping
@@ -77,26 +71,23 @@ public class MessageController implements MessageApi {
       @PageableDefault(
           size = 50, sort = "createdAt", direction = Direction.DESC
       ) Pageable pageable) {
-    Slice<MessageDto> results = messageService.findAllByChannelId(channelId, cursor,
-        pageable);
-    PageResponse<MessageDto> pageResponse = PageResponseMapper.fromSlice(results,
-        MessageDto::createdAt);
-    return ResponseEntity.ok(pageResponse);
+    Slice<MessageDto> results = messageService.findAllByChannelId(channelId, cursor, pageable);
+
+    return ResponseEntity.ok(PageResponse.create(results, MessageDto::createdAt));
   }
 
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> update(
       @PathVariable UUID messageId,
-      @RequestBody MessageUpdateRequest requestBody) {
-    MessageUpdateCommand command = MessageDtoMapper.toUpdateMessageCommand(messageId, requestBody);
-    MessageDto result = messageService.update(command);
+      @RequestBody MessageUpdateRequest request) {
+    MessageDto result = messageService.update(messageId, request);
     return ResponseEntity.ok(result);
   }
 
   @DeleteMapping("/{messageId}")
-  public ResponseEntity<MessageDeleteResponse> delete(@PathVariable UUID messageId) {
+  public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
     messageService.delete(messageId);
-    return ResponseEntity.ok(new MessageDeleteResponse(true));
+    return ResponseEntity.noContent().build();
   }
 
 }

@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.core.storage.controller;
 
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
-import com.sprint.mission.discodeit.core.storage.usecase.BinaryContentService;
+import com.sprint.mission.discodeit.core.storage.repository.BinaryContentStoragePort;
+import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.swagger.BinaryContentApi;
 import java.util.List;
 import java.util.UUID;
