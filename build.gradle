@@ -20,7 +20,7 @@ jacocoTestReport {
 
 
 group = 'com.sprint.mission'
-version = '1.2-M8'
+version = '2.0-M9'
 
 java {
     toolchain {
@@ -73,7 +73,7 @@ dependencies {
 
     //actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    
+
     implementation 'software.amazon.awssdk:s3:2.31.7'
     //Swagger UI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'

@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 .logs/
+logs/
 .env
 file-data-map
 data
