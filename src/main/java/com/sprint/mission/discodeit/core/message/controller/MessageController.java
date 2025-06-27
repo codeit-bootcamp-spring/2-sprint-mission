@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.core.message.controller;
 
-import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.message.dto.MessageDto;
+import com.sprint.mission.discodeit.core.message.dto.PageResponse;
 import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.core.message.dto.PageResponse;
 import com.sprint.mission.discodeit.core.message.service.MessageService;
-import com.sprint.mission.discodeit.core.message.dto.MessageDto;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.swagger.MessageApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

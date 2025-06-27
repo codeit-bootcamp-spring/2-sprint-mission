@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.core.message.service;
 
+import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
+import com.sprint.mission.discodeit.core.message.MessageException;
 import com.sprint.mission.discodeit.core.message.dto.MessageDto;
 import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
@@ -10,12 +12,10 @@ import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
+import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.core.message.MessageException;
-import com.sprint.mission.discodeit.core.user.UserException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;

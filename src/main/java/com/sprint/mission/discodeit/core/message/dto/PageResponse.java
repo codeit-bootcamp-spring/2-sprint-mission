@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.core.message.dto;
 
-import com.sprint.mission.discodeit.core.message.entity.Message;
 import java.util.List;
 import java.util.function.Function;
 import lombok.Builder;

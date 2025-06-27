@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.core.storage.repository;
 
+import com.sprint.mission.discodeit.core.storage.BinaryContentException;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.io.FileInputStream;
@@ -55,7 +55,7 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
   private Path resolvePath(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.FILE_NOT_FOUND, id)
+        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
     );
     String extension = binaryContent.getExtension();
 

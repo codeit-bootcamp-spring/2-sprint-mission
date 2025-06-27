@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.core.channel.controller;
 
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.service.ChannelService;
 import com.sprint.mission.discodeit.swagger.ChannelApi;
 import io.swagger.v3.oas.annotations.tags.Tag;

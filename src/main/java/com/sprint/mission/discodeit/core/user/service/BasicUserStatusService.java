@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.core.user.service;
 
+import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserStatusRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.core.user.UserException;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

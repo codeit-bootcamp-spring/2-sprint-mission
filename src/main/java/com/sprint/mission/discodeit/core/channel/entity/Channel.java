@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.channel.entity;
 
 import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
+import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,7 +56,7 @@ public class Channel extends BaseUpdatableEntity {
 
   public static void validateType(ChannelType type) {
     if (type == ChannelType.PRIVATE) {
-      throw new ChannelUnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR);
+      throw new ChannelException(ErrorCode.UNMODIFIABLE_ERROR);
     }
   }
 }

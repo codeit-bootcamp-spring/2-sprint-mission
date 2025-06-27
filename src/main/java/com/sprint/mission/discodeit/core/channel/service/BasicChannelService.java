@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.core.channel.service;
 
 
+import com.sprint.mission.discodeit.core.channel.ChannelException;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
@@ -74,7 +74,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public ChannelDto update(UUID channelId, ChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId).orElseThrow(
-        () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
+        () -> new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
     );
 
     channel.update(request.newName(), request.newDescription());
@@ -89,7 +89,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   public void delete(UUID channelId) {
     Channel channel = channelRepository.findById(channelId).orElseThrow(
-        () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
+        () -> new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
     );
 
     channelRepository.delete(channel);

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.core.read.service;
 
+import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.read.ReadStatusException;
@@ -8,12 +9,11 @@ import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusCreateReques
 import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
+import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.core.user.UserException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

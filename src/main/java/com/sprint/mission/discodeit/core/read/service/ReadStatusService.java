@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.core.read.service;
 
+import com.sprint.mission.discodeit.core.read.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.core.read.dto.ReadStatusDto;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;

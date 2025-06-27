@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.core.storage.repository;
 
+import com.sprint.mission.discodeit.core.storage.BinaryContentException;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.io.InputStream;
 import java.net.URI;
@@ -42,7 +42,7 @@ public class S3BinaryContentStorage implements BinaryContentStoragePort {
   @Override
   public UUID put(UUID id, byte[] bytes) {
     BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> new BinaryContentNotFoundException(ErrorCode.FILE_NOT_FOUND, id)
+        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
     );
 
     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -60,7 +60,7 @@ public class S3BinaryContentStorage implements BinaryContentStoragePort {
   @Override
   public InputStream get(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> new BinaryContentNotFoundException(ErrorCode.FILE_NOT_FOUND, id)
+        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
     );
     GetObjectRequest getObjectRequest = GetObjectRequest.builder()
         .bucket(bucket)

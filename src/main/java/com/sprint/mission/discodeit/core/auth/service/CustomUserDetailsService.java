@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.core.auth.service;
 
 import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
-import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
-import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
+import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Transactional(readOnly = true)
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findByName(username).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+        () -> new UserException(ErrorCode.USER_NOT_FOUND)
     );
 
     return new CustomUserDetails(UserDto.from(user), user.getPassword());
