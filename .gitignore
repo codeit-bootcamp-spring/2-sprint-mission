@@ -50,4 +50,6 @@ bin/
 !.github/
 .env
 discodeit.env
-/.logs
+/.logs/
+/.logs/application.log
+
