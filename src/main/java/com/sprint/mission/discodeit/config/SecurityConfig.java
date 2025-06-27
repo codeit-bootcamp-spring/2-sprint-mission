@@ -16,7 +16,8 @@ public class SecurityConfig {
                     "/swagger-ui/**", "/v3/api-docs/**",
                     "/actuator/**",
                     "/", "/favicon.ico", "/index.html",
-                    "/static/**", "/assets/**", "/profile-images/**"
+                    "/static/**", "/assets/**", "/profile-images/**",
+                    "/api/auth/csrf-token"
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
