@@ -2,17 +2,14 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.CustomUserDetails;
-import com.sprint.mission.discodeit.mapper.UserDtoMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController implements AuthApi {
 
   private final AuthService authService;
-  private final UserDtoMapper userDtoMapper;
+  private final UserMapper userMapper;
   private final UserService userService;
 
   @GetMapping("/me")
@@ -44,7 +41,7 @@ public class AuthController implements AuthApi {
     }
 
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-    return ResponseEntity.ok(userDtoMapper.from(userDetails));
+    return ResponseEntity.ok(userMapper.toDto(userDetails.getUser()));
   }
 
   @GetMapping("/csrf-token")
