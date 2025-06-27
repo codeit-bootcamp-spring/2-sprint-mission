@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@EnableMethodSecurity
 @RequestMapping("/api/users")
 public class UserController implements UserApi {
 
@@ -55,6 +58,7 @@ public class UserController implements UserApi {
         .body(createdUser);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping(
       path = "{userId}",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}

@@ -74,6 +74,14 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
+CREATE TABLE persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+);
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
