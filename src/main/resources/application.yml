@@ -69,3 +69,5 @@ server:
 logging:
   level:
     root: info
+    org.springframework.security: trace
+    org.springframework.security.web.csrf: DEBUG
