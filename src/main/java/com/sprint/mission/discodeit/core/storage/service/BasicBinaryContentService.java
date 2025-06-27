@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.core.storage.service;
 
+import com.sprint.mission.discodeit.core.storage.BinaryContentException;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.repository.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.storage.repository.JpaBinaryContentRepository;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional(readOnly = true)
   public BinaryContent findById(UUID binaryId) {
     return binaryContentMetaRepository.findById(binaryId).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.FILE_NOT_FOUND, binaryId)
+        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, binaryId)
     );
   }
 
@@ -56,7 +57,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   public void delete(UUID binaryId) {
     BinaryContent binaryContent = binaryContentMetaRepository.findById(binaryId).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.FILE_NOT_FOUND, binaryId)
+        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, binaryId)
     );
     binaryContentMetaRepository.delete(binaryContent);
     log.info("[BinaryContentService] Binary Content deleted successfully");

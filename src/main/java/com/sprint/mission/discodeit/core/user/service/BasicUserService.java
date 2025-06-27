@@ -1,21 +1,20 @@
 package com.sprint.mission.discodeit.core.user.service;
 
 
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
-import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.dto.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.UserAlreadyExistsException;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.core.user.UserException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +40,7 @@ public class BasicUserService implements UserService {
   public UserDto create(UserCreateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) {
     if (userRepository.existsByNameOrEmail(request.username(), request.email())) {
-      throw new UserAlreadyExistsException(ErrorCode.USER_NAME_ALREADY_EXISTS);
+      throw new UserException(ErrorCode.USER_NAME_ALREADY_EXISTS);
     }
 
     BinaryContent profile = null;
@@ -75,7 +74,7 @@ public class BasicUserService implements UserService {
   public UserDto update(UUID id, UserUpdateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) {
     User user = userRepository.findById(id).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, id));
+        () -> new UserException(ErrorCode.USER_NOT_FOUND, id));
 
     BinaryContent newProfile = binaryContentService.create(binaryContentRequest.orElse(null));
     user.update(request.newUsername(), request.newEmail(), newProfile);
@@ -96,7 +95,7 @@ public class BasicUserService implements UserService {
   @Transactional
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
+        .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND, userId));
 
     UUID id = user.getId();
     BinaryContent profile = user.getProfile();
@@ -114,7 +113,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserStatusDto online(UUID userId, UserStatusRequest request) {
     User user = userRepository.findById(userId).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, userId));
+        () -> new UserException(ErrorCode.USER_NOT_FOUND, userId));
 
     UserStatus userStatus = user.getUserStatus();
     userStatus.update(request.newLastActiveAt());
