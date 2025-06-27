@@ -22,18 +22,5 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository userStatusRepository;
     private final UserMapper userMapper;
 
-    @Override
-    public UserDto login(LoginRequest request) {
-        User user = userRepository.findByUsername(request.username())
-            .orElseThrow(() -> new UserNotFoundException(Map.of("username", request.username())));
 
-        if (!user.getPassword().equals(request.password())) {
-            throw new InvalidPasswordException();
-        }
-
-        userStatusRepository.findByUserId(user.getId())
-            .orElseGet(() -> userStatusRepository.save(new UserStatus(user)));
-
-        return userMapper.toDto(user);
-    }
 }
