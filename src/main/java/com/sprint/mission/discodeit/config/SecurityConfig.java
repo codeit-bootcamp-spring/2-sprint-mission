@@ -17,6 +17,8 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,7 +29,9 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -46,6 +50,7 @@ public class SecurityConfig {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
   private final DataSource dataSource;
+  private final AccessRoles roles;
 
   @Bean
   public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
@@ -85,6 +90,22 @@ public class SecurityConfig {
             .requestMatchers("/sensitive/**").
             access(new WebExpressionAuthorizationManager("isFullyAuthenticated()"))
             .requestMatchers("/", "/home", "/about").permitAll()
+
+            //1. 사용자 정보 수정/삭제: 본인 또는 관리자
+            .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").access(roles.userOrAdmin())
+            .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}").access(roles.userOrAdmin())
+
+            //2. 메시지 수정: 작성자만 가능
+            .requestMatchers(HttpMethod.PUT, "/api/messages/{messageId}")
+            .access(roles.messageOwner())
+
+            //3. 메시지 삭제: 작성자 또는 관리자
+            .requestMatchers(HttpMethod.DELETE, "/api/messages/{messageId}")
+            .access(roles.messageOwnerOrAdmin())
+
+            //4. 읽음 상태 생성/수정: 본인만
+            .requestMatchers("/api/messages/{messageId}/read-status").access(roles.userOnly())
+
             .anyRequest().authenticated()
             // 관리자 페이지: ROLE_ADMIN만 접근 가능
             .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasRole("ADMIN")
@@ -95,7 +116,6 @@ public class SecurityConfig {
 
             // 일반 사용자 페이지: ROLE_USER 이상 접근 가능
             // (CHANNEL_MANAGER, ADMIN도 접근 가능)
-
             .anyRequest().hasRole("USER")
         )
         .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
@@ -169,5 +189,6 @@ public class SecurityConfig {
           Map.of("message", "인증 실패", "error", exception.getMessage()));
     };
   }
+
 
 }
