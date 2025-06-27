@@ -22,6 +22,7 @@ import jakarta.persistence.PersistenceContext;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentService binaryContentService;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -66,9 +68,11 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new ProfileUploadFailedException(Map.of("파일이름", p.fileName())));
         }).orElse(null);
 
+        String encodedPassword = passwordEncoder.encode(request.password());
+        
         User user = new User(
             request.username(),
-            request.password(),
+            encodedPassword,
             request.email(),
             profile
         );
