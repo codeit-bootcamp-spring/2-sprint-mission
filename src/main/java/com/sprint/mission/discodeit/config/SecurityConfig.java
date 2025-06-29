@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
-        JsonUsernamePasswordAuthenticationFilter jsonLoginFilter
+        JsonUsernamePasswordAuthenticationFilter jsonLoginFilter,
+        CustomLogoutFilter customLogoutFilter
     ) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
@@ -39,6 +41,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
             )
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/auth/logout") // CSRF 무시
+            )
+            .addFilterBefore(customLogoutFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonLoginFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())
             .logout(logout -> logout.disable()); // LogoutFilter 제외
@@ -91,5 +97,10 @@ public class SecurityConfig {
         filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
 
         return filter;
+    }
+
+    @Bean
+    public CustomLogoutFilter customLogoutFilter() {
+        return new CustomLogoutFilter();
     }
 }
