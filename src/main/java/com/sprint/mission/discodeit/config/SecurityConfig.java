@@ -33,7 +33,7 @@ public class SecurityConfig {
                     "/actuator/**",
                     "/", "/favicon.ico", "/index.html",
                     "/static/**", "/assets/**", "/profile-images/**",
-                    "/api/auth/csrf-token",
+                    "/api/auth/csrf-token", "/api/auth/login",
                     "/api/users"
                 ).permitAll()
                 .requestMatchers("/api/**").authenticated()
@@ -83,6 +83,7 @@ public class SecurityConfig {
             new JsonUsernamePasswordAuthenticationFilter(objectMapper);
 
         filter.setAuthenticationManager(authenticationManager);
+        filter.setFilterProcessesUrl("/api/auth/login");
         filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
         filter.setAuthenticationSuccessHandler(
