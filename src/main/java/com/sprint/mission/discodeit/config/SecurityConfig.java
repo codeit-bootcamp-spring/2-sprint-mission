@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
+import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,13 +76,19 @@ public class SecurityConfig {
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
         AuthenticationManager authenticationManager,
-        ObjectMapper objectMapper
+        ObjectMapper objectMapper,
+        UserMapper userMapper
     ) {
         JsonUsernamePasswordAuthenticationFilter filter =
             new JsonUsernamePasswordAuthenticationFilter(objectMapper);
 
         filter.setAuthenticationManager(authenticationManager);
         filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
+
+        filter.setAuthenticationSuccessHandler(
+            new CustomLoginSuccessHandler(objectMapper, userMapper));
+        filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
+
         return filter;
     }
 }
