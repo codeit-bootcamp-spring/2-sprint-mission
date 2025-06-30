@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
@@ -38,13 +41,20 @@ public class SecurityConfig {
                     "/api/auth/csrf-token", "/api/auth/login",
                     "/api/users"
                 ).permitAll()
-                .requestMatchers("/api/**").authenticated()
+                .requestMatchers("/api/auth/role").hasRole("ADMIN") // 권한 수정은 관리자만 가능
+                .requestMatchers(
+                    "/api/channels/public",
+                    "/api/channels/public/**"
+                ).hasRole("CHANNEL_MANAGER") // 퍼블릭 채널 생성/수정/삭제는 채널 매니저 이상만 가능
+                .requestMatchers("/api/**").hasRole("USER") // 그 외 API는 최소 ROLE_USER 이상
                 .anyRequest().permitAll()
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
                     "/api/auth/login",
-                    "/api/auth/logout") // CSRF 무시
+                    "/api/auth/logout",
+                    "/api/auth/role"
+                ) // CSRF 무시
             )
             .addFilterBefore(customLogoutFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonLoginFilter, UsernamePasswordAuthenticationFilter.class)
@@ -104,5 +114,15 @@ public class SecurityConfig {
     @Bean
     public CustomLogoutFilter customLogoutFilter() {
         return new CustomLogoutFilter();
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+        hierarchy.setHierarchy("""
+                ROLE_ADMIN > ROLE_CHANNEL_MANAGER
+                ROLE_CHANNEL_MANAGER > ROLE_USER
+            """);
+        return hierarchy;
     }
 }
