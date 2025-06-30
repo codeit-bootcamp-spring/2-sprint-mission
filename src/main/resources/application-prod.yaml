@@ -1,7 +1,4 @@
-# 아직 사용은 안해서 일단 만들어 놓았습니다.
 spring:
-  config:
-    import: optional:file:.env.prod[.properties]
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
@@ -11,16 +8,11 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 10
       idle-timeout: 60000
-  boot:
-    admin:
-      client:
-        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
 
 server:
-  port: 80
+  port: 8081
 
 logging:
   level:
     com.sprint.mission.discodeit: info
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+    org.hibernate.SQL: info

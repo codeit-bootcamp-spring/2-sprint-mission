@@ -23,7 +23,7 @@ public record ErrorResponse(
                 error,
                 discodeitException.getErrorCode().getMessage(),
                 discodeitException.getDetails(),
-                discodeitException.getClass().getTypeName(),
+                discodeitException.getClass().getTypeName(), // 이게 뭘로 나오지? 확인 필요, Exception이 발생하는 크래스면 좋긴한데
                 status
         );
     }

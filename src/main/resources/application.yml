@@ -1,3 +1,32 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  profiles:
+    active: prod
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 4MB
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        use_sql_comments: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    org:
+      hibernate.SQL: WARN
+      springframework.data: INFO
+    com.sprint.mission.discodeit: INFO
+
 discodeit:
   storage:
     type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
@@ -9,66 +38,3 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
-
-spring:
-  profiles:
-    active: dev
-  servlet:
-    multipart:
-      max-file-size: 3MB
-      max-request-size: 4MB
-  jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        use_sql_comments: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-  sql:
-    init:
-      mode: never
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
-
-logging:
-  level:
-    org:
-      hibernate.SQL: DEBUG
-      orm.jdbc.bind: TRACE
-      springframework.data: DEBUG
-    com.sprint.mission.discodeit: info
-
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, metrics, loggers
-  info:
-    env:
-      enabled: true
-
-info:
-  app:
-    name: Discodeit
-    version: 1.7.0
-  java:
-    version: 17
-  spring-boot:
-    version: 3.4.0
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    ddl-auto: none
-  storage:
-    type: local
-    path: filestorage/binary-content-storage
-  multipart:
-    max-file-size: 3MB
-    max-request-size: 4MB

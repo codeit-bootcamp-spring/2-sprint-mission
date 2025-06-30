@@ -52,7 +52,10 @@ public class GlobalControllerExceptionHandler {
         log.error("Not SpecificException: {}", unexpectedException.getMessage());
 
         return ResponseEntity.internalServerError()
-                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.toString(), unexpectedException, HttpStatus.INTERNAL_SERVER_ERROR.value()));
+                .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR.toString(),
+                        unexpectedException,
+                        HttpStatus.INTERNAL_SERVER_ERROR.value())
+                );
     }
 
 }
