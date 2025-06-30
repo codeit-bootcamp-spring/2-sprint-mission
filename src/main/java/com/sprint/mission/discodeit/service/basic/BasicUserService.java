@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserException;
@@ -69,7 +70,7 @@ public class BasicUserService implements UserService {
         }).orElse(null);
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        
+
         User user = new User(
             request.username(),
             encodedPassword,
@@ -168,5 +169,16 @@ public class BasicUserService implements UserService {
         userRepository.delete(user);
         log.info("사용자 삭제 완료 - userId: {}", userId);
 
+    }
+
+    @Override
+    public UserDto updateUserRole(UUID userId, Role newRole) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toDto(updatedUser);
     }
 }

@@ -42,7 +42,9 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/auth/logout") // CSRF 무시
+                .ignoringRequestMatchers(
+                    "/api/auth/login",
+                    "/api/auth/logout") // CSRF 무시
             )
             .addFilterBefore(customLogoutFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonLoginFilter, UsernamePasswordAuthenticationFilter.class)
