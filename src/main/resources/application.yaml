@@ -55,11 +55,15 @@ discodeit:
       region: ${AWS_S3_REGION:ap-northeast-2}
       bucket: ${AWS_S3_BUCKET:your-bucket-name}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
+  admin:
+    username: ${ADMIN_USERNAME}
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
 
-admin:
-  username: ${ADMIN_USERNAME}
-  email: ${ADMIN_EMAIL}
-  password: ${ADMIN_PASSWORD}
+security:
+  remember-me:
+    key: ${REMEMBER_ME_KEY}
+    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 logging:
   level:

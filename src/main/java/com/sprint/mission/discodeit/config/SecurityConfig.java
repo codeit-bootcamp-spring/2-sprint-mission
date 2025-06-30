@@ -3,15 +3,19 @@ package com.sprint.mission.discodeit.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.DatabaseUserDetailsService;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.Role;
 import com.sprint.mission.discodeit.security.RoleIntegrityCheckFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionInvalidateLogoutHandler;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -25,6 +29,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +42,9 @@ public class SecurityConfig {
       HttpSecurity http,
       DaoAuthenticationProvider daoAuthenticationProvider,
       SessionRegistry sessionRegistry,
-      RoleIntegrityCheckFilter roleIntegrityCheckFilter, ObjectMapper objectMapper)
+      RoleIntegrityCheckFilter roleIntegrityCheckFilter,
+      ObjectMapper objectMapper,
+      PersistentTokenBasedRememberMeServices rememberMeServices)
       throws Exception {
     http
         .authenticationProvider(daoAuthenticationProvider)
@@ -58,8 +66,16 @@ public class SecurityConfig {
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             Customizer.withDefaults())
-        .addFilterAfter(roleIntegrityCheckFilter, JsonUsernamePasswordAuthenticationFilter.class);
-
+        .addFilterAfter(roleIntegrityCheckFilter, JsonUsernamePasswordAuthenticationFilter.class)
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+        .sessionManagement(session -> session
+            .sessionFixation().migrateSession()
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(false)
+            .sessionRegistry(sessionRegistry)
+            .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+        )
+    ;
     return http.build();
   }
 
@@ -71,11 +87,13 @@ public class SecurityConfig {
   @Bean
   public DaoAuthenticationProvider daoAuthenticationProvider(
       PasswordEncoder passwordEncoder,
-      UserDetailsService userDetailsService
+      UserDetailsService userDetailsService,
+      RoleHierarchy roleHierarchy
   ) {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     provider.setPasswordEncoder(passwordEncoder);
     provider.setUserDetailsService(userDetailsService);
+    provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
     return provider;
   }
 
@@ -101,5 +119,22 @@ public class SecurityConfig {
   @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
+  }
+
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      UserDetailsService userDetailsService,
+      DataSource dataSource
+  ) {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+
+    PersistentTokenBasedRememberMeServices rememberMeServices =
+        new PersistentTokenBasedRememberMeServices(key, userDetailsService, tokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+    return rememberMeServices;
   }
 }

@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -50,7 +51,8 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   public static JsonUsernamePasswordAuthenticationFilter createDefault(
       ObjectMapper objectMapper,
       AuthenticationManager authenticationManager,
-      SessionAuthenticationStrategy sessionAuthenticationStrategy
+      SessionAuthenticationStrategy sessionAuthenticationStrategy,
+      RememberMeServices rememberMeServices
   ) {
     JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
         objectMapper);
@@ -60,6 +62,8 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
     filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
     filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
+    filter.setRememberMeServices(rememberMeServices);
+
     return filter;
   }
 
