@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.constant.Role;
+import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
@@ -11,16 +13,19 @@ import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +40,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+    private final SessionRegistry sessionRegistry;
 
     @Override
     @Transactional
@@ -164,6 +170,25 @@ public class BasicUserService implements UserService {
         userRepository.delete(user);
     }
 
+    @Override
+    public UserDto updateRole(RoleUpdateRequest roleUpdateRequest) {
+
+        UUID userId = roleUpdateRequest.userId();
+        Role newRole = roleUpdateRequest.newRole();
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> {
+                log.error("사용자 권한 수정 중 사용자를 찾을 수 없음: userId = {}", userId);
+                return UserNotFoundException.forId(userId.toString());
+            });
+
+        user.updateRole(newRole);
+        userRepository.save(user);
+        expireUserSession(userId);
+
+        return userMapper.toDto(user);
+    }
+
     private BinaryContent extractBinaryContent(MultipartFile profile) {
         try {
             return BinaryContent.builder()
@@ -180,5 +205,14 @@ public class BasicUserService implements UserService {
                 "size", profile.getSize()),
                 e);
         }
+    }
+
+    private void expireUserSession(UUID userId) {
+        sessionRegistry.getAllPrincipals().stream()
+            .filter(DiscodeitUserDetails.class::isInstance)
+            .map(DiscodeitUserDetails.class::cast)
+            .filter(u -> u.getUserId().equals(userId))
+            .flatMap(u -> sessionRegistry.getAllSessions(u, false).stream())
+            .forEach(SessionInformation::expireNow);
     }
 }

@@ -18,6 +18,7 @@ public class UserMapper {
         user.getId(),
         user.getUsername(),
         user.getEmail(),
+        user.getRole(),
         user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile(),
             binaryContentStorage.get(user.getProfile().getId())) : null,
         user.getStatus().isLastStatus()

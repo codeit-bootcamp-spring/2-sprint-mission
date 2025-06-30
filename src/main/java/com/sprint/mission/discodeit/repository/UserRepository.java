@@ -32,4 +32,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
         LEFT JOIN FETCH u.status
       """)
   List<User> findAllWithProfileAndStatus();
+
+  boolean existsByUsername(@Param("username") String username);
+
+  boolean existsByEmail(@Param("email") String email);
 }

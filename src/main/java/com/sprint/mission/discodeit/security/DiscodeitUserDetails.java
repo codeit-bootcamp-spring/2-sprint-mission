@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.security;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
@@ -17,7 +19,7 @@ public class DiscodeitUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_".concat(userDto.role().name())));
     }
 
     @Override
@@ -28,5 +30,9 @@ public class DiscodeitUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return userDto.username();
+    }
+
+    public UUID getUserId() {
+        return userDto.id();
     }
 }

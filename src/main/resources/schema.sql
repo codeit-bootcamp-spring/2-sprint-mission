@@ -18,12 +18,13 @@ CREATE TABLE IF NOT EXISTS binary_contents
 CREATE TABLE IF NOT EXISTS users
 (
     id         UUID PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE                                          NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE,
-    username   VARCHAR(50) UNIQUE       NOT NULL,
-    email      VARCHAR(100) UNIQUE      NOT NULL,
-    password   VARCHAR(60)              NOT NULL,
+    username   VARCHAR(50) UNIQUE                                                NOT NULL,
+    email      VARCHAR(100) UNIQUE                                               NOT NULL,
+    password   VARCHAR(60)                                                       NOT NULL,
     profile_id UUID,
+    role       VARCHAR(20) CHECK ( role IN ('ADMIN', 'CHANNEL_MANAGER', 'USER')) NOT NULL DEFAULT 'USER',
     constraint fk_users_binary_contents FOREIGN KEY (profile_id) REFERENCES binary_contents (id)
 );
 
