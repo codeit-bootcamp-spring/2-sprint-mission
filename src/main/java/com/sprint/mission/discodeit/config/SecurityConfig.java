@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomUserDetailsService;
 import com.sprint.mission.discodeit.security.JsonLoginConfigurer;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +19,8 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -24,12 +28,18 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+    @Value("${REMEMBER_ME_KEY}")
+    private String rememberMeKey;
+    @Value("${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}")
+    private int tokenValiditySeconds;
 
     @Bean
     public SecurityFilterChain filterChain(
         HttpSecurity http,
         ObjectMapper objectMapper,
-        DaoAuthenticationProvider daoAuthenticationProvider
+        DaoAuthenticationProvider daoAuthenticationProvider,
+        CustomUserDetailsService customUserDetailsService,
+        DataSource dataSource
     ) throws Exception {
         return http
             .csrf(csrf -> csrf
@@ -56,13 +66,19 @@ public class SecurityConfig {
 
             )
             .authenticationProvider(daoAuthenticationProvider)
-            .sessionManagement(session-> session
+            .sessionManagement(session -> session
                 .maximumSessions(1)
                 .sessionRegistry(sessionRegistry()))
             .with(new JsonLoginConfigurer(objectMapper),
                 Customizer.withDefaults())
             .securityContext(context ->
                 context.securityContextRepository(new HttpSessionSecurityContextRepository())
+            )
+            .rememberMe(rememberMe -> rememberMe
+                .key(rememberMeKey)
+                .tokenRepository(persistentTokenRepository(dataSource))
+                .userDetailsService(customUserDetailsService)
+                .tokenValiditySeconds(tokenValiditySeconds)
             )
             .build();
     }
@@ -87,5 +103,12 @@ public class SecurityConfig {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(DataSource datasource) {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(datasource);
+        return tokenRepository;
     }
 }
