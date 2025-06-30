@@ -9,6 +9,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -50,6 +52,9 @@ public class SecurityConfig {
 
             )
             .authenticationProvider(daoAuthenticationProvider)
+            .sessionManagement(session-> session
+                .maximumSessions(1)
+                .sessionRegistry(sessionRegistry()))
             .with(new JsonLoginConfigurer(objectMapper),
                 Customizer.withDefaults())
             .securityContext(context ->
@@ -73,5 +78,10 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
 
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 }

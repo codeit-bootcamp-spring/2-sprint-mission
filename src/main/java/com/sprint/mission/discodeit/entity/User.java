@@ -25,8 +25,8 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @Column(nullable = false, length = 60)
     private String password;
 
-    @OneToOne(cascade = CascadeType.ALL,orphanRemoval = true,fetch = FetchType.LAZY)
-    @JoinColumn(name = "profile_id",columnDefinition = "UUID")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id", columnDefinition = "UUID")
     private BinaryContent profile;
 
     @JsonManagedReference
@@ -34,16 +34,22 @@ public class User extends BaseUpdatableEntity implements Serializable {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     public User(String username, String email, String password, BinaryContent profile) {
 
         this.username = username;
         this.email = email;
         this.password = password;
         this.profile = profile;
+        this.role = Role.ROLE_USER;
 
     }
 
-    public void updateUser(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
+    public void updateUser(String newUsername, String newEmail, String newPassword,
+        BinaryContent newProfile) {
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
         }
@@ -55,6 +61,12 @@ public class User extends BaseUpdatableEntity implements Serializable {
         }
         if (newProfile != this.profile) {
             this.profile = newProfile;
+        }
+    }
+
+    public void updateRole(Role newRole) {
+        if (this.role != newRole) {
+            this.role = newRole;
         }
     }
 }

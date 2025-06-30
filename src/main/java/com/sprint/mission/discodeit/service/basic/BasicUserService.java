@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.role.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
@@ -40,6 +41,8 @@ public class BasicUserService implements UserService {
 
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
+
+    private final SessionManager sessionManager;
 
     @Transactional
     @Override
@@ -142,6 +145,15 @@ public class BasicUserService implements UserService {
 
         log.info("User updated successfully: username = {}", newUsername);
 
+        return userMapper.toDto(user);
+    }
+
+    @Transactional
+    @Override
+    public UserDto updateRole(RoleUpdateRequest request) {
+        User user = getUser(request.userId());
+        user.updateRole(request.newRole());
+        sessionManager.invalidateSession(user.getId());
         return userMapper.toDto(user);
     }
 
