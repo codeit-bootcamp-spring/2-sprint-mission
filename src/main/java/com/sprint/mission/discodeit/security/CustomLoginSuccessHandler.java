@@ -7,10 +7,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -23,5 +25,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.getWriter().write(objectMapper.writeValueAsString(principal.getUserDto()));
+    log.info("[성공 응답] {}", objectMapper.writeValueAsString(principal.getUserDto()));
   }
 }

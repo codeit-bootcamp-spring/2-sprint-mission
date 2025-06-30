@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStra
 import com.sprint.mission.discodeit.security.DatabaseUserDetailsService;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.Role;
-import com.sprint.mission.discodeit.security.RoleIntegrityCheckFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionInvalidateLogoutHandler;
 import javax.sql.DataSource;
@@ -42,7 +41,6 @@ public class SecurityConfig {
       HttpSecurity http,
       DaoAuthenticationProvider daoAuthenticationProvider,
       SessionRegistry sessionRegistry,
-      RoleIntegrityCheckFilter roleIntegrityCheckFilter,
       ObjectMapper objectMapper,
       PersistentTokenBasedRememberMeServices rememberMeServices)
       throws Exception {
@@ -66,7 +64,6 @@ public class SecurityConfig {
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             Customizer.withDefaults())
-        .addFilterAfter(roleIntegrityCheckFilter, JsonUsernamePasswordAuthenticationFilter.class)
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .sessionManagement(session -> session
             .sessionFixation().migrateSession()
@@ -109,11 +106,6 @@ public class SecurityConfig {
         .role(Role.ADMIN.name()).implies(Role.CHANNEL_MANAGER.name())
         .role(Role.CHANNEL_MANAGER.name()).implies(Role.USER.name())
         .build();
-  }
-
-  @Bean
-  public RoleIntegrityCheckFilter roleIntegrityCheckFilter(UserRepository userRepository) {
-    return new RoleIntegrityCheckFilter(userRepository);
   }
 
   @Bean

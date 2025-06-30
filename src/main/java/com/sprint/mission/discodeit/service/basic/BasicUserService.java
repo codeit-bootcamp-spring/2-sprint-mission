@@ -73,6 +73,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto find(UUID userId) {
     log.debug("사용자 조회 시작: id={}", userId);
     UserDto userDto = userRepository.findById(userId)

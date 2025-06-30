@@ -11,7 +11,7 @@ public class SecurityMatchers {
       new AntPathRequestMatcher("/api/**"));
 
   public static final RequestMatcher CSRF_TOKEN = new AntPathRequestMatcher(
-      "/api/auth/csrf-token");
+      "/api/auth/csrf-token", HttpMethod.GET.name());
 
   public static final RequestMatcher SIGN_UP = new AntPathRequestMatcher(
       "/api/users", HttpMethod.POST.name());

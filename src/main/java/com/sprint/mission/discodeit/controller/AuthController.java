@@ -29,11 +29,13 @@ public class AuthController implements AuthApi {
 
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> csrfToken(CsrfToken csrfToken) {
+    log.info("csrf-token - CSRF 토큰 요청");
     return ResponseEntity.ok(csrfToken);
   }
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> me(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    log.info("me - 정보 조회 요청");
     UUID userId = userDetails.getUserDto().id();
     UserDto res = userService.find(userId);
     return ResponseEntity.ok(res);
@@ -41,6 +43,7 @@ public class AuthController implements AuthApi {
 
   @PutMapping("/role")
   public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest request) {
+    log.info("role - 권한 수정 요청");
     UserDto res = authService.updateRole(request);
     return ResponseEntity.ok(res);
   }
