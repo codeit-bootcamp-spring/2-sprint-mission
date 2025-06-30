@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.storage;
+package com.sprint.mission.discodeit.s3;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -37,7 +37,7 @@ public class S3Test {
     @BeforeEach
     void setup() throws Exception {
         Properties props = new Properties();
-        Path path = Paths.get("/Users/hwangjihwan/Downloads/IntelliJStorage/2-sprint-mission/.env.dev");
+        Path path = Paths.get("/Users/hwangjihwan/Downloads/IntelliJStorage/2-sprint-mission/.env");
 
         try (InputStream input = Files.newInputStream(path)) {
             props.load(input);
@@ -94,7 +94,7 @@ public class S3Test {
     @Test
     void testPresignedUrl() {
         // given
-        String key = UUID.randomUUID() + ".txt";
+        key = UUID.randomUUID() + ".txt";
         byte[] content = UUID.randomUUID().toString().getBytes();
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(bucket)

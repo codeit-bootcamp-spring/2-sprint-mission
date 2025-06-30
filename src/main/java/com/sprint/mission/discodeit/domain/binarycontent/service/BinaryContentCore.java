@@ -26,7 +26,6 @@ public class BinaryContentCore {
     @Transactional
     public BinaryContent createBinaryContent(BinaryContentRequest binaryContentRequest) {
         if (binaryContentRequest == null) {
-            log.warn("바이너리 컨텐츠 생성 요청이 null입니다.");
             return null;
         }
         log.info("바이너리 컨텐츠 저장 요청: fileName={}, pageSize={}", binaryContentRequest.fileName(), binaryContentRequest.size());
@@ -41,7 +40,6 @@ public class BinaryContentCore {
     @Transactional
     public List<BinaryContent> createBinaryContents(List<BinaryContentRequest> binaryContentRequests) {
         if (binaryContentRequests == null) {
-            log.warn("바이너리 컨텐츠 생성 요청이 null입니다.");
             return null;
         }
 

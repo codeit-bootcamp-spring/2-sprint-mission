@@ -44,9 +44,12 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         this.bucket = bucket;
         this.presignedUrlExpirationSeconds = presignedUrlExpirationSeconds;
 
+        StaticCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKey, secretKey)
+        );
         this.s3Client = S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
+                .credentialsProvider(credentialsProvider)
                 .build();
     }
 
@@ -87,7 +90,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
                 .build();
         PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(
                 builder -> builder.getObjectRequest(getObjectRequest)
-                        .signatureDuration(Duration.ofSeconds(presignedUrlExpirationSeconds)));
+                        .signatureDuration(Duration.ofSeconds(presignedUrlExpirationSeconds))
+        );
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(String.valueOf(presignedRequest.url())))
