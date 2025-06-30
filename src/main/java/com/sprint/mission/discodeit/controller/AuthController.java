@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,5 +53,14 @@ public class AuthController implements AuthApi {
         UserDto userDto = authService.getCurrentUser(authentication);
         log.debug("현재 사용자 정보 반환: {}", userDto);
         return ResponseEntity.ok(userDto);
+    }
+
+    @PutMapping("/role")
+    public ResponseEntity<UserDto> updateUserRole(@RequestBody RoleUpdateRequest request) {
+        log.info("사용자 권한 수정 API 요청 수신: userId={}, newRole={}", request.userId(), request.newRole());
+        UserDto updatedUser = authService.updateUserRole(request);
+
+        log.info("사용자 권한 수정 완료: userId={}, newRole={}", request.userId(), request.newRole());
+        return ResponseEntity.ok(updatedUser);
     }
 }
