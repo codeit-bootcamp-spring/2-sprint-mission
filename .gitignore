@@ -41,5 +41,10 @@ bin/
 ### Discodeit ###
 .discodeit
 
-.logs
-.env
+### 숨김 파일 ###
+.*
+!.gitignore
+
+
+### Github Actions ###
+!.github/

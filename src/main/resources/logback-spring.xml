@@ -1,49 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <!-- 로그 레벨별 색상 설정 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    
+    <!-- MDC 값을 포함한 로그 패턴 설정 -->
+    <property name="LOG_PATTERN" value="%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%-5level) %-36logger{36} [%X{requestId} | %X{requestMethod} | %X{requestUri}] - %msg%n"/>
+    <property name="LOG_FILE_PATH" value=".logs"/>
+    <property name="LOG_FILE_NAME" value="application"/>
 
-    <!-- 로그 저장 경로 (프로젝트 루트/.logs) -->
-    <property name="LOG_PATH" value="./.logs"/>
-
-    <!-- 1. 콘솔 출력 Appender -->
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- 콘솔 출력 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- 2. 파일 출력 + 일자별 롤링 Appender -->
-    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 실제 쓰일 로그 파일 -->
-        <file>${LOG_PATH}/discodeit.log</file>
-
-        <!-- 일별 롤링 정책 -->
+    <!-- 파일 출력 설정 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 일자별 파일명 패턴 -->
-            <fileNamePattern>${LOG_PATH}/discodeit-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <!-- 보관 기간(일) -->
+            <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
-
-        <encoder>
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
     </appender>
 
-    <!-- 3. 프로파일별 Root Logger 설정 -->
-    <!-- 개발(dev) 환경: DEBUG 레벨 -->
-    <springProfile name="dev">
-        <root level="DEBUG">
-            <appender-ref ref="Console"/>
-            <appender-ref ref="RollingFile"/>
-        </root>
-    </springProfile>
-
-    <!-- 운영(prod) 환경: INFO 레벨 -->
-    <springProfile name="prod">
-        <root level="INFO">
-            <appender-ref ref="Console"/>
-            <appender-ref ref="RollingFile"/>
-        </root>
-    </springProfile>
-
-</configuration>
+    <!-- 루트 로거 설정 - 레벨은 application.yaml에서 관리 -->
+    <root>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration> 
