@@ -38,11 +38,15 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/auth/signup",
+                                "/api/auth/login",
                                 "/api/auth/csrf-token",
                                 "/swagger-ui/**",
-                                "/actuator/**",
-                                "/api/users").permitAll()
-                        .requestMatchers("/api/**").authenticated()
+                                "/actuator/**"
+                        ).permitAll()
+                        .requestMatchers("/api/auth/role").hasRole("ADMIN")
+                        .requestMatchers("/api/channels/public/**").hasRole("CHANNEL_MANAGER")
+                        .requestMatchers("/api/**").hasRole("USER")
                 )
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
