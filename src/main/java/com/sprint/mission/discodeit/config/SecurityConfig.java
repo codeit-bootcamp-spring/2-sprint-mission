@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomUserDetailsService;
 import com.sprint.mission.discodeit.security.JsonLoginConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
@@ -19,6 +22,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -43,12 +47,12 @@ public class SecurityConfig {
                     "/favicon.ico",
                     "/index.html",
                     "/assets/**",
-                    "/api/users",
                     "/api/auth/login",
                     "/api/auth/csrf-token",
                     "/error"
                 ).permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .anyRequest().hasAuthority(Role.ROLE_USER.name())
 
             )
             .authenticationProvider(daoAuthenticationProvider)

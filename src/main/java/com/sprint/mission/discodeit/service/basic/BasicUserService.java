@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -148,6 +149,7 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @Transactional
     @Override
     public UserDto updateRole(RoleUpdateRequest request) {
