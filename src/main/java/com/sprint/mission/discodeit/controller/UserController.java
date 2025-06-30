@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.validation.Valid;
 
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -60,12 +62,13 @@ public class UserController implements UserApi {
     public ResponseEntity<UserDto> update(
             @PathVariable("userId") UUID userId,
             @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
-            @RequestPart(value = "profile", required = false) MultipartFile profile
+            @RequestPart(value = "profile", required = false) MultipartFile profile,
+            @AuthenticationPrincipal CustomUserDetails principal
     ) {
         log.info("사용자 수정 요청: id={}, request={}", userId, userUpdateRequest);
         Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
-        UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest);
+        UserDto updatedUser = userService.update(userId, userUpdateRequest, profileRequest, principal);
         log.debug("사용자 수정 응답: {}", updatedUser);
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -74,11 +77,10 @@ public class UserController implements UserApi {
 
     @DeleteMapping(path = "{userId}")
     @Override
-    public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
-        userService.delete(userId);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
+    public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId,
+                                       @AuthenticationPrincipal CustomUserDetails principal) {
+        userService.delete(userId, principal);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping

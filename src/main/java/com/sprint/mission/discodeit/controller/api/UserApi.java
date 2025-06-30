@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -63,7 +64,8 @@ public interface UserApi {
     ResponseEntity<UserDto> update(
             @Parameter(description = "수정할 User ID") UUID userId,
             @Parameter(description = "수정할 User 정보") UserUpdateRequest userUpdateRequest,
-            @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
+            @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile,
+            @Parameter(hidden = true) CustomUserDetails principal
     );
 
     @Operation(summary = "User 삭제")
@@ -79,7 +81,8 @@ public interface UserApi {
             )
     })
     ResponseEntity<Void> delete(
-            @Parameter(description = "삭제할 User ID") UUID userId
+            @Parameter(description = "삭제할 User ID") UUID userId,
+            @Parameter(hidden = true) CustomUserDetails principal
     );
 
     @Operation(summary = "전체 User 목록 조회")

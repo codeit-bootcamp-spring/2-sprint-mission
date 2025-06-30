@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -105,8 +107,12 @@ public class BasicUserService implements UserService {
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-                          Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+                          Optional<BinaryContentCreateRequest> optionalProfileCreateRequest,
+                          CustomUserDetails principal) {
+
         log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
+
+        checkPermission(userId, principal);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
@@ -150,8 +156,12 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public void delete(UUID userId) {
+    public void delete(UUID userId,
+                       CustomUserDetails principal) {
+
         log.debug("사용자 삭제 시작: id={}", userId);
+
+        checkPermission(userId, principal);
 
         if (!userRepository.existsById(userId)) {
             throw UserNotFoundException.withId(userId);
@@ -159,5 +169,15 @@ public class BasicUserService implements UserService {
 
         userRepository.deleteById(userId);
         log.info("사용자 삭제 완료: id={}", userId);
+    }
+
+    private void checkPermission(UUID userId, CustomUserDetails principal) {
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isSelf = principal.getUser().getId().equals(userId);
+
+        if (!isSelf && !isAdmin) {
+            throw new AccessDeniedException("권한이 없습니다.");
+        }
     }
 }
