@@ -74,6 +74,14 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
+-- Persistent Logins (Remember-Me 토큰 저장용)
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
+);
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)

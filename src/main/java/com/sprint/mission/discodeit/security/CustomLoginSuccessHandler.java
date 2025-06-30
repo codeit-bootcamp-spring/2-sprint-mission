@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final ObjectMapper objectMapper;
     private final UserMapper userMapper;
     private final SessionRegistry sessionRegistry;
+    private final RememberMeServices rememberMeServices;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -44,7 +46,9 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         if (session != null) {
             sessionRegistry.registerNewSession(session.getId(), authentication.getName());
         }
-        
+
+        rememberMeServices.loginSuccess(request, response, authentication);
+
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json;charset=UTF-8");
         objectMapper.writeValue(response.getWriter(), userDto);

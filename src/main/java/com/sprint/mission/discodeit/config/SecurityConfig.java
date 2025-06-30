@@ -22,10 +22,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +42,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final ObjectMapper objectMapper;
     private final UserMapper userMapper;
+    private final DataSource dataSource;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
@@ -65,25 +72,60 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider())
                 .sessionManagement(session -> session
-                        .maximumSessions(2)
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
                         .sessionRegistry(sessionRegistry())
+                )
+                .rememberMe(rememberMe -> rememberMe
+                        .rememberMeParameter("remember-me")
+                        .tokenRepository(persistentTokenRepository(dataSource))
+                        .tokenValiditySeconds(60 * 60 * 24 * 21)
+                        .userDetailsService(userDetailsService)
                 )
                 .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(authenticationManager, sessionRegistry()),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new CustomLogoutFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(
+                        new CustomLogoutFilter(persistentTokenRepository(dataSource)),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
 
     @Bean
-    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry) {
+    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
+            AuthenticationManager authenticationManager,
+            SessionRegistry sessionRegistry
+    ) {
         JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
         filter.setAuthenticationManager(authenticationManager);
         filter.setFilterProcessesUrl("/api/auth/login");
         filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
-        filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, userMapper, sessionRegistry));
+        filter.setAuthenticationSuccessHandler(
+                new CustomLoginSuccessHandler(objectMapper, userMapper, sessionRegistry, rememberMeServices())
+        );
         filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
         return filter;
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(DataSource dataSource) {
+        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+        repo.setDataSource(dataSource);
+        return repo;
+    }
+
+    @Bean
+    public RememberMeServices rememberMeServices() {
+        PersistentTokenBasedRememberMeServices services =
+                new PersistentTokenBasedRememberMeServices(
+                        "aVerySecureKey",
+                        userDetailsService,
+                        persistentTokenRepository(dataSource)
+                );
+        services.setParameter("remember-me");
+        services.setTokenValiditySeconds(60 * 60 * 24 * 21);
+        return services;
     }
 
     @Bean
