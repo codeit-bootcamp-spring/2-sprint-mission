@@ -20,20 +20,8 @@ public class AuthController implements AuthApi {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<UserDto> login(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            log.warn("로그인 실패 또는 인증 안됨");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        log.info("로그인 요청 수신: principal={}", authentication.getName());
-        UserDto user = authService.getCurrentUser(authentication);
-        log.debug("로그인 응답: {}", user);
-        return ResponseEntity.ok(user);
-    }
-
     @GetMapping(path = "csrf-token")
-    public ResponseEntity<CsrfToken> getCsrfToken(@RequestAttribute CsrfToken csrfToken) {
+    public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
         log.info("CSRF 토큰 발급 요청");
 
         return ResponseEntity

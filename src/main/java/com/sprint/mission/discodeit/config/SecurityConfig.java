@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
@@ -38,26 +40,33 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/signup",
-                                "/api/auth/login",
+                                "/",
+                                "/index.html",
+                                "/assets/**",
+                                "/favicon.ico",
                                 "/api/auth/csrf-token",
+                                "/api/users",
                                 "/swagger-ui/**",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/favicon.ico",
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/error"
                         ).permitAll()
                         .requestMatchers("/api/auth/role").hasRole("ADMIN")
                         .requestMatchers("/api/channels/public/**").hasRole("CHANNEL_MANAGER")
                         .requestMatchers("/api/**").hasRole("USER")
                 )
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/api/auth/logout")
+                        .csrfTokenRepository(customCsrfTokenRepository())
+                        .ignoringRequestMatchers("/api/auth/logout", "/api/auth/login", "/api/users")
                 )
                 .authenticationProvider(authenticationProvider())
                 .sessionManagement(session -> session
                         .maximumSessions(2)
                         .sessionRegistry(sessionRegistry())
                 )
-                .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(authenticationManager),
+                .addFilterBefore(jsonUsernamePasswordAuthenticationFilter(authenticationManager, sessionRegistry()),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new CustomLogoutFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -65,12 +74,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(AuthenticationManager authenticationManager, SessionRegistry sessionRegistry) {
         JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(objectMapper);
         filter.setAuthenticationManager(authenticationManager);
         filter.setFilterProcessesUrl("/api/auth/login");
         filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
-        filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, userMapper));
+        filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, userMapper, sessionRegistry));
         filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
         return filter;
     }
@@ -96,6 +105,18 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public ServletListenerRegistrationBean<HttpSessionEventPublisher> httpSessionEventPublisher() {
+        return new ServletListenerRegistrationBean<>(new HttpSessionEventPublisher());
+    }
+
+    @Bean
+    public CookieCsrfTokenRepository customCsrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setHeaderName("X-CSRF-TOKEN");
+        return repository;
     }
 }
 
