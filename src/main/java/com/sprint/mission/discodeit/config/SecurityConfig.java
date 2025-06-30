@@ -68,6 +68,7 @@ public class SecurityConfig {
             .authenticationProvider(daoAuthenticationProvider)
             .sessionManagement(session -> session
                 .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
                 .sessionRegistry(sessionRegistry()))
             .with(new JsonLoginConfigurer(objectMapper),
                 Customizer.withDefaults())
