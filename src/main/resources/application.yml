@@ -1,4 +1,7 @@
 spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
   config:
     import: optional:file:.env[.properties]
   profiles:
@@ -14,18 +17,17 @@ spring:
     properties:
       hibernate:
         use_sql_comments: true
+        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
+    generate-ddl: false
   sql:
     init:
       mode: never
 
 logging:
   level:
-    org:
-      hibernate.SQL: WARN
-      springframework.data: INFO
-    com.sprint.mission.discodeit: INFO
+    root: info
 
 discodeit:
   storage:

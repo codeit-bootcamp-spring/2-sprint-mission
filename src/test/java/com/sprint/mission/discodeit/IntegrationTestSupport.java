@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 @SpringBootTest
-public abstract class IntegrationTestSupport {
+@ActiveProfiles("test")
+public abstract class IntegrationTestSupport extends TestContainerSupport {
 }

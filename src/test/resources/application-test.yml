@@ -1,3 +1,21 @@
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        use_sql_comments: true
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    generate-ddl: false
+  sql:
+    init:
+      mode: never
+
 discodeit:
   storage:
     type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
@@ -9,23 +27,6 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
-
-spring:
-  config:
-    import: optional:file:.env.dev[.properties]
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        use_sql_comments: true
-        dialect: org.hibernate.dialect.H2Dialect
-    open-in-view: false
 
 logging:
   level:
