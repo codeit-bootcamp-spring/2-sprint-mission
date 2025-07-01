@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
+  @PreAuthorize("principal.userDto.id == #createReadStatusCommand.userId()")
   public CreateReadStatusResult create(CreateReadStatusCommand createReadStatusCommand) {
     User user = checkUserExists(createReadStatusCommand);
     Channel channel = checkChannelExists(createReadStatusCommand);
@@ -86,6 +88,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
+  @PreAuthorize("principal.userDto.id == #updateReadStatusCommand.userId()")
   public UpdateReadStatusResult update(UUID id, UpdateReadStatusCommand updateReadStatusCommand) {
     ReadStatus readStatus = findReadStatusById(id, "update");
     readStatus.updateReadStatus(updateReadStatusCommand.newLastReadAt());

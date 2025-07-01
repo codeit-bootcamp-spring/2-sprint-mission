@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,6 +112,7 @@ public class BasicUserService implements UserService {
   @Transactional
   @CachePut(value = "user", key = "#p0")
   @CacheEvict(value = "allUsers", allEntries = true)
+  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   public UpdateUserResult update(UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
     User findUser = findUserById(userId, "update");
@@ -150,6 +152,7 @@ public class BasicUserService implements UserService {
       @CacheEvict(value = "user", key = "#p0"),
       @CacheEvict(value = "allUsers", allEntries = true)
   })
+  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   public void delete(UUID userId) {
     User user = findUserById(userId, "delete");
     userRepository.deleteById(userId);
