@@ -54,4 +54,18 @@ public class BasicAuthService implements AuthService {
 
     return userMapper.toDto(user);
   }
+
+  @Override
+  public void logout(HttpServletRequest request) {
+    log.info("로그아웃 처리 시작");
+
+    HttpSession session = request.getSession(false);
+    if (session != null) {
+      session.invalidate();
+    }
+
+    SecurityContextHolder.clearContext();
+
+    log.info("로그아웃 완료");
+  }
 }
