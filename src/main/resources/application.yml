@@ -1,7 +1,7 @@
 spring:
   flyway:
     enabled: true
-    baseline-on-migrate: false
+    baseline-on-migrate: true
   config:
     import: optional:file:.env[.properties]
   profiles:
@@ -40,3 +40,10 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
