@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.exception.auth.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -36,7 +40,8 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper objectMapper,
       SessionRegistry sessionRegistry,
-      CustomAccessDeniedHandler accessDeniedHandler)
+      CustomAccessDeniedHandler accessDeniedHandler,
+      PersistentTokenBasedRememberMeServices rememberMeServices)
       throws Exception {
 
     // 프론트에서 X-CSRF-TOKEN 헤더로 토큰을 보내주지만, CookieCsrfTokenRepository에선 X-XSRF-TOKEN을 기대함 -> 헤더명 명시적 지정
@@ -56,7 +61,8 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.PATCH, "/api/channels/**")
             .hasRole(Role.CHANNEL_MANAGER.name())
             .requestMatchers(HttpMethod.PATCH, "/api/auth/role").hasRole(Role.ADMIN.name())
-            .anyRequest().hasRole(Role.USER.name())
+            .requestMatchers("/api/**").hasRole(Role.USER.name())
+            .anyRequest().permitAll()
         )
         .exceptionHandling(exception -> exception
             .accessDeniedHandler(accessDeniedHandler)
@@ -72,6 +78,7 @@ public class SecurityConfig {
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
             .addLogoutHandler(new SecurityContextLogoutHandler())
             .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+            .addLogoutHandler(rememberMeServices)
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             Customizer.withDefaults())
@@ -82,7 +89,8 @@ public class SecurityConfig {
                 .maxSessionsPreventsLogin(false)
                 .sessionRegistry(sessionRegistry)
                 .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
-        );
+        )
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
     return http.build();
   }
 
@@ -118,5 +126,22 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      UserDetailsService userDetailsService,
+      DataSource dataSource
+  ) {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+
+    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+        key, userDetailsService, tokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+    return rememberMeServices;
   }
 }

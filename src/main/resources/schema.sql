@@ -33,6 +33,15 @@ CREATE TABLE spring_session_attributes
     PRIMARY KEY (session_primary_id, attribute_name)
 );
 
+-- remember-me
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
+);
+
 -- BinaryContent
 CREATE TABLE binary_contents
 (
