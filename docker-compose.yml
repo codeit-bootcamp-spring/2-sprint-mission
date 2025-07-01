@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:15
+    container_name: discodeit-db-dev
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    ports:
+      - "${DB_PORT}:5432" # HOST_PORT : CONTAINER_PORT
+    volumes:
+      - db_data:/var/lib/postgresql/data # postgres 컨테이너가 실제로 데이터베이스 파일을 저장하는 내부 경로
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql # 서비스 실행 후 schema.sql이 자동으로 실행 되도록 구성
+    networks:
+      - discodeit-network
+
+  # 애플리케이션 서비스
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit-app-dev
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      STORAGE_TYPE: ${STORAGE_TYPE}
+    ports:
+      - "${APP_PORT}:${APP_PORT}" # 호스트와 컨테이너 포트 매핑 (예: 8080:8080)
+    volumes:
+      - type: bind
+        source: ${APP_STORAGE_PATH} # 호스트 pc의 경로
+        target: /app/storage # 컨테이너 내부 경로
+    depends_on:
+      - db
+    networks:
+      - discodeit-network
+
+# 이름 있는 볼륨 . docker 가 직접 지정한 위치에 저장함  (/var/lib/docker/volumes/)
+volumes:
+  db_data:
+
+# 네트워크 정의 (서비스들이 동일 네트워크 상에서 통신하도록)
+networks:
+  discodeit-network:
+    driver: bridge

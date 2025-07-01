@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.login.LoginForm;
-import com.sprint.mission.discodeit.dto.user.UserDto;
-import org.springframework.stereotype.Service;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 
-@Service
 public interface AuthService {
 
-    UserDto login(LoginForm form);
+  UserDto login(LoginRequest loginRequest);
 }

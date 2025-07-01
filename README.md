@@ -1,2 +1,3 @@
-# 2-sprint-mission
-2기 스프린트 미션 제출 리포지토리입니다.
+# 2-spring-mission
+
+[![codecov](https://codecov.io/gh/kimtaewoo9/2-sprint-mission/graph/badge.svg?token=UGDJV0QJ54)](https://codecov.io/gh/kimtaewoo9/2-sprint-mission)

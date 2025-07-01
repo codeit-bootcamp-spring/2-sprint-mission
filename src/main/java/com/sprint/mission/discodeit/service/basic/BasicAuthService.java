@@ -1,40 +1,42 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.login.LoginForm;
-import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
+  private final UserMapper userMapper;
 
-    private final UserMapper userMapper;
+  @Transactional(readOnly = true)
+  @Override
+  public UserDto login(LoginRequest loginRequest) {
+    log.debug("로그인 시도: username={}", loginRequest.username());
+    
+    String username = loginRequest.username();
+    String password = loginRequest.password();
 
-    @Override
-    @Transactional
-    public UserDto login(LoginForm form) {
+    User user = userRepository.findByUsername(username)
+        .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
-        String username = form.username();
-        String password = form.password();
-
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new NoSuchElementException("[ERROR] user not found");
-        }
-        boolean result = user.getPassword().equals(password);
-        if (!result) {
-            throw new IllegalArgumentException("[ERROR] try again");
-        }
-
-        return userMapper.toDto(user);
+    if (!user.getPassword().equals(password)) {
+      throw InvalidCredentialsException.wrongPassword();
     }
+
+    log.info("로그인 성공: userId={}, username={}", user.getId(), username);
+    return userMapper.toDto(user);
+  }
 }

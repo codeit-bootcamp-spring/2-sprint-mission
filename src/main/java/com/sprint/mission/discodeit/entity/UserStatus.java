@@ -1,65 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.common.BaseUpdatableEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.domain.Persistable;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user_statuses")
 @Getter
-@Setter
-public class UserStatus extends BaseUpdatableEntity implements Persistable<UUID> {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    public static final long ONLINE_TIMEOUT_MINUTES = 5;
+  @JsonBackReference
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastActiveAt;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+  public UserStatus(User user, Instant lastActiveAt) {
+    setUser(user);
+    this.lastActiveAt = lastActiveAt;
+  }
 
-    private Instant lastActiveAt;
-
-    @Transient
-    private boolean isNew = true;
-
-    protected UserStatus() {
+  public void update(Instant lastActiveAt) {
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
     }
+  }
 
-    public static UserStatus createUserStatus(User user, Instant lastActiveAt) {
-        UserStatus userStatus = new UserStatus();
-        userStatus.user = user;
-        userStatus.lastActiveAt = lastActiveAt;
-        user.setStatus(userStatus);
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 
-        return userStatus;
-    }
-
-    public boolean isOnline() {
-        return Duration.between(lastActiveAt, Instant.now()).toMinutes() < ONLINE_TIMEOUT_MINUTES;
-    }
-
-    public void updateLastActiveAt(Instant newLastActiveAt) {
-        this.lastActiveAt = newLastActiveAt;
-    }
-
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
-
-    @PostLoad
-    @PrePersist
-    public void martNotNew() {
-        this.isNew = false;
-    }
+  protected void setUser(User user) {
+    this.user = user;
+    user.setStatus(this);
+  }
 }

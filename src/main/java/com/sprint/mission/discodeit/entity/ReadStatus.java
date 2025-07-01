@@ -1,63 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.common.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Persistable;
 
 @Entity
-@Table(name = "read_statuses")
+@Table(
+    name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
+)
 @Getter
-@NoArgsConstructor
-public class ReadStatus extends BaseUpdatableEntity implements Persistable<UUID> {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", columnDefinition = "uuid")
+  private User user;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
+  private Channel channel;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant lastReadAt;
 
-    @ManyToOne
-    @JoinColumn(name = "channel_id")
-    private Channel channel;
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadAt = lastReadAt;
+  }
 
-    private Instant lastReadAt;
-
-    @Transient
-    private boolean isNew = true;
-
-    protected ReadStatus(User user, Channel channel, Instant lastReadAt) {
-        this.user = user;
-        this.channel = channel;
-        this.lastReadAt = lastReadAt;
+  public void update(Instant newLastReadAt) {
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
     }
-
-    public static ReadStatus createReadStatus(User user, Channel channel, Instant lastReadAt) {
-        return new ReadStatus(user, channel, lastReadAt);
-    }
-
-    public void updateLastReadAt(Instant newLastReadAt) {
-        if (newLastReadAt != null && this.lastReadAt.isAfter(newLastReadAt)) {
-            this.lastReadAt = newLastReadAt;
-        }
-    }
-
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
-
-    @PostLoad
-    @PrePersist
-    void markNotNew() {
-        this.isNew = false;
-    }
+  }
 }

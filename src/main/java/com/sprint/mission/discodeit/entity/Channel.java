@@ -1,71 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.common.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.domain.Persistable;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "channels")
 @Getter
-@Setter
-public class Channel extends BaseUpdatableEntity implements Persistable<UUID> {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseUpdatableEntity {
 
-    @Enumerated(EnumType.STRING)
-    private ChannelType channelType;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  @Column(length = 100)
+  private String name;
+  @Column(length = 500)
+  private String description;
 
-    private String name;
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    private String description;
-
-    @Transient
-    private boolean isNew = true;
-
-    protected Channel() {
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public static Channel createPublicChannel(String name, String description) {
-        Channel channel = new Channel();
-        channel.setName(name);
-        channel.setDescription(description);
-        channel.setChannelType(ChannelType.PUBLIC);
-
-        return channel;
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
-
-    public static Channel createPrivateChannel() {
-        Channel channel = new Channel();
-        channel.setChannelType(ChannelType.PRIVATE);
-
-        return channel;
-    }
-
-    public void update(String newName, String newDescription) {
-        if (newName != null && !newName.equals(this.name)) {
-            this.name = newName;
-        }
-
-        if (newDescription != null && newDescription.equals((this.description))) {
-            this.description = newDescription;
-        }
-    }
-
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
-
-    @PostLoad
-    @PrePersist
-    public void markNotNew() {
-        this.isNew = false;
-    }
+  }
 }
