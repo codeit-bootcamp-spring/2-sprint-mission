@@ -26,6 +26,10 @@ discodeit:
         password: ${ADMIN_PASSWORD:admin123@}
         email: ${ADMIN_EMAIL:admin@discodeit.com}
 
+    rememberme:
+        key: discodeitRememberKey
+        token-validity-day: 30
+
 management:
     endpoints:
         web:

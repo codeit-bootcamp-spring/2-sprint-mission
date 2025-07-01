@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +35,17 @@ public class DiscodeitUserDetails implements UserDetails {
 
     public UUID getUserId() {
         return userDto.id();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DiscodeitUserDetails that)) return false;
+        return userDto.id().equals(that.userDto.id());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userDto.id());
     }
 }
