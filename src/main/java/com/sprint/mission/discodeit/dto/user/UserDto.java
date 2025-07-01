@@ -13,4 +13,7 @@ public record UserDto(
         Role role,
         Boolean online
 ) {
+    public UserDto withOnline(Boolean isOnline) {
+        return new UserDto(id, username, email, profile, role, isOnline);
+    }
 }

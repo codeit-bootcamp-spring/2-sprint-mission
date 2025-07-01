@@ -7,13 +7,11 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,8 +31,6 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
 
     private final UserMapper userMapper;
@@ -44,6 +39,8 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final SessionManager sessionManager;
+
+    private final UserOnlineSessionService userOnlineSessionService;
 
     @Transactional
     @Override
@@ -80,26 +77,25 @@ public class BasicUserService implements UserService {
         String password = passwordEncoder.encode(userCreateRequest.password());
 
         User user = new User(username, email, password, profile);
-
-        UserStatus userStatus = new UserStatus(user, Instant.now());
         userRepository.save(user);
 
         log.info("User created successfully: username = {}", username);
 
-        return userMapper.toDto(user);
+        return userMapper.toDto(user).withOnline(userOnlineSessionService.isOnline(user.getId()));
     }
 
     @Override
     public UserDto searchUser(UUID userId) {
         User user = getUser(userId);
-        return userMapper.toDto(user);
+        return userMapper.toDto(user).withOnline(userOnlineSessionService.isOnline(user.getId()));
     }
 
     @Override
     public List<UserDto> findAll() {
         return userRepository.findAll()
             .stream()
-            .map(userMapper::toDto)
+            .map(user -> userMapper.toDto(user)
+                .withOnline(userOnlineSessionService.isOnline(user.getId())))
             .toList();
     }
 
@@ -146,7 +142,7 @@ public class BasicUserService implements UserService {
 
         log.info("User updated successfully: username = {}", newUsername);
 
-        return userMapper.toDto(user);
+        return userMapper.toDto(user).withOnline(userOnlineSessionService.isOnline(user.getId()));
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -156,7 +152,7 @@ public class BasicUserService implements UserService {
         User user = getUser(request.userId());
         user.updateRole(request.newRole());
         sessionManager.invalidateSession(user.getId());
-        return userMapper.toDto(user);
+        return userMapper.toDto(user).withOnline(userOnlineSessionService.isOnline(user.getId()));
     }
 
     @Transactional
