@@ -33,3 +33,8 @@ admin:
   email: admin@email.com
   username: admin
   password: admin1234
+
+security:
+  remember-me:
+    key: RememberMeKey
+    token-validity-seconds: 1814400 # 3주

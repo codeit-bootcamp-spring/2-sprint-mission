@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.user.LoginRequest;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -40,5 +42,17 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         } catch (IOException e) {
             throw new AuthenticationServiceException("로그인 요청 파싱 실패", e);
         }
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request,
+        HttpServletResponse response, FilterChain chain, Authentication authResult)
+        throws IOException, ServletException {
+
+        if (getRememberMeServices() != null) {
+            getRememberMeServices().loginSuccess(request, response, authResult);
+        }
+
+        getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
     }
 }

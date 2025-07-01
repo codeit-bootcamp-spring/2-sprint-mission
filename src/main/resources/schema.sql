@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS user_statuses CASCADE;
 DROP TABLE IF EXISTS read_statuses CASCADE;
 DROP TABLE IF EXISTS message_attachments CASCADE;
 DROP TABLE IF EXISTS binary_contents CASCADE;
+DROP TABLE IF EXISTS persistent_logins CASCADE;
 
 CREATE TABLE binary_contents
 (
@@ -86,4 +87,13 @@ CREATE TABLE message_attachments
     PRIMARY KEY (message_id, attachment_id),
     CONSTRAINT fk_attach_message FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
     CONSTRAINT fk_attach_file FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+);
+
+-- Remember Me 관련 테이블
+CREATE TABLE persistent_logins
+(
+    username  varchar(64) NOT NULL,
+    series    varchar(64) PRIMARY KEY,
+    token     varchar(64) NOT NULL,
+    last_used timestamp   NOT NULL
 );

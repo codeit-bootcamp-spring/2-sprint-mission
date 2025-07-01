@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.CustomLogoutFilter;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -14,12 +16,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
@@ -29,7 +35,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         JsonUsernamePasswordAuthenticationFilter jsonLoginFilter,
-        CustomLogoutFilter customLogoutFilter
+        CustomLogoutFilter customLogoutFilter,
+        RememberMeServices rememberMeServices
     ) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
@@ -55,6 +62,10 @@ public class SecurityConfig {
                     "/api/auth/logout",
                     "/api/auth/role"
                 ) // CSRF 무시
+            )
+            .rememberMe(rememberMe -> rememberMe
+                .rememberMeServices(rememberMeServices)
+                .alwaysRemember(true)
             )
             .addFilterBefore(customLogoutFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonLoginFilter, UsernamePasswordAuthenticationFilter.class)
@@ -95,12 +106,14 @@ public class SecurityConfig {
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
         AuthenticationManager authenticationManager,
         ObjectMapper objectMapper,
-        UserMapper userMapper
+        UserMapper userMapper,
+        RememberMeServices rememberMeServices
     ) {
         JsonUsernamePasswordAuthenticationFilter filter =
             new JsonUsernamePasswordAuthenticationFilter(objectMapper);
 
         filter.setAuthenticationManager(authenticationManager);
+        filter.setRememberMeServices(rememberMeServices);
         filter.setFilterProcessesUrl("/api/auth/login");
         filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
@@ -112,11 +125,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomLogoutFilter customLogoutFilter() {
-        return new CustomLogoutFilter();
-    }
-
-    @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
         hierarchy.setHierarchy("""
@@ -124,5 +132,33 @@ public class SecurityConfig {
                 ROLE_CHANNEL_MANAGER > ROLE_USER
             """);
         return hierarchy;
+    }
+
+    @Bean
+    public CustomLogoutFilter customLogoutFilter(PersistentTokenRepository tokenRepository) {
+        return new CustomLogoutFilter(tokenRepository);
+    }
+
+    // Remember-Me 토큰 저장소
+    @Bean
+    public PersistentTokenRepository tokenRepository(DataSource dataSource) {
+        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
+        repo.setDataSource(dataSource);
+        return repo;
+    }
+
+    // // Remember-Me 쿠키 발급
+    @Bean
+    public PersistentTokenBasedRememberMeServices rememberMeServices(
+        @Value("${security.remember-me.key}") String key,
+        @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+        UserDetailsService userDetailsService,
+        PersistentTokenRepository tokenRepository
+    ) {
+        PersistentTokenBasedRememberMeServices services =
+            new PersistentTokenBasedRememberMeServices(key, userDetailsService, tokenRepository);
+        services.setTokenValiditySeconds(tokenValiditySeconds);
+        services.setAlwaysRemember(true);
+        return services;
     }
 }
