@@ -36,16 +36,6 @@ CREATE TABLE IF NOT EXISTS users
     constraint fk_users_binary_contents FOREIGN KEY (profile_id) REFERENCES binary_contents (id)
 );
 
-CREATE TABLE IF NOT EXISTS user_statuses
-(
-    id             UUID PRIMARY KEY,
-    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at     TIMESTAMP WITH TIME ZONE,
-    user_id        UUID UNIQUE,
-    last_active_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    constraint fk_user_status_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS channels
 (
     id          UUID PRIMARY KEY,

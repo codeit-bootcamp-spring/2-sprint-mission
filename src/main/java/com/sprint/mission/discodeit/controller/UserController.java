@@ -3,11 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,7 +28,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     @PostMapping(
         path = "",
@@ -170,50 +164,5 @@ public class UserController {
     public ResponseEntity<List<UserDto>> findAll() {
         List<UserDto> userDtoList = userService.findAllUser();
         return ResponseEntity.status(HttpStatus.OK).body(userDtoList);
-    }
-
-    @PatchMapping("/{userId}/userStatus")
-    @Operation(summary = "User 온라인 상태 업데이트", operationId = "updateUserStatusByUserId")
-    @Parameters(
-        @Parameter(
-            name = "userId",
-            in = ParameterIn.PATH,
-            description = "상태를 변경할 User ID",
-            required = true,
-            schema = @Schema(type = "String", format = "uuid")
-        )
-    )
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-        content = @Content(
-            schema = @Schema(implementation = UserStatusUpdateRequest.class)
-        )
-    )
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "User 온라인 상태가 성공적으로 업데이트됨",
-            content = @Content(
-                mediaType = "*/*",
-                schema = @Schema(implementation = UserStatusDto.class)
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "해당 User의 UserStatus를 찾을 수 없음",
-            content = @Content(
-                mediaType = "*/*",
-                examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
-            )
-        )
-    })
-    public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
-        @PathVariable("userId") UUID userId,
-        @Valid @RequestBody UserStatusUpdateRequest dto
-    ) {
-        System.out.println(dto.newLastActiveAt());
-        UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
-            dto);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userStatusDto);
     }
 }

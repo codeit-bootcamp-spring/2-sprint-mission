@@ -40,10 +40,6 @@ public class User extends BaseUpdatableEntity {
   @Enumerated(EnumType.STRING)
   private Role role = Role.USER;
 
-  @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST,
-      CascadeType.REMOVE}, orphanRemoval = true, optional = false)
-  private UserStatus status;
-
   public void updateUsername(String username) {
     this.username = username;
   }
@@ -69,7 +65,6 @@ public class User extends BaseUpdatableEntity {
     this.password = password;
     this.email = email;
     this.profile = profile;
-    this.status = new UserStatus(this);
   }
 
   public static User adminUser(String username, String encodedPassword, String email) {
@@ -78,7 +73,6 @@ public class User extends BaseUpdatableEntity {
     user.password = encodedPassword;
     user.email = email;
     user.role = Role.ADMIN;
-    user.status = new UserStatus(user);
     return user;
   }
 }

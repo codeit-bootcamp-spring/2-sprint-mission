@@ -14,6 +14,10 @@ public class UserMapper {
   private final BinaryContentStorage binaryContentStorage;
 
   public UserDto toDto(User user) {
+    return toDto(user, null);
+  }
+
+  public UserDto toDto(User user, Boolean online) {
     return new UserDto(
         user.getId(),
         user.getUsername(),
@@ -21,7 +25,8 @@ public class UserMapper {
         user.getRole(),
         user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile(),
             binaryContentStorage.get(user.getProfile().getId())) : null,
-        user.getStatus().isLastStatus()
+        online
     );
   }
+
 }

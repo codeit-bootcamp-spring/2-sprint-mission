@@ -20,12 +20,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,8 +96,15 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAllUser() {
-        return userRepository.findAllWithProfileAndStatus().stream()
-            .map(userMapper::toDto)
+        Set<UUID> onlineIds = sessionRegistry.getAllPrincipals().stream()
+            .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
+            .filter(principal -> principal instanceof DiscodeitUserDetails)
+            .map(principal -> ((DiscodeitUserDetails) principal).getUserDto().id())
+            .collect(Collectors.toSet());
+
+        return userRepository.findAllWithProfile()
+            .stream()
+            .map(user -> userMapper.toDto(user, onlineIds.contains(user.getId())))
             .toList();
     }
 

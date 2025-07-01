@@ -90,6 +90,7 @@ public class SecurityConfig {
                 .anyRequest().permitAll()
             )
             .sessionManagement(session -> session
+                .sessionFixation().migrateSession()
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
                 .sessionRegistry(sessionRegistry)
