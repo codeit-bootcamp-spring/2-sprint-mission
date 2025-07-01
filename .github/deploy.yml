@@ -3,7 +3,7 @@ name: AWS Deploy Pipeline
 on:
   push:
     branches:
-      - main
+      - part3-황지환-sprint7
 
 env:
   ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
