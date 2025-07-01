@@ -40,10 +40,17 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
                 SecurityMatchers.NON_API,
+                SecurityMatchers.LOGIN,
                 SecurityMatchers.GET_CSRF_TOKEN,
                 SecurityMatchers.SIGN_UP
             ).permitAll()
-            .anyRequest().authenticated())
+            .requestMatchers(
+                SecurityMatchers.CREATE_CHANNEL,
+                SecurityMatchers.UPDATE_CHANNEL,
+                SecurityMatchers.DELETE_CHANNEL
+            ).hasRole("CHANNEL_MANAGER")
+            .requestMatchers(SecurityMatchers.UPDATE_ROLE).hasRole("ADMIN")
+            .anyRequest().hasRole("USER"))
         .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
         .logout(logout -> logout
             .logoutRequestMatcher(SecurityMatchers.LOGOUT)
