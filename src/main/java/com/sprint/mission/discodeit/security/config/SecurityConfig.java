@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.user.entity.Role;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
+import com.sprint.mission.discodeit.security.handler.SessionRegistryLogoutHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -14,13 +16,13 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -43,7 +45,13 @@ public class SecurityConfig {
             ).permitAll()
             .anyRequest().authenticated())
         .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
-        .logout(AbstractHttpConfigurer::disable)
+        .logout(logout -> logout
+            .logoutRequestMatcher(SecurityMatchers.LOGOUT)
+            .invalidateHttpSession(true)
+            .deleteCookies("JSESSIONID")
+            .logoutSuccessHandler((request, response, authentication) -> response.setStatus(
+                HttpServletResponse.SC_OK)
+            ))
         .with(new Configurer(objectMapper),
             Customizer.withDefaults())
         .sessionManagement(session -> session
@@ -79,9 +87,7 @@ public class SecurityConfig {
 
   @Bean
   public RoleHierarchy roleHierarchy() {
-    return RoleHierarchyImpl.withDefaultRolePrefix()
-        .role(Role.ADMIN.name())
-        .implies(Role.USER.name())
-        .build();
+    String hierarchy = "ROLE_ADMIN > ROLE_CHANNEL_MANAGE\n" + "ROLE_CHANNEL_MANAGE > ROLE_USER";
+    return RoleHierarchyImpl.fromHierarchy(hierarchy);
   }
 }

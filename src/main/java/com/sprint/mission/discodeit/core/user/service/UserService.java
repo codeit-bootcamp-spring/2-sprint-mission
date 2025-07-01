@@ -20,7 +20,7 @@ public interface UserService {
   UserStatusDto online(UUID userId, UserStatusRequest request);
 
   UserDto update(UUID id, UserUpdateRequest request,
-      Optional<BinaryContentCreateRequest> binaryContentDTO);
+      Optional<BinaryContentCreateRequest> binaryContentCreateRequest);
 
   void delete(UUID id);
 }
