@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.user.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.BDDAssertions.within;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -90,7 +91,7 @@ public class UserServiceUnitTest {
     assertThat(userDto.username()).isEqualTo("test");
     assertThat(userDto.email()).isEqualTo("test@test.com");
     assertNotNull(userDto.profile());
-    assertTrue(userDto.online());
+    assertFalse(userDto.online());
   }
 
   @Test

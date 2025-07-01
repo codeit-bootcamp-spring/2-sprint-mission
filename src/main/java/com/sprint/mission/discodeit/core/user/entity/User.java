@@ -93,5 +93,4 @@ public class User extends BaseUpdatableEntity {
     this.role = updateFiled(this.role, newRole);
   }
 
-
 }

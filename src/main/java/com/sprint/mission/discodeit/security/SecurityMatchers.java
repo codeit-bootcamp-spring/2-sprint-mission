@@ -28,21 +28,5 @@ public final class SecurityMatchers {
       "/api/auth/logout", HttpMethod.POST.name()
   );
 
-  public static final RequestMatcher CREATE_CHANNEL = new AntPathRequestMatcher(
-      "/api/channels/public", HttpMethod.POST.name()
-  );
-
-  public static final RequestMatcher UPDATE_CHANNEL = new AntPathRequestMatcher(
-      "/api/channels/{channelId}", HttpMethod.PATCH.name()
-  );
-
-  public static final RequestMatcher DELETE_CHANNEL = new AntPathRequestMatcher(
-      "/api/channels/{channelId}", HttpMethod.DELETE.name()
-  );
-
-  public static final RequestMatcher UPDATE_ROLE = new AntPathRequestMatcher(
-      "/api/auth/role", HttpMethod.PUT.name()
-  );
-
   public static final String LOGIN_URL = "/api/auth/login";
 }

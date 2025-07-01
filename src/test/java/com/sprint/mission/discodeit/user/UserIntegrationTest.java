@@ -42,7 +42,6 @@ public class UserIntegrationTest {
 
   @BeforeEach
   void setUp() {
-    Instant now = Instant.now();
     BinaryContent binaryContent = BinaryContent.create(
         "test.png", 1L, "image/png");
     User beforeUser1 = User.create("a", "a@a.com", "a", null);
@@ -145,8 +144,8 @@ public class UserIntegrationTest {
     for (UserDto userDto : userDtoList) {
       assertNotNull(userDto.id());
     }
-    assertNotNull(userDtoList.get(1).profile());
-    assertEquals("a", userDtoList.get(0).username());
-    assertEquals("b", userDtoList.get(1).username());
+
+    assertEquals("admin", userDtoList.get(0).username());
+    assertEquals("manager", userDtoList.get(1).username());
   }
 }

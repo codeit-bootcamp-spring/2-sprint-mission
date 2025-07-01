@@ -41,10 +41,8 @@ public class ChannelRepositoryTest {
   void findAllByIdInSuccess() {
     // given
     User user1 = User.create("a", "a", "test", null);
-    user1.setUserStatus(UserStatus.create(user1, Instant.now()));
 
     User user2 = User.create("b", "b", "test", null);
-    user2.setUserStatus(UserStatus.create(user2, Instant.now()));
 
     Channel publicChannel = Channel.create("public", "public", ChannelType.PUBLIC);
     Channel privateChannel = Channel.create("private", "private", ChannelType.PRIVATE);
@@ -74,10 +72,8 @@ public class ChannelRepositoryTest {
   void findAllByTypeSuccess() {
     // given
     User user1 = User.create("a", "a", "test", null);
-    user1.setUserStatus(UserStatus.create(user1, Instant.now()));
 
     User user2 = User.create("b", "b", "test", null);
-    user2.setUserStatus(UserStatus.create(user2, Instant.now()));
 
     Channel publicChannel = Channel.create("public", "public", ChannelType.PUBLIC);
     Channel privateChannel = Channel.create("private", "private", ChannelType.PRIVATE);
@@ -107,10 +103,8 @@ public class ChannelRepositoryTest {
   void findAllByTypeOrIdInSuccess() {
     // given
     User user1 = User.create("a", "a", "test", null);
-    user1.setUserStatus(UserStatus.create(user1, Instant.now()));
 
     User user2 = User.create("b", "b", "test", null);
-    user2.setUserStatus(UserStatus.create(user2, Instant.now()));
 
     Channel publicChannel = Channel.create("public", "public", ChannelType.PUBLIC);
     Channel privateChannel = Channel.create("private", "private", ChannelType.PRIVATE);

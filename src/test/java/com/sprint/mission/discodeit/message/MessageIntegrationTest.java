@@ -65,7 +65,6 @@ public class MessageIntegrationTest {
   @BeforeEach
   void setUp() {
     User user = User.create("user", "user@user.com", "user123", null);
-    user.setUserStatus(UserStatus.create(user, Instant.now()));
     userId = userRepository.save(user).getId();
     Channel channel = Channel.create("channel", "channel123", ChannelType.PUBLIC);
     channelId = channelRepository.save(channel).getId();

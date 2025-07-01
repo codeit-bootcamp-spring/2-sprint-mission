@@ -54,7 +54,6 @@ public class MessageRepositoryTest {
   @BeforeEach
   void setUp() {
     user = User.create("a", "a", "test", null);
-    user.setUserStatus(UserStatus.create(user, Instant.now()));
 
     channel = Channel.create("public", "public", ChannelType.PUBLIC);
 

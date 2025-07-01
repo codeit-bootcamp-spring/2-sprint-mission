@@ -24,7 +24,6 @@ import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -70,7 +69,6 @@ public class ChannelServiceUnitTest {
     UUID userId = UUID.randomUUID();
     BinaryContent oldProfile = BinaryContent.create("old.png", 0L, "image/png");
     User user = User.create("a", "a@email.com", "a", oldProfile);
-    user.setUserStatus(UserStatus.create(user, Instant.now()));
 
     PrivateChannelCreateRequest request = new PrivateChannelCreateRequest(
         List.of(userId));

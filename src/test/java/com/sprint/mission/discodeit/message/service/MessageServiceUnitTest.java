@@ -57,7 +57,6 @@ public class MessageServiceUnitTest {
   void setUp() {
     user = spy(User.class);
     channel = spy(Channel.class);
-    user.setUserStatus(mock(UserStatus.class));
   }
 
   @Test
@@ -171,7 +170,6 @@ public class MessageServiceUnitTest {
   void MessageFindByChannelIdSuccess() {
     // given
     UUID channelId = UUID.randomUUID();
-    when(user.getUserStatus()).thenReturn(mock(UserStatus.class));
 
     Message message1 = Message.create(user, channel, "hello", List.of());
     Message message2 = Message.create(user, channel, "world", List.of());
