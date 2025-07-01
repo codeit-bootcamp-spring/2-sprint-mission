@@ -24,7 +24,7 @@ WORKDIR /app
 
 # 프로젝트 정보를 ENV로 설정 # 해당 레이어에 저장
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=1.2-M8  \
+    PROJECT_VERSION=2.0-M9  \
     JVM_OPTS=""
 
 ## jar파일만 가져오기
