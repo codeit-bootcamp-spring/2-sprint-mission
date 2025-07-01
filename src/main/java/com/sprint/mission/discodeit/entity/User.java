@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -40,6 +42,10 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
   @Column(length = 60, nullable = false)
   private String password;
 
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Role role;
+
 
   // 클래스가 아니라 생성자에 붙여야 해당 값들에 대해 build가 가능
   // 클래스에 붙이면 모든 필드에 대해 build를 해줘야함 (안하면 null)
@@ -49,7 +55,12 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
     this.profile = profile;
     this.username = username;
     this.email = email;
+    this.role = Role.USER;
     this.password = password;
+  }
+
+  public void updateRole(Role role) {
+    this.role = role;
   }
 
 

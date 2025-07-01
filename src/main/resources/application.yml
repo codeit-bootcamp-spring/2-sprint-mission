@@ -51,6 +51,12 @@ spring:
       org.hibernate.SQL: INFO
       com.sprint.mission.discodeit: INFO
 
+sprint:
+  admin:
+    username: ${SPRINT_ADMIN_USERNAME}
+    email: ${SPRINT_ADMIN_EMAIL}
+    password: ${SPRINT_ADMIN_PASSWORD}
+
 info:
   app:
     name: Discodeit

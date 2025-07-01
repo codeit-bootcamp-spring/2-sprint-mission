@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.exception.auth.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
@@ -34,7 +35,8 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper objectMapper,
-      SessionRegistry sessionRegistry)
+      SessionRegistry sessionRegistry,
+      CustomAccessDeniedHandler accessDeniedHandler)
       throws Exception {
 
     // 프론트에서 X-CSRF-TOKEN 헤더로 토큰을 보내주지만, CookieCsrfTokenRepository에선 X-XSRF-TOKEN을 기대함 -> 헤더명 명시적 지정
@@ -47,8 +49,17 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/csrf-token").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-            .requestMatchers("/api/**").authenticated()
-            .anyRequest().permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/channels/public")
+            .hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/**")
+            .hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.PATCH, "/api/channels/**")
+            .hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.PATCH, "/api/auth/role").hasRole(Role.ADMIN.name())
+            .anyRequest().hasRole(Role.USER.name())
+        )
+        .exceptionHandling(exception -> exception
+            .accessDeniedHandler(accessDeniedHandler)
         )
         // 명시적으로 설정 안해줘도 자동으로 사용됨 (HttpSession을 통해 SecurityContext를 저장하고 복원)
         .securityContext(context ->
@@ -98,6 +109,8 @@ public class SecurityConfig {
   public RoleHierarchy roleHierarchy() {
     return RoleHierarchyImpl.withDefaultRolePrefix()
         .role(Role.ADMIN.name())
+        .implies(Role.CHANNEL_MANAGER.name())
+        .role(Role.CHANNEL_MANAGER.name())
         .implies(Role.USER.name())
         .build();
   }
