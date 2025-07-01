@@ -77,8 +77,8 @@ public class BasicUserService implements UserService {
     }
     CreateUserCommand encodedUserCommand = new CreateUserCommand(
         createUserCommand.username(),
-        passwordEncoder.encode(createUserCommand.password()),
-        createUserCommand.email());
+        createUserCommand.email(),
+        passwordEncoder.encode(createUserCommand.password()));
 
     User user = createUserEntity(encodedUserCommand, binaryContent);
     userRepository.save(user);
@@ -185,7 +185,7 @@ public class BasicUserService implements UserService {
     return User.builder()
         .email(createUserCommand.email())
         .profile(binaryContent)
-        .password(BCrypt.hashpw(createUserCommand.password(), BCrypt.gensalt()))
+        .password(createUserCommand.password())
         .username(createUserCommand.username())
         .build();
   }

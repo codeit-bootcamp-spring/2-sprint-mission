@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.aop;
 
-import com.sprint.mission.discodeit.dto.controller.auth.LoginRequestDTO;
+import com.sprint.mission.discodeit.dto.controller.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.controller.user.CreateUserRequestDTO;
 import com.sprint.mission.discodeit.util.MaskingUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class LoggingAspect {
     Object[] args = joinPoint.getArgs();
 
     for (Object arg : args) {
-      if (arg instanceof LoginRequestDTO dto) {
+      if (arg instanceof LoginRequest dto) {
         String maskedUsername = MaskingUtil.maskUsername(dto.username());
         log.info("Login request (username = {})", maskedUsername);
       } else if (arg instanceof CreateUserRequestDTO dto) {

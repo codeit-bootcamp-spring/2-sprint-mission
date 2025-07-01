@@ -1,14 +1,27 @@
 package com.sprint.mission.discodeit.config;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
@@ -16,18 +29,68 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfig {
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper objectMapper,
+      SessionRegistry sessionRegistry)
+      throws Exception {
+
+    // 프론트에서 X-CSRF-TOKEN 헤더로 토큰을 보내주지만, CookieCsrfTokenRepository에선 X-XSRF-TOKEN을 기대함 -> 헤더명 명시적 지정
+    CookieCsrfTokenRepository repository =
+        CookieCsrfTokenRepository.withHttpOnlyFalse();
+    repository.setHeaderName("X-CSRF-TOKEN");
+
     http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/csrf-token").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll()
         )
+        // 명시적으로 설정 안해줘도 자동으로 사용됨 (HttpSession을 통해 SecurityContext를 저장하고 복원)
+        .securityContext(context ->
+            context.securityContextRepository(new HttpSessionSecurityContextRepository()))
         .csrf(csrf -> csrf
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-        .logout(logout -> logout.disable());
+            .csrfTokenRepository(repository))
+        //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        .logout(logout -> logout.disable())
+        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+            Customizer.withDefaults())
+        .sessionManagement(session ->
+            session
+                .sessionFixation().migrateSession()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+                .sessionRegistry(sessionRegistry)
+                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+        );
     return http.build();
+  }
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+  }
+
+
+  @Bean
+  public DaoAuthenticationProvider daoAuthenticationProvider(
+      UserDetailsService userDetailsService,
+      PasswordEncoder passwordEncoder,
+      RoleHierarchy roleHierarchy) {
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+    provider.setUserDetailsService(userDetailsService);
+    provider.setPasswordEncoder(passwordEncoder);
+    provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
+
+    return provider;
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    return RoleHierarchyImpl.withDefaultRolePrefix()
+        .role(Role.ADMIN.name())
+        .implies(Role.USER.name())
+        .build();
   }
 
   @Bean

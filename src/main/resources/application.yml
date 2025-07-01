@@ -25,6 +25,8 @@ spring:
         url: http://localhost:9090
   cache:
     type: simple
+  session:
+    store-type: jdbc
 
   jpa:
     hibernate:
