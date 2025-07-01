@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 public enum UserRole {
   USER("ROLE_USER"),
+  CHANNEL_MANAGER("ROLE_CHANNEL_MANAGER"),
   ADMIN("ROLE_ADMIN");
 
   private final String authority;

@@ -1,14 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.entity.UserRole;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -20,23 +27,52 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
-  @Transactional(readOnly = true)
+  @Value("${discodeit.admin.username}")
+  private String adminUsername;
+  @Value("${discodeit.admin.password}")
+  private String adminPassword;
+  @Value("${discodeit.admin.email}")
+  private String adminEmail;
+
+  @Transactional
   @Override
-  public UserDto login(LoginRequest loginRequest) {
-    log.debug("로그인 시도: username={}", loginRequest.username());
-    
-    String username = loginRequest.username();
-    String password = loginRequest.password();
-
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> UserNotFoundException.withUsername(username));
-
-    if (!user.getPassword().equals(password)) {
-      throw InvalidCredentialsException.wrongPassword();
+  public void initAdmin() {
+    if (userRepository.existsByEmail(adminEmail) || userRepository.existsByUsername(adminUsername)) {
+      log.warn("이미 어드민이 존재합니다.");
+      return;
     }
 
-    log.info("로그인 성공: userId={}, username={}", user.getId(), username);
+    String encodedPassword = passwordEncoder.encode(adminPassword);
+    User admin = new User(
+        adminUsername,
+        adminEmail,
+        encodedPassword,
+        null,
+        UserRole.ADMIN);
+
+    UserStatus status = new UserStatus(admin, Instant.now());
+
+    userRepository.save(admin);
+    log.info("어드민이 초기화되었습니다. {}", adminUsername);
+
+  }
+
+  @Transactional
+  @Override
+  public UserDto updateRole(UserRoleUpdateRequest request) {
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> UserNotFoundException.withId(request.userId()));
+
+    user.setRole(request.role());
+    userRepository.save(user);
+
+    List<SessionInformation> sessions = sessionRegistry.getAllSessions(user.getUsername(), false);
+    sessions.forEach(SessionInformation::expireNow);
+
     return userMapper.toDto(user);
   }
+
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
@@ -14,10 +15,13 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,9 +38,11 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private final ObjectMapper objectMapper;
+  private final UserMapper userMapper;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -60,9 +66,14 @@ public class SecurityConfig {
   }
 
   @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+  }
+
+  @Bean
   public RoleHierarchy roleHierarchy() {
     RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-    roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+    roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_CHANNEL_MANAGER > ROLE_USER");
     return roleHierarchy;
   }
 
@@ -85,7 +96,7 @@ public class SecurityConfig {
     JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter();
     filter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/api/auth/login", "POST"));
     filter.setAuthenticationManager(authenticationManager);
-    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler());
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(userMapper));
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler());
     filter.setSecurityContextRepository(securityContextRepository());
 
@@ -119,6 +130,7 @@ public class SecurityConfig {
         )
         .logout(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers(HttpMethod.PUT, "/api/auth/role").hasRole("ADMIN")
             .requestMatchers("/api/auth/csrf-token").permitAll()
             .requestMatchers("/api/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
@@ -130,12 +142,12 @@ public class SecurityConfig {
 
     SecurityFilterChain filterChain = http.build();
 
-    // 필터 목록 출력
-    System.out.println("=== Security Filter Chain ===");
-    filterChain.getFilters().forEach(filter ->
-        System.out.println(filter.getClass().getSimpleName())
-    );
-    System.out.println("==============================");
+//    // 필터 목록 출력
+//    System.out.println("=== Security Filter Chain ===");
+//    filterChain.getFilters().forEach(filter ->
+//        System.out.println(filter.getClass().getSimpleName())
+//    );
+//    System.out.println("==============================");
 
     return filterChain;
   }

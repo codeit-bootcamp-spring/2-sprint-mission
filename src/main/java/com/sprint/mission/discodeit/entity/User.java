@@ -11,6 +11,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ import lombok.Setter;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
-public class User extends BaseUpdatableEntity {
+public class User extends BaseUpdatableEntity implements Serializable {
 
   @Column(length = 50, nullable = false, unique = true)
   private String username;
@@ -62,4 +63,15 @@ public class User extends BaseUpdatableEntity {
       this.profile = newProfile;
     }
   }
+
+  public void updateRole(UserRole newRole) {
+    if (this.role != newRole) {
+      this.role = newRole;
+    }
+  }
+
+  public void setRole(UserRole Role) {
+    this.role = Role;
+  }
+
 }

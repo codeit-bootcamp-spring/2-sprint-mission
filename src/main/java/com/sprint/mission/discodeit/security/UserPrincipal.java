@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.security;
 
-import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mapper.UserMapper;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import lombok.Getter;
@@ -13,10 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @RequiredArgsConstructor
-public class UserPrincipal implements UserDetails {
+public class UserPrincipal implements UserDetails, Serializable {
 
   private final User user;
-  private final UserMapper userMapper;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -54,7 +52,4 @@ public class UserPrincipal implements UserDetails {
     return true;
   }
 
-  public UserDto toUserDto() {
-    return userMapper.toDto(this.user);
-  }
 }

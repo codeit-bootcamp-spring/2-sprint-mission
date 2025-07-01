@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "binary_contents")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BinaryContent extends BaseEntity {
+public class BinaryContent extends BaseEntity implements Serializable {
 
   @Column(nullable = false)
   private String fileName;

@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.UserRoleUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,5 +26,10 @@ public interface AuthApi {
           content = @Content(examples = @ExampleObject(value = "Unauthorized"))
       )
   })
+
   ResponseEntity<UserDto> getCurrentUser(Authentication authentication);
+
+  @Operation(summary = "사용자 권한 수정", description = "관리자만 사용 가능")
+  ResponseEntity<UserDto> updateUserRole(UserRoleUpdateRequest request);
+
 }

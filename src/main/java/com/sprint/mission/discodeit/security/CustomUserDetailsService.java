@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomUserDetailsService implements UserDetailsService {
 
   private final UserRepository userRepository;
-  private final UserMapper userMapper;
 
   @Override
   @Transactional(readOnly = true)
@@ -28,6 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
     log.info("사용자 조회 성공: userId={}, username={}", user.getId(), username);
-    return new UserPrincipal(user, userMapper);
+    return new UserPrincipal(user);
   }
 }
