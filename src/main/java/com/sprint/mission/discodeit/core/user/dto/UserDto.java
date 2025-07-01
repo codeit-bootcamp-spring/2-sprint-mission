@@ -24,6 +24,7 @@ public record UserDto(
     @Schema(description = "User 프로필")
     BinaryContentDto profile,
 
+    @Schema(description = "User 권한")
     Role role,
 
     @Schema(description = "User 온라인 상태", example = "true")
