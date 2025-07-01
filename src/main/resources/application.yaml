@@ -30,6 +30,11 @@ management:
     health:
       show-details: always
 
+security:
+  remember-me:
+    key: ${REMEMBER_ME_KEY:discodeit-key}
+    token-validity-seconds: 1814400
+
 aws:
   accessKeyId: ${AWS_S3_ACCESS_KEY:your-access-key}
   secretKey: ${AWS_S3_SECRET_KEY:your-secret-key}

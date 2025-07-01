@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
 import com.sprint.mission.discodeit.security.handler.SessionRegistryLogoutHandler;
 import jakarta.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.expression.SecurityExpressionHandler;
@@ -27,6 +29,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +42,8 @@ public class SecurityConfig {
       HttpSecurity http,
       ObjectMapper objectMapper,
       SessionRegistry sessionRegistry,
-      DaoAuthenticationProvider daoAuthenticationProvider) throws Exception {
+      DaoAuthenticationProvider daoAuthenticationProvider,
+      PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
     http
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(auth -> auth
@@ -48,12 +53,12 @@ public class SecurityConfig {
                 SecurityMatchers.GET_CSRF_TOKEN,
                 SecurityMatchers.SIGN_UP
             ).permitAll()
-            .anyRequest().hasRole("USER"))
+            .anyRequest().hasRole(Role.USER.name()))
         .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
         .logout(logout -> logout
             .logoutRequestMatcher(SecurityMatchers.LOGOUT)
             .invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID")
+            .deleteCookies("JSESSIONID", "remember-me")
             .logoutSuccessHandler((request, response, authentication) -> response.setStatus(
                 HttpServletResponse.SC_OK)
             ))
@@ -63,7 +68,8 @@ public class SecurityConfig {
             .sessionFixation().migrateSession()
             .maximumSessions(1)
             .maxSessionsPreventsLogin(false)
-            .sessionRegistry(sessionRegistry));
+            .sessionRegistry(sessionRegistry))
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
     return http.build();
   }
 
@@ -105,4 +111,22 @@ public class SecurityConfig {
     expressionHandler.setRoleHierarchy(roleHierarchy); // 역할 계층 설정
     return expressionHandler;
   }
+
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      UserDetailsService userDetailsService,
+      DataSource dataSource
+  ) {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+
+    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+        key, userDetailsService, tokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+    return rememberMeServices;
+  }
+
 }
