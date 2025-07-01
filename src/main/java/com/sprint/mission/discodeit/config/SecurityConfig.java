@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,8 +22,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -50,9 +54,14 @@ public class SecurityConfig {
         .securityContext(context ->
             context.securityContextRepository(new HttpSessionSecurityContextRepository()))
         .csrf(csrf -> csrf
-            .csrfTokenRepository(repository))
-        //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-        .logout(logout -> logout.disable())
+            .csrfTokenRepository(repository)
+            .ignoringRequestMatchers("/api/auth/logout"))
+        .logout(logout -> logout
+            .logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout", "POST"))
+            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+            .addLogoutHandler(new SecurityContextLogoutHandler())
+            .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+        )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             Customizer.withDefaults())
         .sessionManagement(session ->
