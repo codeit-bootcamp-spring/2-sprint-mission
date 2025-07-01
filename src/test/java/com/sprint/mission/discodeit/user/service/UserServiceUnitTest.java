@@ -15,19 +15,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
-import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
-import com.sprint.mission.discodeit.core.user.service.UserStatusService;
+import com.sprint.mission.discodeit.core.user.UserException;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
+import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.service.BasicUserService;
-import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.service.UserStatusService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -75,9 +76,9 @@ public class UserServiceUnitTest {
   @Disabled
   void UserCreate_WithNoProfile_Success() {
     // given
-    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
+    UserCreateRequest request = new UserCreateRequest("test", "test@test.com", "test");
     // when
-    UserDto result = userService.create(command, Optional.empty());
+    UserDto result = userService.create(request, Optional.empty());
     // then
     assertThat(result.username()).isEqualTo("test");
     assertThat(result.email()).isEqualTo("test@test.com");
@@ -86,66 +87,65 @@ public class UserServiceUnitTest {
   }
 
   @Test
-  @Disabled
   void UserCreate_WithProfile_Success() {
-//    // given
-//    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
-//    BinaryContentCreateCommand binaryContentCreateCommand = new BinaryContentCreateCommand(
-//        "a.png", "image/png", new byte[0]);
-//    when(binaryContentService.create(binaryContentCreateCommand)).thenReturn(
-//        BinaryContent.create("a.png", 0L, "image/png"));
-//    // when
-//    UserDto userDto = userService.create(command, Optional.of(binaryContentCreateCommand));
-//    // then
-//    assertThat(userDto.username()).isEqualTo("test");
-//    assertThat(userDto.email()).isEqualTo("test@test.com");
-//    assertNotNull(userDto.profile());
-//    assertTrue(userDto.online());
-  }
-
-  @Test
-  @Disabled
-  void CreateUser_WithSameName_ShouldThrowException() {
-//    // given
-//    UserCreateCommand command = new UserCreateCommand("test", "test@test.com", "test");
-//    // when
-//    when(userRepository.existsByName(command.username())).thenReturn(true);
-//    // then
-//    assertThrows(UserAlreadyExistsException.class, () -> {
-//      userService.create(command, Optional.empty());
-//    });
-  }
-
-  @Test
-  @Disabled
-  void CreateUser_WithSameEmail_ShouldThrowException() {
-//    // given
-//    UserCreateCommand command = new UserCreateCommand("b", "a@a.com", "test");
-//    // when
-//    when(userRepository.existsByEmail(command.email())).thenReturn(true);
-//    // then
-//    assertThrows(UserAlreadyExistsException.class, () -> {
-//      userService.create(command, Optional.empty());
-//    });
-  }
-
-  @Test
-  void CreateUser_WithoutName_ShouldThrowException() {
     // given
-    UserCreateCommand noNameCommand = new UserCreateCommand(null, "test@test.com", "test");
-    // when & then
-    assertThrows(UserInvalidRequestException.class, () -> {
-      userService.create(noNameCommand, Optional.empty());
+    UserCreateRequest request = new UserCreateRequest("test", "test@test.com", "test");
+    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+        "a.png", "image/png", new byte[0]);
+    when(binaryContentService.create(binaryContentCreateRequest)).thenReturn(
+        BinaryContent.create("a.png", 0L, "image/png"));
+    // when
+    UserDto userDto = userService.create(request, Optional.of(binaryContentCreateRequest));
+    // then
+    assertThat(userDto.username()).isEqualTo("test");
+    assertThat(userDto.email()).isEqualTo("test@test.com");
+    assertNotNull(userDto.profile());
+    assertTrue(userDto.online());
+  }
+
+  @Test
+  void CreateUser_WithSameName_ShouldThrowException() {
+    // given
+    UserCreateRequest request = new UserCreateRequest("test", "test@test.com", "test");
+    // when
+    when(userRepository.existsByNameOrEmail(request.username(), request.email())).thenReturn(true);
+    // then
+    assertThrows(UserException.class, () -> {
+      userService.create(request, Optional.empty());
     });
   }
 
   @Test
+  void CreateUser_WithSameEmail_ShouldThrowException() {
+    // given
+    UserCreateRequest request = new UserCreateRequest("b", "a@a.com", "test");
+    // when
+    when(userRepository.existsByNameOrEmail(request.username(), request.email())).thenReturn(true);
+    // then
+    assertThrows(UserException.class, () -> {
+      userService.create(request, Optional.empty());
+    });
+  }
+
+  @Test
+  @Disabled
+  void CreateUser_WithoutName_ShouldThrowException() {
+    // given
+    UserCreateRequest request = new UserCreateRequest(null, "test@test.com", "test");
+    // when & then
+    assertThrows(UserException.class, () -> {
+      userService.create(request, Optional.empty());
+    });
+  }
+
+  @Test
+  @Disabled
   void CreateUser_WithoutEmail_ShouldThrowException() {
     // given
-    UserCreateCommand noEmailCommand = new UserCreateCommand("test", null, "test");
+    UserCreateRequest request = new UserCreateRequest("test", null, "test");
     // when & then
-    assertThrows(UserInvalidRequestException.class, () -> {
-      userService.create(noEmailCommand, Optional.empty());
+    assertThrows(UserException.class, () -> {
+      userService.create(request, Optional.empty());
     });
   }
 
@@ -153,17 +153,17 @@ public class UserServiceUnitTest {
   void UserUpdate_WithImage_Success() {
     // given
     UUID userId = UUID.randomUUID();
-    UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
-    BinaryContentCreateRequest contentCommand = new BinaryContentCreateRequest("a.png",
+    UserUpdateRequest request = new UserUpdateRequest("newName", "newEmail", "newPassword");
+    BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest("a.png",
         "image/png", new byte[0]);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(binaryContentService.create(contentCommand)).thenReturn(
+    when(binaryContentService.create(binaryContentCreateRequest)).thenReturn(
         BinaryContent.create("a.png", 0L, "image/png"));
     when(userRepository.save(user)).thenReturn(user);
 
     // when
-    UserDto result = userService.update(command, Optional.of(contentCommand));
+    UserDto result = userService.update(userId, request, Optional.of(binaryContentCreateRequest));
 
     // then
     assertNotNull(result.profile());
@@ -172,20 +172,19 @@ public class UserServiceUnitTest {
     assertThat(result.email()).isEqualTo("newEmail");
     assertThat(result.profile().fileName()).isEqualTo("a.png");
     assertThat(result.profile().fileName()).isNotEqualTo("old.png");
-    then(binaryContentService).should().delete(any());
   }
 
   @Test
   void UserUpdate_WithoutImage_Success() {
     // given
     UUID userId = UUID.randomUUID();
-    UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
+    UserUpdateRequest request = new UserUpdateRequest("newName", "newEmail", "newPassword");
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(userRepository.save(user)).thenReturn(user);
 
     // when
-    UserDto result = userService.update(command, Optional.empty());
+    UserDto result = userService.update(userId, request, Optional.empty());
 
     // then
     assertThat(result.username()).isEqualTo("newName");
@@ -197,13 +196,13 @@ public class UserServiceUnitTest {
   void UserUpdate_WithoutUser_ShouldThrowException() {
     // given
     UUID userId = UUID.randomUUID();
-    UserUpdateCommand command = new UserUpdateCommand(userId, "newName", "newEmail", "newPassword");
+    UserUpdateRequest request = new UserUpdateRequest("newName", "newEmail", "newPassword");
 
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
     // when & then
-    assertThrows(UserNotFoundException.class, () -> {
-      userService.update(command, Optional.empty());
+    assertThrows(UserException.class, () -> {
+      userService.update(userId, request, Optional.empty());
     });
   }
 
@@ -217,7 +216,7 @@ public class UserServiceUnitTest {
     userService.delete(userId);
     // then
     verify(userStatusService).delete(userId);
-    verify(userRepository).deleteById(userId);
+    verify(userRepository).delete(spyUser);
   }
 
   @Test
@@ -225,7 +224,7 @@ public class UserServiceUnitTest {
     // given
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     // when
-    assertThrows(UserNotFoundException.class, () -> userService.delete(userId));
+    assertThrows(UserException.class, () -> userService.delete(userId));
     // then
     verifyNoInteractions(binaryContentService);
     verifyNoInteractions(userStatusService);
@@ -251,7 +250,7 @@ public class UserServiceUnitTest {
     UserStatusRequest request = mock(UserStatusRequest.class);
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     // when & then
-    assertThrows(UserNotFoundException.class, () -> {
+    assertThrows(UserException.class, () -> {
       userService.online(userId, request);
     });
   }

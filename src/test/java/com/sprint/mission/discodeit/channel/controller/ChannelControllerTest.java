@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.channel.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -14,15 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.core.channel.controller.ChannelController;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.service.BasicChannelService;
-import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +60,7 @@ public class ChannelControllerTest {
         "test");
     ChannelDto channelDto = new ChannelDto(channelId, ChannelType.PUBLIC, "test", "test", null,
         null);
-    when(channelService.create(any(PublicChannelCreateCommand.class))).thenReturn(channelDto);
+    when(channelService.create(any(PublicChannelCreateRequest.class))).thenReturn(channelDto);
     // when & then
     mockMvc.perform(post("/api/channels/public")
             .with(csrf())
@@ -81,7 +81,7 @@ public class ChannelControllerTest {
     PrivateChannelCreateRequest request = new PrivateChannelCreateRequest(List.of(u1Id, u2Id));
     ChannelDto channelDto = new ChannelDto(channelId, ChannelType.PRIVATE, null, null, null,
         null);
-    when(channelService.create(any(PrivateChannelCreateCommand.class))).thenReturn(channelDto);
+    when(channelService.create(any(PrivateChannelCreateRequest.class))).thenReturn(channelDto);
     // when & then
     mockMvc.perform(post("/api/channels/private")
             .with(csrf())
@@ -120,7 +120,8 @@ public class ChannelControllerTest {
     ChannelUpdateRequest updateRequest = new ChannelUpdateRequest("abc", "aaa");
     ChannelDto channelDto = new ChannelDto(channelId, ChannelType.PUBLIC, "abc", "aaa", null,
         null);
-    when(channelService.update(any(ChannelUpdateCommand.class))).thenReturn(channelDto);
+    when(channelService.update(eq(channelId), any(ChannelUpdateRequest.class))).thenReturn(
+        channelDto);
     // when & then
     mockMvc.perform(patch("/api/channels/{channelId}", channelId)
             .with(csrf())
@@ -137,8 +138,8 @@ public class ChannelControllerTest {
   void update_ChannelNotFound_Throw404() throws Exception {
     // given
     ChannelUpdateRequest updateRequest = new ChannelUpdateRequest("abc", "aaa");
-    doThrow(new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId))
-        .when(channelService).update(any(ChannelUpdateCommand.class));
+    doThrow(new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, channelId))
+        .when(channelService).update(eq(channelId), any(ChannelUpdateRequest.class));
     // when & then
     mockMvc.perform(patch("/api/channels/{channelId}", channelId)
             .with(csrf())
@@ -153,8 +154,8 @@ public class ChannelControllerTest {
   void update_PrivateChannel_Throw400() throws Exception {
     // given
     ChannelUpdateRequest updateRequest = new ChannelUpdateRequest("abc", "aaa");
-    doThrow(new ChannelUnmodifiableException(ErrorCode.CHANNEL_INVALID_REQUEST, channelId))
-        .when(channelService).update(any(ChannelUpdateCommand.class));
+    doThrow(new ChannelException(ErrorCode.CHANNEL_INVALID_REQUEST, channelId))
+        .when(channelService).update(eq(channelId), any(ChannelUpdateRequest.class));
     // when & then
     mockMvc.perform(patch("/api/channels/{channelId}", channelId)
             .with(csrf())
@@ -173,14 +174,13 @@ public class ChannelControllerTest {
             .with(csrf())
             .with(user("user").roles("USER"))
         )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.success").value(true));
+        .andExpect(status().isNoContent());
   }
 
   @Test
   void delete_ChannelNotFound_Throw404() throws Exception {
     // given
-    doThrow(new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND, channelId))
+    doThrow(new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, channelId))
         .when(channelService).delete(channelId);
     // when & then
     mockMvc.perform(delete("/api/channels/{channelId}", channelId)

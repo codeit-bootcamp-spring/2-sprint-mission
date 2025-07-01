@@ -8,13 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.sprint.mission.discodeit.core.channel.ChannelException;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
+import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.service.ChannelService;
-import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -51,10 +53,10 @@ public class ChannelIntegrationTest {
   @Test
   void create_Public() {
     // given
-    PublicChannelCreateCommand createCommand = new PublicChannelCreateCommand("a",
+    PublicChannelCreateRequest request = new PublicChannelCreateRequest("a",
         "b");
     // when
-    ChannelDto channelDto = channelService.create(createCommand);
+    ChannelDto channelDto = channelService.create(request);
     // then
     assertNotNull(channelDto.id());
     assertEquals("a", channelDto.name());
@@ -69,10 +71,10 @@ public class ChannelIntegrationTest {
     // given
     UUID u1Id = UUID.randomUUID();
     UUID u2Id = UUID.randomUUID();
-    PrivateChannelCreateCommand privateChannelCreateCommand = new PrivateChannelCreateCommand(
+    PrivateChannelCreateRequest request = new PrivateChannelCreateRequest(
         List.of(u1Id, u2Id));
     // when
-    ChannelDto channelDto = channelService.create(privateChannelCreateCommand);
+    ChannelDto channelDto = channelService.create(request);
     // then
     assertNotNull(channelDto.id());
     assertNull(channelDto.name());
@@ -84,10 +86,9 @@ public class ChannelIntegrationTest {
   @Test
   void update_public() {
     // given
-    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(publicId, "test",
-        "test123");
+    ChannelUpdateRequest request = new ChannelUpdateRequest("test", "test123");
     // when
-    ChannelDto channelDto = channelService.update(channelUpdateCommand);
+    ChannelDto channelDto = channelService.update(publicId, request);
     // then
     assertNotNull(channelDto.id());
     assertNotEquals("public", channelDto.name());
@@ -99,11 +100,11 @@ public class ChannelIntegrationTest {
   @Test
   void update_Private_Throw400() {
     // given
-    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(privateId, "test",
+    ChannelUpdateRequest request = new ChannelUpdateRequest("test",
         "test123");
     // when & then
-    assertThrows(ChannelUnmodifiableException.class, () -> {
-          channelService.update(channelUpdateCommand);
+    assertThrows(ChannelException.class, () -> {
+          channelService.update(privateId, request);
         }
     );
   }
@@ -121,7 +122,7 @@ public class ChannelIntegrationTest {
   void delete_ChannelNotFound_Throw404() {
     UUID fakeId = UUID.randomUUID();
     // when
-    assertThrows(ChannelNotFoundException.class, () -> {
+    assertThrows(ChannelException.class, () -> {
       channelService.delete(fakeId);
     });
     // then

@@ -6,13 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.service.UserService;
-import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -59,9 +61,9 @@ public class UserIntegrationTest {
   @Disabled
   void register_NoProfile() {
     // given
-    UserCreateCommand createCommand = new UserCreateCommand("c", "c@c.com", "c");
+    UserCreateRequest request = new UserCreateRequest("c", "c@c.com", "c");
     // when
-    UserDto userDto = userService.create(createCommand, Optional.empty());
+    UserDto userDto = userService.create(request, Optional.empty());
     // then
     assertNotNull(userDto.id());
     assertEquals("c", userDto.username());
@@ -73,12 +75,12 @@ public class UserIntegrationTest {
   @Disabled
   void register_WithProfile() {
     // given
-    UserCreateCommand createCommand = new UserCreateCommand("c", "c@c.com", "c");
+    UserCreateRequest request = new UserCreateRequest("c", "c@c.com", "c");
 
     BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
         "test.png", "image/png", new byte[0]);
     // when
-    UserDto userDto = userService.create(createCommand, Optional.of(binaryContentCreateRequest));
+    UserDto userDto = userService.create(request, Optional.of(binaryContentCreateRequest));
     // then
     assertNotNull(userDto.id());
     assertNotNull(userDto.profile());
@@ -91,9 +93,9 @@ public class UserIntegrationTest {
   @Test
   void update_NoProfile() {
     // given
-    UserUpdateCommand updateCommand = new UserUpdateCommand(u1Id, "aaa", "bbb@bbb.com", "ccc");
+    UserUpdateRequest request = new UserUpdateRequest("aaa", "bbb@bbb.com", "ccc");
     // when
-    UserDto userDto = userService.update(updateCommand, Optional.empty());
+    UserDto userDto = userService.update(u1Id, request, Optional.empty());
     // then
     assertNotNull(userDto.id());
     assertNotEquals("c", userDto.username());
@@ -105,11 +107,11 @@ public class UserIntegrationTest {
   @Test
   void update_WithProfile() {
     // given
-    UserUpdateCommand updateCommand = new UserUpdateCommand(u2Id, "aaa", "bbb@bbb.com", "ccc");
+    UserUpdateRequest request = new UserUpdateRequest("aaa", "bbb@bbb.com", "ccc");
     BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
         "test123.png", "image/png", new byte[1]);
     // when
-    UserDto userDto = userService.update(updateCommand, Optional.of(binaryContentCreateRequest));
+    UserDto userDto = userService.update(u2Id, request, Optional.of(binaryContentCreateRequest));
     // then
     assertNotNull(userDto.id());
     assertNotNull(userDto.profile());

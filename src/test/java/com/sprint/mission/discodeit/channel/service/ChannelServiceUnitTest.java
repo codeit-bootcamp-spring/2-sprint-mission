@@ -9,19 +9,21 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sprint.mission.discodeit.core.channel.ChannelException;
+import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
+import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.channel.service.BasicChannelService;
-import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
-import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
 import java.util.List;
@@ -54,9 +56,9 @@ public class ChannelServiceUnitTest {
   @Test
   void PublicChannelCreate() {
     // given
-    PublicChannelCreateCommand command = new PublicChannelCreateCommand("abc", "abc");
+    PublicChannelCreateRequest request = new PublicChannelCreateRequest("abc", "abc");
     // when
-    ChannelDto channelDto = channelService.create(command);
+    ChannelDto channelDto = channelService.create(request);
     // then
     assertThat(channelDto.name()).isEqualTo("abc");
     assertThat(channelDto.description()).isEqualTo("abc");
@@ -71,11 +73,11 @@ public class ChannelServiceUnitTest {
     User user = User.create("a", "a@email.com", "a", oldProfile);
     user.setUserStatus(UserStatus.create(user, Instant.now()));
 
-    PrivateChannelCreateCommand command = new PrivateChannelCreateCommand(
+    PrivateChannelCreateRequest request = new PrivateChannelCreateRequest(
         List.of(userId));
     when(userRepository.findAllById(List.of(userId))).thenReturn(List.of(user));
     // when
-    ChannelDto channelDto = channelService.create(command);
+    ChannelDto channelDto = channelService.create(request);
     // then
     assertThat(channelDto.name()).isNull();
     assertThat(channelDto.description()).isNull();
@@ -87,10 +89,10 @@ public class ChannelServiceUnitTest {
     // given
     Channel channel = Channel.create("test", "test", ChannelType.PUBLIC);
     UUID channelUUID = UUID.randomUUID();
-    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(channelUUID, "aaa", "aaa");
+    ChannelUpdateRequest request = new ChannelUpdateRequest("aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.of(channel));
     // when
-    ChannelDto update = channelService.update(channelUpdateCommand);
+    ChannelDto update = channelService.update(channelUUID, request);
     // then
     assertThat(update.name()).isEqualTo("aaa");
     assertThat(update.description()).isEqualTo("aaa");
@@ -101,11 +103,11 @@ public class ChannelServiceUnitTest {
   void ChannelUpdate_WithoutChannel_ShouldThrowException() {
     // given
     UUID channelUUID = UUID.randomUUID();
-    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(channelUUID, "aaa", "aaa");
+    ChannelUpdateRequest request = new ChannelUpdateRequest("aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.empty());
     // when & then
-    assertThrows(ChannelNotFoundException.class, () -> {
-      channelService.update(channelUpdateCommand);
+    assertThrows(ChannelException.class, () -> {
+      channelService.update(channelUUID, request);
     });
   }
 
@@ -114,11 +116,11 @@ public class ChannelServiceUnitTest {
     // given
     Channel channel = Channel.create("test", "test", ChannelType.PRIVATE);
     UUID channelUUID = UUID.randomUUID();
-    ChannelUpdateCommand channelUpdateCommand = new ChannelUpdateCommand(channelUUID, "aaa", "aaa");
+    ChannelUpdateRequest request = new ChannelUpdateRequest("aaa", "aaa");
     when(channelRepository.findById(channelUUID)).thenReturn(Optional.of(channel));
     // when & then
-    assertThrows(ChannelUnmodifiableException.class, () -> {
-      channelService.update(channelUpdateCommand);
+    assertThrows(ChannelException.class, () -> {
+      channelService.update(channelUUID, request);
     });
   }
 
@@ -140,7 +142,7 @@ public class ChannelServiceUnitTest {
     UUID channelId = UUID.randomUUID();
     when(channelRepository.findById(channelId)).thenReturn(Optional.empty());
     // when & then
-    assertThrows(ChannelNotFoundException.class, () -> channelService.delete(channelId));
+    assertThrows(ChannelException.class, () -> channelService.delete(channelId));
 
     verify(channelRepository, never()).delete(any());
   }

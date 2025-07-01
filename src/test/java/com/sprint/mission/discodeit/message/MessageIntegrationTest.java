@@ -5,21 +5,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
-import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.message.MessageException;
+import com.sprint.mission.discodeit.core.message.dto.MessageDto;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.service.MessageService;
-import com.sprint.mission.discodeit.core.message.dto.MessageDto;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
 import java.util.List;
@@ -80,7 +81,7 @@ public class MessageIntegrationTest {
   @Test
   void Create_NoImage() {
     // given
-    MessageCreateCommand createCommand = new MessageCreateCommand(userId, channelId, "test");
+    MessageCreateRequest createCommand = new MessageCreateRequest(userId, channelId, "test");
     // when
     MessageDto messageDto = messageService.create(createCommand, List.of());
     // then
@@ -97,7 +98,7 @@ public class MessageIntegrationTest {
   @Test
   void Create_WithImage() {
     // given
-    MessageCreateCommand createCommand = new MessageCreateCommand(userId, channelId, "test");
+    MessageCreateRequest createCommand = new MessageCreateRequest(userId, channelId, "test");
     BinaryContentCreateRequest binaryContentCreateRequest1 = new BinaryContentCreateRequest(
         "test1.png", "image/png", new byte[0]);
     BinaryContentCreateRequest binaryContentCreateRequest2 = new BinaryContentCreateRequest(
@@ -123,9 +124,9 @@ public class MessageIntegrationTest {
   @Test
   void update_Success() {
     // given
-    MessageUpdateCommand updateCommand = new MessageUpdateCommand(m1Id, "aaaa");
+    MessageUpdateRequest request = new MessageUpdateRequest("aaaa");
     // when
-    MessageDto messageDto = messageService.update(updateCommand);
+    MessageDto messageDto = messageService.update(m1Id, request);
     // then
     assertNotNull(messageDto.id());
     assertEquals(userId, messageDto.author().id());
@@ -139,10 +140,10 @@ public class MessageIntegrationTest {
   void update_WithoutMessage_Throw404() {
     // given
     UUID fakeId = UUID.randomUUID();
-    MessageUpdateCommand updateCommand = new MessageUpdateCommand(fakeId, "aaaa");
+    MessageUpdateRequest request = new MessageUpdateRequest("aaaa");
     // when & then
-    assertThrows(MessageNotFoundException.class, () -> {
-      messageService.update(updateCommand);
+    assertThrows(MessageException.class, () -> {
+      messageService.update(fakeId, request);
     });
   }
 
@@ -160,7 +161,7 @@ public class MessageIntegrationTest {
     // given
     UUID fakeId = UUID.randomUUID();
     // when & then
-    assertThrows(MessageNotFoundException.class, () -> {
+    assertThrows(MessageException.class, () -> {
       messageService.delete(fakeId);
     });
     Optional<Message> optionalMessage = messageRepository.findById(fakeId);

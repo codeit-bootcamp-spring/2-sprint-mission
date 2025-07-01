@@ -8,20 +8,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
-import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
-import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.message.MessageException;
+import com.sprint.mission.discodeit.core.message.dto.MessageDto;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.entity.Message;
-import com.sprint.mission.discodeit.core.message.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.message.service.BasicMessageService;
-import com.sprint.mission.discodeit.core.message.dto.MessageDto;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
+import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +66,7 @@ public class MessageServiceUnitTest {
     // given
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
-    MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
+    MessageCreateRequest command = new MessageCreateRequest(userId, channelId, "test");
 
     BinaryContent dummyContent = mock(BinaryContent.class);
     binaryCommand = mock(BinaryContentCreateRequest.class);
@@ -85,12 +87,12 @@ public class MessageServiceUnitTest {
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
 
-    MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
+    MessageCreateRequest command = new MessageCreateRequest(userId, channelId, "test");
     BinaryContentCreateRequest binaryCommand = mock(BinaryContentCreateRequest.class);
 
     when(userRepository.findById(userId)).thenReturn(Optional.empty());
     // when & then
-    assertThrows(UserNotFoundException.class,
+    assertThrows(UserException.class,
         () -> messageService.create(command, List.of(binaryCommand)));
 
     verifyNoInteractions(channelRepository);
@@ -103,14 +105,14 @@ public class MessageServiceUnitTest {
     UUID userId = UUID.randomUUID();
     UUID channelId = UUID.randomUUID();
 
-    MessageCreateCommand command = new MessageCreateCommand(userId, channelId, "test");
+    MessageCreateRequest command = new MessageCreateRequest(userId, channelId, "test");
     BinaryContentCreateRequest binaryCommand = mock(BinaryContentCreateRequest.class);
 
     when(userRepository.findById(userId)).thenReturn(Optional.of(user));
     when(channelRepository.findById(channelId)).thenReturn(Optional.empty());
 
     // when & then
-    assertThrows(ChannelNotFoundException.class,
+    assertThrows(ChannelException.class,
         () -> messageService.create(command, List.of(binaryCommand)));
 
     verifyNoInteractions(messageRepository);
@@ -121,11 +123,11 @@ public class MessageServiceUnitTest {
     // given
     UUID messageId = UUID.randomUUID();
     Message message = Message.create(user, channel, "test", List.of());
-    MessageUpdateCommand command = new MessageUpdateCommand(messageId, "abcdefg");
+    MessageUpdateRequest request = new MessageUpdateRequest("abcdefg");
 
     when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
     // when
-    MessageDto update = messageService.update(command);
+    MessageDto update = messageService.update(messageId, request);
     // then
     assertThat(update.content()).isEqualTo("abcdefg");
   }
@@ -134,12 +136,12 @@ public class MessageServiceUnitTest {
   void MessageUpdate_WithoutMessage_ShouldThrowException() {
     // given
     UUID messageId = UUID.randomUUID();
-    MessageUpdateCommand command = new MessageUpdateCommand(messageId, "abcdefg");
+    MessageUpdateRequest command = new MessageUpdateRequest("abcdefg");
 
     when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
     // when & then
-    assertThrows(MessageNotFoundException.class, () -> {
-      messageService.update(command);
+    assertThrows(MessageException.class, () -> {
+      messageService.update(messageId, command);
     });
   }
 
@@ -152,7 +154,7 @@ public class MessageServiceUnitTest {
     // when
     messageService.delete(messageId);
     // then
-    verify(messageRepository).deleteById(messageId);
+    verify(messageRepository).delete(message);
   }
 
   @Test
@@ -161,7 +163,7 @@ public class MessageServiceUnitTest {
     UUID messageId = UUID.randomUUID();
     when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
     // when & then
-    assertThrows(MessageNotFoundException.class, () -> {
+    assertThrows(MessageException.class, () -> {
       messageService.delete(messageId);
     });
   }
