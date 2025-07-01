@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.config.JpaAuditingConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceUnitUtil;
 import java.time.Instant;
@@ -32,8 +31,6 @@ public class JpaUserRepositoryTest {
 
   private User user1;
   private User user2;
-  private UserStatus userStatus1;
-  private UserStatus userStatus2;
   private BinaryContent profile1;
   private BinaryContent profile2;
 
@@ -54,9 +51,6 @@ public class JpaUserRepositoryTest {
 
     userRepository.save(user1);
 
-    userStatus1 = new UserStatus(user1, Instant.now());
-    user1.updateUserStatus(userStatus1);
-
     profile2 = BinaryContent.builder()
         .filename("file2")
         .contentType("img/png")
@@ -71,9 +65,6 @@ public class JpaUserRepositoryTest {
         .build();
 
     userRepository.save(user2);
-
-    userStatus2 = new UserStatus(user2, Instant.now());
-    user2.updateUserStatus(userStatus2);
 
     // BinaryContent는 UserStatus와 달리 Cascade로 관리되는 객체가 아니므로, 따로 영속성 컨텍스트에 persist
     entityManager.persist(profile1);

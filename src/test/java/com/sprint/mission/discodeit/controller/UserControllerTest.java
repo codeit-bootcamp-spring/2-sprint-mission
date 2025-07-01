@@ -10,14 +10,13 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapperImpl;
 import com.sprint.mission.discodeit.mapper.UserMapperImpl;
-import com.sprint.mission.discodeit.mapper.UserStatusMapperImpl;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -33,7 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.BDDMockito.*;
 
 @WebMvcTest(UserController.class)
-@Import({UserMapperImpl.class, BinaryContentMapperImpl.class, UserStatusMapperImpl.class})
+@AutoConfigureMockMvc(addFilters = false)
+@Import({UserMapperImpl.class, BinaryContentMapperImpl.class})
 public class UserControllerTest {
 
   @Autowired
@@ -41,9 +41,6 @@ public class UserControllerTest {
 
   @MockitoBean
   private UserService userService;
-
-  @MockitoBean
-  private UserStatusService userStatusService;
 
   @Autowired
   private UserMapper userMapper;
@@ -83,7 +80,7 @@ public class UserControllerTest {
 
     CreateUserResult createUserResult = new CreateUserResult(UUID.randomUUID(),
         binaryContentMapper.toFindBinaryContentResult(binaryContent), requestDTO.username(),
-        requestDTO.email(), true);
+        requestDTO.email());
 
     given(userService.create(userMapper.toCreateUserCommand(requestDTO), profileImage)).willReturn(
         createUserResult);
@@ -96,8 +93,7 @@ public class UserControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(createUserResult.id().toString()))
         .andExpect(jsonPath("$.username").value("testUser"))
-        .andExpect(jsonPath("$.email").value("test@example.com"))
-        .andExpect(jsonPath("$.online").value(true));
+        .andExpect(jsonPath("$.email").value("test@example.com"));
   }
 
   @Test
@@ -127,7 +123,7 @@ public class UserControllerTest {
 
     CreateUserResult createUserResult = new CreateUserResult(UUID.randomUUID(),
         binaryContentMapper.toFindBinaryContentResult(binaryContent), requestDTO.username(),
-        requestDTO.email(), true);
+        requestDTO.email());
 
     given(userService.create(userMapper.toCreateUserCommand(requestDTO), profileImage)).willReturn(
         createUserResult);
@@ -167,7 +163,7 @@ public class UserControllerTest {
 
     CreateUserResult createUserResult = new CreateUserResult(UUID.randomUUID(),
         binaryContentMapper.toFindBinaryContentResult(binaryContent), requestDTO.username(),
-        requestDTO.email(), true);
+        requestDTO.email());
 
     given(userService.create(userMapper.toCreateUserCommand(requestDTO), profileImage)).willReturn(
         createUserResult);
@@ -210,7 +206,7 @@ public class UserControllerTest {
 
     UpdateUserResult updateUserResult = new UpdateUserResult(userId, Instant.now(),
         binaryContentMapper.toFindBinaryContentResult(binaryContent), requestDTO.newUsername(),
-        requestDTO.newEmail(), true);
+        requestDTO.newEmail());
 
     given(userService.update(userId, userMapper.toUpdateUserCommand(requestDTO),
         profileImage)).willReturn(
@@ -224,8 +220,7 @@ public class UserControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(userId.toString()))
         .andExpect(jsonPath("$.username").value("newUser"))
-        .andExpect(jsonPath("$.email").value("new@example.com"))
-        .andExpect(jsonPath("$.online").value(true));
+        .andExpect(jsonPath("$.email").value("new@example.com"));
   }
 
   @Test
@@ -258,7 +253,7 @@ public class UserControllerTest {
 
     UpdateUserResult updateUserResult = new UpdateUserResult(userId, Instant.now(),
         binaryContentMapper.toFindBinaryContentResult(binaryContent), requestDTO.newUsername(),
-        requestDTO.newEmail(), true);
+        requestDTO.newEmail());
 
     given(userService.update(userId, userMapper.toUpdateUserCommand(requestDTO),
         profileImage)).willReturn(

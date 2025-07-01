@@ -57,10 +57,10 @@ sprint:
     email: ${SPRINT_ADMIN_EMAIL}
     password: ${SPRINT_ADMIN_PASSWORD}
 
-  security:
-    remember-me:
-      key: ${SECURITY_REMEMBER_ME_KEY}
-      token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 info:
   app:
