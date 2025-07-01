@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.domain.channel.mapper;
 
+import com.sprint.mission.discodeit.common.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.domain.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
+import com.sprint.mission.discodeit.domain.message.entity.Message;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -22,8 +25,8 @@ public class ChannelMapper {
     private final UserResultMapper userResultMapper;
 
     public ChannelResult convertToChannelResult(Channel channel) {
-        Instant lastMessageCreatedAt = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId())
-                .orElse(null);
+        Instant lastMessageCreatedAt = getLastMessageCreatedAt(channel);
+
         if (channel.isPrivate()) {
             List<UserResult> participants = readStatusRepository.findByChannelId(channel.getId())
                     .stream()
@@ -35,6 +38,11 @@ public class ChannelMapper {
         }
 
         return ChannelResult.fromPublic(channel, lastMessageCreatedAt);
+    }
+
+    private Instant getLastMessageCreatedAt(Channel channel) {
+        Optional<Message> lastMessageCreatedAtByChannelId = messageRepository.findLastMessageCreatedAtByChannelId(channel.getId());
+        return lastMessageCreatedAtByChannelId.map(BaseEntity::getCreatedAt).orElse(null);
     }
 
 }

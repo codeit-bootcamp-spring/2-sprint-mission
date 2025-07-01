@@ -3,7 +3,7 @@ name: AWS Deploy Pipeline
 on:
   push:
     branches:
-      - main
+      - part2-황지환
 
 env:
   ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
@@ -13,6 +13,7 @@ env:
   ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}
 
+# 생성한 이미지에 문제 있음, 자동 종료됨 추후 수정
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -21,12 +22,18 @@ jobs:
       - name: 소스 체크아웃
         uses: actions/checkout@v4
 
+      - name: QEMU 설치 (멀티 플랫폼 지원)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Buildx 설치
+        uses: docker/setup-buildx-action@v3
+
       - name: AWS CLI 인증
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: us-east-1
 
       - name: 이미지 태그 생성
         run: echo "IMAGE_TAG=$(date +'%Y%m%d%H%M%S')-${GITHUB_SHA::8}" >> $GITHUB_ENV
@@ -56,7 +63,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: 현재 태스크 정의 다운로드
+      - name: 타켓 태스크-def 다운로드
         run: |
           aws ecs describe-task-definition \
             --task-definition ${{ env.ECS_TASK_DEFINITION }} \

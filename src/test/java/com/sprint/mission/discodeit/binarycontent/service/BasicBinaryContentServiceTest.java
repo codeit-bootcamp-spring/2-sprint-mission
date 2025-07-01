@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.binarycontent.service;
 
+import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
@@ -15,9 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.UUID;
 
-@ActiveProfiles("test")
-@SpringBootTest
-class BasicBinaryContentServiceTest {
+class BasicBinaryContentServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private BinaryContentRepository binaryContentRepository;
