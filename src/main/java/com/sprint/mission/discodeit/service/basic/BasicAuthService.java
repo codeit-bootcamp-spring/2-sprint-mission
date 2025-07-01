@@ -41,9 +41,13 @@ public class BasicAuthService implements AuthService {
     Authentication auth = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(username, password)
     );
-    SecurityContextHolder.getContext().setAuthentication(auth);
 
-    System.out.println("현재 인증 정보: " + auth);
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(auth);
+    SecurityContextHolder.setContext(context);
+
+    HttpSession session = request.getSession(true);
+    session.setAttribute("SPRING_SECURITY_CONTEXT", context);
 
     User user = userRepository.findByEmail(username)
         .orElseThrow(() -> UserNotFoundException.withUsername(username));
