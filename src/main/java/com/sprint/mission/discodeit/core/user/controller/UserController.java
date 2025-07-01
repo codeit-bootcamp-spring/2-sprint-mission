@@ -44,7 +44,7 @@ public class UserController implements UserApi {
 
     Optional<BinaryContentCreateRequest> optional = Optional.empty();
 
-    if (!file.isEmpty()) {
+    if (file != null && !file.isEmpty()) {
       BinaryContentCreateRequest binaryRequest = BinaryContentCreateRequest.create(file);
       optional = Optional.of(binaryRequest);
     }

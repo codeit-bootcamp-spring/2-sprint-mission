@@ -59,10 +59,14 @@ public class User extends BaseUpdatableEntity {
     return new User(name, email, password, profile, Role.USER);
   }
 
-
   public static User createAdmin(String name, String email, String password,
       BinaryContent profile) {
     return new User(name, email, password, profile, Role.ADMIN);
+  }
+
+  public static User createManager(String name, String email, String password,
+      BinaryContent profile) {
+    return new User(name, email, password, profile, Role.CHANNEL_MANAGER);
   }
 
   private <T> T updateFiled(T target, T replace) {

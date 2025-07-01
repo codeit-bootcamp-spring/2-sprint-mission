@@ -8,6 +8,9 @@ import com.sprint.mission.discodeit.security.handler.SessionRegistryLogoutHandle
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -21,6 +24,7 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
@@ -44,12 +48,6 @@ public class SecurityConfig {
                 SecurityMatchers.GET_CSRF_TOKEN,
                 SecurityMatchers.SIGN_UP
             ).permitAll()
-            .requestMatchers(
-                SecurityMatchers.CREATE_CHANNEL,
-                SecurityMatchers.UPDATE_CHANNEL,
-                SecurityMatchers.DELETE_CHANNEL
-            ).hasRole("CHANNEL_MANAGER")
-            .requestMatchers(SecurityMatchers.UPDATE_ROLE).hasRole("ADMIN")
             .anyRequest().hasRole("USER"))
         .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
         .logout(logout -> logout
@@ -94,7 +92,17 @@ public class SecurityConfig {
 
   @Bean
   public RoleHierarchy roleHierarchy() {
-    String hierarchy = "ROLE_ADMIN > ROLE_CHANNEL_MANAGE\n" + "ROLE_CHANNEL_MANAGE > ROLE_USER";
+    String hierarchy =
+        "ROLE_ADMIN > ROLE_CHANNEL_MANAGER\n" +
+            "ROLE_CHANNEL_MANAGER > ROLE_USER";
     return RoleHierarchyImpl.fromHierarchy(hierarchy);
+  }
+
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+      RoleHierarchy roleHierarchy) {
+    DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+    expressionHandler.setRoleHierarchy(roleHierarchy); // 역할 계층 설정
+    return expressionHandler;
   }
 }
