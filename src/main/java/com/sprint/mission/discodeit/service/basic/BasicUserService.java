@@ -99,6 +99,7 @@ public class BasicUserService implements UserService {
             .toList();
     }
 
+    @PreAuthorize("hasPermission(#userId,'User','update')")
     @Transactional
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
@@ -155,6 +156,7 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user).withOnline(userOnlineSessionService.isOnline(user.getId()));
     }
 
+    @PreAuthorize("hasPermission(#userId,'User','delete')")
     @Transactional
     @Override
     public void delete(UUID userId) {
