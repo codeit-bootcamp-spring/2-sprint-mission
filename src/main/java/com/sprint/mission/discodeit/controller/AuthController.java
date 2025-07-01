@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.AuthApi;
+//import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -20,26 +20,38 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
-public class AuthController implements AuthApi {
+public class AuthController {
 
   private final AuthService authService;
 
   @GetMapping(path = "/csrf-token")
-  public Map<String, String> getCsrfToken(HttpServletRequest request) {
-    CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
-    Map<String, String> tokenMap = new HashMap<>();
-    tokenMap.put("csrfToken", csrfToken.getToken());
-    return tokenMap;
+  public CsrfToken getCsrfToken(HttpServletRequest request) {
+    CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+    if (csrfToken == null) {
+      csrfToken = (CsrfToken) request.getAttribute("_csrf");
+    }
+
+    if (csrfToken != null) {
+      log.info("CSRF 토큰 반환: {}", csrfToken.getToken());
+    } else {
+      log.warn("CSRF 토큰을 찾을 수 없습니다");
+    }
+
+    return csrfToken;
   }
 
-
   @PostMapping(path = "/login")
-  public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest) {
-    log.info("로그인 요청: username={}", loginRequest.username());
-    UserDto user = authService.login(loginRequest);
-    log.debug("로그인 응답: {}", user);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(user);
+  public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest,
+                                       HttpServletRequest request) {
+    log.info("로그인 요청: {}", loginRequest.username());
+
+    try {
+      UserDto user = authService.login(loginRequest, request);
+      log.info("로그인 성공: {}", user.username());
+      return ResponseEntity.ok(user);
+    } catch (Exception e) {
+      log.error("로그인 실패", e);
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
   }
 }

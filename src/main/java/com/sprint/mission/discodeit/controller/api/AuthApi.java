@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller.api;
+/*package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
@@ -33,4 +33,4 @@ public interface AuthApi {
   ResponseEntity<UserDto> login(
       @Parameter(description = "로그인 정보") LoginRequest loginRequest
   );
-} 
+} */
