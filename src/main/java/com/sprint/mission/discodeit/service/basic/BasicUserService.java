@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -67,7 +68,7 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    User user = new User(username, email, encodedPassword, nullableProfile);
+    User user = new User(username, email, encodedPassword, nullableProfile, UserRole.USER);
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
@@ -77,6 +78,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto find(UUID userId) {
     log.debug("사용자 조회 시작: id={}", userId);
     UserDto userDto = userRepository.findById(userId)
