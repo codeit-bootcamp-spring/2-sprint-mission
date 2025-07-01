@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.file.FileReadException;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
@@ -16,15 +15,13 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.LoginStatusService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.util.MaskingUtil;
-import java.time.Instant;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,7 +42,7 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusService userStatusService;
+  private final LoginStatusService loginStatusService;
   private final BinaryContentService binaryContentService;
   private final UserMapper userMapper;
   private final BinaryContentStorage binaryContentStorage;
@@ -54,6 +51,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict(value = "allUsers", allEntries = true)
   public CreateUserResult create(CreateUserCommand createUserCommand, MultipartFile multipartFile) {
     checkDuplicateUsername(createUserCommand);
     checkDuplicateEmail(createUserCommand);
@@ -83,11 +81,6 @@ public class BasicUserService implements UserService {
     User user = createUserEntity(encodedUserCommand, binaryContent);
     userRepository.save(user);
 
-    // GenerationType.UUID의 경우, save()만 해줘도 User의 id를 DB가 아닌 자바에서 직접 생성
-    // IDENTITY와 다르게 flush()를 안해줘도 user.getId()로 접근이 가능하다.
-    UserStatus userStatus = new UserStatus(user, Instant.now());
-    user.updateUserStatus(userStatus);
-
     return userMapper.toCreateUserResult(user);
   }
 
@@ -96,17 +89,21 @@ public class BasicUserService implements UserService {
   @Cacheable(value = "user", key = "#p0")
   public FindUserResult find(UUID userId) {
     User findUser = findUserById(userId, "find");
-    return userMapper.toFindUserResult(findUser);
+    return userMapper.toFindUserResult(findUser, loginStatusService.isUserOnline(
+        findUser.getUsername()));
+  }
+
+  @Cacheable("allUsers")
+  public List<User> getCachedUsers() {
+    return userRepository.findAllFetch();
   }
 
   @Override
   @Transactional(readOnly = true)
-  @Cacheable(value = "allUsers")
   public List<FindUserResult> findAll() {
-    List<User> users = userRepository.findAllFetch();
-
-    return users.stream()
-        .map(user -> userMapper.toFindUserResult(user))
+    return getCachedUsers().stream()
+        .map(user -> userMapper.toFindUserResult(user,
+            loginStatusService.isUserOnline(user.getUsername())))
         .toList();
   }
 
@@ -160,7 +157,6 @@ public class BasicUserService implements UserService {
       binaryContentService.delete(user.getProfile().getId());
       binaryContentStorage.delete(user.getProfile().getId());
     }
-    userStatusService.deleteByUserId(userId);
   }
 
 

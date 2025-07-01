@@ -9,8 +9,7 @@ public record UpdateUserResult(
     Instant updatedAt,
     FindBinaryContentResult profile,
     String username,
-    String email,
-    Boolean online
+    String email
 ) {
 
 }

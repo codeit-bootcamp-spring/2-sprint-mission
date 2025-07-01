@@ -30,9 +30,6 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus userStatus;
-
   @Column(length = 50, nullable = false, unique = true)
   private String username;
 
@@ -83,10 +80,5 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
   public void updateProfileDefault() {
     this.profile = null;
   }
-
-  public void updateUserStatus(UserStatus userStatus) {
-    this.userStatus = userStatus;
-  }
-
 }
 

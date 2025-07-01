@@ -29,6 +29,8 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -111,6 +113,12 @@ public class SecurityConfig {
     provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
 
     return provider;
+  }
+
+  @Bean
+  public SessionAuthenticationStrategy sessionAuthenticationStrategy(
+      SessionRegistry sessionRegistry) {
+    return new RegisterSessionAuthenticationStrategy(sessionRegistry);
   }
 
   @Bean

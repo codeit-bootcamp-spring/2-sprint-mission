@@ -9,8 +9,7 @@ public record LoginResult(
     FindBinaryContentResult profile,
     String username,
     Role role,
-    String email,
-    Boolean online
+    String email
 ) {
 
 }

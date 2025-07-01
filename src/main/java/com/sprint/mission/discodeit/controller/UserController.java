@@ -7,11 +7,8 @@ import com.sprint.mission.discodeit.dto.service.user.CreateUserResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
-import com.sprint.mission.discodeit.dto.service.userStatus.UpdateUserStatusResult;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.swagger.UserApi;
 import com.sprint.mission.discodeit.validator.ProfileImageValidator;
 import jakarta.validation.Valid;
@@ -33,9 +30,7 @@ import java.util.UUID;
 public class UserController implements UserApi {
 
   private final UserService userService;
-  private final UserStatusService userStatusService;
   private final UserMapper userMapper;
-  private final UserStatusMapper userStatusMapper;
 
   @Override
   @LogMasking
@@ -87,16 +82,6 @@ public class UserController implements UserApi {
     return ResponseEntity.ok(updatedUser);
   }
 
-  @Override
-  @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UpdateUserStatusResponseDTO> updateUserStatus(
-      @PathVariable("userId") UUID id) {
-    log.info("UserStatus update request (userId: {})", id);
-    UpdateUserStatusResult updateUserStatusResult = userStatusService.updateByUserId(id);
-    UpdateUserStatusResponseDTO updatedUserStatus = userStatusMapper.toUpdateUserStatusResponseDTO(
-        updateUserStatusResult);
-    return ResponseEntity.ok(updatedUserStatus);
-  }
 
   @Override
   @DeleteMapping("/{userId}")
