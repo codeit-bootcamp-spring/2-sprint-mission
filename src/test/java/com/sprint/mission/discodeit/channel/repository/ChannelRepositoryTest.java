@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;

@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.Role;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 import lombok.Builder;
@@ -32,23 +31,17 @@ public record UserDto(
 ) {
 
   public static UserDto from(User user) {
-    UserStatus userStatus = user.getUserStatus();
-    boolean online = true;
-    if (userStatus != null) {
-      online = userStatus.isOnline();
-    }
     BinaryContent userProfile = user.getProfile();
     BinaryContentDto binaryContentDto = null;
     if (userProfile != null) {
       binaryContentDto = BinaryContentDto.create(userProfile);
     }
-
     return UserDto.builder()
         .id(user.getId())
         .username(user.getName())
         .email(user.getEmail())
         .profile(binaryContentDto)
         .role(user.getRole())
-        .online(online).build();
+        .online(user.isOnline()).build();
   }
 }

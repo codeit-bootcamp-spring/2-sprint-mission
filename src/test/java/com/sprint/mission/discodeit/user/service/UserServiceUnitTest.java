@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -20,17 +19,11 @@ import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.service.BasicUserService;
-import com.sprint.mission.discodeit.core.user.service.UserStatusService;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +41,6 @@ public class UserServiceUnitTest {
   @Mock
   private JpaUserRepository userRepository;
 
-  @Mock
-  private UserStatusService userStatusService;
 
   @Mock
   private PasswordEncoder passwordEncoder;
@@ -69,7 +60,6 @@ public class UserServiceUnitTest {
     userId = UUID.randomUUID();
     oldProfile = BinaryContent.create("old.png", 0L, "image/png");
     user = User.create("a", "a@email.com", "a", oldProfile);
-    user.setUserStatus(UserStatus.create(user, Instant.now()));
   }
 
   @Test
@@ -215,7 +205,6 @@ public class UserServiceUnitTest {
     // when
     userService.delete(userId);
     // then
-    verify(userStatusService).delete(userId);
     verify(userRepository).delete(spyUser);
   }
 
@@ -227,32 +216,8 @@ public class UserServiceUnitTest {
     assertThrows(UserException.class, () -> userService.delete(userId));
     // then
     verifyNoInteractions(binaryContentService);
-    verifyNoInteractions(userStatusService);
 
     verify(userRepository, never()).deleteById(any());
-  }
-
-  @Test
-  void UserStatusOnline_Success() {
-    // given
-    Instant now = Instant.now();
-    UserStatusRequest request = new UserStatusRequest(now);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    // when
-    UserStatusDto online = userService.online(userId, request);
-    // then
-    assertThat(online.lastActiveAt()).isCloseTo(now, within(1, ChronoUnit.SECONDS));
-  }
-
-  @Test
-  void UserStatusOnline_WithoutUser_ShouldThrowException() {
-    // given
-    UserStatusRequest request = mock(UserStatusRequest.class);
-    when(userRepository.findById(userId)).thenReturn(Optional.empty());
-    // when & then
-    assertThrows(UserException.class, () -> {
-      userService.online(userId, request);
-    });
   }
 
 }

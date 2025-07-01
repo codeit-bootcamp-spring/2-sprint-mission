@@ -6,16 +6,11 @@ import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.request.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +27,6 @@ public class BasicUserService implements UserService {
 
   private final PasswordEncoder passwordEncoder;
   private final JpaUserRepository userRepository;
-  private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
 
   @Override
@@ -53,10 +47,6 @@ public class BasicUserService implements UserService {
     userRepository.save(user);
 
     log.info("[UserService] User registered: id {}, name {}", user.getId(), user.getName());
-
-    UserStatus userStatus = userStatusService.create(
-        new UserStatusCreateRequest(user, Instant.now()));
-    user.setUserStatus(userStatus);
 
     return UserDto.from(user);
   }
@@ -104,19 +94,8 @@ public class BasicUserService implements UserService {
       binaryContentService.delete(profile.getId());
     }
 
-    userStatusService.delete(id);
     userRepository.delete(user);
 
     log.info("[UserService] User deleted {}", userId);
-  }
-
-  @Override
-  public UserStatusDto online(UUID userId, UserStatusRequest request) {
-    User user = userRepository.findById(userId).orElseThrow(
-        () -> new UserException(ErrorCode.USER_NOT_FOUND, userId));
-
-    UserStatus userStatus = user.getUserStatus();
-    userStatus.update(request.newLastActiveAt());
-    return UserStatusDto.create(user, userStatus);
   }
 }

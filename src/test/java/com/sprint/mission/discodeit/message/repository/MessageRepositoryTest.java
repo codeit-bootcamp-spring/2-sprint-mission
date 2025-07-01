@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;

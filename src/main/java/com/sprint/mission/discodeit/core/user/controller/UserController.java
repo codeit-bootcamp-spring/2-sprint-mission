@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.core.user.controller;
 
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.dto.UserStatusDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.dto.request.UserStatusRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.service.UserService;
 import com.sprint.mission.discodeit.swagger.UserApi;
@@ -18,12 +16,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,6 +60,7 @@ public class UserController implements UserApi {
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.getUserDto().id()")
   public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
       @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
@@ -78,15 +77,10 @@ public class UserController implements UserApi {
   }
 
   @DeleteMapping("/{userId}")
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.getUserDto().id()")
   public ResponseEntity<Void> delete(@PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @RequestBody UserStatusRequest request) {
-    UserStatusDto result = userService.online(userId, request);
-    return ResponseEntity.ok(result);
-  }
 }

@@ -34,13 +34,12 @@ public class User extends BaseUpdatableEntity {
   private String password;
 
   @Setter
+  @Column(name = "online")
+  private boolean online;
+
   @Column(name = "role")
   @Enumerated(EnumType.STRING)
   private Role role;
-
-  @Setter
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-  private UserStatus userStatus;
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "profile_id")
@@ -53,6 +52,7 @@ public class User extends BaseUpdatableEntity {
     this.email = email;
     this.password = password;
     this.role = role;
+    this.online = false;
   }
 
   public static User create(String name, String email, String password, BinaryContent profile) {

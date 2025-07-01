@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.core.user.service.UserService;
 import java.time.Instant;
@@ -47,9 +46,7 @@ public class UserIntegrationTest {
     BinaryContent binaryContent = BinaryContent.create(
         "test.png", 1L, "image/png");
     User beforeUser1 = User.create("a", "a@a.com", "a", null);
-    beforeUser1.setUserStatus(UserStatus.create(beforeUser1, now));
     User beforeUser2 = User.create("b", "b@b.com", "b", binaryContent);
-    beforeUser2.setUserStatus(UserStatus.create(beforeUser2, now));
 
     User u1 = userRepository.save(beforeUser1);
     User u2 = userRepository.save(beforeUser2);

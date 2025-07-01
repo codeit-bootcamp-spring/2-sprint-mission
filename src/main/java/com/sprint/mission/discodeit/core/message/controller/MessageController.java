@@ -23,6 +23,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -77,6 +78,7 @@ public class MessageController implements MessageApi {
   }
 
   @PatchMapping("/{messageId}")
+  @PreAuthorize("@customSecurity.isMessageOwner(#messageId)")
   public ResponseEntity<MessageDto> update(
       @PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest request) {
@@ -85,6 +87,7 @@ public class MessageController implements MessageApi {
   }
 
   @DeleteMapping("/{messageId}")
+  @PreAuthorize("hasRole('ADMIN') or @customSecurity.isMessageOwner(#messageId)")
   public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity.noContent().build();

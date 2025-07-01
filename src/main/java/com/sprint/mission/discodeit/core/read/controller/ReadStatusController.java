@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ public class ReadStatusController implements ReadStatusApi {
   private final ReadStatusService readStatusService;
 
   @PostMapping
+  @PreAuthorize("#request.userId() == authentication.principal.getUserDto().id()")
   public ResponseEntity<ReadStatusDto> create(
       @RequestBody ReadStatusCreateRequest request) {
     ReadStatusDto result = readStatusService.create(request);
@@ -37,6 +39,7 @@ public class ReadStatusController implements ReadStatusApi {
   }
 
   @PatchMapping("/{readStatusId}")
+  @PreAuthorize("@customSecurity.isReadStatusOwner(#readStatusId)")
   public ResponseEntity<ReadStatusDto> update(
       @PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest request) {

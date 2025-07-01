@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserRoleUpdateRequest;
-import com.sprint.mission.discodeit.core.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

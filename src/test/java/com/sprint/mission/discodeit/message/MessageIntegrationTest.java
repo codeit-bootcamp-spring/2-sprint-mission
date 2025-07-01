@@ -20,7 +20,6 @@ import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository
 import com.sprint.mission.discodeit.core.message.service.MessageService;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
 import java.util.List;

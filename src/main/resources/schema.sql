@@ -24,19 +24,6 @@ create table if not exists users
             on delete set null
 );
 
-create table if not exists user_statuses
-(
-    id             uuid primary key,
-    created_at     timestamp default current_timestamp,
-    updated_at     timestamp,
-    last_active_at timestamp   not null,
-    user_id        uuid unique not null,
-    constraint fk_user
-        foreign key (user_id)
-            references users (id)
-            on delete cascade
-);
-
 create table if not exists channels
 (
     id          uuid primary key,
@@ -96,4 +83,12 @@ create table if not exists message_attachments
         foreign key (attachment_id)
             references binary_contents (id)
             on delete cascade
+);
+
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
 );

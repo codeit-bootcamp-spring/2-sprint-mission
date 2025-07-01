@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.user.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.config.TestAuditingConfig;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
@@ -30,19 +29,14 @@ public class UserRepositoryTest {
   void findAllWithProfileAndStatus() {
     // given
     User user1 = User.create("a", "a", "test", null);
-    user1.setUserStatus(UserStatus.create(user1, Instant.now()));
 
     User user2 = User.create("b", "b", "test", null);
-    user2.setUserStatus(UserStatus.create(user2, Instant.now()));
 
     User user3 = User.create("c", "c", "test", null);
-    user3.setUserStatus(UserStatus.create(user3, Instant.now()));
 
     User user4 = User.create("d", "d", "test", null);
-    user4.setUserStatus(UserStatus.create(user4, Instant.now()));
 
     User user5 = User.create("e", "e", "test", null);
-    user5.setUserStatus(UserStatus.create(user5, Instant.now()));
 
     userRepository.saveAll(List.of(user1, user2, user3, user4, user5));
     entityManager.flush();
@@ -65,7 +59,6 @@ public class UserRepositoryTest {
   void findAllWithProfileAndStatus_whenUserHasNoStatus_shouldNotReturnThatUser() {
     // given
     User withStatus = User.create("withStatus", "email1@test.com", "pwd", null);
-    withStatus.setUserStatus(UserStatus.create(withStatus, Instant.now()));
 
     User noStatus = User.create("noStatus", "email2@test.com", "pwd", null);
 

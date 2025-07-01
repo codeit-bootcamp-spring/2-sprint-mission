@@ -23,7 +23,6 @@ import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.time.Instant;
 import java.util.List;
