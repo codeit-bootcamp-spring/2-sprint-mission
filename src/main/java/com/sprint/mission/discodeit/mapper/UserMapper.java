@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.file.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
