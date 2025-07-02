@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.CustomLogoutFilter;
+import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import java.util.List;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +18,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +29,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.session.CompositeSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
@@ -60,12 +67,20 @@ public class SecurityConfig {
                 .ignoringRequestMatchers(
                     "/api/auth/login",
                     "/api/auth/logout",
-                    "/api/auth/role"
+                    "/api/auth/role",
+                    "/api/users"
                 ) // CSRF 무시
             )
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
                 .alwaysRemember(true)
+            )
+            .sessionManagement(session -> session
+                .maximumSessions(1) // 하나의 세션만 허용
+                .expiredSessionStrategy(
+                    new CustomSessionInformationExpiredStrategy(
+                        new ObjectMapper())) // 세션 만료 시 사용자 정의 응답
+                .sessionRegistry(sessionRegistry())
             )
             .addFilterBefore(customLogoutFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jsonLoginFilter, UsernamePasswordAuthenticationFilter.class)
@@ -103,11 +118,29 @@ public class SecurityConfig {
     }
 
     @Bean
+    public SessionAuthenticationStrategy sessionAuthenticationStrategy(
+        SessionRegistry sessionRegistry) {
+
+        // 동시에 하나의 세션만 허용
+        ConcurrentSessionControlAuthenticationStrategy concurrent =
+            new ConcurrentSessionControlAuthenticationStrategy(sessionRegistry);
+        concurrent.setMaximumSessions(1);
+
+        // 세션 정보를 SessionRegistry에 등록
+        RegisterSessionAuthenticationStrategy register =
+            new RegisterSessionAuthenticationStrategy(sessionRegistry);
+
+        return new CompositeSessionAuthenticationStrategy(List.of(concurrent, register));
+    }
+
+    @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter(
         AuthenticationManager authenticationManager,
         ObjectMapper objectMapper,
         UserMapper userMapper,
-        RememberMeServices rememberMeServices
+        RememberMeServices rememberMeServices,
+        SessionRegistry sessionRegistry,
+        SessionAuthenticationStrategy sessionAuthenticationStrategy
     ) {
         JsonUsernamePasswordAuthenticationFilter filter =
             new JsonUsernamePasswordAuthenticationFilter(objectMapper);
@@ -117,8 +150,10 @@ public class SecurityConfig {
         filter.setFilterProcessesUrl("/api/auth/login");
         filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
 
+        filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy); // 세션 전략 명시적 등록
+
         filter.setAuthenticationSuccessHandler(
-            new CustomLoginSuccessHandler(objectMapper, userMapper));
+            new CustomLoginSuccessHandler(objectMapper, userMapper, sessionRegistry));
         filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
 
         return filter;
@@ -160,5 +195,10 @@ public class SecurityConfig {
         services.setTokenValiditySeconds(tokenValiditySeconds);
         services.setAlwaysRemember(true);
         return services;
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
     }
 }
