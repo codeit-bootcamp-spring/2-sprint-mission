@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,6 +76,7 @@ public class UserController {
             )
         }
     )
+    @PreAuthorize("#userId == principal.user.id or hasRole('ADMIN')")
     @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateUser(
         @PathVariable UUID userId,
@@ -112,6 +114,7 @@ public class UserController {
 
     @Operation(summary = "사용자 삭제")
     @ApiResponse(responseCode = "204", description = "사용자 삭제 성공")
+    @PreAuthorize("#userId == principal.user.id or hasRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         log.info("사용자 삭제 API 호출 - userId: {}", userId);

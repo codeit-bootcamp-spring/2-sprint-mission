@@ -22,6 +22,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
@@ -29,6 +30,8 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -170,6 +173,17 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
 
+        // 인가 처리 추가 -> 작성자와 현재 사용자 비교
+        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
+
+        if (!message.getAuthor().getId().equals(currentUser.getUser().getId())) {
+            log.warn("메시지 수정 권한 없음 - 요청자: {}, 작성자: {}",
+                currentUser.getUser().getId(), message.getAuthor().getId());
+            throw new AccessDeniedException("해당 메시지를 수정할 권한이 없습니다.");
+        }
+
         message.update(request.newContent(), message.getAttachments());
         log.info("메시지 수정 완료 - messageId: {}", message.getId());
 
@@ -183,6 +197,22 @@ public class BasicMessageService implements MessageService {
 
         Message message = messageRepository.findById(messageId)
             .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
+
+        // 인가 처리 추가 -> 작성자 또는 ADMIN 권한을 가진 사용자만
+        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
+
+        UUID currentUserId = currentUser.getUser().getId();
+        boolean isAuthor = message.getAuthor().getId().equals(currentUserId);
+        boolean isAdmin = currentUser.getAuthorities().stream()
+            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAuthor && !isAdmin) {
+            log.warn("메시지 삭제 권한 없음 - 요청자: {}, 작성자: {}",
+                currentUserId, message.getAuthor().getId());
+            throw new AccessDeniedException("해당 메시지를 삭제할 권한이 없습니다.");
+        }
 
         message.getAttachments().forEach(file -> {
             binaryContentRepository.delete(file);
