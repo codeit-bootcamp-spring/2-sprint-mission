@@ -13,10 +13,10 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   List<Message> findByChannelId(UUID channelId);
 
-  @EntityGraph(attributePaths = {"author", "author.status", "attachments"})
+  @EntityGraph(attributePaths = {"author", "attachments"})
   Slice<Message> findSliceByChannelId(UUID channelId, Pageable pageable);
 
-  @EntityGraph(attributePaths = {"author", "author.status", "attachments"})
+  @EntityGraph(attributePaths = {"author", "attachments"})
   Slice<Message> findSliceByChannelIdAndCreatedAtBefore(UUID channelId, Pageable pageable,
       Instant createdAt);
 }

@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +20,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,6 +74,7 @@ public class ReadStatusController {
           )
       )
   })
+  @PreAuthorize("principal.userId == readStatusRequest.userId()")
   public ResponseEntity<ReadStatusDto> save(
       @RequestBody ReadStatusRequest readStatusRequest
   ) {
@@ -116,6 +118,7 @@ public class ReadStatusController {
           )
       )
   })
+  @PostAuthorize("principal.userId == returnObject.body.userId()")
   public ResponseEntity<ReadStatusDto> update(
       @PathVariable("readStatusId") UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
@@ -145,10 +148,10 @@ public class ReadStatusController {
       )
   })
   public ResponseEntity<List<ReadStatusDto>> findByUserId(
-      @RequestParam("userId") UUID readStatusId
+      @RequestParam("userId") UUID userId
   ) {
     List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(
-        readStatusId);
+        userId);
     return ResponseEntity.status(HttpStatus.OK).body(readStatusDtoList);
   }
 }

@@ -31,6 +31,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -114,6 +115,7 @@ public class MessageController {
             )
         )
     })
+    @PreAuthorize("principal.userId == @basicMessageService.findById(#messageId).author.id")
     public ResponseEntity<MessageDto> update(
         @PathVariable("messageId") UUID messageId,
         @Valid @RequestBody MessageUpdateRequest messageUpdateRequest
@@ -147,6 +149,7 @@ public class MessageController {
             )
         )
     })
+    @PreAuthorize("hasRole('ADMIN') or principal.userId == @basicMessageService.findById(#messageId).author.id")
     public ResponseEntity<Void> delete(
         @PathVariable("messageId") UUID messageId
     ) {
