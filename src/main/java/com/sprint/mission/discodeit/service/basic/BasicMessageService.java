@@ -28,6 +28,7 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -128,7 +129,8 @@ public class BasicMessageService implements MessageService {
   @CachePut(value = "message", key = "#p0")
   @CacheEvict(value = "allMessages", allEntries = true)
   @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author().id()")
-  public UpdateMessageResult update(UUID messageId, UpdateMessageCommand updateMessageCommand,
+  public UpdateMessageResult update(@Param("messageId") UUID messageId,
+      UpdateMessageCommand updateMessageCommand,
       List<MultipartFile> multipartFiles) {
     Message message = findMessageById(messageId, "update");
     message.updateMessageInfo(updateMessageCommand.newContent());
@@ -145,7 +147,7 @@ public class BasicMessageService implements MessageService {
       @CacheEvict(value = "message", key = "#p0")
   })
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author().id()")
-  public void delete(UUID messageId) {
+  public void delete(@Param("messageId") UUID messageId) {
     Message message = findMessageById(messageId, "delete");
     if (message.getAttachments() != null) {
       message.getAttachments()
