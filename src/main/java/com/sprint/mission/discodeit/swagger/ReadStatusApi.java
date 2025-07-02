@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.dto.controller.readstatus.CreateReadStatusRe
 import com.sprint.mission.discodeit.dto.controller.readstatus.FindReadStatusResponseDTO;
 import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.readstatus.UpdateReadStatusResponseDTO;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 
 @Tag(name = "Read-Status-Controller", description = "ReadStatus 관련 API")
@@ -32,7 +34,7 @@ public interface ReadStatusApi {
           @ApiResponse(responseCode = "404", description = "readStatusId에 해당하는 ReadStatus가 존재하지 않음")
       })
   ResponseEntity<UpdateReadStatusResponseDTO> updateReadStatus(UUID id,
-      UpdateReadStatusRequestDTO request);
+      UpdateReadStatusRequestDTO request, CustomUserDetails principal);
 
   @Operation(summary = "유저의 읽음상태 조회",
       description = "userId에 해당하는 읽음상태들을 조회합니다.",
