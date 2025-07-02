@@ -1,17 +1,36 @@
-version: '3'
+version: "3.8"
+
 services:
   postgres-db:
     image: postgres:15
     container_name: local_postgres
     environment:
-      POSTGRES_USER: discodeit_user
-      POSTGRES_PASSWORD: discodeit1234
-      POSTGRES_DB: discodeit
+      POSTGRES_USER: ${POSTGRES_USER:-discodeit_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-discodeit1234}
+      POSTGRES_DB: ${POSTGRES_DB:-discodeit}
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discodeit_app
+    depends_on:
+      - postgres-db
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${POSTGRES_DB:-discodeit}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-discodeit_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-discodeit1234}
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./BinaryContentStorage:/app/BinaryContentStorage
+    restart: always
 
 volumes:
   db_data:
