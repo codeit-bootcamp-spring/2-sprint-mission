@@ -30,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     @Operation(summary = "사용자 생성")
     @ApiResponses(value = {
@@ -125,26 +124,5 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @Operation(
-        summary = "온라인 상태 변경",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "상태 변경 성공",
-                content = @Content(mediaType = "*/*")
-            )
-        }
-    )
-    @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<Void> updateOnlineStatus(
-        @PathVariable UUID userId,
-        @RequestBody @Valid UpdateUserStatusRequest request
-    ) {
-        log.info("사용자 상태 변경 API 호출 - userId: {}", userId);
-        userStatusService.update(userId, request);
-        log.info("사용자 상태 변경 완료 - userId: {}", userId);
-        return ResponseEntity.ok().build();
     }
 }

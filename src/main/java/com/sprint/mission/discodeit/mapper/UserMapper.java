@@ -19,18 +19,11 @@ public class UserMapper {
 
         BinaryContentDto profileDto = binaryContentMapper.toDto(user.getProfile());
 
-        Boolean online = null;
-        UserStatus status = user.getStatus();
-        if (status != null) {
-            online = status.online();
-        }
-
         return new UserDto(
             user.getId(),
             user.getUsername(),
             user.getEmail(),
             profileDto,
-            online,
             user.getRole()
         );
     }

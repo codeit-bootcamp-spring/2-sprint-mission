@@ -54,7 +54,7 @@ public class SecurityConfig {
                     "/", "/favicon.ico", "/index.html",
                     "/static/**", "/assets/**", "/profile-images/**",
                     "/api/auth/csrf-token", "/api/auth/login",
-                    "/api/users"
+                    "/api/users", "/api/auth/me"
                 ).permitAll()
                 .requestMatchers("/api/auth/role").hasRole("ADMIN") // 권한 수정은 관리자만 가능
                 .requestMatchers(

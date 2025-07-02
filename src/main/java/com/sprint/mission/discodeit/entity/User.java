@@ -40,9 +40,6 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_profile"))
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus status;
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReadStatus> readStatuses = new ArrayList<>();
 

@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentService binaryContentService;
     private final UserMapper userMapper;
@@ -76,8 +75,6 @@ public class BasicUserService implements UserService {
             profile
         );
         userRepository.save(user);
-        userStatusRepository.save(new UserStatus(user));
-        userStatusRepository.flush();
 
         log.info("사용자 생성 완료 - userId: {}", user.getId());
         return userMapper.toDto(user);
