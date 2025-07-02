@@ -2,21 +2,21 @@
 
 ## Spring Security 환경 설정
 
-- [ ] 프로젝트에 Spring Security 의존성을 추가하세요.
-- [ ] Security 설정 클래스를 생성하세요.
+- [x] 프로젝트에 Spring Security 의존성을 추가하세요.
+- [x] Security 설정 클래스를 생성하세요.
   ~~~text
   - 패키지명: com.sprint.mission.discodeit.config
   - 클래스명: SecurityConfig
   ~~~
-- [ ] SecurityFilterChain Bean을 선언하세요.
-- [ ] 가장 기본적인 SecurityFilterChain을 등록하고, 이때 등록되는 필터 목록을 디버깅해보세요. 필터 목록은 PR에 첨부하세요.
-- [ ] 모든 요청에 대해 인증이 수행되도록 하세요.
-- [ ] /api/를 포함하지 않는 모든 url에 대한 요청(정적 리소스, swagger, actuator 등)은 인증을 수행하지 않도록 하세요.
-- [ ] LogoutFilter를 제외하세요.
+- [x] SecurityFilterChain Bean을 선언하세요.
+- [x] 가장 기본적인 SecurityFilterChain을 등록하고, 이때 등록되는 필터 목록을 디버깅해보세요. 필터 목록은 PR에 첨부하세요.
+- [x] 모든 요청에 대해 인증이 수행되도록 하세요.
+- [x] /api/를 포함하지 않는 모든 url에 대한 요청(정적 리소스, swagger, actuator 등)은 인증을 수행하지 않도록 하세요.
+- [x] LogoutFilter를 제외하세요.
   ~~~text
   - 디스코드잇은 로그아웃 페이지를 CSR로 처리하기 때문에 LogoutFilter는 사용하지 않습니다.
   ~~~
-- [ ] 개발 환경에서 Spring Security 모듈의 로깅 레벨을 trace로 설정하세요.
+- [x] 개발 환경에서 Spring Security 모듈의 로깅 레벨을 trace로 설정하세요.
   ~~~text
   - 각 요청마다 통과하는 필터 목록을 확인할 수 있습니다.
   ~~~

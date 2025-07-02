@@ -47,6 +47,9 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
     testImplementation 'org.apache.commons:commons-compress:1.26.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation "org.springframework.security:spring-security-test"
 }
 
 test {

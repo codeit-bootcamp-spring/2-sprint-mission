@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.config;
+package com.sprint.mission.discodeit.common.config.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

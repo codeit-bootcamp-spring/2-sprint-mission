@@ -5,7 +5,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
   profiles:
-    active: prod
+    active: dev
   servlet:
     multipart:
       max-file-size: 4MB
