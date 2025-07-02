@@ -33,6 +33,7 @@ import org.springframework.security.web.authentication.session.CompositeSessionA
 import org.springframework.security.web.authentication.session.ConcurrentSessionControlAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionFixationProtectionStrategy;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Configuration
@@ -130,7 +131,10 @@ public class SecurityConfig {
         RegisterSessionAuthenticationStrategy register =
             new RegisterSessionAuthenticationStrategy(sessionRegistry);
 
-        return new CompositeSessionAuthenticationStrategy(List.of(concurrent, register));
+        // 로그인 시 세션 ID 새로 발급
+        SessionFixationProtectionStrategy fixation = new SessionFixationProtectionStrategy();
+
+        return new CompositeSessionAuthenticationStrategy(List.of(concurrent, register, fixation));
     }
 
     @Bean
