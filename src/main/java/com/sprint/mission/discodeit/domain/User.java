@@ -3,9 +3,10 @@ package com.sprint.mission.discodeit.domain;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.sprint.mission.discodeit.domain.base.BaseUpdatableEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -34,8 +35,9 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role;
 
   public static User create(String username, String email, String password, BinaryContent profile) {
     validate(username, email, password);
@@ -44,31 +46,9 @@ public class User extends BaseUpdatableEntity {
         .email(email)
         .password(password)
         .profile(profile)
+        .role(Role.USER)
         .build();
   }
-
-  public void assignStatus(UserStatus status) {
-    this.status = status;
-  }
-
-  public void update(String username, String email, String password, BinaryContent profile) {
-    if (username != null && !username.equals(this.username)) {
-      validateUsername(username);
-      this.username = username;
-    }
-    if (email != null && !email.equals(this.email)) {
-      validateEmail(email);
-      this.email = email;
-    }
-    if (password != null && !password.equals(this.password)) {
-      validatePassword(password);
-      this.password = password;
-    }
-    if (profile != null) {
-      this.profile = profile;
-    }
-  }
-
 
   /*******************************
    * Validation check
@@ -103,6 +83,30 @@ public class User extends BaseUpdatableEntity {
   private static void validatePassword(String password) {
     if (password.length() > 60) {
       throw new IllegalArgumentException("비밀번호는 60자 이하여야 합니다.");
+    }
+  }
+
+  public void update(String username, String email, String password, BinaryContent profile) {
+    if (username != null && !username.equals(this.username)) {
+      validateUsername(username);
+      this.username = username;
+    }
+    if (email != null && !email.equals(this.email)) {
+      validateEmail(email);
+      this.email = email;
+    }
+    if (password != null && !password.equals(this.password)) {
+      validatePassword(password);
+      this.password = password;
+    }
+    if (profile != null) {
+      this.profile = profile;
+    }
+  }
+
+  public void updateRole(Role role) {
+    if (role != null && !role.equals(this.role)) {
+      this.role = role;
     }
   }
 
