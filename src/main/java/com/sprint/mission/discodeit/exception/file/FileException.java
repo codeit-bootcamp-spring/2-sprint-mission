@@ -6,7 +6,8 @@ import java.util.*;
 
 public class FileException extends DiscodeitException {
 
-    public FileException(ErrorCode errorCode, Map<String, Object> details) {
-        super(errorCode, details);
+    public FileException(ErrorCode errorCode) {
+        super(errorCode);
     }
+
 }

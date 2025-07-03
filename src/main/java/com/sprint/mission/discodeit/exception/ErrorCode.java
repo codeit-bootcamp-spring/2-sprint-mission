@@ -16,6 +16,7 @@ public enum ErrorCode {
 
     USER_OPERATION_RESTRICTED(HttpStatus.FORBIDDEN, "해당 사용자에 대한 작업이 제한되었습니다."),
     INVALID_USER_STATUS_UPDATE(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자 상태 변경입니다."),
+    ROLE_UPDATE_NOT_AUTHORIZED(HttpStatus.FORBIDDEN, "권한 업데이트가 허용되지 않습니다."),
 
 
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾을 수 없습니다."),
