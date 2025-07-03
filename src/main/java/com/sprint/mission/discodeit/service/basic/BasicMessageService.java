@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.PageResponse;
+
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -10,7 +11,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import com.sprint.mission.discodeit.exception.message.MessageFileProcessingException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -24,15 +24,12 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -40,9 +37,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class BasicMessageService implements MessageService {
 
-    private static final Logger log = LoggerFactory.getLogger(BasicMessageService.class);
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
@@ -55,66 +52,58 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest,
         List<MultipartFile> attachments) {
+        log.info("🔧 MessageService.create 시작");
+        log.info("🔧 요청 내용: {}", messageCreateRequest);
+        log.info("🔧 첨부파일 개수: {}", attachments != null ? attachments.size() : 0);
+        
         UUID channelId = messageCreateRequest.channelId();
         UUID authorId = messageCreateRequest.authorId();
-
+        
+        log.info("🔧 채널 조회 시작 - channelId: {}", channelId);
         Channel channel = findChannelOrThrow(channelId);
+        log.info("🔧 채널 조회 성공 - 채널명: {}", channel.getName());
+        
+        log.info("🔧 사용자 조회 시작 - authorId: {}", authorId);
         User author = findUserOrThrow(authorId);
-        log.info("채널 및 작성자 확인 완료");
+        log.info("🔧 사용자 조회 성공 - 사용자명: {}", author.getUsername());
 
         List<BinaryContent> savedAttachmentEntities = new ArrayList<>();
         if (!CollectionUtils.isEmpty(attachments)) {
             for (MultipartFile file : attachments) {
                 if (file == null || file.isEmpty()) {
-                    log.warn("첨부파일이 비어 있음");
                     continue;
                 }
-
-                String fileName = file.getOriginalFilename();
                 try {
                     BinaryContentDto attachmentDto = binaryContentService.create(file);
 
                     BinaryContent savedAttachment = binaryContentRepository.findById(
-                        attachmentDto.id()).orElseThrow(() -> {
-                        log.error("첨부파일 메타데이터를 찾을 수 없음");
-                        return new MessageFileProcessingException(
-                            Map.of("fileName", Objects.requireNonNull(fileName), "detail",
-                                "저장된 첨부파일 메타데이터를 찾을 수 없습니다."));
-                    });
+                        attachmentDto.id()).orElseThrow(MessageFileProcessingException::new);
                     savedAttachmentEntities.add(savedAttachment);
-                    log.info("첨부파일 저장 완료");
                 } catch (Exception e) {
-                    log.error("첨부파일 처리 오류", e);
-                    if (e instanceof FileProcessingCustomException fe) {
-                        throw new MessageFileProcessingException(new HashMap<>(fe.getDetails()));
-                    } else {
-                        Map<String, Object> newDetails = new HashMap<>();
-                        newDetails.put("fileName", fileName);
-                        String errorMessage = e.getMessage();
-                        newDetails.put("originalError",
-                            errorMessage != null ? errorMessage : e.getClass().getSimpleName());
-                        throw new MessageFileProcessingException(newDetails);
-                    }
+                    throw new MessageFileProcessingException();
                 }
             }
-            log.info("첨부파일 처리 완료");
-        } else {
-            log.info("첨부파일 없음");
         }
-
         Message message = new Message(messageCreateRequest.content(), channel, author,
             savedAttachmentEntities);
 
         Message savedMessage = messageRepository.save(message);
-        log.info("메시지 저장 완료");
-        return messageMapper.toDto(savedMessage);
+        log.info("메시지 생성 완료");
+
+        try {
+            return messageMapper.toDto(savedMessage);
+        } catch (Exception e) {
+            binaryContentService.delete(savedMessage.getAttachments().get(0).getId());
+            throw new MessageFileProcessingException();
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public MessageDto find(UUID messageId) {
-        Message message = messageRepository.findById(messageId).orElseThrow(
-            () -> new MessageNotFoundException(Map.of("messageId", messageId.toString())));
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException(messageId));
+
         log.info("메시지 조회 완료");
         return messageMapper.toDto(message);
     }
@@ -123,8 +112,7 @@ public class BasicMessageService implements MessageService {
     @Transactional(readOnly = true)
     public PageResponse<MessageDto> findAllByChannelId(UUID channelId, String cursor, int size) {
         if (!channelRepository.existsById(channelId)) {
-            log.warn("채널 없음");
-            throw new ChannelNotFoundException(Map.of("channelId", channelId.toString()));
+            throw new ChannelNotFoundException(channelId);
         }
 
         List<Message> messages;
@@ -139,7 +127,7 @@ public class BasicMessageService implements MessageService {
 
         boolean hasNext = messages.size() > size;
         List<Message> pageContent = hasNext ? messages.subList(0, size) : messages;
-        log.info("메시지 조회 완료");
+        log.info("메시지 목록 조회 완료");
         return pageMapper.messageListToPageResponse(pageContent, size, hasNext);
     }
 
@@ -150,37 +138,51 @@ public class BasicMessageService implements MessageService {
             .map(Message::getCreatedAt).orElse(Instant.now());
     }
 
+
+    @PreAuthorize("@messageRepository.findById(#messageId).orElse(null)?.author?.id == authentication.principal.user.id")
     @Override
     @Transactional
     public MessageDto update(UUID messageId, MessageUpdateRequest request) {
-        Message message = messageRepository.findById(messageId).orElseThrow(
-            () -> new MessageNotFoundException(Map.of("messageId", messageId.toString())));
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         String newContent = request.newContent();
         message.update(newContent);
         Message updatedMessage = messageRepository.save(message);
-        log.info("메시지 업데이트 완료");
+        log.info("메시지 수정 완료");
         return messageMapper.toDto(updatedMessage);
     }
 
+    @PreAuthorize("@messageRepository.findById(#messageId).orElse(null)?.author?.id == authentication.principal.user.id or hasRole('ADMIN')")
     @Override
     @Transactional
     public void delete(UUID messageId) {
         if (!messageRepository.existsById(messageId)) {
-            log.warn("메시지 없음");
-            throw new MessageNotFoundException(Map.of("messageId", messageId.toString()));
+            throw new MessageNotFoundException(messageId);
+        }
+        Message messageToDelete = messageRepository.findById(messageId)
+            .orElseThrow(() -> new MessageNotFoundException(messageId));
+
+        List<BinaryContent> attachments = messageToDelete.getAttachments();
+        if (attachments != null && !attachments.isEmpty()) {
+            for (BinaryContent attachment : attachments) {
+                try {
+                    binaryContentService.delete(attachment.getId());
+                } catch (Exception e) {
+                    log.error("메시지 삭제 중 파일 삭제 실패");
+                }
+            }
         }
         messageRepository.deleteById(messageId);
-        log.info("메시지 삭제 완료");
     }
 
     private Channel findChannelOrThrow(UUID channelId) {
-        return channelRepository.findById(channelId).orElseThrow(
-            () -> new ChannelNotFoundException(Map.of("channelId", channelId.toString())));
+        return channelRepository.findById(channelId)
+            .orElseThrow(() -> new ChannelNotFoundException(channelId));
     }
 
     private User findUserOrThrow(UUID userId) {
-        return userRepository.findById(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        return userRepository.findById(userId).
+            orElseThrow(() -> new UserNotFoundException(userId));
     }
 }

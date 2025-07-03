@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -34,102 +33,79 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContentDto create(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            log.warn("파일 메타데이터 생성 실패 (파일이 없거나 비어있음)");
-            throw new FileProcessingCustomException(Map.of(
-                "operation", "create-file-metadata",
-                "customMessageContext", "업로드된 파일이 없거나 내용이 비어있습니다."
-            ));
+            log.error("파일이 null이거나 비어있습니다");
+            throw new FileProcessingCustomException();
         }
 
         String fileName = file.getOriginalFilename();
         Long size = file.getSize();
         String contentType = file.getContentType();
+        
         BinaryContent binaryContent = BinaryContent.builder()
             .fileName(fileName)
             .size(size)
             .contentType(contentType)
             .build();
-        BinaryContent.builder()
-            .s3Key(binaryContent.generateS3Key());
 
         BinaryContent savedMetadata = binaryContentRepository.save(binaryContent);
         UUID metadataId = savedMetadata.getId();
-        log.info("파일 메타데이터 DB 저장 완료. ID: '{}', 파일명: '{}'", metadataId, fileName);
 
         try {
-            binaryContentStorage.put(metadataId, file.getBytes());
-            log.info("실제 파일 저장 완료. 저장소 ID: '{}' (메타데이터 ID와 동일)", metadataId);
-        } catch (IOException e) {
-            log.error("파일 바이트를 읽는 중 IOException 발생");
-            if (fileName != null) {
-                throw new FileProcessingCustomException(Map.of(
-                    "operation", "create-storage-io",
-                    "filePath", fileName,
-                    "customMessageContext", "파일 내용을 읽는 중 오류 발생: " + e.getMessage()
-                ));
+            byte[] fileBytes = file.getBytes();
+            binaryContentStorage.put(metadataId, fileBytes);
+            
+            // 저장 후 실제로 파일이 존재하는지 검증
+            try {
+                binaryContentStorage.get(metadataId);
+            } catch (Exception verifyEx) {
+                binaryContentRepository.deleteById(metadataId);
+                throw new FileProcessingCustomException();
             }
+            
         } catch (FileProcessingCustomException e) {
-            log.error("실제 파일 저장 중 처리 오류발생");
+            binaryContentRepository.deleteById(metadataId);
             throw e;
+        } catch (IOException e) {
+            binaryContentRepository.deleteById(metadataId);
+            throw new FileProcessingCustomException();
         } catch (Exception e) {
-            log.error("실제 파일 저장 중 예기치 않은 오류");
-            if (fileName != null) {
-                throw new FileProcessingCustomException(Map.of(
-                    "operation", "create-storage-unexpected",
-                    "filePath", fileName,
-                    "customMessageContext", "파일 저장 중 예상치 못한 오류 발생: " + e.getMessage()
-                ));
-            }
+            binaryContentRepository.deleteById(metadataId);
+            throw new FileProcessingCustomException();
         }
 
         return binaryContentMapper.toDto(savedMetadata);
     }
 
     @Override
-    public BinaryContent find(UUID binaryContentId) {
-        log.info("파일 메타데이터 조회 시도. ID: '{}'", binaryContentId);
+    public BinaryContentDto find(UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-            .orElseThrow(() -> {
-                log.warn("파일 메타데이터 조회 실패 (찾을 수 없음): ID '{}'", binaryContentId);
-                return new FileNotFoundCustomException(Map.of(
-                    "filePath", binaryContentId.toString(),
-                    "customMessageContext", "파일 메타데이터를 찾을 수 없습니다."
-                ));
-            });
-        log.info("파일 메타데이터 조회 성공. ID: '{}', 파일명: '{}'", binaryContentId,
-            binaryContent.getFileName());
-        return binaryContent;
+            .orElseThrow(FileNotFoundCustomException::new);
+        
+        return binaryContentMapper.toDto(binaryContent);
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
         if (CollectionUtils.isEmpty(binaryContentIds)) {
-            log.info("조회할 파일 메타데이터 ID 목록이 비어있음.");
             return new ArrayList<>();
         }
-        log.info("ID 목록으로 파일 메타데이터 조회 시도. ID 개수: {}", binaryContentIds.size());
         List<BinaryContent> contents = binaryContentRepository.findAllByIdIn(binaryContentIds);
-        log.info("ID 목록으로 파일 메타데이터 조회 완료. 조회된 개수: {}", contents.size());
-        return contents.stream().toList();
+        return contents.stream()
+            .map(binaryContentMapper::toDto)
+            .toList();
     }
 
     @Override
     @Transactional
     public void delete(UUID binaryContentId) {
-        log.info("파일 메타데이터 및 실제 파일 삭제 시작. ID: '{}'", binaryContentId);
+        log.info("파일 삭제 시작");
         binaryContentRepository.findById(binaryContentId)
-            .orElseThrow(() -> {
-                log.warn("파일 메타데이터 삭제 실패 (찾을 수 없음): ID '{}'", binaryContentId);
-                return new FileNotFoundCustomException(Map.of(
-                    "filePath", binaryContentId.toString(),
-                    "customMessageContext", "삭제할 파일 메타데이터를 찾을 수 없습니다."
-                ));
-            });
+            .orElseThrow(FileNotFoundCustomException::new);
 
         // 실제 파일 삭제
         try {
             binaryContentStorage.delete(binaryContentId);
-            log.info("실제 파일 삭제 완료 (저장소). 저장소 ID: '{}'", binaryContentId);
+            log.info("실제 파일 삭제 완료");
         } catch (FileNotFoundCustomException e) {
             log.warn("실제 파일 삭제 중 파일 없음 (삭제는 진행)");
         } catch (FileProcessingCustomException e) {
@@ -138,8 +114,36 @@ public class BasicBinaryContentService implements BinaryContentService {
             log.error("실제 파일 삭제 중 예기치 않은 일반 오류", e);
         }
 
-        // 메타데이터 삭제
         binaryContentRepository.deleteById(binaryContentId);
-        log.info("파일 메타데이터 DB 삭제 완료. ID: '{}'", binaryContentId);
+        log.info("파일 삭제 완료");
+    }
+
+    /**
+     * 데이터베이스에는 있지만 실제 파일이 없는 BinaryContent 레코드들을 정리합니다. 관리자용 유틸리티 메서드입니다.
+     */
+    @Transactional
+    public int cleanupOrphanedRecords() {
+        log.info("🧹 고아 BinaryContent 레코드 정리 시작");
+
+        List<BinaryContent> allRecords = binaryContentRepository.findAll();
+        int cleanedCount = 0;
+
+        for (BinaryContent record : allRecords) {
+            try {
+                // 실제 파일이 존재하는지 확인
+                binaryContentStorage.get(record.getId());
+                log.debug("파일 존재 확인 - ID: {}", record.getId());
+            } catch (FileNotFoundCustomException e) {
+                // 파일이 없는 경우 레코드 삭제
+                log.warn("🧹 고아 레코드 삭제 - ID: {}, 파일명: {}", record.getId(), record.getFileName());
+                binaryContentRepository.deleteById(record.getId());
+                cleanedCount++;
+            } catch (Exception e) {
+                log.error("🧹 파일 확인 중 오류 - ID: {}", record.getId(), e);
+            }
+        }
+
+        log.info("🧹 고아 BinaryContent 레코드 정리 완료 - 정리된 개수: {}", cleanedCount);
+        return cleanedCount;
     }
 }

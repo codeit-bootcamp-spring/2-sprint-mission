@@ -16,5 +16,4 @@ public interface ReadStatusService {
 
     ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request);
 
-    void delete(UUID readStatusId);
-}
+} 
