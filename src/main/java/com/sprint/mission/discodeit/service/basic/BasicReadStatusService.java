@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistException;
 import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
@@ -16,9 +17,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,40 +33,26 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusMapper readStatusMapper;
 
   @Transactional
+  @PreAuthorize("@authorizationChecker.isSameUser(#request.userId(), authentication)")
   @Override
   public ReadStatusDto createReadStatus(ReadStatusCreateRequest request) {
     UUID userId = request.userId();
     UUID channelId = request.channelId();
-    Instant lastReadAt = request.lastReadAt();
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> UserNotFoundException.byId(userId));
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
 
-//    validateReadStatusDoesNotExist(userId, channelId);
-//
-//    ReadStatus readStatus = ReadStatus.create(user, channel, lastReadAt);
-//    ReadStatus createdReadStatus = readStatusRepository.save(readStatus);
-//
-//    return readStatusMapper.toDto(createdReadStatus);
-
-    Optional<ReadStatus> existing = readStatusRepository.findByUserIdAndChannelId(userId,
-        channelId);
-
-    ReadStatus result;
-    if (existing.isPresent()) {
-      // 존재하면 업데이트!
-      ReadStatus toUpdate = existing.get();
-      toUpdate.update(lastReadAt);
-      result = toUpdate;
-    } else {
-      // 존재하지 않으면 새로 생성!
-      ReadStatus newStatus = ReadStatus.create(user, channel, lastReadAt);
-      result = readStatusRepository.save(newStatus);
+    if (readStatusRepository.existsByUserIdAndChannelId(user.getId(), channel.getId())) {
+      throw ReadStatusAlreadyExistException.byUserIdAndChannelId(userId, channelId);
     }
 
-    return readStatusMapper.toDto(result);
+    Instant lastReadAt = request.lastReadAt();
+    ReadStatus readStatus = ReadStatus.create(user, channel, lastReadAt);
+    readStatusRepository.save(readStatus);
+
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Transactional(readOnly = true)
@@ -86,6 +73,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Transactional
+  @PreAuthorize("@authorizationChecker.isReadStatusOwner(#readStatusId, authentication)")
   @Override
   public ReadStatusDto updateReadStatus(UUID readStatusId, ReadStatusUpdateRequest updateDto) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId)
