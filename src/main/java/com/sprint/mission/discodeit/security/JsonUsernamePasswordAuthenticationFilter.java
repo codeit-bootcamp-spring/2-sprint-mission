@@ -49,7 +49,8 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         HttpServletResponse response, FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
 
-        if (getRememberMeServices() != null) {
+        String rememberMeParam = request.getParameter("remember-me");
+        if (getRememberMeServices() != null && "true".equals(rememberMeParam)) {
             getRememberMeServices().loginSuccess(request, response, authResult);
         }
 

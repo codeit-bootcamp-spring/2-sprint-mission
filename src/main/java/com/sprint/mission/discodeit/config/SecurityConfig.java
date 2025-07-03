@@ -78,7 +78,6 @@ public class SecurityConfig {
             )
             .rememberMe(rememberMe -> rememberMe
                 .rememberMeServices(rememberMeServices)
-                .alwaysRemember(true)
             )
             .sessionManagement(session -> session
                 .maximumSessions(1) // 하나의 세션만 허용
