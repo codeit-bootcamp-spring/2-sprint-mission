@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.exception;
 
-import java.net.MalformedURLException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,13 +15,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-  @ExceptionHandler(MalformedURLException.class)
-  public ResponseEntity<String> handleMalformedURLException(MalformedURLException ex) {
-    log.error("URL 생성 오류 발생: {}", ex.getMessage());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body("잘못된 URL 형식이 생성되었습니다: " + ex.getMessage());
-  }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
@@ -67,6 +60,15 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
         .body(response);
+  }
+
+  @ExceptionHandler(AuthorizationDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(
+      AuthorizationDeniedException exception) {
+    ErrorResponse errorResponse = new ErrorResponse(exception, HttpStatus.FORBIDDEN.value());
+    return ResponseEntity
+        .status(errorResponse.getStatus())
+        .body(errorResponse);
   }
 
   private HttpStatus determineHttpStatus(DiscodeitException exception) {
