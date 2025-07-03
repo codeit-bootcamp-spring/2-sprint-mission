@@ -13,7 +13,10 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -48,6 +51,16 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     protected void successfulAuthentication(HttpServletRequest request,
         HttpServletResponse response, FilterChain chain, Authentication authResult)
         throws IOException, ServletException {
+
+        // 1. SecurityContextHolder에 인증 정보 저장
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authResult);
+        SecurityContextHolder.setContext(context);
+
+        // 2. 세션에 컨텍스트 저장
+        HttpSessionSecurityContextRepository repo =
+            new HttpSessionSecurityContextRepository();
+        repo.saveContext(context, request, response);
 
         String rememberMeParam = request.getParameter("remember-me");
         if (getRememberMeServices() != null && "true".equals(rememberMeParam)) {
