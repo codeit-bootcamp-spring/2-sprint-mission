@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 //import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,6 +11,7 @@ import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -91,5 +93,11 @@ public class AuthController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
     return ResponseEntity.ok().build();
+  }
+
+  @PutMapping("/role")
+  public ResponseEntity<UserDto> updateRole(@Valid @RequestBody RoleUpdateRequest request){
+    UserDto updatedUser = authService.updateRole(request);
+    return ResponseEntity.ok(updatedUser);
   }
 }
