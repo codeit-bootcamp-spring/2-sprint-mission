@@ -24,9 +24,7 @@ public abstract class ChannelMapper {
     @Autowired
     protected UserMapper userMapper;
 
-    @Autowired
-    protected MessageRepository messageRepository;
-    
+
     @Autowired
     protected ReadStatusRepository readStatusRepository;
 

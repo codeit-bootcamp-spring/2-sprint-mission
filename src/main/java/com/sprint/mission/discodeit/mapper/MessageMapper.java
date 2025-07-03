@@ -21,15 +21,4 @@ public interface MessageMapper {
 
     List<MessageDto> toDto(List<Message> messages);
 
-    default List<BinaryContentDto> mapAttachments(List<BinaryContent> attachments,
-        BinaryContentMapper binaryContentMapper) {
-        if (attachments == null) {
-            return Collections.emptyList();
-        }
-        List<BinaryContentDto> result = new ArrayList<>();
-        for (BinaryContent binaryContent : attachments) {
-            result.add(binaryContentMapper.toDto(binaryContent));
-        }
-        return result;
-    }
 }
