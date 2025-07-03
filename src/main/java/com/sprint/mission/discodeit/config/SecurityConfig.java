@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.filter.LoginFilter;
-import com.sprint.mission.discodeit.filter.RequestLoggingFilter;
 import com.sprint.mission.discodeit.service.basic.CsrfTokenDbService;
 import com.sprint.mission.discodeit.service.basic.CsrfTokenLogout;
-import jakarta.servlet.http.Cookie;
+import com.sprint.mission.discodeit.service.basic.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +34,7 @@ public class SecurityConfig {
 
     private final CsrfTokenDbService csrfTokenDbService;
     private final SessionRegistry sessionRegistry;
-    private final com.sprint.mission.discodeit.service.basic.CustomUserDetailsService customUserDetailsService;
-    private final RequestLoggingFilter requestLoggingFilter;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
@@ -58,12 +56,9 @@ public class SecurityConfig {
             String rememberMe = request.getParameter("remember-me");
             boolean isRememberMe = "true".equals(rememberMe);
 
-            // 세션 마이그레이션 후 CSRF 토큰 마이그레이션
             try {
                 String newSessionId = request.getSession().getId();
-                log.info("🔄 로그인 성공 - 새 세션 ID: {}", newSessionId);
-                
-                // 새 CSRF 토큰 생성 및 저장 (기존 토큰은 자동으로 정리됨)
+
                 var newToken = csrfTokenDbService.generateToken(request);
                 csrfTokenDbService.saveToken(newToken, request, response);
                 log.info("🔄 CSRF 토큰 마이그레이션 완료 - 새 세션: {}", newSessionId);
@@ -88,22 +83,26 @@ public class SecurityConfig {
 
         return http
             .addFilterBefore(loginFilter, UsernamePasswordAuthenticationFilter.class)
-            
+
             .securityContext(securityContext -> securityContext
                 .requireExplicitSave(false))
-            
+
             .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenDbService)
                 .ignoringRequestMatchers(SecurityMachers.CSRF_TOKEN, SecurityMachers.LOGOUT,
                     SecurityMachers.SIGN_UP, SecurityMachers.LOGIN, SecurityMachers.USERS_LIST,
                     SecurityMachers.CHANNELS_LIST, SecurityMachers.AUTH_ME)
-                .ignoringRequestMatchers("/api/auth/login", "/api/users", "/api/users/**", "/api/channels/public", "/api/channels/private", "/api/messages/**", "/api/binaryContents/**"))
+                .ignoringRequestMatchers("/api/auth/login", "/api/users", "/api/users/**",
+                    "/api/channels/public", "/api/channels/private", "/api/messages/**",
+                    "/api/binaryContents/**"))
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/error", "/error/**", "/favicon.ico").permitAll()
                 .requestMatchers(SecurityMachers.NON_API).permitAll() // API가 아닌 경로 허용
                 .requestMatchers(SecurityMachers.CSRF_TOKEN, SecurityMachers.SIGN_UP,
-                    SecurityMachers.USERS_LIST, SecurityMachers.CHANNELS_LIST, SecurityMachers.AUTH_ME).permitAll()
-                .requestMatchers("/api/auth/login", "/api/users", "/api/channels/public").permitAll() // 로그인, 회원가입, 공개 채널 목록 조회 허용
+                    SecurityMachers.USERS_LIST, SecurityMachers.CHANNELS_LIST,
+                    SecurityMachers.AUTH_ME).permitAll()
+                .requestMatchers("/api/auth/login", "/api/users", "/api/channels/public")
+                .permitAll() // 로그인, 회원가입, 공개 채널 목록 조회 허용
                 .anyRequest().authenticated())
 
             .sessionManagement(session -> session
