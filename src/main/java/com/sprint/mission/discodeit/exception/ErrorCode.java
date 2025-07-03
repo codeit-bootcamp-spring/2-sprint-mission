@@ -27,6 +27,7 @@ public enum ErrorCode {
   BINARY_CONTENT_NOT_FOUND("바이너리 컨텐츠를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
   READ_STATUS_NOT_FOUND("읽음 상태를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+  DUPLICATE_READ_STATUS("이미 존재하는 읽음 상태입니다.", HttpStatus.CONFLICT),
 
   USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다.", HttpStatus.CONFLICT);

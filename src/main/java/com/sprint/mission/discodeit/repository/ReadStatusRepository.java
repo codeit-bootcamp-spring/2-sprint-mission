@@ -6,10 +6,11 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-  Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
+  boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
 
   List<ReadStatus> findAllByUserId(UUID userId);
 
@@ -17,5 +18,8 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
   List<ReadStatus> findAllByChannelId(UUID channelId);
 
   void deleteAllByChannelId(UUID channelId);
+
+  @Query("SELECT r.user.id FROM ReadStatus r WHERE r.id = :id")
+  Optional<UUID> findUserIdById(UUID id);
 
 }
