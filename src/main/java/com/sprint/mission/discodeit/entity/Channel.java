@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,15 +7,16 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.Getter;
 
 @Getter
 @Table(name = "channels")
 @Entity
-public class Channel extends BaseEntity { // 부모 클래스 상속 가정
+public class Channel extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false) // 타입은 필수
+    @Column(nullable = false)
     private ChannelType type;
 
     @Column(unique = true, nullable = false)
@@ -25,43 +25,34 @@ public class Channel extends BaseEntity { // 부모 클래스 상속 가정
     @Column(nullable = true)
     private String description;
 
+    @Column(name = "owner_id", nullable = false)
+    private UUID ownerId;
 
     protected Channel() {
         super();
     }
 
-
-    public Channel(ChannelType type, String name, String description) {
+    public Channel(ChannelType type, String name, String description, UUID ownerId) {
         super();
-        if (type == null) {
-            throw new IllegalArgumentException("Channel type cannot be null.");
-        }
-
         this.type = type;
-        this.name = (name != null) ? name.trim() : null; // 이름이 null일 수 있도록 수정
-        this.description =
-            (description == null || description.isBlank()) ? null : description.trim();
+        this.name = name;
+        this.description = description;
+        this.ownerId = ownerId;
     }
-
 
     public boolean update(String newName, String newDescription) {
         boolean updated = false;
-        String trimmedNewName = (newName == null) ? null : newName.trim();
-        String trimmedNewDescription = (newDescription == null) ? null : newDescription.trim();
-
-        if (trimmedNewName != null && trimmedNewName.isEmpty()) {
-            throw new IllegalArgumentException("Channel name cannot be empty.");
-        }
-
-        if (trimmedNewName != null && !trimmedNewName.equals(this.name)) {
-            this.name = trimmedNewName;
+        
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
             updated = true;
         }
-
-        if (!Objects.equals(this.description, trimmedNewDescription)) {
-            this.description = trimmedNewDescription;
+        
+        if (!Objects.equals(this.description, newDescription)) {
+            this.description = newDescription;
             updated = true;
         }
+        
         return updated;
     }
 
@@ -72,6 +63,4 @@ public class Channel extends BaseEntity { // 부모 클래스 상속 가정
     public boolean isPrivate() {
         return this.type == ChannelType.PRIVATE;
     }
-
-
 }

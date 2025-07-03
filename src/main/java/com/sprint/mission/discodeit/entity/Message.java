@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.ArrayList;
 
 @Getter
@@ -21,44 +20,31 @@ public class Message extends BaseUpdatableEntity {
     @Column(name = "text")
     private String content;
 
-    // message-> channel 단방향
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", referencedColumnName = "id", nullable = false)
     private Channel channel;
 
-    //message-> user 단방향
     @ManyToOne(fetch = FetchType.LAZY)
-    //삭제시에 유저 이름 null 처리를 위해 true로 변경
     @JoinColumn(name = "author_id", referencedColumnName = "id", nullable = true)
     private User author;
 
-    //  message-> binary 조인 테이블
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "message_attachments",
-        joinColumns = @JoinColumn(name = "message_id"),
-        inverseJoinColumns = @JoinColumn(name = "attachment_id", unique = true)
-    )
+    @JoinColumn(name = "message_id")
     private List<BinaryContent> attachments = new ArrayList<>();
-
 
     public Message(String content, Channel channel, User author, List<BinaryContent> attachments) {
         super();
         this.content = content;
         this.channel = channel;
         this.author = author;
-        if (attachments != null) {
-            this.attachments = attachments;
-        }
+        this.attachments = attachments != null ? attachments : new ArrayList<>();
     }
 
     public boolean update(String newContent) {
-        boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
-            anyValueUpdated = true;
+            return true;
         }
-        return anyValueUpdated;
+        return false;
     }
-
 }

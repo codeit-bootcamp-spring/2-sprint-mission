@@ -2,17 +2,18 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Set;
-import java.util.HashSet;
+import lombok.AllArgsConstructor;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
 
@@ -25,12 +26,14 @@ public class User extends BaseUpdatableEntity {
     @Column(nullable = false)
     private String password;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private Role role = Role.ROLE_USER;
+
+    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private BinaryContent profile;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private UserStatus userStatus;
 
     public User(String username, String email, String password,
         BinaryContent nullableProfileObject) {
@@ -39,13 +42,17 @@ public class User extends BaseUpdatableEntity {
         this.password = password;
         this.username = username;
         this.profile = nullableProfileObject;
+        this.role = Role.ROLE_USER;
     }
 
-    public void setUserStatus(UserStatus userStatus) {
-        this.userStatus = userStatus;
-        if (userStatus != null && userStatus.getUser() != this) {
-            userStatus.setUser(this);
-        }
+    public User(String username, String email, String password,
+        BinaryContent nullableProfileObject, Role role) {
+        super();
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.profile = nullableProfileObject;
+        this.role = role != null ? role : Role.ROLE_USER;
     }
 }
 
