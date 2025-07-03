@@ -30,7 +30,7 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
         ErrorResponse errorResponse = new ErrorResponse(
             Instant.now(),
             "AUTHENTICATION_FAILED",
-            exception.getMessage(),
+            "사용자 로그인에 실패하였습니다.",
             Map.of(),
             HttpStatus.UNAUTHORIZED.name(),
             HttpStatus.UNAUTHORIZED.value()

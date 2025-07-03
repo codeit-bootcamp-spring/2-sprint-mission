@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +21,11 @@ public interface AuthApi {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "토큰 조회 성공"
+            description = "토큰 조회 성공",
+            content = @Content(
+                mediaType = "*/*",
+                schema = @Schema(implementation = CsrfToken.class)
+            )
         )
     })
     ResponseEntity<CsrfToken> getCsrfToken(
@@ -30,7 +36,11 @@ public interface AuthApi {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "자동 로그인 성공"
+            description = "자동 로그인 성공",
+            content = @Content(
+                mediaType = "*/*",
+                schema = @Schema(implementation = UserDto.class)
+            )
         )
     })
     ResponseEntity<UserDto> getCurrentUser(
@@ -41,7 +51,12 @@ public interface AuthApi {
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "자사용자 권한 변경 성공"
+            description = "자사용자 권한 변경 성공",
+            content = @Content(
+                mediaType = "*/*",
+                schema = @Schema(implementation = UserDto.class)
+            )
+
         )
     })
     ResponseEntity<UserDto> updateRole(
