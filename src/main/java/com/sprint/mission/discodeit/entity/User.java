@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -19,7 +21,9 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)  // JPA를 위한 기본 생성자
 public class User extends BaseUpdatableEntity {
-
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role;
   @Column(length = 50, nullable = false, unique = true)
   private String username;
   @Column(length = 100, nullable = false, unique = true)
@@ -39,6 +43,7 @@ public class User extends BaseUpdatableEntity {
     this.email = email;
     this.password = password;
     this.profile = profile;
+    this.role = Role.ROLE_USER;
   }
 
   public void update(String newUsername, String newEmail, String newPassword,
@@ -55,5 +60,13 @@ public class User extends BaseUpdatableEntity {
     if (newProfile != null) {
       this.profile = newProfile;
     }
+  }
+
+  public Role getRole() {
+    return role;
+  }
+
+  public void updateRole(Role newRole) {
+    this.role = newRole;
   }
 }
