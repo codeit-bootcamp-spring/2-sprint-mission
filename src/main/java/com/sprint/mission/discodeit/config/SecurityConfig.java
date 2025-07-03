@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.DatabaseUserDetailsService;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.security.Role;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionInvalidateLogoutHandler;
 import javax.sql.DataSource;

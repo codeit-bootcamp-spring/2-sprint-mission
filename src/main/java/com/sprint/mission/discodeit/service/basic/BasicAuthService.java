@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.CustomUserDetails;
-import com.sprint.mission.discodeit.security.Role;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.List;
 import java.util.UUID;
