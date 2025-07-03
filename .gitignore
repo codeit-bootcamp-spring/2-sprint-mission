@@ -36,3 +36,15 @@ out/
 ### VS Code ###
 .vscode/
 
+# Log files
+.logs/
+logs/
+
+# Generated API docs
+api-docs*.json
+
+# Project-specific metadata
+.discodeit/
+
+# Frontend build assets
+/src/main/resources/static/assets/
