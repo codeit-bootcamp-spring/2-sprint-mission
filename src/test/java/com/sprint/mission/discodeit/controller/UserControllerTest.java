@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -24,7 +25,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +47,8 @@ class UserControllerTest {
   @MockitoBean
   private UserService userService;
 
+  @MockitoBean
+  private UserStatusService userStatusService;
 
   @Test
   @DisplayName("사용자 생성 성공 테스트")
@@ -85,8 +87,7 @@ class UserControllerTest {
         "testuser",
         "test@example.com",
         profileDto,
-        false,
-        Set.of("new Set<>()")
+        false
     );
 
     given(userService.create(any(UserCreateRequest.class), any(Optional.class)))
@@ -141,8 +142,7 @@ class UserControllerTest {
         "user1",
         "user1@example.com",
         null,
-        true,
-        Set.of("s")
+        true
     );
 
     UserDto user2 = new UserDto(
@@ -150,8 +150,7 @@ class UserControllerTest {
         "user2",
         "user2@example.com",
         null,
-        false,
-        Set.of("s")
+        false
     );
 
     List<UserDto> users = List.of(user1, user2);
@@ -207,8 +206,7 @@ class UserControllerTest {
         "updateduser",
         "updated@example.com",
         profileDto,
-        true,
-        Set.of("s")
+        true
     );
 
     given(userService.update(eq(userId), any(UserUpdateRequest.class), any(Optional.class)))
@@ -308,6 +306,10 @@ class UserControllerTest {
     Instant lastActiveAt = Instant.now();
 
     UserStatusUpdateRequest updateRequest = new UserStatusUpdateRequest(lastActiveAt);
+    UserStatusDto updatedStatus = new UserStatusDto(statusId, userId, lastActiveAt);
+
+    given(userStatusService.updateByUserId(eq(userId), any(UserStatusUpdateRequest.class)))
+        .willReturn(updatedStatus);
 
     // When & Then
     mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
@@ -315,7 +317,8 @@ class UserControllerTest {
             .content(objectMapper.writeValueAsString(updateRequest)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(statusId.toString()))
-        .andExpect(jsonPath("$.userId").value(userId.toString()));
+        .andExpect(jsonPath("$.userId").value(userId.toString()))
+        .andExpect(content().json(objectMapper.writeValueAsString(updatedStatus)));
   }
 
   @Test
@@ -326,6 +329,9 @@ class UserControllerTest {
     Instant lastActiveAt = Instant.now();
 
     UserStatusUpdateRequest updateRequest = new UserStatusUpdateRequest(lastActiveAt);
+
+    given(userStatusService.updateByUserId(eq(userId), any(UserStatusUpdateRequest.class)))
+        .willThrow(UserNotFoundException.withId(userId));
 
     // When & Then
     mockMvc.perform(patch("/api/users/{userId}/userStatus", userId)
