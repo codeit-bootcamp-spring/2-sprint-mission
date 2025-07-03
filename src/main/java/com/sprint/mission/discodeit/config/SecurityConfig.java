@@ -29,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Slf4j
 @Configuration
@@ -55,7 +56,11 @@ public class SecurityConfig {
             ).permitAll()
             .anyRequest().hasRole(Role.USER.name())
         )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
+        .csrf(csrf ->
+            csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT)
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+
+        )
         .logout(logout ->
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
