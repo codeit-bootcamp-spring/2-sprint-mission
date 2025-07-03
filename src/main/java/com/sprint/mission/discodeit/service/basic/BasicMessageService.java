@@ -1,225 +1,138 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.file.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.message.AttachmentSaveFailedException;
-import com.sprint.mission.discodeit.exception.message.InvalidMessageAuthorException;
-import com.sprint.mission.discodeit.exception.message.InvalidMessageChannelException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    private final MessageRepository messageRepository;
-    private final BinaryContentRepository binaryContentRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final MessageMapper messageMapper;
-    private final BinaryContentService binaryContentService;
+  private final MessageRepository messageRepository;
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+  private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentRepository binaryContentRepository;
+  private final PageResponseMapper pageResponseMapper;
 
+  @Transactional
+  @Override
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    log.debug("메시지 생성 시작: request={}", messageCreateRequest);
+    UUID channelId = messageCreateRequest.channelId();
+    UUID authorId = messageCreateRequest.authorId();
 
-    @Override
-    @Transactional
-    public MessageDto createMessage(CreateMessageRequest request, List<MultipartFile> attachments) {
-        log.info("메시지 생성 요청 - authorId: {}, channelId: {}", request.authorId(),
-            request.channelId());
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
+    User author = userRepository.findById(authorId)
+        .orElseThrow(() -> UserNotFoundException.withId(authorId));
 
-        if (request.authorId() == null) {
-            log.warn("메시지 생성 실패 - 사용자 ID가 null");
-            throw new InvalidMessageAuthorException();
-        }
-        if (request.channelId() == null) {
-            log.warn("메시지 생성 실패 - 채널 ID가 null");
-            throw new InvalidMessageChannelException();
-        }
+    List<BinaryContent> attachments = binaryContentCreateRequests.stream()
+        .map(attachmentRequest -> {
+          String fileName = attachmentRequest.fileName();
+          String contentType = attachmentRequest.contentType();
+          byte[] bytes = attachmentRequest.bytes();
 
-        User author = userRepository.findById(request.authorId())
-            .orElseThrow(() -> {
-                log.warn("존재하지 않는 사용자 - userId: {}", request.authorId());
-                return new UserNotFoundException(Map.of("userId", request.authorId()));
-            });
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType);
+          binaryContentRepository.save(binaryContent);
+          binaryContentStorage.put(binaryContent.getId(), bytes);
+          return binaryContent;
+        })
+        .toList();
 
-        Channel channel = channelRepository.findById(request.channelId())
-            .orElseThrow(() -> {
-                log.warn("존재하지 않는 채널 - channelId: {}", request.channelId());
-                return new ChannelNotFoundException(Map.of("channelId", request.channelId()));
-            });
+    String content = messageCreateRequest.content();
+    Message message = new Message(
+        content,
+        channel,
+        author,
+        attachments
+    );
 
-        List<BinaryContent> attachmentIds = new ArrayList<>();
-        if (attachments != null && !attachments.isEmpty()) {
-            for (MultipartFile file : attachments) {
-                try {
-                    log.debug("첨부파일 저장 시작 - fileName: {}", file.getOriginalFilename());
+    messageRepository.save(message);
+    log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
+    return messageMapper.toDto(message);
+  }
 
-                    CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(
-                        file.getOriginalFilename(),
-                        file.getContentType(),
-                        file.getBytes()
-                    );
+  @Transactional(readOnly = true)
+  @Override
+  public MessageDto find(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .map(messageMapper::toDto)
+        .orElseThrow(() -> MessageNotFoundException.withId(messageId));
+  }
 
-                    BinaryContentDto dto = binaryContentService.create(binaryRequest);
-                    BinaryContent content = binaryContentRepository.findById(dto.id())
-                        .orElseThrow(() -> new IllegalStateException("저장된 파일을 다시 찾을 수 없습니다."));
-                    attachmentIds.add(content);
+  @Transactional(readOnly = true)
+  @Override
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
+      Pageable pageable) {
+    Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
+            Optional.ofNullable(createAt).orElse(Instant.now()),
+            pageable)
+        .map(messageMapper::toDto);
 
-                    log.debug("첨부파일 저장 완료 - contentId: {}", content.getId());
-
-                } catch (Exception e) {
-                    log.error("첨부파일 저장 실패 - fileName: {}", file.getOriginalFilename(), e);
-                    throw new AttachmentSaveFailedException(
-                        Map.of("fileName", file.getOriginalFilename()));
-                }
-            }
-        }
-
-        Message message = new Message(author, channel, request.content(), attachmentIds);
-        log.info("메시지 생성 완료 - messageId: {}", message.getId());
-        messageRepository.save(message);
-        return messageMapper.toDto(message);
+    Instant nextCursor = null;
+    if (!slice.getContent().isEmpty()) {
+      nextCursor = slice.getContent().get(slice.getContent().size() - 1)
+          .createdAt();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public MessageDto getMessageById(UUID messageId) {
-        log.info("단일 메시지 조회 요청 - messageId: {}", messageId);
-        return messageRepository.findById(messageId)
-            .map(messageMapper::toDto)
-            .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
+    return pageResponseMapper.fromSlice(slice, nextCursor);
+  }
+
+  @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @Transactional
+  @Override
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    log.debug("메시지 수정 시작: id={}, request={}", messageId, request);
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> MessageNotFoundException.withId(messageId));
+
+    message.update(request.newContent());
+    log.info("메시지 수정 완료: id={}, channelId={}", messageId, message.getChannel().getId());
+    return messageMapper.toDto(message);
+  }
+
+  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @Transactional
+  @Override
+  public void delete(UUID messageId) {
+    log.debug("메시지 삭제 시작: id={}", messageId);
+    if (!messageRepository.existsById(messageId)) {
+      throw MessageNotFoundException.withId(messageId);
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
-        log.info("채널 메시지 목록 조회 요청 - channelId: {}, cursor: {}, size: {}", channelId, cursor, size);
-
-        Channel channel = channelRepository.findById(channelId)
-            .orElseThrow(() -> {
-                log.warn("존재하지 않는 채널 - channelId: {}", channelId);
-                return new ChannelNotFoundException(Map.of("channelId", channelId));
-            });
-
-        PageRequest pageRequest = PageRequest.of(0, size + 1); // +1로 hasNext 판단
-        List<Message> messages;
-
-        if (cursor == null) {
-            messages = messageRepository.findFirstPageByChannel(channel, pageRequest);
-        } else {
-            messages = messageRepository.findNextPageByChannelAndCursor(channel, cursor,
-                pageRequest);
-        }
-
-        boolean hasNext = messages.size() > size;
-        if (hasNext) {
-            messages = messages.subList(0, size); // 초과분 제거
-        }
-
-        List<MessageDto> messageDtos = messages.stream()
-            .map(messageMapper::toDto)
-            .toList();
-
-        Instant nextCursor = !messageDtos.isEmpty()
-            ? messageDtos.get(messageDtos.size() - 1).createdAt()
-            : null;
-
-        return new PageResponse<>(
-            messageDtos,
-            nextCursor,
-            size,
-            hasNext,
-            null
-        );
-    }
-
-    @Override
-    @Transactional
-    public MessageDto updateMessage(UUID messageId, UpdateMessageRequest request) {
-        log.info("메시지 수정 요청 - messageId: {}", messageId);
-
-        Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
-
-        // 인가 처리 추가 -> 작성자와 현재 사용자 비교
-        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getPrincipal();
-
-        if (!message.getAuthor().getId().equals(currentUser.getUser().getId())) {
-            log.warn("메시지 수정 권한 없음 - 요청자: {}, 작성자: {}",
-                currentUser.getUser().getId(), message.getAuthor().getId());
-            throw new AccessDeniedException("해당 메시지를 수정할 권한이 없습니다.");
-        }
-
-        message.update(request.newContent(), message.getAttachments());
-        log.info("메시지 수정 완료 - messageId: {}", message.getId());
-
-        return messageMapper.toDto(message);
-    }
-
-    @Override
-    @Transactional
-    public void deleteMessage(UUID messageId) {
-        log.info("메시지 삭제 요청 - messageId: {}", messageId);
-
-        Message message = messageRepository.findById(messageId)
-            .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", messageId)));
-
-        // 인가 처리 추가 -> 작성자 또는 ADMIN 권한을 가진 사용자만
-        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext()
-            .getAuthentication()
-            .getPrincipal();
-
-        UUID currentUserId = currentUser.getUser().getId();
-        boolean isAuthor = message.getAuthor().getId().equals(currentUserId);
-        boolean isAdmin = currentUser.getAuthorities().stream()
-            .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-
-        if (!isAuthor && !isAdmin) {
-            log.warn("메시지 삭제 권한 없음 - 요청자: {}, 작성자: {}",
-                currentUserId, message.getAuthor().getId());
-            throw new AccessDeniedException("해당 메시지를 삭제할 권한이 없습니다.");
-        }
-
-        message.getAttachments().forEach(file -> {
-            binaryContentRepository.delete(file);
-            log.debug("첨부파일 삭제 - fileId: {}", file.getId());
-        });
-
-        messageRepository.deleteById(messageId);
-        log.info("메시지 삭제 완료 - messageId: {}", messageId);
-    }
+    messageRepository.deleteById(messageId);
+    log.info("메시지 삭제 완료: id={}", messageId);
+  }
 }
