@@ -1,59 +1,62 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentStorage;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.repository.BinaryContentStorage;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.UUID;
-
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
-
 public class BinaryContentController {
 
     private final BinaryContentService binaryContentService;
-    private final BinaryContentStorage s3binaryContentStorage;
-    private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @GetMapping(path = "{binaryContentId}")
-    public ResponseEntity<BinaryContent> find(
+    public ResponseEntity<BinaryContentDto> find(
         @PathVariable("binaryContentId") UUID binaryContentId) {
-        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+        BinaryContentDto binaryContent = binaryContentService.find(binaryContentId);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(binaryContent);
     }
 
     @GetMapping
-    public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+    public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
         @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        List<BinaryContentDto> binaryContents = binaryContentService.findAllByIdIn(
+            binaryContentIds);
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(binaryContents);
     }
 
-    @GetMapping("/{binaryContentId}/download")
-    public ResponseEntity<Void> download(
+    @GetMapping(path = "{binaryContentId}/download")
+    public ResponseEntity<?> download(
         @PathVariable("binaryContentId") UUID binaryContentId) {
-        binaryContentService.find(binaryContentId);
-        s3binaryContentStorage.download(binaryContentId);
-        return null;
+
+        BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
+
+        return binaryContentStorage.download(binaryContentDto);
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<BinaryContentDto> upload(
-        @RequestParam("file") MultipartFile file) {
-
+    public ResponseEntity<BinaryContentDto> upload(@RequestParam("file") MultipartFile file) {
         BinaryContentDto profileDto = binaryContentService.create(file);
         return ResponseEntity.status(HttpStatus.CREATED).body(profileDto);
     }
