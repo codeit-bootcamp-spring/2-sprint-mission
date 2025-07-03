@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,11 @@ public class AuthController{
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+
+  @GetMapping("/csrf-token")
+  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+    return ResponseEntity.ok(csrfToken);
+  }
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {

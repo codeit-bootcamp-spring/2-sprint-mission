@@ -40,7 +40,7 @@ public class SecurityConfig {
     http
         .csrf(csrf -> csrf
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .ignoringRequestMatchers("/api/auth/logout") //로그아웃은 CSRF 검사 안함
+            .ignoringRequestMatchers("/api/auth/logout", "/api/users", "/api/auth/login") //로그아웃은 CSRF 검사 안함
         )
         //만든 커스텀 필터를 UsernamePasswordAuthenticationFilter 자리에 끼워넣기
         .addFilterAt(jsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -83,7 +83,7 @@ public class SecurityConfig {
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
     return (request, response, authentication) -> {
       String username = authentication.getName();
-      User user = userRepository.findByUsername(username).orElseThrow();
+      User user = userRepository.findByUsernameWithProfileAndStatus(username).orElseThrow();
       UserDto userDto = userMapper.toDto(user);
 
       response.setStatus(HttpServletResponse.SC_OK);

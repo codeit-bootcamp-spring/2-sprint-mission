@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="delete: 기존 로그인 코드 삭제">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/config/filter/JsonUsernamePasswordAuthenticationFilter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserDetailsServiceImpl.java" afterDir="false" />
+    <list default="true" id="137e7260-ce0a-4e39-9639-fc6aedf8ef00" name="Changes" comment="feat: 인증(로그인/로그아웃) 기능 완성">
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/md5-checksums.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/sha1-checksums.bin" afterDir="false" />
@@ -19,15 +17,19 @@
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/AuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/AuthController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/controller/api/AuthApi.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/repository/UserRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/AuthService.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicAuthService.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/build/classes/java/main/com/sprint/mission/discodeit/service/basic/BasicUserService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/reports/problems/problems-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/reports/problems/problems-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/resources/main/application-dev.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application-dev.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/resources/main/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/build/resources/main/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/compileTransaction/stash-dir/MessageController.class.uniqueId0" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="$PROJECT_DIR$/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/config/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-dev.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-dev.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,17 +73,21 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "JasonHeo1125"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;JasonHeo1125&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/codeit-bootcamp-spring/2-sprint-mission.git",
-    "accountId": "d3b33119-7647-4f00-b72d-684fd14d26a3"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/codeit-bootcamp-spring/2-sprint-mission.git&quot;,
+    &quot;accountId&quot;: &quot;d3b33119-7647-4f00-b72d-684fd14d26a3&quot;
   }
+}</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
 }]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -96,6 +102,7 @@
   "keyToString": {
     "Gradle.2-sprint-mission 빌드.executor": "Run",
     "Gradle.Build 2-sprint-mission.executor": "Run",
+    "Gradle.소스 다운로드.executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
@@ -161,6 +168,7 @@
       <workItem from="1743655141038" duration="8122000" />
       <workItem from="1750817623806" duration="288000" />
       <workItem from="1750818122724" duration="33973000" />
+      <workItem from="1750990848845" duration="21214000" />
     </task>
     <task id="LOCAL-00001" summary="고급 구현 과정">
       <option name="closed" value="true" />
@@ -234,7 +242,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750836838966</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="feat: 인증(로그인/로그아웃) 기능 완성">
+      <option name="closed" value="true" />
+      <created>1750992398266</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1750992398266</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -261,6 +277,7 @@
     <MESSAGE value="feat: Spring Security 모듈 로깅 레벨 trace" />
     <MESSAGE value="feat: CSRF 보호 설정, 회원가입 고도화" />
     <MESSAGE value="delete: 기존 로그인 코드 삭제" />
-    <option name="LAST_COMMIT_MESSAGE" value="delete: 기존 로그인 코드 삭제" />
+    <MESSAGE value="feat: 인증(로그인/로그아웃) 기능 완성" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: 인증(로그인/로그아웃) 기능 완성" />
   </component>
 </project>
