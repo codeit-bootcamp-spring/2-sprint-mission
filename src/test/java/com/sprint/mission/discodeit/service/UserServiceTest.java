@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
+import com.sprint.mission.discodeit.domain.Role;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.dto.UserDto;
@@ -19,7 +20,6 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -42,9 +42,6 @@ public class UserServiceTest {
 
   @Mock
   private UserRepository userRepository;
-
-  @Mock
-  private UserStatusRepository userStatusRepository;
 
   @Mock
   private BinaryContentRepository binaryContentRepository;
@@ -71,7 +68,7 @@ public class UserServiceTest {
 
     user = User.create(username, email, password, null);
     ReflectionTestUtils.setField(user, "id", userId);
-    userDto = new UserDto(userId, username, email, null, true);
+    userDto = new UserDto(userId, username, email, null, true, Role.USER);
   }
 
   @Test
@@ -155,7 +152,8 @@ public class UserServiceTest {
           updatedUser.getUsername(),
           updatedUser.getEmail(),
           null,
-          true
+          true,
+          updatedUser.getRole()
       );
     });
 
@@ -200,15 +198,12 @@ public class UserServiceTest {
     ReflectionTestUtils.setField(user, "status", status);
 
     given(userRepository.findById(userId)).willReturn(Optional.of(user));
-    given(userStatusRepository.findByUserId(userId)).willReturn(Optional.of(status));
 
     // when
     userService.deleteUser(userId);
 
     // then
     then(userRepository).should().findById(userId);
-    then(userStatusRepository).should().findByUserId(userId);
-    then(userStatusRepository).should().deleteById(status.getId());
     then(userRepository).should().deleteById(userId);
   }
 
@@ -233,7 +228,6 @@ public class UserServiceTest {
 
     then(userRepository).should().findById(userId);
     then(userRepository).should(never()).deleteById(userId);
-    then(userStatusRepository).shouldHaveNoMoreInteractions();
     then(binaryContentStorage).shouldHaveNoMoreInteractions();
     then(binaryContentRepository).shouldHaveNoMoreInteractions();
   }

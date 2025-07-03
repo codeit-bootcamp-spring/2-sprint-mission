@@ -8,11 +8,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.domain.Role;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -32,9 +32,6 @@ class UserControllerTest {
 
   @MockitoBean
   private UserService userService;
-
-  @MockitoBean
-  private UserStatusService userStatusService;
 
   @Test
   @DisplayName("Create User_성공")
@@ -66,8 +63,9 @@ class UserControllerTest {
         "image/png"
     );
 
-    UserDto userDto = new UserDto(userId, "testUser", "test@email.com", profileDto, true);
-    
+    UserDto userDto = new UserDto(userId, "testUser", "test@email.com", profileDto, true,
+        Role.USER);
+
     given(userService.createUser(any(UserCreateRequest.class), any(Optional.class))).willReturn(
         userDto);
 
