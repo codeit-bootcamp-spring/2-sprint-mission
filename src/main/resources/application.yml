@@ -39,8 +39,7 @@ discodeit:
 
 logging:
   level:
-    root: INFO
-    org.springframework.security: DEBUG
+    root: ERROR
 
 management:
   endpoints:
