@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.swagger.AuthApi;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
@@ -19,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "인증 API")
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final UserService userService;
 
