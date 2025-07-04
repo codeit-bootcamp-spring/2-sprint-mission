@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.config.JwtProperties;
 import com.sprint.mission.discodeit.dto.controller.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.jwt.InvalidRefreshTokenException;

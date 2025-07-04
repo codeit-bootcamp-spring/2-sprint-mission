@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.exception.auth.CustomAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationEntryPoint;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -42,9 +45,11 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper objectMapper,
-      CustomAccessDeniedHandler accessDeniedHandler,
       JwtService jwtService,
-      PersistentTokenBasedRememberMeServices rememberMeServices)
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+      JwtAccessDeniedHandler jwtAccessDeniedHandler,
+      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+      JwtAuthenticationFilter jwtAuthenticationFilter)
       throws Exception {
 
     // CSRF 토큰은 원래 세션 저장소 (spring_session_attributes의 attributes_bytes에 저장됨)
@@ -82,7 +87,8 @@ public class SecurityConfig {
             .anyRequest().permitAll()
         )
         .exceptionHandling(exception -> exception
-            .accessDeniedHandler(accessDeniedHandler)
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .accessDeniedHandler(jwtAccessDeniedHandler)
         )
         // 명시적으로 설정 안해줘도 자동으로 사용됨 (HttpSession을 통해 SecurityContext를 저장하고 복원)
         .securityContext(context ->
@@ -99,6 +105,7 @@ public class SecurityConfig {
             .addLogoutHandler(new SecurityContextLogoutHandler())
             .addLogoutHandler(rememberMeServices)
         )
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
             Customizer.withDefaults())
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
