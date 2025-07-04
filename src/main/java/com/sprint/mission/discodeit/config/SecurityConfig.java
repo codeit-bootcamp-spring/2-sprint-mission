@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 )
                 .sessionManagement(session -> session
+                        .sessionFixation().migrateSession()
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
