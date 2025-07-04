@@ -2,11 +2,14 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.LogoutFilter;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -16,8 +19,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 
 @Configuration
 @RequiredArgsConstructor
@@ -28,7 +34,8 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       ObjectMapper objectMapper,
-      SessionRegistry sessionRegistry
+      SessionRegistry sessionRegistry,
+      PersistentTokenBasedRememberMeServices rememberMeServices
   ) throws Exception {
 
     return http
@@ -51,6 +58,14 @@ public class SecurityConfig {
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             Customizer.withDefaults())
+        .sessionManagement(session -> session
+            .sessionFixation().migrateSession()
+            .maximumSessions(1)
+            .maxSessionsPreventsLogin(false)
+            .sessionRegistry(sessionRegistry)
+            .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+        )
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .build();
   }
 
@@ -69,5 +84,22 @@ public class SecurityConfig {
   @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
+  }
+
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      UserDetailsService userDetailsService,
+      DataSource dataSource
+  ) {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+
+    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+        key, userDetailsService, tokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+    return rememberMeServices;
   }
 }

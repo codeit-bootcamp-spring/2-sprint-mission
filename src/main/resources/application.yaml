@@ -61,6 +61,9 @@ security:
     username: admin0001
     email: admin0001@email.com
     password: "admin0001@"
+  remember-me:
+    key: remembermeKey
+    token-validity-seconds: 1209600
 
 logging:
   level:
