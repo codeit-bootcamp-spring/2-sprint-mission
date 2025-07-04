@@ -30,18 +30,20 @@ public class JwtUtil {
     Instant expiration = now.plusMillis(jwtProperties.accessTokenExpiration());
     String username = userDto.username();
 
-    Map<String, Object> claims = Map.of(
+    Map<String, Object> userClaims = Map.of(
         "id", userDto.id(),
+        "username", userDto.username(),
         "email", userDto.email(),
-        "role", userDto.role().name()
+        "role", userDto.role(),
+        "createdAt", userDto.createdAt().toString()
     );
 
     var builder = Jwts.builder()
         .subject(username)
         .issuer(jwtProperties.issuer())
         .issuedAt(Date.from(now))
-        .expiration(Date.from(expiration));
-    claims.forEach(builder::claim);
+        .expiration(Date.from(expiration))
+        .claim("userDto", userClaims);
 
     return builder.signWith(secretKey).compact();
   }
