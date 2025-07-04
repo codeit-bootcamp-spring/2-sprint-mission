@@ -18,5 +18,7 @@ public interface JwtService {
   public String extractUsername(String token);
 
   public List<GrantedAuthority> extractAuthorities(String token);
+
+  public JwtSession findSessionByRefreshToken(String refreshToken);
 }
 

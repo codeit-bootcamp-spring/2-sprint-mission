@@ -128,6 +128,13 @@ public class JwtServiceImpl implements JwtService {
         .ifPresent(jwtSessionRepository::delete);
   }
 
+  @Override
+  public JwtSession findSessionByRefreshToken(String refreshToken) {
+    // Redis or DB 조회
+    return jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElse(null);
+  }
+
   private UserDto convertUserToDto(User user) {
     // User → UserDto 변환 로직 작성
     return userMapper.toDto(user);
