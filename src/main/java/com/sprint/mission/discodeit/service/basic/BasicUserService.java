@@ -36,6 +36,7 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   @Override
@@ -66,7 +67,6 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     String password =  passwordEncoder.encode(userCreateRequest.password());
 
     User user = new User(username, email, password, nullableProfile);
