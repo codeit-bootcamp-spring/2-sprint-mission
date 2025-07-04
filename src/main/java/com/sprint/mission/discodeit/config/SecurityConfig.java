@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.service.basic.DatabaseUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.sprint.mission.discodeit.entity.Role;
@@ -22,11 +23,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+
+import javax.sql.DataSource;
 
 
 @Configuration
@@ -36,8 +41,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
-                                           DaoAuthenticationProvider daoAuthenticationProvider
-                                           ) throws Exception {
+                                           DaoAuthenticationProvider daoAuthenticationProvider,
+                                           PersistentTokenBasedRememberMeServices rememberMeServices)
+            throws Exception {
 
 
         http
@@ -62,7 +68,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authenticationProvider(daoAuthenticationProvider)
                 .logout(logout -> logout.disable())
-
+                .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**")),
@@ -113,5 +119,22 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder);
         provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
         return provider;
+    }
+
+    @Bean
+    public PersistentTokenBasedRememberMeServices rememberMeServices(
+            @Value("${discodeit.security.remember-me.key}") String key,
+            @Value("${discodeit.security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+            UserDetailsService userDetailsService,
+            DataSource dataSource
+    ) {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+
+        PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+                key, userDetailsService, tokenRepository);
+        rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+        return rememberMeServices;
     }
 }
