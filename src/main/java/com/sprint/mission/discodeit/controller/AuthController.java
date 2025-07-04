@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,8 +65,26 @@ public class AuthController implements AuthApi {
     log.info("권한 수정 요청");
     UserDto userDto = authService.updateRole(request);
 
+    jwtService.forceLogoutUser(request.userId());
+
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userDto);
   }
+
+  @PostMapping("refresh")
+  public ResponseEntity<String> refreshToken(@CookieValue("refresh_token") String refreshToken,
+      HttpServletResponse response) {
+    JwtSession session = jwtService.findSessionByRefreshToken(refreshToken);
+    if (session == null || !jwtService.isValidToken(refreshToken)) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    String newAccessToken = jwtService.reissueAccessToken(session.getRefreshToken()).toString();
+    // 리프레시 토큰 재발급이 필요하면 여기서 새 쿠키에 담아서 보내기
+
+    return ResponseEntity.ok(newAccessToken);
+  }
+
+
 }

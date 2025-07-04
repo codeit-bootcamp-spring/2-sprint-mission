@@ -129,6 +129,15 @@ public class JwtServiceImpl implements JwtService {
   }
 
   @Override
+  public void forceLogoutUser(UUID userId) {
+    List<JwtSession> sessions = jwtSessionRepository.findAllByUserId(userId);
+
+    for (JwtSession session : sessions) {
+      jwtSessionRepository.delete(session); // 세션 삭제 → 토큰 무효화 효과
+    }
+  }
+
+  @Override
   public JwtSession findSessionByRefreshToken(String refreshToken) {
     // Redis or DB 조회
     return jwtSessionRepository.findByRefreshToken(refreshToken)
