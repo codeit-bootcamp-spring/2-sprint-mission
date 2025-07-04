@@ -69,7 +69,7 @@ public class SecurityConfig {
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+                .addLogoutHandler(new SessionRegistryLogoutHandler(jwtService))
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
             Customizer.withDefaults())
