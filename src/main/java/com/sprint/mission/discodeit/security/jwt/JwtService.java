@@ -1,0 +1,86 @@
+package com.sprint.mission.discodeit.security.jwt;
+
+import com.sprint.mission.discodeit.config.JwtProperties;
+import com.sprint.mission.discodeit.dto.controller.user.UserDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.jwt.InvalidRefreshTokenException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Base64;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+@Service
+@AllArgsConstructor
+@Slf4j
+public class JwtService {
+
+  private final JwtUtil jwtUtil;
+  private final UserMapper userMapper;
+  private final SecureRandom secureRandom = new SecureRandom();
+  private final JwtSessionRepository jwtSessionRepository;
+  private final UserRepository userRepository;
+  private final JwtProperties jwtProperties;
+
+
+  public JwtSession generateJwtSession(UserDto userDto) {
+    String refreshToken = generateSecureRandomToken();
+    String accessToken = jwtUtil.generateAccessToken(userDto);
+
+    User user = userRepository.findById(userDto.id())
+        .orElseThrow(() -> new UserNotFoundException(Map.of("id", userDto.id())));
+
+    JwtSession jwtSession = JwtSession.builder()
+        .accessToken(accessToken)
+        .user(user)
+        .refreshToken(refreshToken)
+        .refreshTokenExpiresAt(LocalDateTime.now()
+            .plusSeconds(jwtProperties.refreshTokenExpiration() / 1000))
+        .issuedAt(LocalDateTime.now())
+        .build();
+    jwtSessionRepository.save(jwtSession);
+
+    return jwtSession;
+  }
+
+  public boolean validateAccessToken(String token) {
+    return jwtUtil.validateToken(token);
+  }
+
+  public String refreshAccessToken(String token) {
+    // Refresh Token 검증 및 조회
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
+        .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
+
+    User user = jwtSession.getUser();
+
+    String newAccessToken = jwtUtil.generateAccessToken(userMapper.toUserDto(user));
+
+    // RefreshToken rotation
+    String refreshToken = generateSecureRandomToken();
+    LocalDateTime expiresAt = LocalDateTime.now()
+        .plusSeconds(jwtProperties.refreshTokenExpiration() / 1000);
+    jwtSession.rotateRefreshToken(refreshToken, expiresAt);
+    jwtSessionRepository.save(jwtSession);
+
+    return newAccessToken;
+  }
+
+  public void invalidateRefreshToken(String token) {
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
+        .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
+
+    jwtSessionRepository.deleteById(jwtSession.getId());
+  }
+
+  private String generateSecureRandomToken() {
+    byte[] tokenBytes = new byte[32];
+    secureRandom.nextBytes(tokenBytes);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+  }
+}

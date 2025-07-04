@@ -25,8 +25,6 @@ spring:
         url: http://localhost:9090
   cache:
     type: simple
-  session:
-    store-type: jdbc
 
   jpa:
     hibernate:
@@ -61,6 +59,14 @@ security:
   remember-me:
     key: ${SECURITY_REMEMBER_ME_KEY}
     token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+    access-token-expiration: 1800000   # 30
+    refresh-token-expiration: 1209600000 # 14
+    issuer: ${JWT_ISSUER}
+
 
 info:
   app:

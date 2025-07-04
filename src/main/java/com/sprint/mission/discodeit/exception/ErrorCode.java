@@ -4,6 +4,9 @@ public enum ErrorCode implements Code {
 
   BAD_REQUEST(400, "BAD REQUEST"),
 
+  // Jwt
+  INVALID_REFRESH_TOKEN(401, "Invalid or expired refresh token"),
+
   // Auth
   AUTHENTICATION_FAILED(401, "Authentication failed"),
   SESSION_EXPIRED(401, "Session expired"),
