@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -50,10 +52,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       }
     } catch (JwtAuthenticationException ex) {
       // Filter에서 잡힌 JWT 인증 관련 예외는 request attribute에 저장하여 EntryPoint에서 처리
+      log.warn("JWT 인증 처리 중 오류 발생", ex);
       request.setAttribute("jwt.exception", ex);
     } catch (Exception ex) {
       // 기타 예외는 일반적인 인증 예외로 처리
-      logger.error("JWT 인증 처리 중 예상치 못한 오류 발생", ex);
+      log.error("JWT 인증 처리 중 예상치 못한 오류 발생", ex);
       request.setAttribute("jwt.exception",
           new JwtAuthenticationException("JWT 처리 중 내부 오류가 발생했습니다.", ErrorCode.JWT_INTERNAL_ERROR));
     }
