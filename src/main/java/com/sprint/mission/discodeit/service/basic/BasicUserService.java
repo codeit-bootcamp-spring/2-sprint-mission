@@ -11,13 +11,18 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +38,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
   @Transactional
   @Override
@@ -82,13 +88,18 @@ public class BasicUserService implements UserService {
 
   @Override
   public List<UserDto> findAll() {
-    log.debug("모든 사용자 조회 시작");
-    List<UserDto> userDtos = userRepository.findAllWithProfile()
-        .stream()
-        .map(userMapper::toDto)
-        .toList();
-    log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
-    return userDtos;
+      log.debug("모든 사용자 조회 시작");
+      Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
+              .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
+              .filter(principal -> principal instanceof DiscodeitUserDetails)
+              .map(principal -> ((DiscodeitUserDetails) principal).getUserDto().id())
+              .collect(Collectors.toSet());
+      List<UserDto> userDtos = userRepository.findAllWithProfile()
+              .stream()
+              .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
+              .toList();
+      log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
+      return userDtos;
   }
 
   @Transactional

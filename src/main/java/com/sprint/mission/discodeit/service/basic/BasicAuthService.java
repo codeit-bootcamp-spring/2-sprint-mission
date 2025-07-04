@@ -91,6 +91,8 @@ public class BasicAuthService implements AuthService {
     HttpSession session = request.getSession(true);
     session.setAttribute("SPRING_SECURITY_CONTEXT", context);
 
+    sessionRegistry.registerNewSession(session.getId(), auth.getPrincipal());
+
     User user = userRepository.findByEmail(username)
         .orElseThrow(() -> UserNotFoundException.withUsername(username));
 
@@ -120,8 +122,6 @@ public class BasicAuthService implements AuthService {
 
     user.updateRole(request.newRole());
 
-    System.out.println("=== SESSION DEBUG ===");
-    System.out.println("Target user email: " + user.getEmail());
 
     sessionRegistry.getAllPrincipals().stream()
             .filter(principal -> principal.equals(user.getEmail()))
