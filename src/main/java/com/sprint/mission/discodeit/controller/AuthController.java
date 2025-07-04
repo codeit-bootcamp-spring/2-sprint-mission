@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.AuthApi;
+import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.service.AuthService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,5 +23,14 @@ public class AuthController implements AuthApi {
   @GetMapping(path = "/csrf-token")
   public ResponseEntity<CsrfToken> csrf(CsrfToken csrfToken) {
     return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<UserDto> getCurrentUser(HttpSession session) {
+    UserDto userDto = (UserDto) session.getAttribute("user");
+    if (userDto == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+    return ResponseEntity.ok(userDto);
   }
 }
