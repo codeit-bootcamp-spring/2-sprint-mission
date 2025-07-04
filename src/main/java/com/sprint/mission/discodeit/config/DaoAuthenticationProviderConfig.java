@@ -14,12 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class DaoAuthenticationProviderConfig {
   private final UserDetailsService userDetailsService;
   private final PasswordEncoder passwordEncoder;
+  private final RoleHierarchy roleHierarchy;
 
   @Bean
   public DaoAuthenticationProvider daoAuthenticationProvider() {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     provider.setUserDetailsService(userDetailsService);
     provider.setPasswordEncoder(passwordEncoder);
+    provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
     return provider;
   }
 }
