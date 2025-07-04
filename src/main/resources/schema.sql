@@ -9,7 +9,7 @@ CREATE TABLE users
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
     profile_id uuid,
-    role       varchar(20)              NOT NULL
+    role       varchar(20)              NOT NULL CHECK (role IN ('ROLE_ADMIN', 'ROLE_CHANNEL_MANAGER', 'ROLE_USER'))
 );
 
 -- BinaryContent
@@ -20,7 +20,6 @@ CREATE TABLE binary_contents
     file_name    varchar(255)             NOT NULL,
     size         bigint                   NOT NULL,
     content_type varchar(100)             NOT NULL
---     ,bytes        bytea        NOT NULL
 );
 
 
@@ -66,6 +65,15 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
+-- ⭐️ jwt_sessions 테이블 추가 (JWT 리프레시 토큰 저장용)
+CREATE TABLE jwt_sessions
+(
+    id            uuid PRIMARY KEY,
+    user_id       uuid NOT NULL,
+    refresh_token varchar(36) NOT NULL UNIQUE,
+    CONSTRAINT fk_jwt_session_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
@@ -109,11 +117,3 @@ ALTER TABLE read_statuses
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
             ON DELETE CASCADE;
-
-create table persistent_logins
-(
-    username  varchar(64) not null,
-    series    varchar(64) primary key,
-    token     varchar(64) not null,
-    last_used timestamp   not null
-);

@@ -10,6 +10,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  sql:
+    init:
+      mode: embedded
 
 logging:
   level:
