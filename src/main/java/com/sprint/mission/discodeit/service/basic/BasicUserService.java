@@ -15,14 +15,16 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,8 +36,9 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+    private final PasswordEncoder passwordEncoder;
 
-  @Transactional
+    @Transactional
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -64,8 +67,10 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
     String password = userCreateRequest.password();
+    String passwordEncode = passwordEncoder.encode(password);
 
-    User user = new User(username, email, password, nullableProfile);
+
+    User user = new User(username, email, passwordEncode, nullableProfile);
     Instant now = Instant.now();
     UserStatus userStatus = new UserStatus(user, now);
 
