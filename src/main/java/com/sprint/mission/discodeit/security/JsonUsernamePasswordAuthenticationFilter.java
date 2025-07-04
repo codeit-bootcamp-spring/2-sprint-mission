@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -55,13 +56,14 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       ObjectMapper objectMapper,
       AuthenticationManager authenticationManager,
       SessionAuthenticationStrategy sessionAuthenticationStrategy,
-      RememberMeServices rememberMeServices
+      RememberMeServices rememberMeServices,
+      JwtService jwtService
   ) {
     JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
         objectMapper);
     filter.setRequiresAuthenticationRequestMatcher(SecurityMatchers.LOGIN);
     filter.setAuthenticationManager(authenticationManager);
-    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
     filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
     filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
@@ -73,10 +75,12 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
     private final ObjectMapper objectMapper;
+    private final JwtService jwtService;  // 추가
 
-    public Configurer(ObjectMapper objectMapper) {
+    public Configurer(ObjectMapper objectMapper, JwtService jwtService) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), SecurityMatchers.LOGIN_URL);
       this.objectMapper = objectMapper;
+      this.jwtService = jwtService;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     @Override
     public void init(HttpSecurity http) throws Exception {
       loginProcessingUrl(SecurityMatchers.LOGIN_URL);
-      successHandler(new CustomLoginSuccessHandler(objectMapper));
+      successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));  // jwtService 추가
       failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
   }

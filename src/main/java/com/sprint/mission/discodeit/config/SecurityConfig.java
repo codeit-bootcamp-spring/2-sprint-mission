@@ -6,12 +6,14 @@ import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStra
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.stream.IntStream;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
@@ -38,9 +40,11 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfig {
 
   @Bean
+  @Primary
   public SecurityFilterChain filterChain(
       HttpSecurity http,
       ObjectMapper objectMapper,
+      JwtService jwtService,
       DaoAuthenticationProvider daoAuthenticationProvider,
       SessionRegistry sessionRegistry,
       PersistentTokenBasedRememberMeServices rememberMeServices
@@ -67,7 +71,7 @@ public class SecurityConfig {
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
         )
-        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
             Customizer.withDefaults())
         .sessionManagement(session ->
             session
