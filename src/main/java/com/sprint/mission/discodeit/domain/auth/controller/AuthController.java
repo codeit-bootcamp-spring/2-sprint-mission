@@ -6,10 +6,8 @@ import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -23,6 +21,11 @@ public class AuthController {
         UserResult userResult = authService.login(loginRequest);
 
         return ResponseEntity.ok(userResult);
+    }
+
+    @GetMapping("/csrf-token")
+    public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+        return ResponseEntity.ok(csrfToken);
     }
 
 }

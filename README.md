@@ -23,17 +23,17 @@
 
 ## CSRF 보호 설정하기
 
-- [ ] CSRF 토큰을 발급하는 API를 구현하세요
-- [ ] CSRF 토큰을 발급하는 API는 인증하지 않도록 SecurityFilterChain을 리팩토링하세요.
+- [x] CSRF 토큰을 발급하는 API를 구현하세요
+- [x] CSRF 토큰을 발급하는 API는 인증하지 않도록 SecurityFilterChain을 리팩토링하세요.
 
 ## 회원가입 고도화
 
-- [ ]  회원가입 API 스펙은 유지합니다.
-- [ ]  회원가입 시 비밀번호는 PasswordEncoder를 통해 해시로 저장하세요.
+- [x]  회원가입 API 스펙은 유지합니다.
+- [x]  회원가입 시 비밀번호는 PasswordEncoder를 통해 해시로 저장하세요.
     ~~~text
     - PasswordEncoder의 구현체는 BCryptPasswordEncoder를 활용하세요.
     ~~~~
-- [ ] 회원가입 API는 인증하지 않도록 SecurityFilterChain을 리팩토링하세요.
+- [x] 회원가입 API는 인증하지 않도록 SecurityFilterChain을 리팩토링하세요.
 
 ## 기본 인증 구현
 

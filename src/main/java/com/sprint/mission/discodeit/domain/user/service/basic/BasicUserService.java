@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentCore binaryContentService;
     private final UserResultMapper userResultMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     @Override
@@ -39,7 +41,9 @@ public class BasicUserService implements UserService {
         validateDuplicateUserName(userRequest.username());
 
         BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
-        User savedUser = userRepository.save(new User(userRequest.username(), userRequest.email(), userRequest.password(), binaryContent));
+
+        User user = new User(userRequest.username(), userRequest.email(), passwordEncoder.encode(userRequest.password()), binaryContent);
+        User savedUser = userRepository.save(user);
         log.info("사용자 생성 완료: userId={}", savedUser.getId());
 
         return UserResult.fromEntity(savedUser, savedUser.getUserStatus().isOnline(Instant.now()));
