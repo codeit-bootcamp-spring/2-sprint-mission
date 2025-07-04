@@ -7,6 +7,8 @@ spring:
     username: discodeit_user
     password: discodeit1234
   jpa:
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -25,3 +27,14 @@ management:
   info:
     env:
       enabled: true
+
+discodeit:
+  admin:
+    username: admin
+    email: admin@discodeit.com
+    password: admin1234!
+
+security:
+  remember-me:
+    key: "your-very-long-and-super-secret-key-for-remember-me-12345!"
+    token-validity-seconds: 2592000
