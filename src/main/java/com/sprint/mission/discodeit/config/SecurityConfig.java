@@ -29,6 +29,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Slf4j
 @Configuration
@@ -45,17 +47,32 @@ public class SecurityConfig {
         PersistentTokenBasedRememberMeServices rememberMeServices
     )
         throws Exception {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieName("XSRF-TOKEN");
+        repository.setHeaderName("X-XSRF-TOKEN");
+
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+
         http
             .authenticationProvider(daoAuthenticationProvider)
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(
                     SecurityMatchers.NON_API,
                     SecurityMatchers.GET_CSRF_TOKEN,
-                    SecurityMatchers.SIGN_UP
+                    SecurityMatchers.SIGN_UP,
+                    SecurityMatchers.LOGIN
                 ).permitAll()
                 .anyRequest().hasRole(Role.USER.name())
             )
-            .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(repository) // HttpOnly 속성 -> false
+                .csrfTokenRequestHandler(requestHandler)
+                .ignoringRequestMatchers(
+                    SecurityMatchers.LOGIN,
+                    SecurityMatchers.LOGOUT
+                )
+            )
             .logout(logout ->
                 logout
                     .logoutRequestMatcher(SecurityMatchers.LOGOUT)
