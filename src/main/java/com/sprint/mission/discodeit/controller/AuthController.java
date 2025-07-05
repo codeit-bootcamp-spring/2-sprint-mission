@@ -25,32 +25,32 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController implements AuthApi {
 
-  private final AuthService authService;
-  private final UserService userService;
+    private final AuthService authService;
+    private final UserService userService;
 
-  @GetMapping("csrf-token")
-  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
-    log.debug("CSRF 토큰 요청");
-    return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
-  }
+    @GetMapping("csrf-token")
+    public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+        log.debug("CSRF 토큰 요청");
+        return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+    }
 
-  @GetMapping("me")
-  public ResponseEntity<UserDto> me(@AuthenticationPrincipal DiscodeitUserDetails userDetails) {
-    log.info("내 정보 조회 요청");
-    UUID userId = userDetails.getUserDto().id();
-    UserDto userDto = userService.find(userId);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userDto);
-  }
+    @GetMapping("me")
+    public ResponseEntity<UserDto> me(@AuthenticationPrincipal DiscodeitUserDetails userDetails) {
+        log.info("내 정보 조회 요청");
+        UUID userId = userDetails.getUserDto().id();
+        UserDto userDto = userService.find(userId);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userDto);
+    }
 
-  @PutMapping("role")
-  public ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request) {
-    log.info("권한 수정 요청");
-    UserDto userDto = authService.updateRole(request);
+    @PutMapping("role")
+    public ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request) {
+        log.info("권한 수정 요청");
+        UserDto userDto = authService.updateRole(request);
 
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(userDto);
-  }
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userDto);
+    }
 }
