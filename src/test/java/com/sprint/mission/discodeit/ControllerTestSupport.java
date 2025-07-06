@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.domain.auth.controller.AuthController;
-import com.sprint.mission.discodeit.domain.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.controller.UserController;
 import com.sprint.mission.discodeit.domain.user.service.UserService;
 import com.sprint.mission.discodeit.domain.userstatus.service.UserStatusService;
@@ -18,8 +17,8 @@ public abstract class ControllerTestSupport {
     protected UserService userService;
     @MockitoBean
     private UserStatusService userStatusService;
-    @MockitoBean
-    private AuthService authService;
+//    @MockitoBean
+//    private AuthService authService;
     @MockitoBean
     private JpaMetamodelMappingContext jpaMetamodelMappingContext;
 

@@ -15,4 +15,3 @@ server:
 logging:
   level:
     com.sprint.mission.discodeit: info
-    org.hibernate.SQL: info

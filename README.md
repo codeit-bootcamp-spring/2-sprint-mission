@@ -38,14 +38,14 @@
 ## 기본 인증 구현
 
 - 다음의 조건을 만족하는 필터와 AuthenticationProvider를 구현하세요.
-- [ ]  로그인 API 스펙은 다음과 같습니다.
+- [x]  로그인 API 스펙은 다음과 같습니다.
   - 기존에 구현했던 로그인 관련 코드는 제거하세요.
     ~~~text
         - AuthApi.login, AuthController.login
         - AuthService.login
         - LoginRequest
     ~~~~
-- [ ]  다음의 주요 컴포넌트를 활용해 Spring Security의 기본 인증 플로우를 최대한 유지합니다.
+- [x]  다음의 주요 컴포넌트를 활용해 Spring Security의 기본 인증 플로우를 최대한 유지합니다.
     ~~~text
     - 인증 플로우 참고: UsernamePasswordAuthenticationFilter
     - AuthenticationProvider: DaoAuthenticationProvider

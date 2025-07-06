@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.config.web;
+package com.sprint.mission.discodeit.common.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

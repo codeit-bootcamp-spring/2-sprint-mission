@@ -23,11 +23,10 @@ public record ErrorResponse(
                 error,
                 discodeitException.getErrorCode().getMessage(),
                 discodeitException.getDetails(),
-                discodeitException.getClass().getTypeName(), // 이게 뭘로 나오지? 확인 필요, Exception이 발생하는 크래스면 좋긴한데
+                discodeitException.getClass().getTypeName(),
                 status
         );
     }
-
     public static ErrorResponse of(String error, Exception ex, int status) {
         return new ErrorResponse(
                 Instant.now(),
