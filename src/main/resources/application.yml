@@ -24,6 +24,15 @@ spring:
   sql:
     init:
       mode: never
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+
+security:
+  remember-me:
+    key: blogRememberMeKey
+    token-validity-seconds: 1209600
 
 logging:
   level:

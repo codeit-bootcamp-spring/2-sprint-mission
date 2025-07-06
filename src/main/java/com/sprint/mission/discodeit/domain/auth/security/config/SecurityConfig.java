@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.auth.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.domain.auth.security.filter.SessionRegistryLogoutHandler;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.authentication.rememberme.AbstractRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -43,7 +48,8 @@ public class SecurityConfig {
       HttpSecurity httpSecurity,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      SessionRegistry sessionRegistry
+      SessionRegistry sessionRegistry,
+      PersistentTokenBasedRememberMeServices rememberMeServices
   ) throws Exception {
     httpSecurity
         .authorizeHttpRequests(auth -> auth
@@ -53,9 +59,12 @@ public class SecurityConfig {
                 SIGN_UP
             ).permitAll()
             .requestMatchers("/api/users/**/role").hasRole(Role.ADMIN.name())
-            .requestMatchers(HttpMethod.POST, "/api/channels/public/**").hasRole(Role.CHANNEL_MANAGER.name())
-            .requestMatchers(HttpMethod.PUT, "/api/channels/public/**").hasRole(Role.CHANNEL_MANAGER.name())
-            .requestMatchers(HttpMethod.DELETE, "/api/channels/public/**").hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.POST, "/api/channels/public/**")
+            .hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.PUT, "/api/channels/public/**")
+            .hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/public/**")
+            .hasRole(Role.CHANNEL_MANAGER.name())
             .anyRequest().hasRole(Role.USER.name())
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
@@ -67,6 +76,7 @@ public class SecurityConfig {
             .addLogoutHandler(new SecurityContextLogoutHandler())
             .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
         )
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .csrf(csrf -> csrf.ignoringRequestMatchers(LOGOUT));
 
     return httpSecurity.build();
@@ -101,6 +111,23 @@ public class SecurityConfig {
         .role(Role.CHANNEL_MANAGER.name())
         .implies(Role.USER.name())
         .build();
+  }
+
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      UserDetailsService userDetailsService,
+      DataSource dataSource
+  ) {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+
+    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+        key, userDetailsService, tokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+    return rememberMeServices;
   }
 
 }
