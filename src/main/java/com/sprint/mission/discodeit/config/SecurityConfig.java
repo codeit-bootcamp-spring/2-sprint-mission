@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
@@ -41,7 +40,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  private final ObjectMapper objectMapper;
   private final UserMapper userMapper;
 
   @Bean
