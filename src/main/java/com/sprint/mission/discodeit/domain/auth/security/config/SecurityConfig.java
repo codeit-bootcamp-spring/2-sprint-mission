@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.domain.auth.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.domain.auth.security.filter.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.auth.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.domain.auth.security.filter.SessionRegistryLogoutHandler;
@@ -77,6 +78,14 @@ public class SecurityConfig {
             .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
         )
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+        .sessionManagement(session ->
+            session
+                .sessionFixation().migrateSession()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+                .sessionRegistry(sessionRegistry)
+                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+        )
         .csrf(csrf -> csrf.ignoringRequestMatchers(LOGOUT));
 
     return httpSecurity.build();
