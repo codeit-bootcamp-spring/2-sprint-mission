@@ -9,20 +9,15 @@ import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -35,7 +30,6 @@ public class AuthenticationTest extends IntegrationTestSupport {
   private MockMvcTester mockMvcTester;
   @Autowired
   private ObjectMapper objectMapper;
-
   @Autowired
   private PasswordEncoder passwordEncoder;
 

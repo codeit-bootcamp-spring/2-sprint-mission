@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.security;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.ControllerTestSupport;
-import com.sprint.mission.discodeit.security.config.SecurityConfig;
+import com.sprint.mission.discodeit.domain.auth.security.config.SecurityConfig;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.entity.User;
@@ -19,8 +21,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
-
-import static org.mockito.ArgumentMatchers.any;
 
 @Disabled
 @Import(SecurityConfig.class)

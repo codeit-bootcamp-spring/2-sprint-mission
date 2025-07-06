@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.ControllerTestSupport;
-import com.sprint.mission.discodeit.security.config.SecurityConfig;
+import com.sprint.mission.discodeit.domain.auth.security.config.SecurityConfig;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

@@ -16,47 +16,58 @@ import java.time.Instant;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseUpdatableEntity {
 
-    @Column(name = "username", nullable = false)
-    private String name;
+  @Column(name = "username", nullable = false)
+  private String name;
 
-    @Column(name = "email", nullable = false)
-    private String email;
+  @Column(name = "email", nullable = false)
+  private String email;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+  @Column(name = "password", nullable = false)
+  private String password;
 
-    @OneToOne
-    @JoinColumn(name = "profile_id", columnDefinition = "uuid")
-    private BinaryContent binaryContent;
+  @OneToOne
+  @JoinColumn(name = "profile_id", columnDefinition = "uuid")
+  private BinaryContent binaryContent;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private UserStatus userStatus;
+  @Enumerated(value = EnumType.STRING)
+  @Column(name = "role")
+  private Role role = Role.USER;
 
-    public User(String name, String email, String password, BinaryContent binaryContent) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.binaryContent = binaryContent;
-        this.userStatus = new UserStatus(this, Instant.now());
+  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private UserStatus userStatus;
+
+  public User(String name, String email, String password, BinaryContent binaryContent) {
+    this.name = name;
+    this.email = email;
+    this.password = password;
+    this.binaryContent = binaryContent;
+    this.userStatus = new UserStatus(this, Instant.now());
+  }
+
+  public void update(String newUsername, String newEmail, String newPassword,
+      BinaryContent binaryContent) {
+    if (newUsername != null && !newUsername.equals(this.name)) {
+      this.name = newUsername;
     }
-
-    public void update(String newUsername, String newEmail, String newPassword, BinaryContent binaryContent) {
-        if (newUsername != null && !newUsername.equals(this.name)) {
-            this.name = newUsername;
-        }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-        }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-        }
-        if (binaryContent != null) {
-            this.binaryContent = binaryContent;
-        }
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
     }
-
-    public boolean isSamePassword(String password) {
-        return this.password.equals(password);
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
     }
+    if (binaryContent != null) {
+      this.binaryContent = binaryContent;
+    }
+  }
+
+  public void updateRole(Role role) {
+    if (role != null && !this.role.equals(role)) {
+      this.role = role;
+    }
+  }
+
+  public boolean isSamePassword(String password) {
+    return this.password.equals(password);
+  }
 
 }

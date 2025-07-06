@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security.filter;
+package com.sprint.mission.discodeit.domain.auth.security.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

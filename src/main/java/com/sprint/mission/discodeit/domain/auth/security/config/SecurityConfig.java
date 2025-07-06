@@ -1,11 +1,14 @@
-package com.sprint.mission.discodeit.security.config;
+package com.sprint.mission.discodeit.domain.auth.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
+import com.sprint.mission.discodeit.domain.auth.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.domain.auth.security.filter.SessionRegistryLogoutHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -84,6 +87,16 @@ public class SecurityConfig {
   @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    return RoleHierarchyImpl.withDefaultRolePrefix()
+        .role(Role.ADMIN.name())
+        .implies(Role.CHANNEL_MANAGER.name())
+        .role(Role.CHANNEL_MANAGER.name())
+        .implies(Role.USER.name())
+        .build();
   }
 
 }
