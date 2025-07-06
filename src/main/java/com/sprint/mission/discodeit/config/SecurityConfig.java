@@ -25,7 +25,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -70,16 +69,7 @@ public class SecurityConfig {
 
   @Bean
   public RoleHierarchy roleHierarchy() {
-    RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-    roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_CHANNEL_MANAGER > ROLE_USER");
-    return roleHierarchy;
-  }
-
-  @Bean
-  public DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
-    DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-    expressionHandler.setRoleHierarchy(roleHierarchy);
-    return expressionHandler;
+    return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_CHANNEL_MANAGER > ROLE_USER");
   }
 
   @Bean
@@ -110,10 +100,9 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http,
       JsonUsernamePasswordAuthenticationFilter jsonUsernamePasswordAuthenticationFilter,
-      LogoutAuthenticationFilter logoutAuthenticationFilter,
-      DefaultWebSecurityExpressionHandler customWebSecurityExpressionHandler) throws Exception {
+      LogoutAuthenticationFilter logoutAuthenticationFilter) throws Exception {
 
-    http
+    return http
         .csrf(csrf -> csrf
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
@@ -136,9 +125,8 @@ public class SecurityConfig {
             .anyRequest().authenticated()
         )
         .addFilterBefore(jsonUsernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(logoutAuthenticationFilter, LogoutFilter.class);
-
-    SecurityFilterChain filterChain = http.build();
+        .addFilterBefore(logoutAuthenticationFilter, LogoutFilter.class)
+        .build();
 
 //    // 필터 목록 출력
 //    System.out.println("=== Security Filter Chain ===");
@@ -147,6 +135,5 @@ public class SecurityConfig {
 //    );
 //    System.out.println("==============================");
 
-    return filterChain;
   }
 }
