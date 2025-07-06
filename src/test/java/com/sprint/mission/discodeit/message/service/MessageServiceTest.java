@@ -20,7 +20,6 @@ import com.sprint.mission.discodeit.domain.message.service.basic.BasicMessageSer
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -49,8 +48,6 @@ public class MessageServiceTest extends IntegrationTestSupport {
     @Autowired
     private MessageRepository messageRepository;
     @Autowired
-    private UserStatusRepository userStatusRepository;
-    @Autowired
     private BinaryContentRepository binaryContentRepository;
     @Autowired
     private BasicMessageService messageService;
@@ -58,7 +55,6 @@ public class MessageServiceTest extends IntegrationTestSupport {
     @AfterEach
     void tearDown() {
         messageRepository.deleteAllInBatch();
-        userStatusRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
         channelRepository.deleteAllInBatch();
     }

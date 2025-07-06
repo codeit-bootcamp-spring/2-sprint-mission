@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepos
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
@@ -34,8 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 class BasicChannelServiceTest extends IntegrationTestSupport {
 
     @Autowired
-    private UserStatusRepository userStatusRepository;
-    @Autowired
     private ReadStatusRepository readStatusRepository;
     @Autowired
     private UserRepository userRepository;
@@ -48,7 +45,6 @@ class BasicChannelServiceTest extends IntegrationTestSupport {
 
     @AfterEach
     void tearDown() {
-        userStatusRepository.deleteAllInBatch();
         readStatusRepository.deleteAllInBatch();
         messageRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();

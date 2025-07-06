@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.domain.user.entity;
 
-import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.domain.userstatus.entity.UserStatus;
-import jakarta.persistence.*;
+import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
 
 @Getter
 @Entity
@@ -33,15 +36,11 @@ public class User extends BaseUpdatableEntity {
   @Column(name = "role")
   private Role role = Role.USER;
 
-  @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-  private UserStatus userStatus;
-
   public User(String name, String email, String password, BinaryContent binaryContent) {
     this.name = name;
     this.email = email;
     this.password = password;
     this.binaryContent = binaryContent;
-    this.userStatus = new UserStatus(this, Instant.now());
   }
 
   public void update(String newUsername, String newEmail, String newPassword,
@@ -64,10 +63,6 @@ public class User extends BaseUpdatableEntity {
     if (role != null && !this.role.equals(role)) {
       this.role = role;
     }
-  }
-
-  public boolean isSamePassword(String password) {
-    return this.password.equals(password);
   }
 
 }

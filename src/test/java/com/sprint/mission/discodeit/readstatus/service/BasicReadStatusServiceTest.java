@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.readstatus.service;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 import com.sprint.mission.discodeit.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
@@ -15,26 +17,19 @@ import com.sprint.mission.discodeit.domain.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class BasicReadStatusServiceTest extends IntegrationTestSupport {
 
     @Autowired
     private ChannelRepository channelRepository;
-    @Autowired
-    private UserStatusRepository userStatusRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -45,7 +40,6 @@ class BasicReadStatusServiceTest extends IntegrationTestSupport {
     @AfterEach
     void tearDown() {
         readStatusRepository.deleteAllInBatch();
-        userStatusRepository.deleteAllInBatch();
         channelRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }

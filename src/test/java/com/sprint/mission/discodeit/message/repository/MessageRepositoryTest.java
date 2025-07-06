@@ -8,7 +8,8 @@ import com.sprint.mission.discodeit.domain.message.entity.Message;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
+import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
@@ -20,10 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
 class MessageRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
@@ -32,14 +29,11 @@ class MessageRepositoryTest extends IntegrationTestSupport {
     private ChannelRepository channelRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserStatusRepository userStatusRepository;
 
     @AfterEach
     void tearDown() {
         messageRepository.deleteAllInBatch();
         channelRepository.deleteAllInBatch();
-        userStatusRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 

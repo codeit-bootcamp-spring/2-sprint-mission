@@ -50,8 +50,6 @@ class AuthorizationTest extends IntegrationTestSupport {
     String hashedPassword = passwordEncoder.encode(password);
     User savedUser = userRepository.save(new User(name, "", hashedPassword, null));
 
-    TestingAuthenticationToken auth = new TestingAuthenticationToken(savedUser.getName(),
-        savedUser.getPassword());
     sessionRegistry.registerNewSession("mock-session-id", savedUser.getName());
 
     RoleUpdateRequest request = new RoleUpdateRequest(savedUser.getId(), Role.CHANNEL_MANAGER);

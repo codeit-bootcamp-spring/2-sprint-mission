@@ -59,7 +59,7 @@ public class SecurityConfig {
                 GET_CSRF_TOKEN,
                 SIGN_UP
             ).permitAll()
-            .requestMatchers("/api/users/**/role").hasRole(Role.ADMIN.name())
+            .requestMatchers("/api/auth/role").hasRole(Role.ADMIN.name())
             .requestMatchers(HttpMethod.POST, "/api/channels/public/**")
             .hasRole(Role.CHANNEL_MANAGER.name())
             .requestMatchers(HttpMethod.PUT, "/api/channels/public/**")
