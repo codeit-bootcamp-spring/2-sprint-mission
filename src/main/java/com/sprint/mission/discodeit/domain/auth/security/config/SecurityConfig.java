@@ -52,7 +52,11 @@ public class SecurityConfig {
                 GET_CSRF_TOKEN,
                 SIGN_UP
             ).permitAll()
-            .anyRequest().authenticated()
+            .requestMatchers("/api/users/**/role").hasRole(Role.ADMIN.name())
+            .requestMatchers(HttpMethod.POST, "/api/channels/public/**").hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.PUT, "/api/channels/public/**").hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(HttpMethod.DELETE, "/api/channels/public/**").hasRole(Role.CHANNEL_MANAGER.name())
+            .anyRequest().hasRole(Role.USER.name())
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             Customizer.withDefaults())
