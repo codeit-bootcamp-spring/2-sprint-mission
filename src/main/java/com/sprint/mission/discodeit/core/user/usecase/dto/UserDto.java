@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.core.user.usecase.dto;
 
 import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.auth.dto.Role;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
@@ -22,7 +23,10 @@ public record UserDto(
     BinaryContentDto profile,
 
     @Schema(description = "User 온라인 상태", example = "true")
-    boolean online
+    boolean online,
+
+    @Schema(description = "User 권한")
+    Role role
 ) {
 
   public static UserDto create(User user, boolean online) {
@@ -31,12 +35,14 @@ public record UserDto(
           .id(user.getId())
           .username(user.getName())
           .email(user.getEmail())
+          .role(user.getRole())
           .online(online).build();
     } else {
       return UserDto.builder()
           .id(user.getId())
           .username(user.getName())
           .email(user.getEmail())
+          .role(user.getRole())
           .profile(BinaryContentDto.create(user.getProfile()))
           .online(online).build();
     }

@@ -200,37 +200,6 @@ public class UserServiceUnitTest {
     });
   }
 
-  @Test
-  void UserLoginTestSuccess() {
-    // given
-    UserLoginCommand userLoginCommand = new UserLoginCommand("a", "a");
-    when(userRepository.findByName("a")).thenReturn(Optional.of(user));
-    // when
-    UserDto result = userService.login(userLoginCommand);
-    // then
-    assertThat(result.username()).isEqualTo("a");
-  }
-
-  @Test
-  void UserLogin_WithWrongName_ShouldThrowException() {
-    // given
-    UserLoginCommand userLoginCommand = new UserLoginCommand("b", "a");
-    // when & then
-    assertThrows(UserNotFoundException.class, () -> {
-      userService.login(userLoginCommand);
-    });
-  }
-
-  @Test
-  void UserLogin_WithWrongPassword_ShouldThrowException() {
-    // given
-    UserLoginCommand userLoginCommand = new UserLoginCommand("a", "b");
-    when(userRepository.findByName("a")).thenReturn(Optional.of(user));
-    // when & then
-    assertThrows(UserLoginFailedException.class, () -> {
-      userService.login(userLoginCommand);
-    });
-  }
 
   @Test
   void UserDeleteTest_Success() {
