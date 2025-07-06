@@ -29,6 +29,10 @@ discodeit:
       max-file-size: 10MB
       max-request-size: 10MB
 
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 management:
   info:

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.auth.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.auth.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.core.auth.dto.Role;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,6 +24,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -54,6 +58,12 @@ public class SecurityConfig {
             .logoutUrl("/api/auth/logout")
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
             .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry()))
+        ).sessionManagement(session ->
+            session
+                .sessionFixation().migrateSession()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+                .sessionRegistry(sessionRegistry())
         );
 
     return http.build();
@@ -100,5 +110,22 @@ public class SecurityConfig {
   @Bean
   public SessionRegistry sessionRegistry() {
     return new SessionRegistryImpl();
+  }
+
+  @Bean
+  public PersistentTokenBasedRememberMeServices rememberMeServices(
+      @Value("${security.remember-me.key}") String key,
+      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
+      UserDetailsService userDetailsService,
+      DataSource dataSource
+  ) {
+    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+    tokenRepository.setDataSource(dataSource);
+
+    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
+        key, userDetailsService, tokenRepository);
+    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
+
+    return rememberMeServices;
   }
 }
