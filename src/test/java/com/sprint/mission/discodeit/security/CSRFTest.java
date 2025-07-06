@@ -75,7 +75,7 @@ public class CSRFTest extends ControllerTestSupport {
                 .hasStatus4xxClientError();
     }
 
-    @DisplayName("Post 요청시, CSRF-token이 없으면 정상 처리합니다.")
+    @DisplayName("Post 요청시, CSRF-token이 있으면 정상 처리합니다.")
     @Test
     void test_CsrfToken() {
         // given

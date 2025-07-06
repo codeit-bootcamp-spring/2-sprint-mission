@@ -7,13 +7,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -21,6 +25,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private static final String LOGIN_URL = "/api/auth/login";
+
+  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(
+      "/api/auth/login", HttpMethod.POST.name());
 
   private final ObjectMapper objectMapper;
 
@@ -67,6 +74,22 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       successHandler(new CustomLoginSuccessHandler(objectMapper));
       failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
+  }
+
+  public static JsonUsernamePasswordAuthenticationFilter createDefault(
+      ObjectMapper objectMapper,
+      AuthenticationManager authenticationManager,
+      SessionAuthenticationStrategy sessionAuthenticationStrategy
+  ) {
+    JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
+        objectMapper);
+    filter.setRequiresAuthenticationRequestMatcher(LOGIN);
+    filter.setAuthenticationManager(authenticationManager);
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
+    filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
+    filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
+    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
+    return filter;
   }
 
 }
