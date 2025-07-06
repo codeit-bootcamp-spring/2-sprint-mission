@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.auth;
 
+import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
+import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,12 +17,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return userRepository.findByName(username)
-        .map(user -> org.springframework.security.core.userdetails.User.builder()
-            .username(user.getName())
-            .password(user.getPassword())
-            .build())
+    User user = userRepository.findByName(username)
         .orElseThrow(
             () -> new UsernameNotFoundException("User not found with username: " + username));
+
+    return new CustomUserDetails(UserDto.create(user, user.getUserStatus().isOnline()),
+        user.getPassword());
   }
 }
