@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
 
+    @PreAuthorize("hasRole('ADMIN') or #readStatusCreateRequest.userId() == authentication.principal.id")
     @Transactional
     @Override
     public ReadStatusResult create(ReadStatusCreateRequest readStatusCreateRequest) {
@@ -54,6 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return ReadStatusResult.fromEntity(readStatuses);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or @readStatusRepository.findById(#readStatusId).orElseThrow().getUser().getId() == authentication.principal.id")
     @Transactional
     @Override
     public ReadStatusResult updateLastReadTime(UUID readStatusId, Instant time) {

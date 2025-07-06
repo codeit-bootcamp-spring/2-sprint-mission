@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +53,6 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   @Override
   public UserResult getById(UUID userId) {
-    log.debug("사용자 조회 요청: userId={}", userId);
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
@@ -86,12 +86,13 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(user);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
   @Transactional
   @Override
   public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest,
       BinaryContentRequest binaryContentRequest) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+        .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
     if (user.getBinaryContent() != null) {
       binaryContentService.delete(user.getBinaryContent().getId());
@@ -105,11 +106,12 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(updatedUser);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
   @Transactional
   @Override
   public void delete(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      throw new UserNotFoundException(Map.of("userId", userId));
+      throw new UserNotFoundException(Map.of());
     }
     userRepository.deleteById(userId);
   }
