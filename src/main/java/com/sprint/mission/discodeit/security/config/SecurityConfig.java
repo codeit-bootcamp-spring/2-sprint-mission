@@ -29,6 +29,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
@@ -43,7 +45,13 @@ public class SecurityConfig {
       SessionRegistry sessionRegistry,
       DaoAuthenticationProvider daoAuthenticationProvider,
       PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
+    CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+    requestHandler.setCsrfRequestAttributeName(null);
+    
     http
+        .csrf(csrf -> csrf
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .csrfTokenRequestHandler(requestHandler))
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
@@ -53,7 +61,6 @@ public class SecurityConfig {
                 SecurityMatchers.SIGN_UP
             ).permitAll()
             .anyRequest().hasRole(Role.USER.name()))
-        .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
         .logout(logout -> logout
             .logoutRequestMatcher(SecurityMatchers.LOGOUT)
             .invalidateHttpSession(true)
