@@ -6,9 +6,11 @@ import com.sprint.mission.discodeit.exception.jwt.InvalidRefreshTokenException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -107,9 +109,15 @@ public class JwtService {
   public void invalidateAllJwtSessionByUserId(UUID id) {
     List<JwtSession> jwtSessionList = jwtSessionRepository.findByUserId(id);
     jwtSessionList.forEach(
-        jwtSession -> jwtBlacklist.addBlackList(jwtSession.getAccessToken(),
-            jwtUtil.extractExpiration(
-                jwtSession.getAccessToken())));
+        jwtSession -> {
+          try {
+            Date expiration = jwtUtil.extractExpiration(jwtSession.getAccessToken());
+            jwtBlacklist.addBlackList(jwtSession.getAccessToken(), expiration);
+            // 토큰이 만료된 경우 ExpiredJwtException을 던짐 - 블랙 리스트에 추가 필요 X
+          } catch (ExpiredJwtException e) {
+            // 이미 만료된 토큰은 블랙리스트에 추가하지 않음
+          }
+        });
     jwtSessionRepository.deleteByUserId(id);
   }
 
