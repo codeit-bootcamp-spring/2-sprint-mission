@@ -19,7 +19,7 @@ jacocoTestReport {
 }
 
 group = 'com.sprint.mission'
-version = '2.0-M9'
+version = '2.2-M10'
 
 java {
     toolchain {
@@ -41,6 +41,11 @@ dependencies {
     //security 설치
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // jwt 토큰
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
     //AWS SDK 설치
     implementation 'software.amazon.awssdk:s3:2.31.7'
