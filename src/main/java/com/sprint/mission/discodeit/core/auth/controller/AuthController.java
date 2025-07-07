@@ -48,6 +48,12 @@ public class AuthController {
     return ResponseEntity.ok(csrfToken);
   }
 
+  @PutMapping("/role")
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<UserDto> updateRole(@RequestBody UserRoleUpdateRequest request) {
+    return ResponseEntity.ok(userDetailsService.updateRole(request));
+  }
+
   @PostMapping("/login")
   public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest,
       HttpServletResponse response) {
@@ -66,10 +72,43 @@ public class AuthController {
     return ResponseEntity.ok(session.getAccessToken());
   }
 
-  @PutMapping("/role")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<UserDto> updateRole(@RequestBody UserRoleUpdateRequest request) {
-    return ResponseEntity.ok(userDetailsService.updateRole(request));
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(
+      @CookieValue(name = "refreshToken", required = false) String refreshToken,
+      HttpServletResponse response) {
+    if (refreshToken != null) {
+      jwtService.invalidateRefreshToken(refreshToken);
+    }
+
+    Cookie cookie = new Cookie("refreshToken", null);
+    cookie.setMaxAge(0);
+    cookie.setPath("/");
+    response.addCookie(cookie);
+
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<String> refresh(
+      @CookieValue(name = "refreshToken", required = false) String refreshToken,
+      HttpServletResponse response) {
+    if (refreshToken == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token not found.");
+    }
+    Optional<JwtSession> sessionOptional = jwtService.refreshAccessToken(refreshToken);
+
+    if (sessionOptional.isPresent()) {
+      JwtSession newSession = sessionOptional.get();
+
+      Cookie newRefreshTokenCookie = new Cookie("refreshToken", newSession.getRefreshToken());
+      newRefreshTokenCookie.setHttpOnly(true);
+      newRefreshTokenCookie.setPath("/");
+      response.addCookie(newRefreshTokenCookie);
+
+      return ResponseEntity.ok(newSession.getAccessToken());
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token.");
+    }
   }
 
   @GetMapping("/me")
