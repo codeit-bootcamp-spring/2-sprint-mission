@@ -1,24 +1,25 @@
+server:
+  port: 80
+
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
-
   jpa:
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
-        format_sql: true
-    open-in-view: false
-
-server:
-  port: 8081
+        format_sql: false
 
 logging:
   level:
-    root: INFO
-    com.sprint.mission.discodeit.service.basic: INFO
-    org.hibernate.SQL: INFO
-    org.hibernate.orm.jdbc.bind: WARN
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: info
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: false
