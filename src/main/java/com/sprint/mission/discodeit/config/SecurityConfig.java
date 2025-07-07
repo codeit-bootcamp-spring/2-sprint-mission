@@ -8,8 +8,6 @@ import com.sprint.mission.discodeit.security.jwt.JwtAccessDeniedHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationEntryPoint;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -28,14 +26,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @Profile("!test")
@@ -46,7 +39,6 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper objectMapper,
       JwtService jwtService,
-      PersistentTokenBasedRememberMeServices rememberMeServices,
       JwtAccessDeniedHandler jwtAccessDeniedHandler,
       JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
       JwtAuthenticationFilter jwtAuthenticationFilter)
@@ -101,8 +93,7 @@ public class SecurityConfig {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
-            Customizer.withDefaults())
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+            Customizer.withDefaults());
     return http.build();
   }
 
@@ -133,22 +124,5 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      UserDetailsService userDetailsService,
-      DataSource dataSource
-  ) {
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-
-    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-        key, userDetailsService, tokenRepository);
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
   }
 }
