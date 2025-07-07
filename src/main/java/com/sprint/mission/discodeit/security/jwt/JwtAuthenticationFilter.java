@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final JwtUtil jwtUtil;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
   // 커스텀 인증 필터의 핵심 로직
   @Override
@@ -50,17 +52,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // JWT 토큰 검증 및 사용자 정보 추출
         validateAndProcessToken(jwt, request);
       }
+
     } catch (JwtAuthenticationException ex) {
       // Filter에서 잡힌 JWT 인증 관련 예외는 request attribute에 저장하여 EntryPoint에서 처리
-      log.warn("JWT 인증 처리 중 오류 발생", ex);
+      log.warn("JWT 인증 처리 중 오류 발생 - request: {}, method: {}, errorCode: {}, httpStatus: {}",
+          request.getRequestURI(),
+          request.getMethod(), ex.getErrorCode(), ex.getHttpStatus(), ex);
       request.setAttribute("jwt.exception", ex);
+      jwtAuthenticationEntryPoint.commence(request, response, ex);
+      return;
     } catch (Exception ex) {
       // 기타 예외는 일반적인 인증 예외로 처리
       log.error("JWT 인증 처리 중 예상치 못한 오류 발생", ex);
       request.setAttribute("jwt.exception",
           new JwtAuthenticationException("JWT 처리 중 내부 오류가 발생했습니다.", ErrorCode.JWT_INTERNAL_ERROR));
+      jwtAuthenticationEntryPoint.commence(request, response, (AuthenticationException) ex);
+      return;
     }
-
     // 다음 필터로 요청 전달
     filterChain.doFilter(request, response);
   }

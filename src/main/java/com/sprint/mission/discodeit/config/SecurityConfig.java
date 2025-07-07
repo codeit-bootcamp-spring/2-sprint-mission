@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -67,6 +68,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/csrf-token").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/channels/public")
             .hasRole(Role.CHANNEL_MANAGER.name())
@@ -78,10 +80,6 @@ public class SecurityConfig {
             .requestMatchers("/api/**").hasRole(Role.USER.name())
             .anyRequest().permitAll()
         )
-        .exceptionHandling(exception -> exception
-            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-            .accessDeniedHandler(jwtAccessDeniedHandler)
-        )
         // 명시적으로 설정 안해줘도 자동으로 사용됨 (HttpSession을 통해 SecurityContext를 저장하고 복원)
         .securityContext(context ->
             context.securityContextRepository(new HttpSessionSecurityContextRepository()))
@@ -92,8 +90,18 @@ public class SecurityConfig {
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        // Filter 인증 예외가 EntryPoint까지 도달 못하는 버그 발생 -> 엑세스 토큰 만료 시 401 에러가 터지지 않아 Refresh API 호출이 안됨
+        // jwtAuthenticationFilter에서 예외가 터짐 -> ExceptionTranslationFilter에서 잡음 -> EntryPoint로 전달
+        // ExceptionTranslationFilter는 뒤에 위치한 필터의 예외만 잡을 수 있다.
+        // .addFilterAfter(new JwtAuthenticationFilter(), ExceptionTranslationFilter.class)
+        // 하지만, FilterChanin의 순서는 jwtAuthenticationFilter -> UsernamePasswordAuthenticationFilter -> ExceptionTranslationFilter가 되는게 바람직함
+        // -> jwtAuthenticationFilter에서 Commence 메서드를 직접 호출하는 식으로 수정
+        // https://stackoverflow.com/questions/77694705/spring-security-exceptiontranslationfilter-doest-handle-thrown-in-custom-filter
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
-            Customizer.withDefaults());
+            Customizer.withDefaults())
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .accessDeniedHandler(jwtAccessDeniedHandler));
     return http.build();
   }
 
