@@ -19,12 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 
 
+@WithMockUser(roles = "ADMIN")
 class BasicUserServiceTest extends IntegrationTestSupport {
 
   private static final String USER_NAME = "hwang";
   private static final String USER_EMAIL = "h@naver.com";
   private static final String USER_PASSWORD = "1234";
-
 
   @Autowired
   private UserRepository userRepository;

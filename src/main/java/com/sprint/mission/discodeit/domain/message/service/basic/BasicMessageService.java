@@ -87,7 +87,7 @@ public class BasicMessageService implements MessageService {
         getNextCursor(messages));
   }
 
-  @PreAuthorize("@messageRepository.findById(#id).orElseThrow().getAuthor().getId() == authentication.principal.id")
+  @PreAuthorize("hasRole('ADMIN') or @messageRepository.findById(#id).orElseThrow().getAuthor().getId() == authentication.principal.userResult.id")
   @Transactional
   @Override
   public MessageResult updateContext(UUID id, String context) {
@@ -100,7 +100,7 @@ public class BasicMessageService implements MessageService {
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or @messageRepository.findById(#id).orElseThrow().getAuthor().getId() == authentication.principal.id")
+  @PreAuthorize("hasRole('ADMIN') or @messageRepository.findById(#id).orElseThrow().getAuthor().getId() == authentication.principal.userResult.id")
   @Transactional
   @Override
   public void delete(UUID id) {

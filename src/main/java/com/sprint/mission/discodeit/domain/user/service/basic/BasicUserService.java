@@ -86,7 +86,7 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(user);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
+  @PreAuthorize("hasRole('ADMIN') or authentication.principal.userResult.id == #userId")
   @Transactional
   @Override
   public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest,
@@ -106,7 +106,7 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(updatedUser);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
+  @PreAuthorize("hasRole('ADMIN') or authentication.principal.userResult.id == #userId")
   @Transactional
   @Override
   public void delete(UUID userId) {

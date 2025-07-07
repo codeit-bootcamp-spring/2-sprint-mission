@@ -35,9 +35,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@WithMockUser(roles = "ADMIN")
 public class MessageServiceTest extends IntegrationTestSupport {
 
   private static final String MESSAGE_CONTENT = "안녕하세요";

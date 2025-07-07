@@ -31,8 +31,8 @@ spring:
 
 security:
   remember-me:
-    key: blogRememberMeKey
-    token-validity-seconds: 1209600
+    key: ${REMEMBER_ME_KEY}
+    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 logging:
   level:
@@ -49,7 +49,6 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
-
 
 management:
   endpoints:

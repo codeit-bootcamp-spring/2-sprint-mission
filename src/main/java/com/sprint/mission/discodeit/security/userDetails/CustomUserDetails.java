@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security.userDetails;
 
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,6 +34,25 @@ public class CustomUserDetails implements UserDetails, Serializable {
   @Override
   public String getUsername() {
     return userResult.username();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    CustomUserDetails that = (CustomUserDetails) o;
+
+    return userResult.username().equals(that.userResult.username());
+  }
+
+  @Override
+  public int hashCode() {
+    return userResult.username().hashCode();
   }
 
 }

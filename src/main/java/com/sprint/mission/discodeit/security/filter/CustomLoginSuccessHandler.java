@@ -23,7 +23,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.getWriter().write(objectMapper.writeValueAsString(principal.getUserResult()));
+    response.getWriter()
+        .write(objectMapper.writeValueAsString(principal.getUserResult()));
   }
 
 }

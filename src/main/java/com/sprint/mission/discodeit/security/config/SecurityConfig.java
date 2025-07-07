@@ -44,6 +44,10 @@ public class SecurityConfig {
       HttpMethod.POST.name());
   public static final RequestMatcher LOGOUT = new AntPathRequestMatcher("/api/auth/logout",
       HttpMethod.POST.name());
+  public static final RequestMatcher PUBLIC_CHANNEL_ACCESS = new AntPathRequestMatcher(
+      "/api/channels/public/**");
+  public static final RequestMatcher ROLE_UPDATE = new AntPathRequestMatcher(
+      "/api/auth/role");
 
   @Bean
   public SecurityFilterChain configure(
@@ -60,13 +64,8 @@ public class SecurityConfig {
                 GET_CSRF_TOKEN,
                 SIGN_UP
             ).permitAll()
-            .requestMatchers("/api/auth/role").hasRole(Role.ADMIN.name())
-            .requestMatchers(HttpMethod.POST, "/api/channels/public/**")
-            .hasRole(Role.CHANNEL_MANAGER.name())
-            .requestMatchers(HttpMethod.PUT, "/api/channels/public/**")
-            .hasRole(Role.CHANNEL_MANAGER.name())
-            .requestMatchers(HttpMethod.DELETE, "/api/channels/public/**")
-            .hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(ROLE_UPDATE).hasRole(Role.ADMIN.name())
+            .requestMatchers(PUBLIC_CHANNEL_ACCESS).hasRole(Role.CHANNEL_MANAGER.name())
             .anyRequest().hasRole(Role.USER.name())
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
