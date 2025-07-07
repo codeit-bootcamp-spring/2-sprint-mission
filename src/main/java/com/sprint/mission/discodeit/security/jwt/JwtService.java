@@ -71,6 +71,13 @@ public class JwtService {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
         .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
 
+    // Refresh Token이 만료됐는지 확인
+    if (jwtSession.getRefreshTokenExpiresAt().isBefore(LocalDateTime.now())) {
+      jwtSessionRepository.deleteById(jwtSession.getId()); // 만료됐다면 삭제
+      throw new InvalidRefreshTokenException(
+          Map.of("refreshToken", token, "details", "Refresh token has expired"));
+    }
+
     User user = jwtSession.getUser();
 
     String newAccessToken = jwtUtil.generateAccessToken(userMapper.toUserDto(user));
