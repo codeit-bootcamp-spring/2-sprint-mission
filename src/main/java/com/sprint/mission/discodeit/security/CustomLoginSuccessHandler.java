@@ -9,7 +9,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -38,13 +37,17 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     // RefreshToken을 HttpOnly 쿠키로 저장
     Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-    // XSS 공격 방지, HTTP 요청/응답에서만 쿠키 전송됨
+    // XSS 공격 방지, HTTP 요청/응답에서만 쿠키 전송됨 - JS를 통해 탈취되는걸 방지할 수 있음
+    // 하지만 쿠키는 브라우저가 자동으로 전송하기 때문에 CSRF 공격에 취약함
+    // -> CSRF 보호를 따로 해줘야함!! CSRF 토큰으로 쿠키의 취약점인 CSRF 공격도 해결 가능
+    // 실무에서는 Refresh 토큰을 쿠키에 잘 저장하지 않는 것 같음! 추후 확인해보자.
     refreshCookie.setHttpOnly(true);
     refreshCookie.setPath("/");
     refreshCookie.setMaxAge(14 * 24 * 60 * 60);
     response.addCookie(refreshCookie);
 
     // AccessToken을 응답 Body에 문자열로 반환
+    // Access Token의 경우 응답 바디에 응답된 Access Token을 프론트엔드에서 저장하고, 그걸 요청마다 계속 헤더에 넣어서 보내줌
     response.setContentType("text/plain;charset=UTF-8");
     response.getWriter().write(accessToken);
     response.getWriter().flush();
