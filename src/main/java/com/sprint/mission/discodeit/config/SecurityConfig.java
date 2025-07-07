@@ -99,12 +99,6 @@ public class SecurityConfig {
             .ignoringRequestMatchers("/api/auth/logout"))
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .logout(logout -> logout
-            .logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout", "POST"))
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-            .addLogoutHandler(new SecurityContextLogoutHandler())
-            .addLogoutHandler(rememberMeServices)
-        )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
             Customizer.withDefaults())
