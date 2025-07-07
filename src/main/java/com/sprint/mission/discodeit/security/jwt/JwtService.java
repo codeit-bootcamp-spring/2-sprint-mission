@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,6 +111,14 @@ public class JwtService {
                 jwtSession.getAccessToken())));
     jwtSessionRepository.deleteByUserId(id);
   }
+
+  @Scheduled(cron = "0 0 * * * *")
+  @Transactional
+  public void cleanExpiredJwtSession() {
+    jwtSessionRepository.deleteByRefreshTokenExpiresAtBefore(LocalDateTime.now());
+    log.info("만료된 Refresh Token 삭제 스케쥴링 작업 완료");
+  }
+
 
   private String generateSecureRandomToken() {
     byte[] tokenBytes = new byte[32];
