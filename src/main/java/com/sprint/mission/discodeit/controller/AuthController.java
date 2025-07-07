@@ -44,7 +44,9 @@ public class AuthController implements AuthApi {
 
   @PutMapping("/role")
   public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest roleUpdateRequest) {
-    return ResponseEntity.ok(authService.updateRole(roleUpdateRequest));
+    UserDto userDto = authService.updateRole(roleUpdateRequest);
+    jwtService.invalidateByUserId(roleUpdateRequest.userId());
+    return ResponseEntity.ok(userDto);
   }
 
   @PostMapping("/refresh")

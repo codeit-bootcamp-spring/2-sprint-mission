@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
 
@@ -16,8 +17,8 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
   List<JwtSession> findByUser(User user);
 
   @Modifying
-  @Query("DELETE FROM JwtSession js WHERE js.user = :user")
-  void deleteByUser(User user);
+  @Query("DELETE FROM JwtSession js WHERE js.user.id = :userId")
+  void deleteByUserId(@Param("userId") UUID id);
 
   @Modifying
   @Query("DELETE FROM JwtSession js WHERE js.refreshTokenExpiresAt < :now")

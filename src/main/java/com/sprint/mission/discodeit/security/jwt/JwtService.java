@@ -10,9 +10,11 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +28,7 @@ public class JwtService {
   private final UserRepository userRepository;
   private final JwtProperties jwtProperties;
 
-
+  @Transactional
   public JwtSession generateJwtSession(UserDto userDto) {
     String refreshToken = generateSecureRandomToken();
     String accessToken = jwtUtil.generateAccessToken(userDto);
@@ -51,12 +53,14 @@ public class JwtService {
     return jwtUtil.validateToken(token);
   }
 
+  @Transactional(readOnly = true)
   public JwtSession findByRefreshToken(String token) {
     return jwtSessionRepository.findByRefreshToken(token)
         .orElseThrow(() -> new InvalidRefreshTokenException(
             Map.of("token", token, "details", "유효하지 않은 Refresh Token 입니다.")));
   }
 
+  @Transactional
   public String refreshAccessToken(String token) {
     // Refresh Token 검증 및 조회
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
@@ -76,11 +80,17 @@ public class JwtService {
     return newAccessToken;
   }
 
+  @Transactional
   public void invalidateRefreshToken(String token) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
         .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
 
     jwtSessionRepository.deleteById(jwtSession.getId());
+  }
+
+  @Transactional
+  public void invalidateByUserId(UUID id) {
+    jwtSessionRepository.deleteByUserId(id);
   }
 
   private String generateSecureRandomToken() {
