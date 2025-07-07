@@ -75,7 +75,6 @@ public class SecurityConfig {
         .logout(logout -> logout
             .logoutRequestMatcher(LOGOUT)
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-            .addLogoutHandler(new SecurityContextLogoutHandler())
             .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
             .addLogoutHandler(rememberMeServices)
         )
