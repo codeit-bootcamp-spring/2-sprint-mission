@@ -66,7 +66,6 @@ public class AuthenticationTest extends IntegrationTestSupport {
         .containsExactlyInAnyOrder(name, hashedPassword, true);
   }
 
-
   @DisplayName("로그아웃하면 세션를 무효화 합니다.")
   @Test
   void logoutTest() throws JsonProcessingException {
@@ -86,7 +85,7 @@ public class AuthenticationTest extends IntegrationTestSupport {
         .with(SecurityMockMvcRequestPostProcessors.csrf())
         .exchange();
 
-    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession();
+    MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
 
     // when
     mockMvcTester.post()
@@ -95,12 +94,8 @@ public class AuthenticationTest extends IntegrationTestSupport {
         .exchange();
 
     // then
-    MvcTestResult resultAfterLogout = mockMvcTester.get()
-        .uri("/api/users")
-        .session(session)
-        .exchange();
-
-    Assertions.assertThat(resultAfterLogout.getResponse().getStatus()).isEqualTo(403);
+    Assertions.assertThat(session.isInvalid())
+        .isTrue();
   }
 
 }

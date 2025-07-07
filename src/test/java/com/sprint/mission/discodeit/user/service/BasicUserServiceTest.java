@@ -16,6 +16,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.context.support.WithMockUser;
+
 
 class BasicUserServiceTest extends IntegrationTestSupport {
 
@@ -63,7 +65,6 @@ class BasicUserServiceTest extends IntegrationTestSupport {
     Assertions.assertThatThrownBy(() -> userService.register(userRequest, null))
         .isInstanceOf(UserAlreadyExistsException.class);
   }
-
 
   @DisplayName("이미 등록된 유저 이메일로 등록 시도시, 예외를 반환한다")
   @Test
@@ -114,7 +115,6 @@ class BasicUserServiceTest extends IntegrationTestSupport {
     // then
     Assertions.assertThat(user.username()).isEqualTo(USER_NAME);
   }
-
 
   @DisplayName("유저 이름으로 조회시 해당 이름의 유저가 없다면, 예외를 반환한다.")
   @Test

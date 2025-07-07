@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.auth.security.filter;
+package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.common.controller.exception.ErrorResponse;

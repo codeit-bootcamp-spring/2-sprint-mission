@@ -1,9 +1,9 @@
-package com.sprint.mission.discodeit.domain.auth.security.config;
+package com.sprint.mission.discodeit.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.domain.auth.security.filter.CustomSessionInformationExpiredStrategy;
-import com.sprint.mission.discodeit.domain.auth.security.filter.JsonUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.domain.auth.security.filter.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.filter.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,8 +77,8 @@ public class SecurityConfig {
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
             .addLogoutHandler(new SecurityContextLogoutHandler())
             .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+            .addLogoutHandler(rememberMeServices)
         )
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .sessionManagement(session ->
             session
                 .sessionFixation().migrateSession()
@@ -87,7 +87,8 @@ public class SecurityConfig {
                 .sessionRegistry(sessionRegistry)
                 .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
         )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(LOGOUT));
+        .csrf(csrf -> csrf.ignoringRequestMatchers(LOGOUT))
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
 
     return httpSecurity.build();
   }

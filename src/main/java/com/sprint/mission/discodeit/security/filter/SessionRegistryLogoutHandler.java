@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.auth.security.filter;
+package com.sprint.mission.discodeit.security.filter;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,18 +16,18 @@ public class SessionRegistryLogoutHandler implements LogoutHandler {
 
   @Override
   public void logout(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) {
-
+      Authentication authentication
+  ) {
     HttpSession session = request.getSession();
     if (session != null) {
-      SessionInformation sessionInformation = sessionRegistry.getSessionInformation(
-          session.getId());
+//      SessionInformation sessionInformation = sessionRegistry.getSessionInformation(
+//          session.getId());
+//
+//      if (sessionInformation != null) {
+//        sessionInformation.expireNow();
+//      }
 
-      if (sessionInformation == null) {
-        throw new IllegalArgumentException("로그인 세션이 등록되지 않았습니다.");
-      }
-
-      sessionInformation.expireNow();
+      session.invalidate();
     }
   }
 

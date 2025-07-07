@@ -36,258 +36,288 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.sprint.mission.discodeit.message.service.BasicMessageServiceTest.MESSAGE_CONTENT;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MessageServiceTest extends IntegrationTestSupport {
 
-    @Autowired
-    private ChannelRepository channelRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MessageRepository messageRepository;
-    @Autowired
-    private BinaryContentRepository binaryContentRepository;
-    @Autowired
-    private BasicMessageService messageService;
+  private static final String MESSAGE_CONTENT = "안녕하세요";
 
-    @AfterEach
-    void tearDown() {
-        messageRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-        channelRepository.deleteAllInBatch();
-    }
+  @Autowired
+  private ChannelRepository channelRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private MessageRepository messageRepository;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
+  @Autowired
+  private BasicMessageService messageService;
 
-    @DisplayName("유저가 채널에 메세지 내용을 입력하면, 채널에 메세지 내용을 보여줍니다.")
-    @Test
-    void createTest_NullAttachments() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId());
+  @AfterEach
+  void tearDown() {
+    messageRepository.deleteAllInBatch();
+    userRepository.deleteAllInBatch();
+    channelRepository.deleteAllInBatch();
+  }
 
-        // when
-        MessageResult savedMessage = messageService.create(messageCreateRequest, null);
+  @DisplayName("유저가 채널에 메세지 내용을 입력하면, 채널에 메세지 내용을 보여줍니다.")
+  @Test
+  void createTest_NullAttachments() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
+        savedChannel.getId(), savedUser.getId());
 
-        // then
-        assertAll(
-                () -> Assertions.assertThat(savedMessage)
-                        .extracting(
-                                MessageResult::content, MessageResult::channelId, MessageResult::attachments, messageResult -> messageResult.author().id()
-                        )
-                        .containsExactlyInAnyOrder(MESSAGE_CONTENT, savedChannel.getId(), null, savedUser.getId())
-        );
-    }
+    // when
+    MessageResult savedMessage = messageService.create(messageCreateRequest, null);
 
-    @DisplayName("유저가 채널에 메세지 내용과 이미지 첨부파일들 입력하면, 채널에 메세지와 이미지 첨부파일들을 보여줍니다.")
-    @Test
-    void createTest_HaveAttachments() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId());
-        String fileName = UUID.randomUUID().toString();
-        String bytes = UUID.randomUUID().toString();
-        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(fileName, "", 10, bytes.getBytes());
-        List<BinaryContentRequest> files = List.of(binaryContentRequest);
+    // then
+    assertAll(
+        () -> Assertions.assertThat(savedMessage)
+            .extracting(
+                MessageResult::content, MessageResult::channelId, MessageResult::attachments,
+                messageResult -> messageResult.author().id()
+            )
+            .containsExactlyInAnyOrder(MESSAGE_CONTENT, savedChannel.getId(), null,
+                savedUser.getId())
+    );
+  }
 
-        // when
-        MessageResult savedMessage = messageService.create(messageCreateRequest, files);
+  @DisplayName("유저가 채널에 메세지 내용과 이미지 첨부파일들 입력하면, 채널에 메세지와 이미지 첨부파일들을 보여줍니다.")
+  @Test
+  void createTest_HaveAttachments() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
+        savedChannel.getId(), savedUser.getId());
+    String fileName = UUID.randomUUID().toString();
+    String bytes = UUID.randomUUID().toString();
+    BinaryContentRequest binaryContentRequest = new BinaryContentRequest(fileName, "", 10,
+        bytes.getBytes());
+    List<BinaryContentRequest> files = List.of(binaryContentRequest);
 
-        // then
-        assertAll(
-                () -> Assertions.assertThat(binaryContentRepository.findById(savedMessage.attachments().get(0).id())).isPresent()
-                        .get()
-                        .extracting(BinaryContent::getFileName)
-                        .isEqualTo(fileName),
-                () -> Assertions.assertThat(savedMessage)
-                        .extracting(
-                                MessageResult::content, MessageResult::channelId, messageResult -> messageResult.author().id()
-                        )
-                        .containsExactlyInAnyOrder(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId())
-        );
-    }
+    // when
+    MessageResult savedMessage = messageService.create(messageCreateRequest, files);
 
-    @DisplayName("생성되지않은 채널에 메세지를 입력하면, 예외를 반환합니다.")
-    @Test
-    void createTest_ChannelNotExisting() {
-        // given
-        User savedUser = userRepository.save(new User("", "", "", null));
-        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, UUID.randomUUID(), savedUser.getId());
+    // then
+    assertAll(
+        () -> Assertions.assertThat(
+                binaryContentRepository.findById(savedMessage.attachments().get(0).id())).isPresent()
+            .get()
+            .extracting(BinaryContent::getFileName)
+            .isEqualTo(fileName),
+        () -> Assertions.assertThat(savedMessage)
+            .extracting(
+                MessageResult::content, MessageResult::channelId,
+                messageResult -> messageResult.author().id()
+            )
+            .containsExactlyInAnyOrder(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId())
+    );
+  }
 
-        // when & then
-        Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(ChannelNotFoundException.class);
-    }
+  @DisplayName("생성되지않은 채널에 메세지를 입력하면, 예외를 반환합니다.")
+  @Test
+  void createTest_ChannelNotExisting() {
+    // given
+    User savedUser = userRepository.save(new User("", "", "", null));
+    MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
+        UUID.randomUUID(), savedUser.getId());
 
-    @DisplayName("등록되지않은 유저가 메세지를 입력하면, 예외를 반환합니다.")
-    @Test
-    void createTest_UserNotExisting() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), UUID.randomUUID());
+    // when & then
+    Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
+        .isInstanceOf(ChannelNotFoundException.class);
+  }
 
-        // when & then
-        Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
-                .isInstanceOf(UserNotFoundException.class);
-    }
+  @DisplayName("등록되지않은 유저가 메세지를 입력하면, 예외를 반환합니다.")
+  @Test
+  void createTest_UserNotExisting() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
+        savedChannel.getId(), UUID.randomUUID());
 
-    @DisplayName("메세지 아이디로 조회하면, 메세지를 반환한다.")
-    @Test
-    void getByIdTest() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+    // when & then
+    Assertions.assertThatThrownBy(() -> messageService.create(messageCreateRequest, List.of()))
+        .isInstanceOf(UserNotFoundException.class);
+  }
 
-        // when
-        MessageResult message = messageService.getById(savedMessage.getId());
+  @DisplayName("메세지 아이디로 조회하면, 메세지를 반환한다.")
+  @Test
+  void getByIdTest() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    Message savedMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
 
-        // then
-        Assertions.assertThat(message)
-                .extracting(MessageResult::id)
-                .isEqualTo(savedMessage.getId());
-    }
+    // when
+    MessageResult message = messageService.getById(savedMessage.getId());
 
-    @DisplayName("메세지 아이디로 조회했지만 없는 메세지라면, 예외를 반환한다.")
-    @Test
-    void getByIdTest_Exception() {
-        // when & then
-        Assertions.assertThatThrownBy(() -> messageService.getById(UUID.randomUUID()))
-                .isInstanceOf(MessageNotFoundException.class);
-    }
+    // then
+    Assertions.assertThat(message)
+        .extracting(MessageResult::id)
+        .isEqualTo(savedMessage.getId());
+  }
 
-    private static Stream<Arguments> provideSortAndCursorCase() {
-        return Stream.of(
-                Arguments.of(null, null, List.of("msg5", "msg4")),
-                Arguments.of(null, Sort.by(Sort.Direction.DESC, "createdAt"), List.of("msg5", "msg4"))
-        );
-    }
+  @DisplayName("메세지 아이디로 조회했지만 없는 메세지라면, 예외를 반환한다.")
+  @Test
+  void getByIdTest_Exception() {
+    // when & then
+    Assertions.assertThatThrownBy(() -> messageService.getById(UUID.randomUUID()))
+        .isInstanceOf(MessageNotFoundException.class);
+  }
 
-    @DisplayName("채널내 메세지 조회시, 생성날짜 순 내림차순(default)으로 반환합니다")
-    @ParameterizedTest
-    @MethodSource("provideSortAndCursorCase")
-    void getAllByChannelId(Instant cursor, Sort sort, List<String> expectedMessages) {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        Message firstMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message secondMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message thirdMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message fourthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message fifthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+  private static Stream<Arguments> provideSortAndCursorCase() {
+    return Stream.of(
+        Arguments.of(null, null, List.of("msg5", "msg4")),
+        Arguments.of(null, Sort.by(Sort.Direction.DESC, "createdAt"), List.of("msg5", "msg4"))
+    );
+  }
 
-        ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(cursor, 2, 0, sort);
+  @DisplayName("채널내 메세지 조회시, 생성날짜 순 내림차순(default)으로 반환합니다")
+  @ParameterizedTest
+  @MethodSource("provideSortAndCursorCase")
+  void getAllByChannelId(Instant cursor, Sort sort, List<String> expectedMessages) {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    Message firstMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message secondMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message thirdMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message fourthMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message fifthMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
 
-        Map<String, Message> messageMap = Map.of(
-                "msg1", firstMessage,
-                "msg2", secondMessage,
-                "msg3", thirdMessage,
-                "msg4", fourthMessage,
-                "msg5", fifthMessage
-        );
+    ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(cursor, 2,
+        0, sort);
 
-        // when
-        PageResponse<MessageResult> allByChannelId = messageService.getAllByChannelId(savedChannel.getId(), channelMessagePageRequest);
+    Map<String, Message> messageMap = Map.of(
+        "msg1", firstMessage,
+        "msg2", secondMessage,
+        "msg3", thirdMessage,
+        "msg4", fourthMessage,
+        "msg5", fifthMessage
+    );
 
-        // then
-        assertAll(
-                () -> Assertions.assertThat(allByChannelId).extracting(PageResponse::size).isEqualTo(2),
-                () -> Assertions.assertThat(allByChannelId.content())
-                        .extracting(MessageResult::id)
-                        .containsExactlyInAnyOrder(
-                                messageMap.get(expectedMessages.get(0)).getId(),
-                                messageMap.get(expectedMessages.get(1)).getId()
-                        )
-        );
-    }
+    // when
+    PageResponse<MessageResult> allByChannelId = messageService.getAllByChannelId(
+        savedChannel.getId(), channelMessagePageRequest);
 
-    @DisplayName("채널내 메세지 조회시, 입력된 생성날짜(커서) 이후 내림차순(default) 반환합니다")
-    @Test
-    void getAllByChannelIdDesc_NextCursor() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        Message firstMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message secondMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message thirdMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message fourthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
-        Message fifthMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+    // then
+    assertAll(
+        () -> Assertions.assertThat(allByChannelId).extracting(PageResponse::size).isEqualTo(2),
+        () -> Assertions.assertThat(allByChannelId.content())
+            .extracting(MessageResult::id)
+            .containsExactlyInAnyOrder(
+                messageMap.get(expectedMessages.get(0)).getId(),
+                messageMap.get(expectedMessages.get(1)).getId()
+            )
+    );
+  }
 
-        ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(null, 2, 0, null);
-        PageResponse<MessageResult> noCursorMessage = messageService.getAllByChannelId(savedChannel.getId(), channelMessagePageRequest);
-        ChannelMessagePageRequest nextCursorPageRequest = new ChannelMessagePageRequest((Instant) noCursorMessage.nextCursor(), 2, 0, null);
+  @DisplayName("채널내 메세지 조회시, 입력된 생성날짜(커서) 이후 내림차순(default) 반환합니다")
+  @Test
+  void getAllByChannelIdDesc_NextCursor() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    Message firstMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message secondMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message thirdMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message fourthMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
+    Message fifthMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
 
-        // when
-        PageResponse<MessageResult> nextCursorMessages = messageService.getAllByChannelId(savedChannel.getId(), nextCursorPageRequest);
+    ChannelMessagePageRequest channelMessagePageRequest = new ChannelMessagePageRequest(null, 2, 0,
+        null);
+    PageResponse<MessageResult> noCursorMessage = messageService.getAllByChannelId(
+        savedChannel.getId(), channelMessagePageRequest);
+    ChannelMessagePageRequest nextCursorPageRequest = new ChannelMessagePageRequest(
+        (Instant) noCursorMessage.nextCursor(), 2, 0, null);
 
-        // then
-        assertAll(
-                () -> Assertions.assertThat(noCursorMessage.content())
-                        .extracting(MessageResult::id)
-                        .containsExactlyInAnyOrder(fourthMessage.getId(), fifthMessage.getId()),
-                () -> Assertions.assertThat(nextCursorMessages.content())
-                        .extracting(MessageResult::id)
-                        .containsExactlyInAnyOrder(thirdMessage.getId(), secondMessage.getId())
-        );
-    }
+    // when
+    PageResponse<MessageResult> nextCursorMessages = messageService.getAllByChannelId(
+        savedChannel.getId(), nextCursorPageRequest);
 
-    @DisplayName("메세지 내용 수정본을 받으면, 메세지 내용을 덮어쓴다.")
-    @Test
-    void updateContextTest() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        Message savedMessage = messageRepository.save(new Message(savedChannel, savedUser, "", List.of()));
+    // then
+    assertAll(
+        () -> Assertions.assertThat(noCursorMessage.content())
+            .extracting(MessageResult::id)
+            .containsExactlyInAnyOrder(fourthMessage.getId(), fifthMessage.getId()),
+        () -> Assertions.assertThat(nextCursorMessages.content())
+            .extracting(MessageResult::id)
+            .containsExactlyInAnyOrder(thirdMessage.getId(), secondMessage.getId())
+    );
+  }
 
-        // when
-        MessageResult updatedMessage = messageService.updateContext(savedMessage.getId(), "updated");
+  @DisplayName("메세지 내용 수정본을 받으면, 메세지 내용을 덮어쓴다.")
+  @Test
+  void updateContextTest() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    Message savedMessage = messageRepository.save(
+        new Message(savedChannel, savedUser, "", List.of()));
 
-        // then
-        Assertions.assertThat(updatedMessage).extracting(MessageResult::content).isEqualTo("updated");
-    }
+    // when
+    MessageResult updatedMessage = messageService.updateContext(savedMessage.getId(), "updated");
 
-    @DisplayName("메세지 내용 수정시도했지만 해당 메세지가 없다면, 예외를 반환한다.")
-    @Test
-    void updateContextTest_EntityNotFoundException() {
-        // when & then
-        Assertions.assertThatThrownBy(() -> messageService.updateContext(UUID.randomUUID(), ""))
-                .isInstanceOf(MessageNotFoundException.class);
-    }
+    // then
+    Assertions.assertThat(updatedMessage).extracting(MessageResult::content).isEqualTo("updated");
+  }
 
-    @DisplayName("메세지를 삭제하면, 메세지와 첨부파일도 삭제합니다.")
-    @Test
-    void deleteTest() {
-        // given
-        Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
-        User savedUser = userRepository.save(new User("", "", "", null));
-        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT, savedChannel.getId(), savedUser.getId());
-        BinaryContentRequest binaryContentRequest = new BinaryContentRequest(UUID.randomUUID().toString(), "", 10, UUID.randomUUID().toString().getBytes());
-        List<BinaryContentRequest> files = List.of(binaryContentRequest);
+  @DisplayName("메세지 내용 수정시도했지만 해당 메세지가 없다면, 예외를 반환한다.")
+  @Test
+  void updateContextTest_EntityNotFoundException() {
+    // when & then
+    Assertions.assertThatThrownBy(() -> messageService.updateContext(UUID.randomUUID(), ""))
+        .isInstanceOf(MessageNotFoundException.class);
+  }
 
-        MessageResult savedMessage = messageService.create(messageCreateRequest, files);
-        List<UUID> binaryContentIds = savedMessage.attachments()
-                .stream()
-                .map(BinaryContentResult::id)
-                .toList();
+  @DisplayName("메세지를 삭제하면, 메세지와 첨부파일도 삭제합니다.")
+  @Test
+  void deleteTest() {
+    // given
+    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    User savedUser = userRepository.save(new User("", "", "", null));
+    MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
+        savedChannel.getId(), savedUser.getId());
+    BinaryContentRequest binaryContentRequest = new BinaryContentRequest(
+        UUID.randomUUID().toString(), "", 10, UUID.randomUUID().toString().getBytes());
+    List<BinaryContentRequest> files = List.of(binaryContentRequest);
 
-        // when
-        messageService.delete(savedMessage.id());
+    MessageResult savedMessage = messageService.create(messageCreateRequest, files);
+    List<UUID> binaryContentIds = savedMessage.attachments()
+        .stream()
+        .map(BinaryContentResult::id)
+        .toList();
 
-        // then
-        assertAll(
-                () -> Assertions.assertThat(messageRepository.findById(savedMessage.id())).isNotPresent(),
-                () -> Assertions.assertThat(binaryContentRepository.findAllById(binaryContentIds)).isEmpty()
-        );
-    }
+    // when
+    messageService.delete(savedMessage.id());
 
-    @DisplayName("삭제하려는 메세지가 없으면 예외를 반환한다")
-    @Test
-    void deleteTest_EntityNotFound() {
-        // when & then
-        Assertions.assertThatThrownBy(() -> messageService.delete(UUID.randomUUID()))
-                .isInstanceOf(MessageNotFoundException.class);
-    }
+    // then
+    assertAll(
+        () -> Assertions.assertThat(messageRepository.findById(savedMessage.id())).isNotPresent(),
+        () -> Assertions.assertThat(binaryContentRepository.findAllById(binaryContentIds)).isEmpty()
+    );
+  }
+
+  @DisplayName("삭제하려는 메세지가 없으면 예외를 반환한다")
+  @Test
+  void deleteTest_EntityNotFound() {
+    // when & then
+    Assertions.assertThatThrownBy(() -> messageService.delete(UUID.randomUUID()))
+        .isInstanceOf(MessageNotFoundException.class);
+  }
 
 }

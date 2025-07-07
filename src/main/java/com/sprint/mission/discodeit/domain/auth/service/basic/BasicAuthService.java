@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.domain.auth.service;
+package com.sprint.mission.discodeit.domain.auth.service.basic;
 
 import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.domain.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;

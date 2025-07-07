@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.domain.auth.security.filter;
+package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.domain.auth.security.userDetails.CustomUserDetails;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

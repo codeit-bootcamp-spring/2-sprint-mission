@@ -31,7 +31,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
 
-    @PreAuthorize("hasRole('ADMIN') or #readStatusCreateRequest.userId() == authentication.principal.id")
+    @PreAuthorize("#readStatusCreateRequest.userId() == authentication.principal.id")
     @Transactional
     @Override
     public ReadStatusResult create(ReadStatusCreateRequest readStatusCreateRequest) {
@@ -56,7 +56,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return ReadStatusResult.fromEntity(readStatuses);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @readStatusRepository.findById(#readStatusId).orElseThrow().getUser().getId() == authentication.principal.id")
+    @PreAuthorize("@readStatusRepository.findById(#readStatusId).orElseThrow().getUser().getId() == authentication.principal.id")
     @Transactional
     @Override
     public ReadStatusResult updateLastReadTime(UUID readStatusId, Instant time) {
