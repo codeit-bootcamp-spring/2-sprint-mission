@@ -14,8 +14,8 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.LoginStatusService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicChannelService implements ChannelService {
 
   private final UserRepository userRepository;
-  private final LoginStatusService loginStatusService;
   private final ChannelRepository channelRepository;
   private final ReadStatusService readStatusService;
   private final MessageRepository messageRepository;
+  private final JwtSessionRepository jwtSessionRepository;
   private final ChannelMapper channelMapper;
   private final UserMapper userMapper;
 
@@ -67,7 +67,8 @@ public class BasicChannelService implements ChannelService {
         userRepository.findAllByIdIn(createPrivateChannelCommand.participantIds())
             .stream()
             .map((User user) -> userMapper.toFindUserResult(user,
-                loginStatusService.isUserOnline(user.getUsername())))
+                jwtSessionRepository.existsByUserId(user.getId())
+            ))
             .toList());
   }
 
@@ -83,7 +84,7 @@ public class BasicChannelService implements ChannelService {
     List<FindUserResult> findUserResultList = userRepository.findAllByIdIn(userIds)
         .stream()
         .map((User user) -> userMapper.toFindUserResult(user,
-            loginStatusService.isUserOnline(user.getUsername())))
+            jwtSessionRepository.existsByUserId(user.getId())))
         .toList();
     return channelMapper.toFindChannelResult(channel, latestMessageTime, findUserResultList);
   }
@@ -116,7 +117,7 @@ public class BasicChannelService implements ChannelService {
           List<User> users = userRepository.findAllByIdIn(participantIds);
           List<FindUserResult> participants = users.stream()
               .map((User user) -> userMapper.toFindUserResult(user,
-                  loginStatusService.isUserOnline(user.getUsername())))
+                  jwtSessionRepository.existsByUserId(user.getId())))
               .toList();
 
           return channelMapper.toFindChannelResult(

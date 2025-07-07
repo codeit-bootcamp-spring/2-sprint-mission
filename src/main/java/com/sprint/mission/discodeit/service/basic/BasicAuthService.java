@@ -12,9 +12,6 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +31,8 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
-  private final SessionRegistry sessionRegistry;
 
+  @Override
   @Transactional
   public UserDto initAdmin() {
     if (userRepository.existsByEmail(adminEmail) || userRepository.existsByUsername(
@@ -65,17 +62,7 @@ public class BasicAuthService implements AuthService {
           return new UserNotFoundException(Map.of("userId", roleUpdateRequest.userId()));
         });
     user.updateRole(roleUpdateRequest.newRole());
-    expireUserSessions(user.getUsername());
     return userMapper.toUserDto(user);
-  }
-
-  private void expireUserSessions(String username) {
-    sessionRegistry.getAllPrincipals().stream()
-        .filter(UserDetails.class::isInstance)
-        .map(UserDetails.class::cast)
-        .filter(userDetails -> userDetails.getUsername().equals(username))
-        .flatMap(userDetails -> sessionRegistry.getAllSessions(userDetails, false).stream())
-        .forEach(SessionInformation::expireNow);
   }
 }
 

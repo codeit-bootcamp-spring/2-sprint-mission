@@ -15,6 +15,15 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
 
   List<JwtSession> findByUserId(UUID id);
 
+  // 현재 로그인 상태 확인 (jwtSession이 존재하는지 + refreshToken이 만료되진 않았는지)
+  @Query("""
+      SELECT CASE WHEN COUNT(js) > 0 THEN TRUE ELSE FALSE END
+      FROM JwtSession js
+      WHERE js.user.id = :userId
+      AND js.refreshTokenExpiresAt > CURRENT_TIMESTAMP
+      """)
+  boolean existsByUserId(@Param("userId") UUID userId);
+
   @Modifying
   @Query("DELETE FROM JwtSession js WHERE js.user.id = :userId")
   void deleteByUserId(@Param("userId") UUID userId);
