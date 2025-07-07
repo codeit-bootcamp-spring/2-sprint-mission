@@ -32,4 +32,5 @@ spring:
 
 logging:
     level:
-        root: debug
+        org.springframework.security: trace
+        com.sprint.mission.discodeit: debug

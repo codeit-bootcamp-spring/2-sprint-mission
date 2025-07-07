@@ -5,6 +5,14 @@
 -- DROP TABLE IF EXISTS users;
 -- DROP TABLE IF EXISTS channels;
 -- DROP TABLE IF EXISTS binary_contents;
+-- DROP TABLE IF EXISTS persistent_logins
+
+CREATE TABLE IF NOT EXISTS persistent_logins(
+    username VARCHAR(64) NOT NULL,
+    series   VARCHAR(64) PRIMARY KEY,
+    token VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS binary_contents
 (
@@ -18,23 +26,14 @@ CREATE TABLE IF NOT EXISTS binary_contents
 CREATE TABLE IF NOT EXISTS users
 (
     id         UUID PRIMARY KEY,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE                                          NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE,
-    username   VARCHAR(50) UNIQUE       NOT NULL,
-    email      VARCHAR(100) UNIQUE      NOT NULL,
-    password   VARCHAR(60)              NOT NULL,
+    username   VARCHAR(50) UNIQUE                                                NOT NULL,
+    email      VARCHAR(100) UNIQUE                                               NOT NULL,
+    password   VARCHAR(60)                                                       NOT NULL,
     profile_id UUID,
+    role       VARCHAR(20) CHECK ( role IN ('ADMIN', 'CHANNEL_MANAGER', 'USER')) NOT NULL DEFAULT 'USER',
     constraint fk_users_binary_contents FOREIGN KEY (profile_id) REFERENCES binary_contents (id)
-);
-
-CREATE TABLE IF NOT EXISTS user_statuses
-(
-    id             UUID PRIMARY KEY,
-    created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at     TIMESTAMP WITH TIME ZONE,
-    user_id        UUID UNIQUE,
-    last_active_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    constraint fk_user_status_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS channels

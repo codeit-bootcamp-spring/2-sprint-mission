@@ -13,7 +13,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   @Query("""
         SELECT DISTINCT u FROM User u
         LEFT JOIN FETCH u.profile
-        LEFT JOIN FETCH u.status
         WHERE u.username = :username
       """)
   Optional<User> findByUsername(@Param("username") String username);
@@ -21,7 +20,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   @Query("""
         SELECT DISTINCT u FROM User u
         LEFT JOIN FETCH u.profile
-        LEFT JOIN FETCH u.status
         WHERE u.email = :email
       """)
   Optional<User> findByEmail(@Param("email") String email);
@@ -29,7 +27,10 @@ public interface UserRepository extends JpaRepository<User, UUID> {
   @Query("""
         SELECT DISTINCT u FROM User u
         LEFT JOIN FETCH u.profile
-        LEFT JOIN FETCH u.status
       """)
-  List<User> findAllWithProfileAndStatus();
+  List<User> findAllWithProfile();
+
+  boolean existsByUsername(@Param("username") String username);
+
+  boolean existsByEmail(@Param("email") String email);
 }

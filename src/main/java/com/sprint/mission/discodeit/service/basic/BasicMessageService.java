@@ -123,6 +123,13 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    public MessageDto findById(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> MessageNotFoundException.forId(messageId.toString()));
+        return messageMapper.toDto(message);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public PageResponse<MessageDto> findMessageByChannelId(UUID channelId, Pageable pageable,
         Instant cursor) {

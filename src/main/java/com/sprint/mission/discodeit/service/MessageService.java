@@ -16,6 +16,8 @@ public interface MessageService {
   MessageDto sendMessage(MessageCreateRequest messageCreateRequest,
       List<MultipartFile> attachments);
 
+  MessageDto findById(UUID messageId);
+
   PageResponse<MessageDto> findMessageByChannelId(UUID id, Pageable pageable, Instant cursor);
 
   MessageDto updateMessage(UUID messageId, MessageUpdateRequest messageUpdateRequest);

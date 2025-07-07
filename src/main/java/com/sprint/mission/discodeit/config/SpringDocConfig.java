@@ -18,6 +18,10 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         @Server(
             url = "http://localhost:8080",
             description = "로컬 서버"
+        ),
+        @Server(
+            url = "http://localhost:8082",
+            description = "개발 서버"
         )
     },
     tags = {
