@@ -97,7 +97,8 @@ public class JwtService {
   public void invalidateRefreshToken(String token) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
         .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
-    jwtBlacklist.addBlackList(token, jwtUtil.extractExpiration(token));
+    String accessToken = jwtSession.getAccessToken();
+    jwtBlacklist.addBlackList(accessToken, jwtUtil.extractExpiration(accessToken));
 
     jwtSessionRepository.deleteById(jwtSession.getId());
   }
