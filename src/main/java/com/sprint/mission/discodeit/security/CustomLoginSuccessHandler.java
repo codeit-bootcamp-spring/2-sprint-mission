@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -24,7 +25,11 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
 
+    // Provider에서 넘어온 인증 객체 꺼내기
     UserDto userDto = ((CustomUserDetails) authentication.getPrincipal()).getUserDto();
+
+    // 동시 로그인 제한 (1개만 유지 가능이므로 기존 jwtSession 전부 삭제)
+    jwtService.invalidateAllJwtSessionByUserId(userDto.id());
 
     // 인증 성공 시 토큰 발급 (jwtSession 생성)
     JwtSession jwtSession = jwtService.generateJwtSession(userDto);

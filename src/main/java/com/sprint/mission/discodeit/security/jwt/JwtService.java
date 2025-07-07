@@ -104,7 +104,7 @@ public class JwtService {
   }
 
   @Transactional
-  public void invalidateByUserId(UUID id) {
+  public void invalidateAllJwtSessionByUserId(UUID id) {
     List<JwtSession> jwtSessionList = jwtSessionRepository.findByUserId(id);
     jwtSessionList.forEach(
         jwtSession -> jwtBlacklist.addBlackList(jwtSession.getAccessToken(),
