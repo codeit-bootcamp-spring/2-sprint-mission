@@ -2,17 +2,17 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -20,6 +20,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +34,19 @@ import lombok.extern.slf4j.Slf4j;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final PasswordEncoder passwordEncoder;
+  private final SessionRegistry sessionRegistry;
 
   @Transactional
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+
     log.debug("사용자 생성 시작: {}", userCreateRequest);
-    
+
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
@@ -63,11 +69,11 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
-    String password = userCreateRequest.password();
+    String hashedPassword = passwordEncoder.encode(userCreateRequest.password());
 
-    User user = new User(username, email, password, nullableProfile);
+    User user = new User(username, email, hashedPassword, nullableProfile);
+    user.setRoles(Role.ROLE_USER.name());
     Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(user, now);
 
     userRepository.save(user);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
@@ -100,7 +106,7 @@ public class BasicUserService implements UserService {
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
-    
+
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
           UserNotFoundException exception = UserNotFoundException.withId(userId);
@@ -109,11 +115,11 @@ public class BasicUserService implements UserService {
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
-    
+
     if (userRepository.existsByEmail(newEmail)) {
       throw UserAlreadyExistsException.withEmail(newEmail);
     }
-    
+
     if (userRepository.existsByUsername(newUsername)) {
       throw UserAlreadyExistsException.withUsername(newUsername);
     }
@@ -140,15 +146,41 @@ public class BasicUserService implements UserService {
   }
 
   @Transactional
+  public UserDto updateUserRole(RoleUpdateRequest request) {
+    User user = userRepository.findById(request.userId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+    user.setRoles(request.newRole().name());
+
+    // 로그인된 세션이 있으면 강제 만료
+    expireUserSessions(user.getUsername());
+
+    return userMapper.toDto(user);
+  }
+
+  @Transactional
   @Override
   public void delete(UUID userId) {
     log.debug("사용자 삭제 시작: id={}", userId);
-    
+
     if (!userRepository.existsById(userId)) {
       throw UserNotFoundException.withId(userId);
     }
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+  }
+
+  private void expireUserSessions(String username) {
+    sessionRegistry.getAllPrincipals().stream()
+        .filter(principal -> principal instanceof UserDetails)
+        .map(UserDetails.class::cast)
+        .filter(userDetails -> userDetails.getUsername().equals(username))
+        .forEach(userDetails -> {
+          List<SessionInformation> sessions = sessionRegistry.getAllSessions(userDetails, false);
+          for (SessionInformation session : sessions) {
+            session.expireNow(); // 로그아웃 처리
+          }
+        });
   }
 }

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 
@@ -12,5 +11,5 @@ public interface BinaryContentStorage {
 
   InputStream get(UUID binaryContentId);
 
-  ResponseEntity<?> download(BinaryContentDto metaData) throws URISyntaxException;
+  ResponseEntity<?> download(BinaryContentDto metaData);
 }

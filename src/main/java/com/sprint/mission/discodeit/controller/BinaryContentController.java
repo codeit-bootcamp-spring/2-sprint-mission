@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,11 +49,11 @@ public class BinaryContentController implements BinaryContentApi {
 
   @GetMapping(path = "{binaryContentId}/download")
   public ResponseEntity<?> download(
-      @PathVariable("binaryContentId") UUID binaryContentId) throws URISyntaxException {
+      @PathVariable("binaryContentId") UUID binaryContentId) {
     log.info("바이너리 컨텐츠 다운로드 요청: id={}", binaryContentId);
     BinaryContentDto binaryContentDto = binaryContentService.find(binaryContentId);
     ResponseEntity<?> response = binaryContentStorage.download(binaryContentDto);
-    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}",
+    log.debug("바이너리 컨텐츠 다운로드 응답: contentType={}, contentLength={}", 
         response.getHeaders().getContentType(), response.getHeaders().getContentLength());
     return response;
   }
