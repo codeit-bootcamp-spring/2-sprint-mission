@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class JwtService {
   private final JwtSessionRepository jwtSessionRepository;
   private final UserRepository userRepository;
   private final JwtProperties jwtProperties;
+  private final JwtBlacklist jwtBlacklist;
 
   @Transactional
   public JwtSession generateJwtSession(UserDto userDto) {
@@ -50,6 +52,9 @@ public class JwtService {
   }
 
   public boolean validateAccessToken(String token) {
+    if (jwtBlacklist.isBlacked(token)) {
+      return false;
+    }
     return jwtUtil.validateToken(token);
   }
 
@@ -84,12 +89,18 @@ public class JwtService {
   public void invalidateRefreshToken(String token) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
         .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
+    jwtBlacklist.addBlackList(token, jwtUtil.extractExpiration(token));
 
     jwtSessionRepository.deleteById(jwtSession.getId());
   }
 
   @Transactional
   public void invalidateByUserId(UUID id) {
+    List<JwtSession> jwtSessionList = jwtSessionRepository.findByUserId(id);
+    jwtSessionList.forEach(
+        jwtSession -> jwtBlacklist.addBlackList(jwtSession.getAccessToken(),
+            jwtUtil.extractExpiration(
+                jwtSession.getAccessToken())));
     jwtSessionRepository.deleteByUserId(id);
   }
 

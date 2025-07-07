@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -14,13 +13,9 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
 
   Optional<JwtSession> findByRefreshToken(String refreshToken);
 
-  List<JwtSession> findByUser(User user);
+  List<JwtSession> findByUserId(UUID id);
 
   @Modifying
   @Query("DELETE FROM JwtSession js WHERE js.user.id = :userId")
   void deleteByUserId(@Param("userId") UUID id);
-
-  @Modifying
-  @Query("DELETE FROM JwtSession js WHERE js.refreshTokenExpiresAt < :now")
-  void deleteExpiredJwtSession(LocalDateTime now);
 }
