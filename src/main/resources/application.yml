@@ -54,6 +54,10 @@ discodeit:
       region: ${AWS_REGION}
     local:
       root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+  admin:
+    username: admin
+    email: admin@gmail.com
+    password: admin123!
 
 aws:
   accessKeyId: ${AWS_ACCESS_KEY}
@@ -69,3 +73,5 @@ server:
 logging:
   level:
     root: info
+    org.springframework.security: trace
+    org.springframework.security.web.csrf: DEBUG

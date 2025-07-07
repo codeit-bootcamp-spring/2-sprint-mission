@@ -1,11 +1,14 @@
 -- 기존 테이블 제거 (의존성의 역순으로)
-DROP TABLE IF EXISTS message_attachments;
-DROP TABLE IF EXISTS messages;
-DROP TABLE IF EXISTS read_statuses;
-DROP TABLE IF EXISTS user_statuses;
-DROP TABLE IF EXISTS channels;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS binary_contents;
+DROP TABLE IF EXISTS SPRING_SESSION_ATTRIBUTES CASCADE;
+DROP TABLE IF EXISTS SPRING_SESSION CASCADE;
+
+DROP TABLE IF EXISTS message_attachments CASCADE ;
+DROP TABLE IF EXISTS messages CASCADE ;
+DROP TABLE IF EXISTS read_statuses CASCADE ;
+DROP TABLE IF EXISTS user_statuses CASCADE ;
+DROP TABLE IF EXISTS channels CASCADE ;
+DROP TABLE IF EXISTS users CASCADE ;
+DROP TABLE IF EXISTS binary_contents CASCADE ;
 
 CREATE TABLE users
 (
@@ -15,6 +18,7 @@ CREATE TABLE users
     username   varchar(50) UNIQUE       NOT NULL,
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
+    role       varchar(50)              NOT NULL,
     profile_id uuid
 );
 
@@ -131,3 +135,27 @@ ALTER TABLE read_statuses
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
             ON DELETE CASCADE;
+
+-- Spring Session 용 테이블 생성
+CREATE TABLE SPRING_SESSION (
+                                PRIMARY_ID CHAR(36) NOT NULL,
+                                SESSION_ID CHAR(36) NOT NULL,
+                                CREATION_TIME BIGINT NOT NULL,
+                                LAST_ACCESS_TIME BIGINT NOT NULL,
+                                MAX_INACTIVE_INTERVAL INT NOT NULL,
+                                EXPIRY_TIME BIGINT NOT NULL,
+                                PRINCIPAL_NAME VARCHAR(100),
+                                CONSTRAINT SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
+);
+
+CREATE UNIQUE INDEX SPRING_SESSION_IX1 ON SPRING_SESSION (SESSION_ID);
+CREATE INDEX SPRING_SESSION_IX2 ON SPRING_SESSION (EXPIRY_TIME);
+CREATE INDEX SPRING_SESSION_IX3 ON SPRING_SESSION (PRINCIPAL_NAME);
+
+CREATE TABLE SPRING_SESSION_ATTRIBUTES (
+                                           SESSION_PRIMARY_ID CHAR(36) NOT NULL,
+                                           ATTRIBUTE_NAME VARCHAR(200) NOT NULL,
+                                           ATTRIBUTE_BYTES BYTEA NOT NULL,
+                                           CONSTRAINT SPRING_SESSION_ATTRIBUTES_PK PRIMARY KEY (SESSION_PRIMARY_ID, ATTRIBUTE_NAME),
+                                           CONSTRAINT SPRING_SESSION_ATTRIBUTES_FK FOREIGN KEY (SESSION_PRIMARY_ID) REFERENCES SPRING_SESSION(PRIMARY_ID) ON DELETE CASCADE
+);

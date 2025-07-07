@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_statuses")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserStatus extends BaseUpdatableEntity {
+public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   @JsonBackReference
   @OneToOne(fetch = FetchType.LAZY, optional = false)
