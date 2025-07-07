@@ -45,6 +45,10 @@ public class JwtSession {
   @Column
   private LocalDateTime refreshTokenExpiresAt;
 
+  public void updateAccessToken(String accessToken) {
+    this.accessToken = accessToken;
+  }
+
   public void rotateRefreshToken(String token, LocalDateTime refreshTokenExpiresAt) {
     this.refreshToken = token;
     this.issuedAt = LocalDateTime.now();

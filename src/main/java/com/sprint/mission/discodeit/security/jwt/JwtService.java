@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.controller.user.UserDto;
+import com.sprint.mission.discodeit.dto.service.jwt.RefreshResult;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.jwt.InvalidRefreshTokenException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -69,7 +70,7 @@ public class JwtService {
   }
 
   @Transactional
-  public String refreshAccessToken(String token) {
+  public RefreshResult refreshAccessToken(String token) {
     // Refresh Token 검증 및 조회
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
         .orElseThrow(() -> new InvalidRefreshTokenException(Map.of("refreshToken", token)));
@@ -84,6 +85,7 @@ public class JwtService {
     User user = jwtSession.getUser();
 
     String newAccessToken = jwtUtil.generateAccessToken(userMapper.toUserDto(user));
+    jwtSession.updateAccessToken(newAccessToken);
 
     // RefreshToken rotation
     String refreshToken = generateSecureRandomToken();
@@ -92,7 +94,7 @@ public class JwtService {
     jwtSession.rotateRefreshToken(refreshToken, expiresAt);
     jwtSessionRepository.save(jwtSession);
 
-    return newAccessToken;
+    return new RefreshResult(newAccessToken, refreshToken);
   }
 
   @Transactional
