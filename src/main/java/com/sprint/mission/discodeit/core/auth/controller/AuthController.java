@@ -1,18 +1,32 @@
 package com.sprint.mission.discodeit.core.auth.controller;
 
 
+import com.sprint.mission.discodeit.core.auth.dto.LoginRequest;
 import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.jaas.AbstractJaasAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,10 +39,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final CustomUserDetailsService userDetailsService;
+  private final JwtSessionRepository jwtSessionRepository;
+  private final AuthenticationManager authenticationManager;
+  private final JwtService jwtService;
 
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
     return ResponseEntity.ok(csrfToken);
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest,
+      HttpServletResponse response) {
+    Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
+    );
+
+    UserDto userDto = (UserDto) authentication.getPrincipal();
+    JwtSession session = jwtService.generateTokens(userDto);
+
+    Cookie refreshTokenCookie = new Cookie("refreshToken", session.getRefreshToken());
+    refreshTokenCookie.setHttpOnly(true);
+    refreshTokenCookie.setPath("/");
+    response.addCookie(refreshTokenCookie);
+
+    return ResponseEntity.ok(session.getAccessToken());
   }
 
   @PutMapping("/role")
@@ -38,7 +73,19 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserDto> me(@AuthenticationPrincipal CustomUserDetails userDetails) {
-    return ResponseEntity.status(HttpStatus.OK).body(userDetails.getUserDto());
+  public ResponseEntity<String> me(
+      @CookieValue(name = "refreshToken", required = false) String refreshToken) {
+    if (refreshToken == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token not found.");
+    }
+
+    Optional<JwtSession> sessionOptional = jwtSessionRepository.findByRefreshToken(refreshToken);
+
+    if (sessionOptional.isPresent()) {
+      JwtSession session = sessionOptional.get();
+      return ResponseEntity.ok(session.getAccessToken());
+    } else {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token.");
+    }
   }
 }
