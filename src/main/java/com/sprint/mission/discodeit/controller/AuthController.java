@@ -2,15 +2,16 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.controller.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.controller.user.UserDto;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.swagger.AuthApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthApi {
 
   private final AuthService authService;
+  private final JwtService jwtService;
 
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
@@ -32,8 +34,9 @@ public class AuthController implements AuthApi {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserDto> me(@AuthenticationPrincipal CustomUserDetails userDetails) {
-    return ResponseEntity.status(HttpStatus.OK).body(userDetails.getUserDto());
+  public ResponseEntity<String> me(@CookieValue("refresh_token") String token) {
+    JwtSession jwtSession = jwtService.findByRefreshToken(token);
+    return ResponseEntity.status(HttpStatus.OK).body(jwtSession.getAccessToken());
   }
 
   @PutMapping("/role")

@@ -51,6 +51,12 @@ public class JwtService {
     return jwtUtil.validateToken(token);
   }
 
+  public JwtSession findByRefreshToken(String token) {
+    return jwtSessionRepository.findByRefreshToken(token)
+        .orElseThrow(() -> new InvalidRefreshTokenException(
+            Map.of("token", token, "details", "유효하지 않은 Refresh Token 입니다.")));
+  }
+
   public String refreshAccessToken(String token) {
     // Refresh Token 검증 및 조회
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(token)
