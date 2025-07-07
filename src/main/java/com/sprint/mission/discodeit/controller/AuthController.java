@@ -33,18 +33,24 @@ public class AuthController implements AuthApi {
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
     log.debug("CSRF 토큰 요청");
-    return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+    return ResponseEntity.ok(csrfToken);
   }
 
   @GetMapping("/me")
   public ResponseEntity<String> me(@CookieValue("refreshToken") String token) {
     JwtSession jwtSession = jwtService.findByRefreshToken(token);
-    return ResponseEntity.status(HttpStatus.OK).body(jwtSession.getAccessToken());
+    return ResponseEntity.ok(jwtSession.getAccessToken());
   }
 
   @PutMapping("/role")
   public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest roleUpdateRequest) {
-    return ResponseEntity.status(HttpStatus.OK).body(authService.updateRole(roleUpdateRequest));
+    return ResponseEntity.ok(authService.updateRole(roleUpdateRequest));
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<String> refresh(@CookieValue("refreshToken") String token) {
+    String accessToken = jwtService.refreshAccessToken(token);
+    return ResponseEntity.ok(accessToken);
   }
 
   @PostMapping("/logout")

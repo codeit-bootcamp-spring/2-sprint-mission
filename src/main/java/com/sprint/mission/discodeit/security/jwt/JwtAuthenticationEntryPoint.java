@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 // Filter에서 예외가 발생했을 때 전달되는 포인트 (인증이 안됐을 때)
 @Component
+@Slf4j
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
@@ -71,6 +73,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
       body.put("message", "인증이 필요합니다.");
       body.put("hint", "로그인 후 JWT 토큰을 Authorization 헤더에 포함해주세요.");
     }
+
+    log.warn("JWT 인증 처리 중 오류 발생 - error: {}, message: {}", body.get("error"), body.get("message"));
 
     // JSON 응답 전송
     // 서블릿에서는 response 객체를 세팅만 해주면 알아서 return 해줌
