@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.auth.JwtAuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -9,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-  private final JwtAuthInterceptor jwtAuthInterceptor;
   private final MDCLoggingInterceptor mdcLoggingInterceptor;
 
 //  @Override

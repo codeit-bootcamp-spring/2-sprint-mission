@@ -2,9 +2,6 @@
   <!-- 날짜 변수 정의 -->
   <timestamp key="DATE" datePattern="yyyy-MM-dd"/>
 
-  <!-- 메모리 로그 -->
-  <appender name="MEMORY" class="com.sprint.mission.discodeit.logging.InMemoryLogAppender"/>
-
   <!-- 콘솔 출력 -->
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -47,7 +44,6 @@
 
   <!-- 루트 로거에 모든 Appender 연결 -->
   <root level="INFO">
-    <appender-ref ref="MEMORY"/>
     <appender-ref ref="CONSOLE"/>
     <appender-ref ref="FILE"/>
     <appender-ref ref="ERROR_FILE"/>

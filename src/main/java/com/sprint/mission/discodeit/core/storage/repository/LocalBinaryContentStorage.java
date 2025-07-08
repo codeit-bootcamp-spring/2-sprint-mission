@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.core.storage.repository;
 
-import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.BinaryContentException;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.port.BinaryContentStoragePort;
-import com.sprint.mission.discodeit.core.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.io.FileInputStream;
@@ -56,7 +55,7 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
   private Path resolvePath(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.FILE_NOT_FOUND, id)
+        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
     );
     String extension = binaryContent.getExtension();
 
@@ -88,19 +87,17 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
-    try (InputStream inputStream = get(binaryContentDto.id())) {
-      InputStreamResource resource = new InputStreamResource(inputStream);
+    InputStream inputStream = get(binaryContentDto.id());
+    InputStreamResource resource = new InputStreamResource(inputStream);
 
-      HttpHeaders headers = new HttpHeaders();
+    HttpHeaders headers = new HttpHeaders();
+    headers.add(HttpHeaders.CONTENT_DISPOSITION,
+        "inline; filename=\"" + binaryContentDto.fileName() + "\"");
+    headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
+    headers.setContentLength(binaryContentDto.size());
+    
+    log.info("[LocalBinaryContentStorage] Image Download successfully");
+    return ResponseEntity.ok().headers(headers).body(resource);
 
-      headers.add(HttpHeaders.CONTENT_DISPOSITION,
-          "attachments; filename=\"" + binaryContentDto.fileName() + "\"");
-      headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
-      headers.setContentLength(binaryContentDto.size());
-      log.info("[LocalBinaryContentStorage] Image Download successfully");
-      return ResponseEntity.ok().headers(headers).body(resource);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

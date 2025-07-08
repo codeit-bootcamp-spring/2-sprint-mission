@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.core.channel.entity;
 
 import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
-import com.sprint.mission.discodeit.core.channel.exception.ChannelUnmodifiableException;
+import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +21,7 @@ public class Channel extends BaseUpdatableEntity {
 
   @Column(name = "name", length = 100)
   private String name;
+
   @Column(name = "description", length = 500)
   private String description;
 
@@ -36,40 +37,26 @@ public class Channel extends BaseUpdatableEntity {
   }
 
   public static Channel create(String name, String description, ChannelType type) {
-    Validator.validate(name, description);
     return new Channel(name, description, type);
   }
 
   public void update(String newName, String newDescription) {
-    Validator.validateType(type);
-    if (newName != null && !newName.equals(this.name)) {
-      Validator.validateName(newName);
-      this.name = newName;
-    }
-    if (newDescription != null && !newDescription.equals(this.description)) {
-      Validator.validateDescription(newDescription);
-      this.description = newDescription;
+    validateType(type);
+    this.name = updateField(this.name, newName);
+    this.description = updateField(this.description, newDescription);
+  }
+
+  private <T> T updateField(T target, T replace) {
+    if (replace != null && !replace.equals(target)) {
+      return replace;
+    } else {
+      return target;
     }
   }
 
-  public static class Validator {
-
-    //TODO 정규패턴을 사용해서 유효성 검증할 예정 => 채널 이름 조건, 설명 조건 등
-    public static void validate(String name, String description) {
-      validateName(name);
-      validateDescription(description);
-    }
-
-    public static void validateName(String name) {
-    }
-
-    public static void validateDescription(String description) {
-    }
-
-    public static void validateType(ChannelType type) {
-      if (type == ChannelType.PRIVATE) {
-        throw new ChannelUnmodifiableException(ErrorCode.UNMODIFIABLE_ERROR);
-      }
+  public static void validateType(ChannelType type) {
+    if (type == ChannelType.PRIVATE) {
+      throw new ChannelException(ErrorCode.UNMODIFIABLE_ERROR);
     }
   }
 }

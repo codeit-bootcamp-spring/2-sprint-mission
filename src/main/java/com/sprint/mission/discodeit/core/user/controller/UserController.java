@@ -1,17 +1,11 @@
 package com.sprint.mission.discodeit.core.user.controller;
 
 
-import com.sprint.mission.discodeit.core.storage.usecase.dto.BinaryContentCreateCommand;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusOnlineCommand;
-import com.sprint.mission.discodeit.core.status.usecase.dto.UserStatusDto;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserCreateRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserStatusRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserUpdateRequest;
-import com.sprint.mission.discodeit.core.user.controller.dto.UserDeleteResponse;
-import com.sprint.mission.discodeit.core.user.usecase.UserService;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserCreateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserUpdateCommand;
-import com.sprint.mission.discodeit.core.user.usecase.dto.UserDto;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.core.user.service.UserService;
 import com.sprint.mission.discodeit.swagger.UserApi;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -22,12 +16,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,31 +36,20 @@ public class UserController implements UserApi {
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> create(
-      @RequestPart("userCreateRequest") @Valid UserCreateRequest requestBody,
+      @RequestPart("userCreateRequest") @Valid UserCreateRequest request,
       @RequestPart(value = "profile", required = false) MultipartFile file
-  ) {
+  ) throws IOException {
 
-    Optional<BinaryContentCreateCommand> binaryContentRequest = Optional.ofNullable(file)
-        .flatMap(this::resolveProfileRequest);
+    Optional<BinaryContentCreateRequest> optional = Optional.empty();
 
-    UserCreateCommand command = UserDtoMapper.toCreateUserCommand(requestBody);
-    UserDto result = userService.create(command, binaryContentRequest);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(result);
-  }
-
-  private Optional<BinaryContentCreateCommand> resolveProfileRequest(MultipartFile profileFile) {
-    if (profileFile.isEmpty()) {
-      return Optional.empty();
-    } else {
-      try {
-        BinaryContentCreateCommand binaryContentCreateRequest = BinaryContentCreateCommand.create(
-            profileFile);
-        return Optional.of(binaryContentCreateRequest);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+    if (file != null && !file.isEmpty()) {
+      BinaryContentCreateRequest binaryRequest = BinaryContentCreateRequest.create(file);
+      optional = Optional.of(binaryRequest);
     }
+
+    UserDto userDto = userService.create(request, optional);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
   }
 
   @GetMapping
@@ -77,32 +60,27 @@ public class UserController implements UserApi {
   }
 
   @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.getUserDto().id()")
   public ResponseEntity<UserDto> update(
       @PathVariable UUID userId,
-      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest requestBody,
-      @RequestPart(value = "profile", required = false) MultipartFile file) {
+      @RequestPart("userUpdateRequest") @Valid UserUpdateRequest request,
+      @RequestPart(value = "profile", required = false) MultipartFile file) throws IOException {
+    Optional<BinaryContentCreateRequest> optional = Optional.empty();
 
-    Optional<BinaryContentCreateCommand> binaryContentRequest = Optional.ofNullable(file)
-        .flatMap(this::resolveProfileRequest);
-    UserUpdateCommand command = UserDtoMapper.toUpdateUserCommand(userId, requestBody);
+    if (!file.isEmpty()) {
+      BinaryContentCreateRequest binaryRequest = BinaryContentCreateRequest.create(file);
+      optional = Optional.of(binaryRequest);
+    }
 
-    UserDto result = userService.update(command, binaryContentRequest);
-    return ResponseEntity.ok(result);
+    UserDto userDto = userService.update(userId, request, optional);
+    return ResponseEntity.ok(userDto);
   }
 
   @DeleteMapping("/{userId}")
+  @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.getUserDto().id()")
   public ResponseEntity<Void> delete(@PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
 
-  @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable UUID userId,
-      @RequestBody UserStatusRequest requestBody) {
-
-    UserStatusOnlineCommand command = UserStatusOnlineCommand.create(userId,
-        requestBody);
-    UserStatusDto result = userService.online(userId, requestBody);
-    return ResponseEntity.ok(result);
-  }
 }

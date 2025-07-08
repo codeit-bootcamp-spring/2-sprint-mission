@@ -14,10 +14,9 @@ import org.springframework.data.repository.query.Param;
 public interface JpaMessageRepository extends JpaRepository<Message, UUID> {
 
   Slice<Message> findById(UUID id, Pageable pageable);
-  
+
   @Query("SELECT m FROM Message m "
       + "LEFT JOIN FETCH m.author a "
-      + "JOIN FETCH a.userStatus "
       + "LEFT JOIN FETCH a.profile "
       + "WHERE m.channel.id=:channelId AND m.createdAt < :createdAt")
   Slice<Message> findAllByChannelIdWithAuthor(@Param("channelId") UUID channelId,

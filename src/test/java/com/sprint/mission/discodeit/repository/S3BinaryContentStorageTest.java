@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.discodeit.core.storage.controller.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.core.storage.BinaryContentException;
+import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
-import com.sprint.mission.discodeit.core.storage.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.core.storage.repository.JpaBinaryContentRepository;
 import com.sprint.mission.discodeit.core.storage.repository.S3BinaryContentStorage;
 import java.net.URI;
@@ -63,7 +63,7 @@ public class S3BinaryContentStorageTest {
     // given
     when(binaryContentRepository.findById(any())).thenReturn(Optional.empty());
     // when & then
-    assertThrows(BinaryContentNotFoundException.class, () -> {
+    assertThrows(BinaryContentException.class, () -> {
       binaryContentStorage.put(UUID.randomUUID(), new byte[0]);
     });
   }
@@ -84,7 +84,7 @@ public class S3BinaryContentStorageTest {
     // given
     when(binaryContentRepository.findById(any())).thenReturn(Optional.empty());
     // when & then
-    assertThrows(BinaryContentNotFoundException.class, () -> {
+    assertThrows(BinaryContentException.class, () -> {
       binaryContentStorage.get(UUID.randomUUID());
     });
   }

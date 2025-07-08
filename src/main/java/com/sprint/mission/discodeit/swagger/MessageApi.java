@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.swagger;
 
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageCreateRequest;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageDeleteResponse;
-import com.sprint.mission.discodeit.core.message.controller.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.core.message.controller.dto.PageResponse;
-import com.sprint.mission.discodeit.core.message.usecase.dto.MessageDto;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.core.message.dto.PageResponse;
+import com.sprint.mission.discodeit.core.message.dto.MessageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -72,7 +71,7 @@ public interface MessageApi {
           content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found"))
       ),
   })
-  ResponseEntity<MessageDeleteResponse> delete(
+  ResponseEntity<Void> delete(
       @Parameter(description = "삭제할 Message ID") UUID messageId
   );
 
