@@ -39,7 +39,7 @@ discodeit:
 
 logging:
   level:
-    root: INFO
+    root: ERROR
 
 management:
   endpoints:
@@ -68,3 +68,14 @@ info:
     multipart:
       max-file-size: ${spring.servlet.multipart.maxFileSize}
       max-request-size: ${spring.servlet.multipart.maxRequestSize}
+
+account:
+  admin:
+    username: admin
+    email: admin@email.com
+    password: admin123!
+
+security:
+  remember-me:
+    key: discodeitRememberMeKey
+    token-validity-seconds: 1814400

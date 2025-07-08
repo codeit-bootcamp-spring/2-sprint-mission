@@ -2,26 +2,24 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
-import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.exception.userStatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   @Override
@@ -42,7 +40,8 @@ public class BasicUserService implements UserService {
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = request.username();
     String email = request.email();
-    String password = request.password();
+    String rawPassword = request.password();
+    String encodedPassword = passwordEncoder.encode(rawPassword);
 
     checkUserEmailExists(request.email());
     checkUserUsernameExists(request.username());
@@ -61,18 +60,14 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    User user = User.create(username, email, password, nullableProfile);
+    User user = User.create(username, email, encodedPassword, nullableProfile);
     User createdUser = userRepository.save(user);
-
-    UserStatus userStatus = UserStatus.create(user, Instant.now());
-    user.assignStatus(userStatus);
-
-    userStatusRepository.save(userStatus);
 
     return userMapper.toDto(createdUser);
   }
 
   @Transactional(readOnly = true)
+  @PreAuthorize("hasRole('USER')")
   @Override
   public UserDto findById(UUID userId) {
     return userRepository.findById(userId)
@@ -81,6 +76,7 @@ public class BasicUserService implements UserService {
   }
 
   @Transactional(readOnly = true)
+  @PreAuthorize("hasRole('USER')")
   @Override
   public List<UserDto> findAll() {
     return userRepository.findAll()
@@ -90,6 +86,7 @@ public class BasicUserService implements UserService {
   }
 
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or @authorizationChecker.isSameUser(#userId, authentication)")
   @Override
   public UserDto updateUser(UUID userId, UserUpdateRequest request,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -98,7 +95,11 @@ public class BasicUserService implements UserService {
 
     String newUsername = request.newUsername();
     String newEmail = request.newEmail();
-    String newPassword = request.newPassword();
+    String rawNewPassword = request.newPassword();
+    String encodedNewPassword = null;
+    if (rawNewPassword != null) {
+      encodedNewPassword = passwordEncoder.encode(rawNewPassword);
+    }
 
     checkUserEmailExists(request.newEmail());
     checkUserUsernameExists(request.newUsername());
@@ -124,12 +125,13 @@ public class BasicUserService implements UserService {
         })
         .orElse(null);
 
-    user.update(newUsername, newEmail, newPassword, nullableProfile);
+    user.update(newUsername, newEmail, encodedNewPassword, nullableProfile);
 
     return userMapper.toDto(user);
   }
 
   @Transactional
+  @PreAuthorize("hasRole('ADMIN') or @authorizationChecker.isSameUser(#userId, authentication)")
   @Override
   public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
@@ -140,11 +142,6 @@ public class BasicUserService implements UserService {
       binaryContentStorage.deleteById(profileId);
       binaryContentRepository.deleteById(profileId);
     }
-
-    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-        .orElseThrow(
-            () -> UserStatusNotFoundException.byUserId(userId));
-    userStatusRepository.deleteById(userStatus.getId());
 
     userRepository.deleteById(userId);
   }

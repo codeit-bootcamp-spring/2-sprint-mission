@@ -26,4 +26,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   @Query("SELECT MAX(m.createdAt) FROM Message m WHERE m.channel.id = :channelId")
   Optional<Instant> findLatestCreatedAtByChannelId(UUID channelId);
+
+  @Query("SELECT m.author.id FROM Message m WHERE m.id = :id")
+  Optional<UUID> findAuthorIdById(UUID id);
 }
