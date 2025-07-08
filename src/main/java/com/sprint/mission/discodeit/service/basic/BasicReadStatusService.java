@@ -42,7 +42,6 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   @Transactional
-  @PreAuthorize("principal.userDto.id == #createReadStatusCommand.userId()")
   public CreateReadStatusResult create(
       @Param("createReadStatusCommand") CreateReadStatusCommand createReadStatusCommand) {
     User user = checkUserExists(createReadStatusCommand);
