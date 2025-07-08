@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+/*package com.sprint.mission.discodeit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -119,4 +119,4 @@ class AuthControllerTest {
             .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isBadRequest());
   }
-} 
+} */

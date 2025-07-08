@@ -13,7 +13,7 @@ spring:
     open-in-view: false
   profiles:
     active:
-      - prod
+      - dev
 
 management:
   endpoints:
@@ -55,7 +55,7 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
-
-logging:
-  level:
-    root: info
+  admin:
+    username: ****
+    password: ****
+    email: ********
