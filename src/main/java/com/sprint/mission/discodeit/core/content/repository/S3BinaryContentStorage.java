@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.storage.s3;
+package com.sprint.mission.discodeit.core.content.repository;
 
 import com.sprint.mission.discodeit.core.content.controller.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.content.port.BinaryContentStoragePort;

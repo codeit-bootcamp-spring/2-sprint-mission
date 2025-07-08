@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class BasicUserService implements UserService {
   private final JpaUserRepository userRepository;
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   @Transactional
@@ -48,7 +50,9 @@ public class BasicUserService implements UserService {
       profile = binaryContentService.create(binaryContentDTO.orElse(null));
     }
 
-    User user = User.create(command.username(), command.email(), command.password(), profile);
+    String hashedPassword = passwordEncoder.encode(command.password());
+
+    User user = User.create(command.username(), command.email(), hashedPassword, profile);
     userRepository.save(user);
     log.info("[UserService] User registered: id {}, name {}", user.getId(), user.getName());
 
@@ -57,26 +61,6 @@ public class BasicUserService implements UserService {
     user.setUserStatus(userStatus);
 
     return UserDto.create(user, true);
-  }
-
-  @Override
-  @Transactional
-  public UserDto login(UserLoginCommand command) {
-    User user = userRepository.findByName(command.username()).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, command.username())
-    );
-
-    if (!command.password().equals(user.getPassword())) {
-      throw new UserLoginFailedException(ErrorCode.LOGIN_FAILED, user.getId(), "Password mismatch");
-    }
-
-    user.getUserStatus().updateTime(Instant.now());
-
-    log.info("[UserService] User login: id {}, username {}, password  {}", user.getId(),
-        user.getName(),
-        user.getPassword());
-
-    return UserDto.create(user, user.getUserStatus().isOnline());
   }
 
   private void validateUser(String name, String email) {

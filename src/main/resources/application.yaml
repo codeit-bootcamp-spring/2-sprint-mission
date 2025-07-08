@@ -5,7 +5,7 @@ spring:
     active: dev
 
 server:
-  port: 80
+  port: 8080
 
 discodeit:
   storage:
@@ -18,12 +18,21 @@ discodeit:
       region: ${AWS_S3_REGION:dummy}
       bucket: ${AWS_S3_BUCKET:dummy}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+  admin:
+    username: ${ADMIN_USERNAME}
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
 
   servlet:
     multipart:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
+
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 management:
   info:

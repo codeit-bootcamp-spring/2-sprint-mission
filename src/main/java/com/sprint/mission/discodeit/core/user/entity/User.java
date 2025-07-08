@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.core.user.entity;
 
 import com.sprint.mission.discodeit.core.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.core.auth.dto.Role;
 import com.sprint.mission.discodeit.core.content.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.status.entity.UserStatus;
 import com.sprint.mission.discodeit.core.user.exception.UserInvalidRequestException;
@@ -39,16 +40,20 @@ public class User extends BaseUpdatableEntity {
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
+  @Column(nullable = false)
+  private Role role;
+
   private User(String name, String email, String password, BinaryContent profile) {
     super();
     this.profile = profile;
     this.name = name;
     this.email = email;
     this.password = password;
+    this.role = Role.USER;
   }
 
   public static User create(String name, String email, String password, BinaryContent profile) {
-    Validator.validate(name, email, password);
+    Validator.validate(name, password, email);
     return new User(name, email, password, profile);
   }
 
@@ -71,6 +76,12 @@ public class User extends BaseUpdatableEntity {
     }
   }
 
+  public void updateRole(Role newRole) {
+    if (this.role != newRole) {
+      this.role = newRole;
+    }
+  }
+
   private static class Validator {
 
     //TODO 정규패턴을 사용해서 유효성 검증할 예정 => 이름 조건, 비밀번호 조건, 이메일 조건 등
@@ -87,7 +98,7 @@ public class User extends BaseUpdatableEntity {
     }
 
     public static void validatePassword(String password) {
-      if (password == null || password.isBlank() || password.length() > 50) {
+      if (password == null || password.isBlank()) {
         throw new UserInvalidRequestException(ErrorCode.USER_INVALID_REQUEST, password);
       }
     }
