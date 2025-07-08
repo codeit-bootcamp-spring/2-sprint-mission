@@ -1,6 +1,8 @@
 spring:
   flyway:
     enabled: true
+  config:
+    import: optional:file:.env[.properties]
   jpa:
     hibernate:
       ddl-auto: validate
@@ -13,6 +15,11 @@ spring:
   sql:
     init:
       mode: never
+
+security:
+  remember-me:
+    key: ${REMEMBER_ME_KEY}
+    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 discodeit:
   storage:
