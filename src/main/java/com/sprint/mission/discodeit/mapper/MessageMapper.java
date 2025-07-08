@@ -47,7 +47,6 @@ public interface MessageMapper {
 
   FindBinaryContentResult toFindBinaryContentResult(BinaryContent binaryContent);
 
-  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
   FindUserResult toFindUserResult(User user);
 
 }

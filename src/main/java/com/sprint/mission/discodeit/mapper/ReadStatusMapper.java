@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusResult;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -44,5 +45,5 @@ public interface ReadStatusMapper {
   UpdateReadStatusResult toUpdateReadStatusResult(ReadStatus readStatus);
 
   UpdateReadStatusCommand toUpdateReadStatusCommand(
-      UpdateReadStatusRequestDTO updateReadStatusRequestDTO);
+      UpdateReadStatusRequestDTO updateReadStatusRequestDTO, UUID userId);
 }

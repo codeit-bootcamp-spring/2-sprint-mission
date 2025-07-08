@@ -25,6 +25,8 @@ spring:
         url: http://localhost:9090
   cache:
     type: simple
+  session:
+    store-type: jdbc
 
   jpa:
     hibernate:
@@ -48,6 +50,17 @@ spring:
       root: INFO
       org.hibernate.SQL: INFO
       com.sprint.mission.discodeit: INFO
+
+sprint:
+  admin:
+    username: ${SPRINT_ADMIN_USERNAME}
+    email: ${SPRINT_ADMIN_EMAIL}
+    password: ${SPRINT_ADMIN_PASSWORD}
+
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 info:
   app:

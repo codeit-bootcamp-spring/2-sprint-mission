@@ -7,14 +7,11 @@ import com.sprint.mission.discodeit.dto.service.user.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.service.user.UpdateUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
 import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.mapper.UserMapperImpl;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapperImpl;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -31,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,25 +44,22 @@ public class BasicUserServiceTest {
   @Mock
   UserRepository userRepository;
   @Mock
-  UserStatusService userStatusService;
-  @Mock
   BinaryContentService binaryContentService;
   @Mock
   BinaryContentStorage binaryContentStorage;
+  @Mock
+  PasswordEncoder passwordEncoder;
 
   // DB 접근(프로세스 외부 의존성?)도 아닌, 단순 Mapper이므로 Spy 객체 사용
   // -> 공유 의존성이 없으므로 Spy 객체나 실제 객체를 사용해도 단위 테스트의 조건을 깨뜨리지 않는다. (고전파)
   @Spy
   UserMapper userMapper = new UserMapperImpl();
-  @Spy
-  UserStatusMapper userStatusMapper = new UserStatusMapperImpl();
 
   @InjectMocks
   BasicUserService basicUserService;
 
   // 고전파 - 공유 의존성이 없는 비공개 의존성의 경우 실제 객체 사용
   private User user;
-  private UserStatus userStatus;
   private BinaryContent profile;
   private MultipartFile mockFile;
 
@@ -84,10 +79,6 @@ public class BasicUserServiceTest {
         .profile(profile)
         .build();
     ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
-
-    userStatus = new UserStatus(user, Instant.now());
-
-    user.updateUserStatus(userStatus);
 
     mockFile = new MockMultipartFile(
         "testProfile",
@@ -121,7 +112,6 @@ public class BasicUserServiceTest {
     // userService 단위테스트에서는 binaryContentService, Storage와는 상관없이 작동해야하기 때문에, mockFile이 createUserResult.profile에 잘 저장되는지 정도만 확인하면 될 것 같음
     assertThat(mockFile.getOriginalFilename()).isEqualTo(createUserResult.profile().filename());
     assertThat(mockFile.getSize()).isEqualTo(createUserResult.profile().size());
-    assertThat(createUserResult.online()).isTrue();
 
     then(userRepository).should(times(1)).save(any(User.class));
     then(binaryContentService).should(times(1)).create(any());
@@ -223,7 +213,6 @@ public class BasicUserServiceTest {
     then(userRepository).should(times(1)).deleteById(user.getId());
     then(binaryContentService).should(times(1)).delete(user.getProfile().getId());
     then(binaryContentStorage).should(times(1)).delete(user.getProfile().getId());
-    then(userStatusService).should(times(1)).deleteByUserId(user.getId());
   }
 
   @Test
@@ -241,7 +230,6 @@ public class BasicUserServiceTest {
     then(userRepository).should(never()).deleteById(userId);
     then(binaryContentService).should(never()).delete(any(UUID.class));
     then(binaryContentStorage).should(never()).delete(any(UUID.class));
-    then(userStatusService).should(never()).deleteByUserId(userId);
   }
 }
 

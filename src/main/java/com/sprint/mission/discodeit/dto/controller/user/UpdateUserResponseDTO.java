@@ -7,8 +7,7 @@ public record UpdateUserResponseDTO(
     UUID id,
     FindBinaryContentResult profile,
     String username,
-    String email,
-    Boolean online
+    String email
 ) {
 
 }

@@ -6,9 +6,40 @@ CREATE TABLE users
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone,
     username   varchar(50) UNIQUE       NOT NULL,
+    role       varchar(20)              NOT NULL,
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
     profile_id uuid
+);
+
+-- SPRING_SESSION 테이블 생성
+CREATE TABLE spring_session
+(
+    primary_id            CHAR(36) NOT NULL PRIMARY KEY,
+    session_id            CHAR(36) NOT NULL UNIQUE,
+    creation_time         BIGINT   NOT NULL,
+    last_access_time      BIGINT   NOT NULL,
+    max_inactive_interval INT      NOT NULL,
+    expiry_time           BIGINT   NOT NULL,
+    principal_name        VARCHAR(100)
+);
+
+-- SPRING_SESSION_ATTRIBUTES 테이블 생성
+CREATE TABLE spring_session_attributes
+(
+    session_primary_id CHAR(36)     NOT NULL REFERENCES spring_session (primary_id) ON DELETE CASCADE,
+    attribute_name     VARCHAR(200) NOT NULL,
+    attribute_bytes    BYTEA        NOT NULL,
+    PRIMARY KEY (session_primary_id, attribute_name)
+);
+
+-- remember-me
+CREATE TABLE persistent_logins
+(
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
 );
 
 -- BinaryContent

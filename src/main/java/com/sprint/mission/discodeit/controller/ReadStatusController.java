@@ -9,12 +9,15 @@ import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusResul
 import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
 import com.sprint.mission.discodeit.dto.service.readStatus.UpdateReadStatusResult;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.swagger.ReadStatusApi;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,11 +51,12 @@ public class ReadStatusController implements ReadStatusApi {
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<UpdateReadStatusResponseDTO> updateReadStatus(
       @PathVariable("readStatusId") UUID id,
-      @RequestBody UpdateReadStatusRequestDTO request) {
+      @RequestBody UpdateReadStatusRequestDTO request,
+      @AuthenticationPrincipal CustomUserDetails principal) {
     log.info("ReadStatus create request (readStatusId: {}, lastReadAt: {})", id,
         request.newLastReadAt());
     UpdateReadStatusResult updateReadStatusResult = readStatusService.update(
-        id, readStatusMapper.toUpdateReadStatusCommand(request));
+        id, readStatusMapper.toUpdateReadStatusCommand(request, principal.getUserDto().id()));
     UpdateReadStatusResponseDTO updatedReadStatus = readStatusMapper.toUpdateReadStatusResponseDTO(
         updateReadStatusResult);
     return ResponseEntity.ok(updatedReadStatus);

@@ -16,6 +16,17 @@ spring:
       enabled: true
       path: /h2-console
 
+sprint:
+  admin:
+    username: admin
+    email: admin@admin.com
+    password: 1234
+
+security:
+  remember-me:
+    key: 1353153463463135
+    token-validity-seconds: 300000
+
 logging:
   level:
     org.hibernate.SQL: debug

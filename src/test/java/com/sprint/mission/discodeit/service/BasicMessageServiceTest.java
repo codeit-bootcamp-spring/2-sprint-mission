@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -76,7 +75,6 @@ public class BasicMessageServiceTest {
     // 갑자기 든 생각.. MessageService를 테스트하는데, User 필드를 굳이 채워줄 필요가 없을 것 같다.
     User user = User.builder().build();
     ReflectionTestUtils.setField(user, "id", authorId);
-    ReflectionTestUtils.setField(user, "userStatus", new UserStatus(user, Instant.now()));
     Channel channel = Channel.builder().build();
     ReflectionTestUtils.setField(channel, "id", channelId);
 

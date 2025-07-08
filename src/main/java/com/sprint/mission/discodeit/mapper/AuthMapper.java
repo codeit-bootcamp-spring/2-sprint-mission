@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.controller.auth.LoginRequestDTO;
+import com.sprint.mission.discodeit.dto.controller.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.controller.auth.LoginResponseDTO;
 import com.sprint.mission.discodeit.dto.service.auth.LoginCommand;
 import com.sprint.mission.discodeit.dto.service.auth.LoginResult;
@@ -13,7 +13,7 @@ public interface AuthMapper {
 
   AuthMapper INSTANCE = Mappers.getMapper(AuthMapper.class);
 
-  LoginCommand toLoginCommand(LoginRequestDTO loginRequestDTO);
+  LoginCommand toLoginCommand(LoginRequest loginRequest);
 
   LoginResponseDTO toLoginResponseDTO(LoginResult loginResult);
 

@@ -8,7 +8,7 @@ public record FindUserResult(
     FindBinaryContentResult profile,
     String username,
     String email,
-    Boolean online
+    boolean online
 ) {
 
 }

@@ -28,15 +28,14 @@ public interface UserMapper {
 
   FindUserResponseDTO toFindUserResponseDTO(FindUserResult findUserResult);
   
-  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
-  FindUserResult toFindUserResult(User user);
+  FindUserResult toFindUserResult(User user, boolean online);
 
-  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
   CreateUserResult toCreateUserResult(User user);
 
-  @Mapping(target = "online", expression = "java(user.getUserStatus().isLoginUser())")
   UpdateUserResult toUpdateUserResult(User user);
 
   FindBinaryContentResult toFindBinaryContentResult(BinaryContent binaryContent);
 
+  @Mapping(source = "profile.id", target = "profileId")
+  UserDto toUserDto(User user);
 }

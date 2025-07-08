@@ -57,14 +57,7 @@ public interface UserApi {
   ResponseEntity<UpdateUserResponseDTO> updateUser(UUID id,
       UpdateUserRequestDTO updateUserRequestDTO,
       MultipartFile multipartFile);
-
-  @Operation(summary = "유저상태 수정",
-      description = "userId에 해당하는 유저상태를 수정합니다.",
-      responses = {
-          @ApiResponse(responseCode = "200", description = "유저상태 수정 성공"),
-          @ApiResponse(responseCode = "404", description = "userStatusId에 해당하는 UserStatus를 찾지 못함")
-      })
-  ResponseEntity<UpdateUserStatusResponseDTO> updateUserStatus(UUID id);
+  
 
   @Operation(summary = "유저 삭제",
       description = "userId로 유저를 삭제합니다.",

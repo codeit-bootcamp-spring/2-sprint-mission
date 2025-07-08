@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -28,9 +30,6 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private UserStatus userStatus;
-
   @Column(length = 50, nullable = false, unique = true)
   private String username;
 
@@ -39,6 +38,10 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
 
   @Column(length = 60, nullable = false)
   private String password;
+
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Role role;
 
 
   // 클래스가 아니라 생성자에 붙여야 해당 값들에 대해 build가 가능
@@ -49,7 +52,12 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
     this.profile = profile;
     this.username = username;
     this.email = email;
+    this.role = Role.USER;
     this.password = password;
+  }
+
+  public void updateRole(Role role) {
+    this.role = role;
   }
 
 
@@ -72,10 +80,5 @@ public class User extends BaseUpdatableEntity implements Serializable, Identifia
   public void updateProfileDefault() {
     this.profile = null;
   }
-
-  public void updateUserStatus(UserStatus userStatus) {
-    this.userStatus = userStatus;
-  }
-
 }
 

@@ -10,10 +10,10 @@ import com.sprint.mission.discodeit.dto.service.channel.UpdateChannelResult;
 import com.sprint.mission.discodeit.dto.service.readStatus.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.dto.service.readStatus.FindReadStatusResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -46,6 +46,9 @@ public class BasicChannelServiceTest {
 
   @Mock
   UserRepository userRepository;
+
+  @Mock
+  LoginStatusService loginStatusService;
 
   @Mock
   ChannelRepository channelRepository;
@@ -96,20 +99,37 @@ public class BasicChannelServiceTest {
         UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
 
     // Mapper에서 각 필드가 null이면 예외 발생 -> UserStatus mock 객체 생성
-    List<User> mockUsers = userIds.stream()
-        .map(id -> {
-          User user = mock(User.class);
-          UserStatus userStatus = mock(UserStatus.class);
-          given(user.getId()).willReturn(id);
-          given(user.getUserStatus()).willReturn(userStatus);
-          given(userStatus.isLoginUser()).willReturn(true);
-          return user;
-        })
-        .toList();
+    User user1 = User.builder()
+        .username("test1")
+        .email("test1@test.com")
+        .password("Test123!")
+        .profile(mock(BinaryContent.class))
+        .build();
+
+    User user2 = User.builder()
+        .username("test2")
+        .email("test2@test.com")
+        .password("Test123@")
+        .profile(mock(BinaryContent.class))
+        .build();
+
+    User user3 = User.builder()
+        .username("test3")
+        .email("test3@test.com")
+        .password("Test123#")
+        .profile(mock(BinaryContent.class))
+        .build();
+
+    ReflectionTestUtils.setField(user1, "id", userIds.get(0));
+    ReflectionTestUtils.setField(user2, "id", userIds.get(1));
+    ReflectionTestUtils.setField(user3, "id", userIds.get(2));
+
+    List<User> users = List.of(user1, user2, user3);
+
     CreatePrivateChannelCommand createPrivateChannelCommand = new CreatePrivateChannelCommand(
         userIds);
 
-    given(userRepository.findAllByIdIn(userIds)).willReturn(mockUsers);
+    given(userRepository.findAllByIdIn(userIds)).willReturn(users);
 
     // when
     CreatePrivateChannelResult createPrivateChannelResult = basicChannelService.createPrivateChannel(
@@ -165,8 +185,6 @@ public class BasicChannelServiceTest {
         .username("testUser")
         .password("1234")
         .build();
-    UserStatus userStatus = new UserStatus(user, Instant.now());
-    user.updateUserStatus(userStatus);
 
     given(readStatusService.findAllByUserId(userId)).willReturn(
         List.of(readStatusResult1, readStatusResult2));

@@ -10,8 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
   @Query("select distinct u from User u "
-      + "left join fetch u.profile "
-      + "left join fetch u.userStatus")
+      + "left join fetch u.profile ")
   List<User> findAllFetch();
 
   Optional<User> findByUsername(String username);

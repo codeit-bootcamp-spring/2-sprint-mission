@@ -4,6 +4,11 @@ public enum ErrorCode implements Code {
 
   BAD_REQUEST(400, "BAD REQUEST"),
 
+  // Auth
+  AUTHENTICATION_FAILED(401, "Authentication failed"),
+  SESSION_EXPIRED(401, "Session expired"),
+  FORBIDDEN_ACCESS_DENIED(403, "FORBIDDEN ACCESS DENIED"),
+
   // User
   USER_NOT_FOUND(404, "User not found"),
   DUPLICATE_USERNAME(409, "Username exists already"),

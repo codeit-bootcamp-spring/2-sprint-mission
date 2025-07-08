@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.LoginStatusService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicChannelService implements ChannelService {
 
   private final UserRepository userRepository;
+  private final LoginStatusService loginStatusService;
   private final ChannelRepository channelRepository;
   private final ReadStatusService readStatusService;
   private final MessageRepository messageRepository;
@@ -64,7 +66,8 @@ public class BasicChannelService implements ChannelService {
         findMessageLatestTimeInChannel(channel.getId()),
         userRepository.findAllByIdIn(createPrivateChannelCommand.participantIds())
             .stream()
-            .map(userMapper::toFindUserResult)
+            .map((User user) -> userMapper.toFindUserResult(user,
+                loginStatusService.isUserOnline(user.getUsername())))
             .toList());
   }
 
@@ -79,7 +82,8 @@ public class BasicChannelService implements ChannelService {
         .toList();
     List<FindUserResult> findUserResultList = userRepository.findAllByIdIn(userIds)
         .stream()
-        .map(userMapper::toFindUserResult)
+        .map((User user) -> userMapper.toFindUserResult(user,
+            loginStatusService.isUserOnline(user.getUsername())))
         .toList();
     return channelMapper.toFindChannelResult(channel, latestMessageTime, findUserResultList);
   }
@@ -111,7 +115,8 @@ public class BasicChannelService implements ChannelService {
 
           List<User> users = userRepository.findAllByIdIn(participantIds);
           List<FindUserResult> participants = users.stream()
-              .map(userMapper::toFindUserResult)
+              .map((User user) -> userMapper.toFindUserResult(user,
+                  loginStatusService.isUserOnline(user.getUsername())))
               .toList();
 
           return channelMapper.toFindChannelResult(
