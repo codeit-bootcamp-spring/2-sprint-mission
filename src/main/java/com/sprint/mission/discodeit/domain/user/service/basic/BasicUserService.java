@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.domain.user.service.basic;
 
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentCore;
+import com.sprint.mission.discodeit.domain.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
@@ -20,12 +20,10 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {

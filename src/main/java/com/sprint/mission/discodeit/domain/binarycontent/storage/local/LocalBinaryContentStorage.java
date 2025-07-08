@@ -1,6 +1,7 @@
-package com.sprint.mission.discodeit.domain.binarycontent.storage;
+package com.sprint.mission.discodeit.domain.binarycontent.storage.local;
 
 import com.sprint.mission.discodeit.common.util.FileUtils;
+import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;

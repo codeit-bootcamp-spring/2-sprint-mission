@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.domain.binarycontent.storage;
 
-import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.domain.binarycontent.storage.LocalBinaryContentStorage;
+import com.sprint.mission.discodeit.domain.binarycontent.storage.local.LocalBinaryContentStorage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
