@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -16,10 +17,15 @@ public class CustomUserDetails implements UserDetails {
 
   private final UserDto userDto;
   private final String password;
+  private final Collection<? extends GrantedAuthority> authorities;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+    authorities.add(new SimpleGrantedAuthority(userDto.role().name()));
+
+    return authorities;
   }
 
   @Override
