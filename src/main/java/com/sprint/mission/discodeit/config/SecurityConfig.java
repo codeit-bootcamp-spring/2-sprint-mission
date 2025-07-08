@@ -2,11 +2,14 @@ package com.sprint.mission.discodeit.config;
 
 import com.sprint.mission.discodeit.security.LoginAuthenticationFilter;
 import com.sprint.mission.discodeit.security.LoginAuthenticationProvider;
+import com.sprint.mission.discodeit.security.MultipartCsrfValidationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,12 +17,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final CorsConfig corsConfig;
-
     public SecurityConfig(CorsConfig corsConfig) {
         this.corsConfig = corsConfig;
     }
@@ -33,17 +38,27 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf
-                    .ignoringRequestMatchers("/api/auth/logout")
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                    .csrfTokenRepository(csrfTokenRepository())
+                    .ignoringRequestMatchers("/api/auth/logout", "/api/auth/login", "/api/users"))
                 .addFilterBefore(corsConfig.corsFilter(), UsernamePasswordAuthenticationFilter.class) // CORS 필터 추가
+                .addFilterBefore(new MultipartCsrfValidationFilter(csrfTokenRepository()), CsrfFilter.class)
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/swagger/**", "/actuator/**",
-                        "/static/**", "/api/auth/csrf-token",
-                        "/api/users", "/api/auth/login",
-                        "/api/auth/logout"
-                        ).permitAll()
-                    .requestMatchers("/api/channels/**").hasRole("CHANNEL_MANAGER")
+                    .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/assets/**",
+                        "/favicon.ico",
+                        "/api/auth/csrf-token",
+                        "/api/users",
+                        "/swagger-ui/**",
+                        "/actuator/**",
+                        "/favicon.ico",
+                        "/api/auth/login",
+                        "/api/auth/register",
+                        "/error"
+                    ).permitAll()
+                    .requestMatchers("/api/channels/public/**").hasAnyRole("CHANNEL_MANAGER")
                     .requestMatchers("/api/auth/role").hasRole("ADMIN")
                     .requestMatchers("/api/**").hasRole("USER")
                     .anyRequest().denyAll()
@@ -67,5 +82,13 @@ public class SecurityConfig {
     @Bean
     public SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieName("CSRF-TOKEN");
+        repository.setHeaderName("X-CSRF-TOKEN");
+        return repository;
     }
 }

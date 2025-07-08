@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +27,11 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController {
 
   private final AuthService authService;
+
+  @GetMapping("/csrf-token")
+  public CsrfToken csrfToken(HttpServletRequest request) {
+    return (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+  }
 
   @GetMapping("/me")
   public ResponseEntity<UserDto> currentUser(Authentication authentication) {
