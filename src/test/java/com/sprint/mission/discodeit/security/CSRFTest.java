@@ -42,11 +42,12 @@ public class CSRFTest extends IntegrationTestSupport {
     String csrfUrl = "/api/auth/csrf-token";
 
     // when
-    MockMvcTester.MockMvcRequestBuilder uri = mockMvc.get()
-        .uri(csrfUrl);
+    MvcTestResult result = mockMvc.get()
+        .uri(csrfUrl)
+        .exchange();
 
     // then
-    Assertions.assertThat(uri)
+    Assertions.assertThat(result)
         .hasStatusOk();
   }
 
@@ -58,12 +59,12 @@ public class CSRFTest extends IntegrationTestSupport {
     String apiURL = "/api/users";
 
     // when
-    MockMvcTester.MockMvcRequestBuilder heathCheck = mockMvc.get()
-        .uri(apiURL);
+    MvcTestResult result = mockMvc.get()
+        .uri(apiURL)
+        .exchange();
 
     // then
-    Assertions.assertThat(heathCheck)
-        .hasStatusOk();
+    Assertions.assertThat(result).hasStatusOk();
   }
 
   @DisplayName("Post 요청시, CSRF-token이 없으면 예외처리 입니다.")
@@ -73,12 +74,12 @@ public class CSRFTest extends IntegrationTestSupport {
     String postUrl = "/api/users";
 
     // when
-    MockMvcTester.MockMvcRequestBuilder uri = mockMvc.post()
-        .uri(postUrl);
+    MvcTestResult result = mockMvc.post()
+        .uri(postUrl)
+        .exchange();
 
     // then
-    Assertions.assertThat(uri)
-        .hasStatus4xxClientError();
+    Assertions.assertThat(result).hasStatus(403);
   }
 
   @DisplayName("Post 요청시, CSRF-token이 있으면 정상 처리합니다.")

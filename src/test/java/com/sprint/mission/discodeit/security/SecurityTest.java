@@ -19,7 +19,7 @@ public class SecurityTest extends IntegrationTestSupport {
   @Test
   void test_NoneApiFormat() {
     // given
-    String noneAPIURL = "/assets/index-kQJbKSsj.css";
+    String noneAPIURL = "/";
 
     // when
     MvcTestResult result = mockMvc.get()
