@@ -13,6 +13,10 @@ spring:
   sql:
     init:
       mode: never
+  session:
+    store-type: jdbc
+  jdbc:
+    initialize-schema: always
 
 security:
   remember-me:
