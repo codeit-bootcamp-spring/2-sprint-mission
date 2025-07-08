@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.status.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
-    private final UserStatusService userStatusService;
 
     @Operation(summary = "사용자 생성")
     @ApiResponses(value = {
@@ -78,6 +76,7 @@ public class UserController {
             )
         }
     )
+    @PreAuthorize("#userId == principal.user.id or hasRole('ADMIN')")
     @PatchMapping(path = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateUser(
         @PathVariable UUID userId,
@@ -115,6 +114,7 @@ public class UserController {
 
     @Operation(summary = "사용자 삭제")
     @ApiResponse(responseCode = "204", description = "사용자 삭제 성공")
+    @PreAuthorize("#userId == principal.user.id or hasRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
         log.info("사용자 삭제 API 호출 - userId: {}", userId);
@@ -127,26 +127,5 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
-    }
-
-    @Operation(
-        summary = "온라인 상태 변경",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "상태 변경 성공",
-                content = @Content(mediaType = "*/*")
-            )
-        }
-    )
-    @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<Void> updateOnlineStatus(
-        @PathVariable UUID userId,
-        @RequestBody @Valid UpdateUserStatusRequest request
-    ) {
-        log.info("사용자 상태 변경 API 호출 - userId: {}", userId);
-        userStatusService.update(userId, request);
-        log.info("사용자 상태 변경 완료 - userId: {}", userId);
-        return ResponseEntity.ok().build();
     }
 }

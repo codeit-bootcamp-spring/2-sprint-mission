@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.service.TimeFormatter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -30,12 +32,13 @@ public class User extends BaseUpdatableEntity {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.ROLE_USER;
+
     @OneToOne
     @JoinColumn(name = "profile_id", foreignKey = @ForeignKey(name = "fk_profile"))
     private BinaryContent profile;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private UserStatus status;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReadStatus> readStatuses = new ArrayList<>();

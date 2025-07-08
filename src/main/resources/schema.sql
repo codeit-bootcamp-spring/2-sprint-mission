@@ -4,27 +4,29 @@ DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS user_statuses CASCADE;
 DROP TABLE IF EXISTS read_statuses CASCADE;
 DROP TABLE IF EXISTS message_attachments CASCADE;
-DROP TABLE IF EXISTS binary_contents    CASCADE;
+DROP TABLE IF EXISTS binary_contents CASCADE;
+DROP TABLE IF EXISTS persistent_logins CASCADE;
 
 CREATE TABLE binary_contents
 (
     id           UUID PRIMARY KEY,
-    created_at   timestamp with time zone  NOT NULL,
-    file_name    VARCHAR(255) NOT NULL,
-    size         BIGINT       NOT NULL,
-    content_type VARCHAR(100) NOT NULL
+    created_at   timestamp with time zone NOT NULL,
+    file_name    VARCHAR(255)             NOT NULL,
+    size         BIGINT                   NOT NULL,
+    content_type VARCHAR(100)             NOT NULL
 );
 
 -- users
 CREATE TABLE users
 (
     id         UUID PRIMARY KEY,
-    created_at timestamp with time zone  NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone,
-    username   VARCHAR(50)  NOT NULL UNIQUE,
-    email      VARCHAR(100) NOT NULL UNIQUE,
-    password   VARCHAR(60)  NOT NULL,
+    username   VARCHAR(50)              NOT NULL UNIQUE,
+    email      VARCHAR(100)             NOT NULL UNIQUE,
+    password   VARCHAR(60)              NOT NULL,
     profile_id UUID,
+    role       VARCHAR(50)              NOT NULL DEFAULT 'ROLE_USER',
     CONSTRAINT fk_profile FOREIGN KEY (profile_id) REFERENCES binary_contents (id) ON DELETE SET NULL
 );
 
@@ -32,21 +34,21 @@ CREATE TABLE users
 CREATE TABLE channels
 (
     id          UUID PRIMARY KEY,
-    created_at timestamp with time zone  NOT NULL,
-    updated_at timestamp with time zone,
+    created_at  timestamp with time zone NOT NULL,
+    updated_at  timestamp with time zone,
     name        VARCHAR(100),
     description VARCHAR(500),
-    type        VARCHAR(10) NOT NULL
+    type        VARCHAR(10)              NOT NULL
 );
 
 -- messages
 CREATE TABLE messages
 (
     id         UUID PRIMARY KEY,
-    created_at timestamp with time zone  NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone,
     content    TEXT,
-    channel_id UUID        NOT NULL,
+    channel_id UUID                     NOT NULL,
     author_id  UUID,
     CONSTRAINT fk_channel FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE SET NULL
@@ -56,9 +58,9 @@ CREATE TABLE messages
 CREATE TABLE user_statuses
 (
     id             UUID PRIMARY KEY,
-    created_at timestamp with time zone  NOT NULL,
-    updated_at timestamp with time zone,
-    user_id        UUID        NOT NULL UNIQUE,
+    created_at     timestamp with time zone NOT NULL,
+    updated_at     timestamp with time zone,
+    user_id        UUID                     NOT NULL UNIQUE,
     last_active_at timestamp with time zone NOT NULL,
     CONSTRAINT fk_user_status_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
@@ -67,10 +69,10 @@ CREATE TABLE user_statuses
 CREATE TABLE read_statuses
 (
     id           UUID PRIMARY KEY,
-    created_at timestamp with time zone  NOT NULL,
-    updated_at timestamp with time zone,
-    user_id      UUID        NOT NULL,
-    channel_id   UUID        NOT NULL,
+    created_at   timestamp with time zone NOT NULL,
+    updated_at   timestamp with time zone,
+    user_id      UUID                     NOT NULL,
+    channel_id   UUID                     NOT NULL,
     last_read_at timestamp with time zone NOT NULL,
     CONSTRAINT fk_read_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_read_channel FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
@@ -85,4 +87,13 @@ CREATE TABLE message_attachments
     PRIMARY KEY (message_id, attachment_id),
     CONSTRAINT fk_attach_message FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
     CONSTRAINT fk_attach_file FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+);
+
+-- Remember Me 관련 테이블
+CREATE TABLE persistent_logins
+(
+    username  varchar(64) NOT NULL,
+    series    varchar(64) PRIMARY KEY,
+    token     varchar(64) NOT NULL,
+    last_used timestamp   NOT NULL
 );

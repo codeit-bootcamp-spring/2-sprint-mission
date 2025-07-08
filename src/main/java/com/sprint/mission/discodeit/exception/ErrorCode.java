@@ -32,7 +32,10 @@ public enum ErrorCode {
 
     // ReadStatus
     READ_STATUS_NOT_FOUND("READ_STATUS_NOT_FOUND", "해당 ID의 읽음 상태를 찾을 수 없습니다."),
-    DUPLICATE_READ_STATUS("DUPLICATE_READ_STATUS", "이미 읽음 상태가 존재합니다.");
+    DUPLICATE_READ_STATUS("DUPLICATE_READ_STATUS", "이미 읽음 상태가 존재합니다."),
+
+    // Login
+    LOGIN_FAILED("LOGIN_FAILED", "아이디 또는 비밀번호가 올바르지 않습니다.");
 
     private final String code;
     private final String message;

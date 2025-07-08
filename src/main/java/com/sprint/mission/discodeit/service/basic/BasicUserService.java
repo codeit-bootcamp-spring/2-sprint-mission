@@ -6,15 +6,14 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.DuplicateUserException;
 import com.sprint.mission.discodeit.exception.user.ProfileUploadFailedException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityManager;
@@ -22,6 +21,7 @@ import jakarta.persistence.PersistenceContext;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,10 +35,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentService binaryContentService;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -66,15 +66,15 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new ProfileUploadFailedException(Map.of("파일이름", p.fileName())));
         }).orElse(null);
 
+        String encodedPassword = passwordEncoder.encode(request.password());
+
         User user = new User(
             request.username(),
-            request.password(),
+            encodedPassword,
             request.email(),
             profile
         );
         userRepository.save(user);
-        userStatusRepository.save(new UserStatus(user));
-        userStatusRepository.flush();
 
         log.info("사용자 생성 완료 - userId: {}", user.getId());
         return userMapper.toDto(user);
@@ -164,5 +164,16 @@ public class BasicUserService implements UserService {
         userRepository.delete(user);
         log.info("사용자 삭제 완료 - userId: {}", userId);
 
+    }
+
+    @Override
+    public UserDto updateUserRole(UUID userId, Role newRole) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
+
+        user.setRole(newRole);
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toDto(updatedUser);
     }
 }

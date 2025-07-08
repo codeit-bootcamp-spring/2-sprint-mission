@@ -3,6 +3,8 @@ spring:
     name: discodeit
   profiles:
     active: dev
+  config:
+    import: optional:file:.env[.properties]
   boot:
     admin:
       client:
@@ -26,3 +28,13 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
+admin:
+  email: admin@email.com
+  username: admin
+  password: admin1234
+
+security:
+  remember-me:
+    key: RememberMeKey
+    token-validity-seconds: 1814400 # 3주

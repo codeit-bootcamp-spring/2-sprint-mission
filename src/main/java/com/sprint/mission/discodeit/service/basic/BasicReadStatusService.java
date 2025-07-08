@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,6 +21,8 @@ import java.time.Instant;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,6 +45,15 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID userId = request.userId();
         UUID channelId = request.channelId();
         Instant lastReadAt = request.lastReadAt();
+
+        // 인가 처리 추가 -> 본인만 가능
+        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
+
+        if (!currentUser.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("읽음 상태는 본인만 생성할 수 있습니다.");
+        }
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(Map.of("userId", userId)));
@@ -83,6 +95,15 @@ public class BasicReadStatusService implements ReadStatusService {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
             .orElseThrow(
                 () -> new ReadStatusNotFoundException(Map.of("readStatusId", readStatusId)));
+
+        // 인가 처리 추가 -> 본인만 가능
+        CustomUserDetails currentUser = (CustomUserDetails) SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getPrincipal();
+
+        if (!currentUser.getUser().getId().equals(readStatus.getUser().getId())) {
+            throw new AccessDeniedException("읽음 상태는 본인만 수정할 수 있습니다.");
+        }
 
         readStatus.update(request.newLastReadAt());
 //        readStatusRepository.save(readStatus);
