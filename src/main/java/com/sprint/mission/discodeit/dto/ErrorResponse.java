@@ -30,4 +30,19 @@ public record ErrorResponse(
             status.value()
         );
     }
+
+    public static ErrorResponse of(
+        Exception ex,
+        ErrorCode errorCode,
+        HttpStatus status
+    ) {
+        return new ErrorResponse(
+            Instant.now(),
+            errorCode.name(),
+            errorCode.getMessage(),
+            Map.of(),
+            ex.getClass().getName(),
+            status.value()
+        );
+    }
 }

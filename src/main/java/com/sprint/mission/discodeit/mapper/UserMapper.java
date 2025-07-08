@@ -7,14 +7,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
-public abstract class UserMapper {
+public interface UserMapper {
 
-    public abstract List<UserDto> toDto(List<User> users);
+    List<UserDto> toDto(List<User> users);
+
 
     @Mapping(target = "profile", source = "profile")
-    @Mapping(
-        target = "online",
-        expression = "java(user.getUserStatus() != null && user.getUserStatus().isOnline())"
-    )
-    public abstract UserDto toDto(User user);
+    @Mapping(target = "online", constant = "false")
+    UserDto toDto(User user);
+
+
+    @Mapping(target = "online", source = "online")
+    UserDto toDto(User user, Boolean online);
 }

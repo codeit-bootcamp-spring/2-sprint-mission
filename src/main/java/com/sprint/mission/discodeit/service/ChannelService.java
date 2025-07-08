@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface ChannelService {
 
@@ -17,8 +16,10 @@ public interface ChannelService {
     ChannelDto find(UUID channelId);
 
     ChannelDto update(UUID channelId, PublicChannelUpdateRequest request);
-    
+
     void delete(UUID channelId);
 
     List<ChannelDto> findAllByUserId(UUID userId);
+
+    List<ChannelDto> findAllPublic();
 }
