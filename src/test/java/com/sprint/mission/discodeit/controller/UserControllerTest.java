@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapperImpl;
 import com.sprint.mission.discodeit.mapper.UserMapperImpl;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import java.time.Instant;
@@ -41,6 +42,10 @@ public class UserControllerTest {
 
   @MockitoBean
   private UserService userService;
+
+  @MockitoBean
+  private JwtAuthenticationFilter jwtAuthenticationFilter;
+
 
   @Autowired
   private UserMapper userMapper;

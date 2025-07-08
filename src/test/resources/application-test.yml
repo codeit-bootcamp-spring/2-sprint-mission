@@ -22,6 +22,10 @@ sprint:
     email: admin@admin.com
     password: 1234
 
+app:
+  jwt:
+    secret: "testtestTest359031851390583190483129048301294890314890"
+
 security:
   remember-me:
     key: 1353153463463135

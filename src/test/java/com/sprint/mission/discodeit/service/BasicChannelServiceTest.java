@@ -23,6 +23,7 @@ import com.sprint.mission.discodeit.mapper.UserMapperImpl;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import java.time.Instant;
 import org.junit.jupiter.api.DisplayName;
@@ -48,9 +49,6 @@ public class BasicChannelServiceTest {
   UserRepository userRepository;
 
   @Mock
-  LoginStatusService loginStatusService;
-
-  @Mock
   ChannelRepository channelRepository;
 
   @Mock
@@ -58,6 +56,9 @@ public class BasicChannelServiceTest {
 
   @Mock
   ReadStatusService readStatusService;
+
+  @Mock
+  JwtSessionRepository jwtSessionRepository;
 
   @Spy
   ChannelMapper channelMapper = new ChannelMapperImpl();
@@ -130,6 +131,7 @@ public class BasicChannelServiceTest {
         userIds);
 
     given(userRepository.findAllByIdIn(userIds)).willReturn(users);
+    given(jwtSessionRepository.existsByUserId(any(UUID.class))).willReturn(true);
 
     // when
     CreatePrivateChannelResult createPrivateChannelResult = basicChannelService.createPrivateChannel(

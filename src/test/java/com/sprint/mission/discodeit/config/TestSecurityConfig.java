@@ -37,12 +37,6 @@ public class TestSecurityConfig {
   }
 
   @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
-  }
-
-
-  @Bean
   public DaoAuthenticationProvider daoAuthenticationProvider(
       UserDetailsService userDetailsService,
       PasswordEncoder passwordEncoder,
@@ -53,12 +47,6 @@ public class TestSecurityConfig {
     provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
 
     return provider;
-  }
-
-  @Bean
-  public SessionAuthenticationStrategy sessionAuthenticationStrategy(
-      SessionRegistry sessionRegistry) {
-    return new RegisterSessionAuthenticationStrategy(sessionRegistry);
   }
 
   @Bean
@@ -74,22 +62,5 @@ public class TestSecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      UserDetailsService userDetailsService,
-      DataSource dataSource
-  ) {
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-
-    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-        key, userDetailsService, tokenRepository);
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
   }
 }
