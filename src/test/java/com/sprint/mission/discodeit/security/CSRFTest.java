@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
@@ -23,19 +24,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-@AutoConfigureMockMvc
-public class CSRFTest extends IntegrationTestSupport {
+public class CSRFTest extends ControllerTestSupport {
 
-  @MockitoBean
-  private UserService userService;
-
-  @Autowired
-  private MockMvcTester mockMvc;
-
-  @Autowired
-  private ObjectMapper objectMapper;
-
-  @DisplayName("csrf 요청을 인증 하지 않습니다.")
+  @DisplayName("csrf 토큰을 요청하는 URL은 인증 하지 않습니다.")
   @Test
   void test_csrf() {
     // given

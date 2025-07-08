@@ -14,9 +14,11 @@ public class MessageResultMapper {
   private final UserResultMapper userResultMapper;
 
   public MessageResult convertToMessageResult(Message message) {
-    return MessageResult.fromEntity(message,
+    return MessageResult.fromEntity(
+        message,
         userResultMapper.convertToUserResult(message.getUser()),
-        BinaryContentResult.fromEntity(message.getAttachments()));
+        BinaryContentResult.fromEntity(message.getAttachments())
+    );
   }
 
 }

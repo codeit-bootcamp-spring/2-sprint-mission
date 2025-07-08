@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.domain.message.service;
 
+import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.testutil.AuthSupport;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
@@ -38,12 +39,16 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MessageServiceTest extends IntegrationTestSupport {
 
   private static final String MESSAGE_CONTENT = "안녕하세요";
+
+  @MockitoBean
+  private BinaryContentStorage binaryContentStorage;
 
   @Autowired
   private ChannelRepository channelRepository;

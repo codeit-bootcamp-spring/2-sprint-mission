@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.auth.dto.LogInRequest;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import jakarta.servlet.http.HttpSession;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
@@ -25,11 +26,11 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 public class AuthenticationTest extends IntegrationTestSupport {
 
   @Autowired
-  private UserRepository userRepository;
-  @Autowired
-  private MockMvcTester mockMvcTester;
+  private MockMvcTester mockMvc;
   @Autowired
   private ObjectMapper objectMapper;
+  @Autowired
+  private UserRepository userRepository;
   @Autowired
   private PasswordEncoder passwordEncoder;
 
@@ -51,7 +52,7 @@ public class AuthenticationTest extends IntegrationTestSupport {
     LogInRequest logInRequest = new LogInRequest(name, password);
 
     // when
-    MvcTestResult result = mockMvcTester.post()
+    MvcTestResult result = mockMvc.post()
         .uri(logInUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(logInRequest))
@@ -81,7 +82,7 @@ public class AuthenticationTest extends IntegrationTestSupport {
     String logInUrl = "/api/auth/login";
     LogInRequest logInRequest = new LogInRequest(name, password);
 
-    MvcTestResult loginResult = mockMvcTester.post()
+    MvcTestResult loginResult = mockMvc.post()
         .uri(logInUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(logInRequest))
@@ -91,7 +92,7 @@ public class AuthenticationTest extends IntegrationTestSupport {
     MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
 
     // when
-    mockMvcTester.post()
+    mockMvc.post()
         .uri("/api/auth/logout")
         .session(session)
         .exchange();

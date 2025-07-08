@@ -1,42 +1,25 @@
 package com.sprint.mission.discodeit.domain.binarycontent.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.domain.binarycontent.controller.BinaryContentController;
+import static org.mockito.ArgumentMatchers.any;
+
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentService;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
-import java.util.UUID;
+class BinaryContentControllerTest extends ControllerTestSupport {
 
-import static org.mockito.ArgumentMatchers.any;
 
-@WebMvcTest(controllers = BinaryContentController.class)
-class BinaryContentControllerTest {
 
-  @Autowired
-  private ObjectMapper objectMapper;
-  @Autowired
-  private MockMvcTester mockMvc;
-  @MockitoBean
-  private BinaryContentService binaryContentService;
-  @MockitoBean
-  private BinaryContentStorage binaryContentStorage;
-  @MockitoBean
-  private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
-  @WithMockUser
   @DisplayName("이미지를 업로드시 바이너리 컨텐츠를 반환한다.")
   @Test
   void createProfileImage() {

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.s3;
+package com.sprint.mission.discodeit.common.s3;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
@@ -27,7 +27,7 @@ import java.util.Properties;
 import java.util.UUID;
 
 @Disabled
-public class S3Test {
+public class S3ManagerTest {
 
   private String bucket;
   private S3Client s3Client;

@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.domain.user.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.domain.user.controller.UserController;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.service.UserService;
+import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,34 +17,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
-import java.util.UUID;
-import java.util.stream.Stream;
+class UserControllerTest extends ControllerTestSupport {
 
-import static org.mockito.ArgumentMatchers.any;
-
-@WebMvcTest(controllers = UserController.class)
-class UserControllerTest {
-
-  @Autowired
-  private ObjectMapper objectMapper;
-  @Autowired
-  private MockMvcTester mockMvc;
-  @MockitoBean
-  private UserService userService;
-  @MockitoBean
-  private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
-  @WithMockUser
   @DisplayName("이름, 이메일, 패스워드를 입력받아, 유저를 생성합니다.")
   @Test
   void register() {
@@ -115,7 +98,6 @@ class UserControllerTest {
     }
   }
 
-  @WithMockUser
   @DisplayName("유저 ID를 받아, 해당 유저를 반환합니다.")
   @Test
   void getById() {

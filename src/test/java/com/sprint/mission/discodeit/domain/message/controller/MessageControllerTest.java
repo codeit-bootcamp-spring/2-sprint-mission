@@ -1,48 +1,30 @@
 package com.sprint.mission.discodeit.domain.message.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.domain.message.controller.MessageController;
 import com.sprint.mission.discodeit.domain.message.dto.MessageResult;
 import com.sprint.mission.discodeit.domain.message.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.domain.message.entity.Message;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
+import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
+import java.util.List;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
-import java.util.List;
-import java.util.UUID;
+class MessageControllerTest extends ControllerTestSupport {
 
-import static org.mockito.ArgumentMatchers.any;
-
-@WebMvcTest(controllers = MessageController.class)
-class MessageControllerTest {
-
-  @Autowired
-  private MockMvcTester mockMvc;
-  @MockitoBean
-  private MessageService messageService;
-
-  @Autowired
-  private ObjectMapper objectMapper;
-  @MockitoBean
-  private JpaMetamodelMappingContext jpaMetamodelMappingContext;
-
-  @WithMockUser
   @DisplayName("메세지 채널아이디, 입력한 유저아이디, 내용, 첨부파일들을 입력하면, 메세지를 생성합니다.")
   @Test
   void create() {

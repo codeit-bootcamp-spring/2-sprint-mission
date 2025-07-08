@@ -83,7 +83,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         if (directoryPath == null) {
             return;
         }
-        FileUtils.creatDirectory(directoryPath);
+        FileUtils.createDirectory(directoryPath);
     }
 
 }

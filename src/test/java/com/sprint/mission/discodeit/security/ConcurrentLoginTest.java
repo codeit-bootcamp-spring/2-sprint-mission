@@ -28,7 +28,7 @@ public class ConcurrentLoginTest extends IntegrationTestSupport {
   @Autowired
   private UserRepository userRepository;
   @Autowired
-  private MockMvcTester mockMvcTester;
+  private MockMvcTester mockMvc;
   @Autowired
   private ObjectMapper objectMapper;
   @Autowired
@@ -53,7 +53,7 @@ public class ConcurrentLoginTest extends IntegrationTestSupport {
     String logInUrl = "/api/auth/login";
     LogInRequest logInRequest = new LogInRequest(name, password);
 
-    MvcTestResult firstLoginResult = mockMvcTester.post()
+    MvcTestResult firstLoginResult = mockMvc.post()
         .uri(logInUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(logInRequest))
@@ -63,7 +63,7 @@ public class ConcurrentLoginTest extends IntegrationTestSupport {
         .getSession(false);
 
     // when
-    MvcTestResult secondLoginResult = mockMvcTester.post()
+    MvcTestResult secondLoginResult = mockMvc.post()
         .uri(logInUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(logInRequest))
@@ -92,7 +92,7 @@ public class ConcurrentLoginTest extends IntegrationTestSupport {
     LogInRequest logInRequest = new LogInRequest(name, password);
     String logInUrl = "/api/auth/login";
 
-    MvcTestResult firstLoginResult = mockMvcTester.post()
+    MvcTestResult firstLoginResult = mockMvc.post()
         .uri(logInUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(logInRequest))
@@ -102,7 +102,7 @@ public class ConcurrentLoginTest extends IntegrationTestSupport {
     String firstSessionId = firstLoginResult.getRequest().getSession(false).getId();
 
     // when
-    mockMvcTester.post()
+    mockMvc.post()
         .uri(logInUrl)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(logInRequest))

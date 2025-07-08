@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,46 +16,52 @@ import java.util.UUID;
 
 class BasicBinaryContentServiceTest extends IntegrationTestSupport {
 
-    @Autowired
-    private BinaryContentRepository binaryContentRepository;
-    @Autowired
-    private BinaryContentService binaryContentService;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
+  @Autowired
+  private BinaryContentService binaryContentService;
 
-    @DisplayName("ID로 조회하면, 해당 객체를 반환한다.")
-    @Test
-    void getById() {
-        // given
-        BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+  @AfterEach
+  void tearDown() {
+    binaryContentRepository.deleteAllInBatch();
+  }
 
-        // when
-        BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContent.getId());
+  @DisplayName("ID로 조회하면, 해당 객체를 반환한다.")
+  @Test
+  void getById() {
+    // given
+    BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
 
-        // then
-        Assertions.assertThat(binaryContentResult.id()).isEqualTo(binaryContent.getId());
-    }
+    // when
+    BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContent.getId());
 
-    @DisplayName("ID로 조회하면, 해당 객체를 반환한다.")
-    @Test
-    void getById_NoException() {
-        // when & then
-        Assertions.assertThatThrownBy(() -> binaryContentService.getById(UUID.randomUUID()))
-                .isInstanceOf(BinaryContentNotFoundException.class);
-    }
+    // then
+    Assertions.assertThat(binaryContentResult.id()).isEqualTo(binaryContent.getId());
+  }
 
-    @DisplayName("여러개의 ID로 조회하면, 해당 객체를 반환한다.")
-    @Test
-    void getByIdIn() {
-        // given
-        BinaryContent firstBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
-        BinaryContent secondBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+  @DisplayName("ID로 조회하면, 해당 객체를 반환한다.")
+  @Test
+  void getById_NoException() {
+    // when & then
+    Assertions.assertThatThrownBy(() -> binaryContentService.getById(UUID.randomUUID()))
+        .isInstanceOf(BinaryContentNotFoundException.class);
+  }
 
-        // when
-        List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(List.of(firstBinaryContent.getId(), secondBinaryContent.getId()));
+  @DisplayName("여러개의 ID로 조회하면, 해당 객체를 반환한다.")
+  @Test
+  void getByIdIn() {
+    // given
+    BinaryContent firstBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+    BinaryContent secondBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
 
-        // then
-        Assertions.assertThat(binaryContentResults)
-                .extracting(BinaryContentResult::id)
-                .containsExactlyInAnyOrder(firstBinaryContent.getId(), secondBinaryContent.getId());
-    }
+    // when
+    List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(
+        List.of(firstBinaryContent.getId(), secondBinaryContent.getId()));
+
+    // then
+    Assertions.assertThat(binaryContentResults)
+        .extracting(BinaryContentResult::id)
+        .containsExactlyInAnyOrder(firstBinaryContent.getId(), secondBinaryContent.getId());
+  }
 
 }
