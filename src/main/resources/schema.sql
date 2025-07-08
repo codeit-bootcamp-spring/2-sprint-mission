@@ -8,7 +8,8 @@ CREATE TABLE users
     username   varchar(50) UNIQUE       NOT NULL,
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
-    profile_id uuid
+    profile_id uuid,
+    role        varchar(20)             NOT NULL
 );
 
 -- BinaryContent
@@ -74,6 +75,15 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
+-- RememberMe
+CREATE TABLE persistent_logins (
+                                   username    VARCHAR(64) NOT NULL,
+                                   series      VARCHAR(64) PRIMARY KEY,
+                                   token       VARCHAR(64) NOT NULL,
+                                   last_used   TIMESTAMP   NOT NULL
+);
+
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
@@ -124,3 +134,4 @@ ALTER TABLE read_statuses
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
             ON DELETE CASCADE;
+
