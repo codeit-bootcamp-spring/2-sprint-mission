@@ -1,45 +1,52 @@
 version: '3.8'
 
 services:
-  file-management-app:
+  app:
+    image: discodeit:local
     build:
       context: .
       dockerfile: Dockerfile
-    image: discodeit:local
     container_name: discodeit
     ports:
-      - "8287:8287"
+      - "8081:80"
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
-      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
-      - AWS_REGION=${AWS_REGION}
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/discodeit
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - STORAGE_TYPE=s3
+      - STORAGE_LOCAL_ROOT_PATH=.discodeit/storage
+      - AWS_S3_ACCESS_KEY=${AWS_S3_ACCESS_KEY}
+      - AWS_S3_SECRET_KEY=${AWS_S3_SECRET_KEY}
+      - AWS_S3_REGION=${AWS_S3_REGION}
       - AWS_S3_BUCKET=${AWS_S3_BUCKET}
-      - AWS_S3_BASE_URL=${AWS_S3_BASE_URL}
+      - AWS_S3_PRESIGNED_URL_EXPIRATION=600
     depends_on:
       - db
     volumes:
-      - binary-content:/app/storage
-    restart: always
+      - binary-content-storage:/app/.discodeit/storage
+    networks:
+      - discodeit-network
 
   db:
-    image: postgres:17
-    container_name: postgres
+    image: postgres:16-alpine
+    container_name: discodeit-db
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      - POSTGRES_DB=discodeit
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
-    restart: always
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - discodeit-network
 
 volumes:
-  binary-content:
   postgres-data:
+  binary-content-storage:
+
+networks:
+  discodeit-network:
+    driver: bridge 
