@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusMapper readStatusMapper;
 
+    @PreAuthorize("hasPermission(#request.userId(),'ReadStatus','create')")
     @Transactional
     @Override
     public ReadStatusDto create(ReadStatusCreateRequest request) {
@@ -68,6 +70,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .toList();
     }
 
+    @PreAuthorize("hasPermission(#readStatusId,'ReadStatus','update')")
     @Transactional
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest dto) {
