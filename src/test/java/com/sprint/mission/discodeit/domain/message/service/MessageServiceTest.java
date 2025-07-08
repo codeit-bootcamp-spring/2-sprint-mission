@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.message.service;
+package com.sprint.mission.discodeit.domain.message.service;
 
-import com.sprint.mission.discodeit.IntegrationTestSupport;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
+import com.sprint.mission.discodeit.testutil.AuthSupport;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
@@ -35,11 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@WithMockUser(roles = "ADMIN")
 public class MessageServiceTest extends IntegrationTestSupport {
 
   private static final String MESSAGE_CONTENT = "안녕하세요";
@@ -60,6 +61,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
     messageRepository.deleteAllInBatch();
     userRepository.deleteAllInBatch();
     channelRepository.deleteAllInBatch();
+    SecurityContextHolder.clearContext();
   }
 
   @DisplayName("유저가 채널에 메세지 내용을 입력하면, 채널에 메세지 내용을 보여줍니다.")
@@ -270,6 +272,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
     User savedUser = userRepository.save(new User("", "", "", null));
     Message savedMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
+    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     MessageResult updatedMessage = messageService.updateContext(savedMessage.getId(), "updated");
@@ -303,6 +306,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
         .stream()
         .map(BinaryContentResult::id)
         .toList();
+    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     messageService.delete(savedMessage.id());

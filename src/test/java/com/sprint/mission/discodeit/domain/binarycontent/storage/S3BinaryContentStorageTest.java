@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.binarycontent.storage;
+package com.sprint.mission.discodeit.domain.binarycontent.storage;
 
-import com.sprint.mission.discodeit.IntegrationTestSupport;
-import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Disabled;

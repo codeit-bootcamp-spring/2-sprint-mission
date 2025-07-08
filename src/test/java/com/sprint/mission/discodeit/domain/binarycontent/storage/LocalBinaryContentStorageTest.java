@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.binarycontent.storage;
+package com.sprint.mission.discodeit.domain.binarycontent.storage;
 
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.LocalBinaryContentStorage;

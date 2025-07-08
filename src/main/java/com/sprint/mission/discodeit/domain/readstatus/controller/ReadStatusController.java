@@ -7,13 +7,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/readStatuses")
 @RequiredArgsConstructor
@@ -23,9 +24,7 @@ public class ReadStatusController {
 
     @PostMapping
     public ResponseEntity<ReadStatusResult> create(@Valid @RequestBody ReadStatusCreateRequest request) {
-        log.info("읽음 상태 생성 요청 수신: channelId={}, userId={}", request.channelId(), request.userId());
         ReadStatusResult readStatusResult = readStatusService.create(request);
-        log.info("읽음 상태 생성 완료: channelId={}, userId={}, result={}", request.channelId(), request.userId(), readStatusResult);
 
         return ResponseEntity.ok(readStatusResult);
     }

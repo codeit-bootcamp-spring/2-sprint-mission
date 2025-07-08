@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.testutil;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest

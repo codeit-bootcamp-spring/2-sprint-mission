@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.binarycontent.controller;
+package com.sprint.mission.discodeit.domain.binarycontent.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.binarycontent.controller.BinaryContentController;

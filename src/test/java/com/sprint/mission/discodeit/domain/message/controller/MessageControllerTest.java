@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.message.controller;
+package com.sprint.mission.discodeit.domain.message.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

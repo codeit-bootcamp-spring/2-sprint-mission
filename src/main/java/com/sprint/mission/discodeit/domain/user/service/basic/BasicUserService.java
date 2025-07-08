@@ -6,17 +6,20 @@ import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentCo
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.mapper.UserResultMapper;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.user.service.UserService;
+import com.sprint.mission.discodeit.security.util.SecurityUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -86,18 +89,20 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(user);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or authentication.principal.userResult.id == #userId")
   @Transactional
   @Override
-  public UserResult update(UUID userId, UserUpdateRequest userUpdateRequest,
-      BinaryContentRequest binaryContentRequest) {
+  public UserResult update(
+      UUID userId,
+      UserUpdateRequest userUpdateRequest,
+      BinaryContentRequest binaryContentRequest
+  ) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
+    validateIsCurrentUser(user, Role.ADMIN.name());
 
     if (user.getBinaryContent() != null) {
       binaryContentService.delete(user.getBinaryContent().getId());
     }
-
     BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
         userUpdateRequest.newPassword(), binaryContent);
@@ -106,13 +111,13 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(updatedUser);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or authentication.principal.userResult.id == #userId")
   @Transactional
   @Override
   public void delete(UUID userId) {
-    if (!userRepository.existsById(userId)) {
-      throw new UserNotFoundException(Map.of());
-    }
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new UserNotFoundException(Map.of()));
+    validateIsCurrentUser(user, Role.ADMIN.name());
+
     userRepository.deleteById(userId);
   }
 
@@ -126,6 +131,14 @@ public class BasicUserService implements UserService {
     if (userRepository.existsUserByEmail(email)) {
       throw new UserAlreadyExistsException(Map.of("email", email));
     }
+  }
+
+  private void validateIsCurrentUser(User user, String role) {
+    UUID currentUserId = SecurityUtil.getCurrentUserId();
+    if (user.getId().equals(currentUserId) || SecurityUtil.hasRole(role)) {
+      return;
+    }
+    throw new AccessDeniedException("권한 없음");
   }
 
 }

@@ -1,14 +1,15 @@
-package com.sprint.mission.discodeit.user.service;
+package com.sprint.mission.discodeit.domain.user.service;
 
-import com.sprint.mission.discodeit.IntegrationTestSupport;
+import com.sprint.mission.discodeit.testutil.AuthSupport;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.domain.user.service.UserService;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
@@ -16,10 +17,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContext;
 
-
-@WithMockUser(roles = "ADMIN")
 class BasicUserServiceTest extends IntegrationTestSupport {
 
   private static final String USER_NAME = "hwang";
@@ -35,6 +36,7 @@ class BasicUserServiceTest extends IntegrationTestSupport {
   @AfterEach
   void tearDown() {
     userRepository.deleteAllInBatch();
+    SecurityContextHolder.clearContext();
   }
 
   @DisplayName("유저 등록을 요청하면, 유저와 유저의 상태를 저장한다")
@@ -166,13 +168,12 @@ class BasicUserServiceTest extends IntegrationTestSupport {
   void updateUser() {
     // given
     User user = userRepository.save(new User(USER_NAME, USER_EMAIL, USER_PASSWORD, null));
-    UUID id = user.getId();
-
     UserUpdateRequest request = new UserUpdateRequest(
         "newName", "newEmail@example.com", "newPassword");
+    AuthSupport.setTestAuthentication(user, Role.USER);
 
     // when
-    UserResult updatedUser = userService.update(id, request, null);
+    UserResult updatedUser = userService.update(user.getId(), request, null);
 
     // then
     Assertions.assertThat(updatedUser.username()).isEqualTo("newName");
@@ -196,6 +197,7 @@ class BasicUserServiceTest extends IntegrationTestSupport {
   void deleteUser() {
     // given
     User user = userRepository.save(new User(USER_NAME, USER_EMAIL, USER_PASSWORD, null));
+    AuthSupport.setTestAuthentication(user, Role.USER);
 
     // when
     userService.delete(user.getId());

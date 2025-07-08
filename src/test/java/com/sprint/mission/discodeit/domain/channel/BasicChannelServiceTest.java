@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.channel.service;
+package com.sprint.mission.discodeit.domain.channel;
 
-import com.sprint.mission.discodeit.IntegrationTestSupport;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelUpdateRequest;
@@ -26,10 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-
+@WithMockUser(roles = "ADMIN")
 class BasicChannelServiceTest extends IntegrationTestSupport {
 
     @Autowired

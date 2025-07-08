@@ -5,15 +5,26 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.Query;
 
 public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
-    List<ReadStatus> findByChannelId(UUID channelId);
+  @Query("""
+      SELECT rs From ReadStatus rs  
+      JOIN FETCH rs.channel c 
+      where rs.channel.id = :channelId
+      """)
+  List<ReadStatus> findByChannelId(UUID channelId);
 
-    List<ReadStatus> findByUserId(UUID userId);
+  @Query("""
+      SELECT rs From ReadStatus rs 
+      JOIN FETCH rs.user u 
+      where rs.user.id = :userId
+      """)
+  List<ReadStatus> findByUserId(UUID userId);
 
-    boolean existsByChannelIdAndUserId(UUID channelId, UUID userId);
+  boolean existsByChannelIdAndUserId(UUID channelId, UUID userId);
 
-    void deleteAllByChannel_Id(UUID channelId);
+  void deleteAllByChannel_Id(UUID channelId);
 
 }

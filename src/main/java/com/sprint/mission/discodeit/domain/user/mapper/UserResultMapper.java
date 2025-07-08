@@ -2,7 +2,11 @@ package com.sprint.mission.discodeit.domain.user.mapper;
 
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,15 +21,13 @@ public class UserResultMapper {
   private final SessionRegistry sessionRegistry;
 
   public UserResult convertToUserResult(User user) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    List<SessionInformation> allSessions = sessionRegistry.getAllSessions(auth.getPrincipal(),
-        false);
+    Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
+        .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
+        .filter(principal -> principal instanceof CustomUserDetails)
+        .map(principal -> ((CustomUserDetails) principal).getUserResult().id())
+        .collect(Collectors.toSet());
 
-    if (allSessions.isEmpty()) {
-      return UserResult.fromEntity(user, false);
-    }
-
-    return UserResult.fromEntity(user, true);
+    return UserResult.fromEntity(user, onlineUserIds.contains(user.getId()));
   }
 
 }

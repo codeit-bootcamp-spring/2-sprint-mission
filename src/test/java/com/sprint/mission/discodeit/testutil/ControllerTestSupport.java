@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.testutil;
 
 import com.sprint.mission.discodeit.domain.user.controller.UserController;
 import org.springframework.beans.factory.annotation.Autowired;

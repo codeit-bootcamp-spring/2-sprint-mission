@@ -15,9 +15,11 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.security.util.SecurityUtil;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,11 +52,9 @@ public class BasicMessageService implements MessageService {
       List<BinaryContentRequest> files
   ) {
     Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-        .orElseThrow(() -> new ChannelNotFoundException(
-            Map.of("channelId", messageCreateRequest.channelId())));
+        .orElseThrow(() -> new ChannelNotFoundException(Map.of()));
     User user = userRepository.findById(messageCreateRequest.authorId())
-        .orElseThrow(
-            () -> new UserNotFoundException(Map.of("userId", messageCreateRequest.authorId())));
+        .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
     List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
@@ -66,7 +67,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageResult getById(UUID id) {
     Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", id)));
+        .orElseThrow(() -> new MessageNotFoundException(Map.of()));
 
     return messageResultMapper.convertToMessageResult(message);
   }
@@ -87,12 +88,12 @@ public class BasicMessageService implements MessageService {
         getNextCursor(messages));
   }
 
-  @PreAuthorize("hasRole('ADMIN') or @messageRepository.findById(#id).orElseThrow().getAuthor().getId() == authentication.principal.userResult.id")
   @Transactional
   @Override
   public MessageResult updateContext(UUID id, String context) {
     Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new MessageNotFoundException(Map.of("messageId", id)));
+        .orElseThrow(() -> new MessageNotFoundException(Map.of()));
+    validateIsCurrentUser(message, null);
 
     message.updateContext(context);
     Message savedMessage = messageRepository.save(message);
@@ -100,13 +101,12 @@ public class BasicMessageService implements MessageService {
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or @messageRepository.findById(#id).orElseThrow().getAuthor().getId() == authentication.principal.userResult.id")
   @Transactional
   @Override
   public void delete(UUID id) {
-    if (!messageRepository.existsById(id)) {
-      throw new MessageNotFoundException(Map.of("messageId", id));
-    }
+    Message message = messageRepository.findById(id)
+        .orElseThrow(() -> new MessageNotFoundException(Map.of()));
+    validateIsCurrentUser(message, Role.ADMIN.name());
 
     messageRepository.deleteById(id);
   }
@@ -129,6 +129,18 @@ public class BasicMessageService implements MessageService {
       return null;
     }
     return messages.getContent().get(messages.getContent().size() - 1).getCreatedAt();
+  }
+
+  private void validateIsCurrentUser(Message message, String roleName) {
+    UUID currentUserId = SecurityUtil.getCurrentUserId();
+    if (message.getUser().getId().equals(currentUserId)) {
+      return;
+    }
+    if (roleName != null && SecurityUtil.hasRole(roleName)) {
+      return;
+    }
+
+    throw new AccessDeniedException("권한 없음");
   }
 
 }

@@ -1,11 +1,10 @@
-package com.sprint.mission.discodeit.binarycontent.service;
+package com.sprint.mission.discodeit.domain.binarycontent.service;
 
-import com.sprint.mission.discodeit.IntegrationTestSupport;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentCore;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
