@@ -1,68 +1,57 @@
-discodeit:
-  storage:
-    type: local
-    local:
-      root-path: filestorage/binary-content-storage
-
 spring:
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  config:
+    import: optional:file:.env[.properties]
   profiles:
     active: dev
   servlet:
     multipart:
-      max-file-size: 3MB
+      max-file-size: 4MB
       max-request-size: 4MB
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
         use_sql_comments: true
+        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
+    generate-ddl: false
   sql:
     init:
       mode: never
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
+
+security:
+  remember-me:
+    key: ${REMEMBER_ME_KEY}
+    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
 logging:
   level:
-    org:
-      hibernate.SQL: DEBUG
-      orm.jdbc.bind: TRACE
-      springframework.data: DEBUG
-    com.sprint.mission.discodeit: info
+    root: info
 
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics, loggers
-  info:
-    env:
-      enabled: true
-
-info:
-  app:
-    name: Discodeit
-    version: 1.7.0
-  java:
-    version: 17
-  spring-boot:
-    version: 3.4.0
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    ddl-auto: none
-  storage:
-    type: local
-    path: filestorage/binary-content-storage
-  multipart:
-    max-file-size: 3MB
-    max-request-size: 4MB
+        include: health

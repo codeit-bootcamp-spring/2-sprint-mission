@@ -1,0 +1,67 @@
+package com.sprint.mission.discodeit.domain.binarycontent.service;
+
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
+import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
+import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.UUID;
+
+class BasicBinaryContentServiceTest extends IntegrationTestSupport {
+
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
+  @Autowired
+  private BinaryContentService binaryContentService;
+
+  @AfterEach
+  void tearDown() {
+    binaryContentRepository.deleteAllInBatch();
+  }
+
+  @DisplayName("ID로 조회하면, 해당 객체를 반환한다.")
+  @Test
+  void getById() {
+    // given
+    BinaryContent binaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+
+    // when
+    BinaryContentResult binaryContentResult = binaryContentService.getById(binaryContent.getId());
+
+    // then
+    Assertions.assertThat(binaryContentResult.id()).isEqualTo(binaryContent.getId());
+  }
+
+  @DisplayName("ID로 조회하면, 해당 객체를 반환한다.")
+  @Test
+  void getById_NoException() {
+    // when & then
+    Assertions.assertThatThrownBy(() -> binaryContentService.getById(UUID.randomUUID()))
+        .isInstanceOf(BinaryContentNotFoundException.class);
+  }
+
+  @DisplayName("여러개의 ID로 조회하면, 해당 객체를 반환한다.")
+  @Test
+  void getByIdIn() {
+    // given
+    BinaryContent firstBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+    BinaryContent secondBinaryContent = binaryContentRepository.save(new BinaryContent("", "", 0));
+
+    // when
+    List<BinaryContentResult> binaryContentResults = binaryContentService.getByIdIn(
+        List.of(firstBinaryContent.getId(), secondBinaryContent.getId()));
+
+    // then
+    Assertions.assertThat(binaryContentResults)
+        .extracting(BinaryContentResult::id)
+        .containsExactlyInAnyOrder(firstBinaryContent.getId(), secondBinaryContent.getId());
+  }
+
+}

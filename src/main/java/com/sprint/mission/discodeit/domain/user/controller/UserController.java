@@ -1,23 +1,27 @@
 package com.sprint.mission.discodeit.domain.user.controller;
 
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
-import com.sprint.mission.discodeit.domain.user.service.UserService;
-import com.sprint.mission.discodeit.domain.userstatus.service.UserStatusService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.domain.userstatus.dto.UserStatusResult;
+import com.sprint.mission.discodeit.domain.user.service.UserService;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -25,76 +29,57 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
-    private final UserStatusService userStatusService;
+  private final UserService userService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResult> register(
-            @Valid @RequestPart UserCreateRequest userCreateRequest,
-            @RequestPart(required = false) MultipartFile profile
-    ) {
-        log.info("사용자 생성 요청: username={}, email={}", userCreateRequest.username(), userCreateRequest.email());
-        BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profile);
-        UserResult user = userService.register(userCreateRequest, binaryContentRequest);
-        log.info("사용자 생성 성공: userId={}", user.id());
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<UserResult> register(
+      @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+      @RequestPart(required = false) MultipartFile profile
+  ) {
+    BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profile);
+    UserResult user = userService.register(userCreateRequest, binaryContentRequest);
 
-        return ResponseEntity.ok(user);
+    return ResponseEntity.ok(user);
+  }
+
+  @GetMapping("/{userId}")
+  public ResponseEntity<UserResult> getById(@PathVariable UUID userId) {
+    UserResult user = userService.getById(userId);
+
+    return ResponseEntity.ok(user);
+  }
+
+  @GetMapping
+  public ResponseEntity<List<UserResult>> getAll() {
+    List<UserResult> users = userService.getAllIn();
+
+    return ResponseEntity.ok(users);
+  }
+
+  @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId,
+      @Valid @RequestPart UserUpdateRequest userUpdateRequest,
+      @RequestPart(required = false) MultipartFile profile
+  ) {
+    BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profile);
+    UserResult updatedUser = userService.update(userId, userUpdateRequest, binaryContentRequest);
+
+    return ResponseEntity.ok(updatedUser);
+  }
+
+  @DeleteMapping("/{userId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    userService.delete(userId);
+
+    return ResponseEntity.noContent().build();
+  }
+
+  private BinaryContentRequest getBinaryContentRequest(MultipartFile profileImage) {
+    if (profileImage == null) {
+      return null;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserResult> getById(@PathVariable UUID userId) {
-        log.debug("사용자 조회 요청: userId={}", userId);
-        UserResult user = userService.getById(userId);
-        log.info("사용자 조회 성공: userId={}", userId);
-
-        return ResponseEntity.ok(user);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResult>> getAll() {
-        log.debug("전체 사용자 목록 조회 요청");
-        List<UserResult> users = userService.getAllIn();
-        log.info("전체 사용자 목록 조회 성공: count={}", users.size());
-
-        return ResponseEntity.ok(users);
-    }
-
-    @PatchMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResult> updateUser(@PathVariable UUID userId, @Valid @RequestPart UserUpdateRequest userUpdateRequest, @RequestPart(required = false) MultipartFile profile) {
-        log.info("사용자 수정 요청: userId={}, newUsername={}, newEmail={}", userId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
-        BinaryContentRequest binaryContentRequest = getBinaryContentRequest(profile);
-        UserResult updatedUser = userService.update(userId, userUpdateRequest, binaryContentRequest);
-        log.info("사용자 수정 성공: userId={}", userId);
-
-        return ResponseEntity.ok(updatedUser);
-    }
-
-    @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatusResult> updateOnlineStatus(@PathVariable UUID userId) {
-        log.info("사용자 온라인 상태 갱신 요청: userId={}", userId);
-        UserStatusResult status = userStatusService.updateByUserId(userId, Instant.now());
-        log.info("사용자 온라인 상태 갱신 성공: userId={}", userId);
-
-        return ResponseEntity.ok(status);
-    }
-
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
-        log.warn("사용자 삭제 요청: userId={}", userId);
-        userService.delete(userId);
-        log.info("사용자 삭제 성공: userId={}", userId);
-
-        return ResponseEntity.noContent().build();
-    }
-
-    private BinaryContentRequest getBinaryContentRequest(MultipartFile profileImage) {
-        if (profileImage == null) {
-            log.debug("프로필 이미지가 첨부되지 않음");
-            return null;
-        }
-        log.debug("프로필 이미지 업로드 요청: filename={}, pageSize={}", profileImage.getOriginalFilename(), profileImage.getSize());
-
-        return BinaryContentRequest.fromMultipartFile(profileImage);
-    }
+    return BinaryContentRequest.fromMultipartFile(profileImage);
+  }
 
 }

@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Entity
@@ -28,6 +29,7 @@ public class Message extends BaseUpdatableEntity {
     @Column(name = "content", nullable = false)
     private String context;
 
+    @BatchSize(size = 100) //누락
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinTable(
             name = "message_attachments",

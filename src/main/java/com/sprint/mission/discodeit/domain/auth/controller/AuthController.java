@@ -1,28 +1,47 @@
 package com.sprint.mission.discodeit.domain.auth.controller;
 
-import com.sprint.mission.discodeit.domain.auth.dto.LoginRequest;
+import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
-import jakarta.validation.Valid;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+  private AuthService authService;
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResult> login(@RequestBody @Valid LoginRequest loginRequest) {
-        UserResult userResult = authService.login(loginRequest);
+  @GetMapping("/csrf-token")
+  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+    return ResponseEntity.ok(csrfToken);
+  }
 
-        return ResponseEntity.ok(userResult);
+  @GetMapping("/me")
+  public ResponseEntity<UserResult> getCurrentUser(
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    if (userDetails == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
+    return ResponseEntity.ok(userDetails.getUserResult());
+  }
+
+  @PutMapping("/role")
+  public ResponseEntity<UserResult> updateRole(
+      RoleUpdateRequest roleUpdateRequest,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    UserResult userResult = authService.updateRole(roleUpdateRequest);
+
+    return ResponseEntity.ok(userResult);
+  }
 
 }

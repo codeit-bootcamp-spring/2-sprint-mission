@@ -1,0 +1,41 @@
+spring:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    generate-ddl: false
+  sql:
+    init:
+      mode: never
+  session:
+    store-type: jdbc
+  jdbc:
+    initialize-schema: always
+
+security:
+  remember-me:
+    key: ${REMEMBER_ME_KEY:111111111111111111}
+    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS:123456}
+
+discodeit:
+  storage:
+    type: ${STORAGE_TYPE:local}  # local | s3 (기본값: local)
+    local:
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage/test}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY:11111111}
+      secret-key: ${AWS_S3_SECRET_KEY:1111111111}
+      region: ${AWS_S3_REGION:11111111}
+      bucket: ${AWS_S3_BUCKET:11111111111}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
+
+logging:
+  level:
+    com.sprint.mission.discodeit: DEBUG
+    org.springframework.security: trace

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.domain.user.dto;
 
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentResult;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 
 import java.time.Instant;
@@ -12,26 +13,28 @@ public record UserResult(UUID id,
                          String username,
                          String email,
                          BinaryContentResult profile,
+                         Role role,
                          boolean online) {
 
-    public static UserResult fromEntity(User user, boolean isOnline) {
-        BinaryContentResult binaryContentResult = getBinaryContentResult(user);
+  public static UserResult fromEntity(User user, boolean isOnline) {
+    BinaryContentResult binaryContentResult = getBinaryContentResult(user);
 
-        return new UserResult(user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getName(),
-                user.getEmail(),
-                binaryContentResult,
-                isOnline);
+    return new UserResult(user.getId(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
+        user.getName(),
+        user.getEmail(),
+        binaryContentResult,
+        user.getRole(),
+        isOnline);
+  }
+
+  private static BinaryContentResult getBinaryContentResult(User user) {
+    if (user.getBinaryContent() == null) {
+      return null;
     }
 
-    private static BinaryContentResult getBinaryContentResult(User user) {
-        if (user.getBinaryContent() == null) {
-            return null;
-        }
-
-        return BinaryContentResult.fromEntity(user.getBinaryContent());
-    }
+    return BinaryContentResult.fromEntity(user.getBinaryContent());
+  }
 
 }

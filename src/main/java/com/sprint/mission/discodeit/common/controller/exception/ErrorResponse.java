@@ -27,7 +27,6 @@ public record ErrorResponse(
                 status
         );
     }
-
     public static ErrorResponse of(String error, Exception ex, int status) {
         return new ErrorResponse(
                 Instant.now(),

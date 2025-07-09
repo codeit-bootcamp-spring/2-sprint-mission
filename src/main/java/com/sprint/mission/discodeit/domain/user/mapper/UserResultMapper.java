@@ -1,33 +1,33 @@
 package com.sprint.mission.discodeit.domain.user.mapper;
 
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
-import com.sprint.mission.discodeit.domain.userstatus.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;
-import com.sprint.mission.discodeit.domain.userstatus.entity.UserStatus;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
-import java.time.Instant;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class UserResultMapper {
 
-    private final UserStatusRepository userStatusRepository;
+  private final SessionRegistry sessionRegistry;
 
-    public UserResult convertToUserResult(User user) {
-        UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 유저Id를 가진 UserStatus가 없습니다."));
+  public UserResult convertToUserResult(User user) {
+    Set<UUID> onlineUserIds = sessionRegistry.getAllPrincipals().stream()
+        .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
+        .filter(principal -> principal instanceof CustomUserDetails)
+        .map(principal -> ((CustomUserDetails) principal).getUserResult().id())
+        .collect(Collectors.toSet());
 
-        return UserResult.fromEntity(user, userStatus.isOnline(Instant.now()));
-    }
-
-    public List<UserResult> convertToUsersResult(List<User> users) {
-        return users.stream()
-                .map(user -> UserResult.fromEntity(user, user.getUserStatus().isOnline(Instant.now())))
-                .toList();
-    }
+    return UserResult.fromEntity(user, onlineUserIds.contains(user.getId()));
+  }
 
 }

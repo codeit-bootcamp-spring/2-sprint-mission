@@ -37,6 +37,10 @@ out/
 .vscode/
 
 ### fileStorage
-filestore/
+.discodeit/storage
 *.ser
 .logs
+
+## env
+.env
+.discodeit.env

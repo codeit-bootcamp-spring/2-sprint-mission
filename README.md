@@ -1,204 +1,117 @@
-# Part2-sprint5
+# Sprint9 - 인증, 인가
 
-## 기본 요구사항
+## Spring Security 환경 설정
 
-### 1. git 브랜치 관리
+- [x] 프로젝트에 Spring Security 의존성을 추가하세요.
+- [x] Security 설정 클래스를 생성하세요.
+  ~~~text
+  - 패키지명: com.sprint.mission.discodeit.config
+  - 클래스명: SecurityConfig
+  ~~~
+- [x] SecurityFilterChain Bean을 선언하세요.
+- [x] 가장 기본적인 SecurityFilterChain을 등록하고, 이때 등록되는 필터 목록을 디버깅해보세요. 필터 목록은 PR에 첨부하세요.
+- [x] 모든 요청에 대해 인증이 수행되도록 하세요.
+- [x] /api/를 포함하지 않는 모든 url에 대한 요청(정적 리소스, swagger, actuator 등)은 인증을 수행하지 않도록 하세요.
+- [x] LogoutFilter를 제외하세요.
+  ~~~text
+  - 디스코드잇은 로그아웃 페이지를 CSR로 처리하기 때문에 LogoutFilter는 사용하지 않습니다.
+  ~~~
+- [x] 개발 환경에서 Spring Security 모듈의 로깅 레벨을 trace로 설정하세요.
+  ~~~text
+  - 각 요청마다 통과하는 필터 목록을 확인할 수 있습니다.
+  ~~~
 
-- [x] 브랜치 변경 : part3-황지환-sprint7
-- [x] git rebase를 통한 커밋 관리
-- [x] git push를 통해 내 레포지토리 상태 동기화
+## CSRF 보호 설정하기
 
-### 2. 기본 요구사항
-- [x] 로그 관리
-- [x] 커스텀 예외 설계[도메인별]
-- [x] 유효성 검사
-- [x] Actuator를 활용한 모니터링
-- [x] 단위 테스트
-- [x] 슬라이스 테스트
-- [ ] 통합 테스트
+- [x] CSRF 토큰을 발급하는 API를 구현하세요
+- [x] CSRF 토큰을 발급하는 API는 인증하지 않도록 SecurityFilterChain을 리팩토링하세요.
 
-#### 3. 기본 요구사항 체크 리스트
+## 회원가입 고도화
 
-1. 프로파일 기반 설정 관리
-- [x] 개발, 운영 환경에 대한 프로파일을 구성하세요.
-  - [x] application -> application-dev.yaml, application-prod.yaml 파일을 생성하세요.
-  - [x] 다음과 같은 설정값을 프로파일별로 분리하세요.
-    - [x] 데이터베이스 연결 정보
-    - [x] 서버 포트
-
-2. 단위 테스트
-- [ ] 서비스 레이어의 주요 메소드에 대한 단위 테스트를 작성하세요.
-  - [ ] 다음 서비스의 핵심 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
-    - [ ] UserService: create, update, delete 메소드
-    - [ ] ChannelService: create(PUBLIC, PRIVATE), update, delete, findByUserId 메소드
-    - [x] MessageService: create, update, delete, findByChannelId 메소드
-- [x] Mockito를 활용해 Repository 의존성을 모의(mock)하세요.
-- [x] BDDMockito를 활용해 테스트 가독성을 높이세요.
-
-
-3. 슬라이스(컴포넌트) 테스트
-- [x] 레포지토리 레이어의 슬라이스 테스트를 작성하세요.
-  - [x] @DataJpaTest를 활용해 테스트를 구현하세요.
-  - [x] 테스트 환경을 구성하는 프로파일을 구성하세요.
-    - [x] application-test.yaml을 생성하세요.
-    - [x] 데이터소스는 **H2 인메모리 데이터 베이스**를 사용하고, PostgreSQL 호환 모드로 설정하세요.
-    - [x] H2 데이터베이스를 위해 필요한 의존성을 추가하세요.
-    - [x] 테스트 시작 시 스키마를 새로 생성하도록 설정하세요.
-    - [x] 디버깅에 용이하도록 로그 레벨을 적절히 설정하세요.
-  - [x] 테스트 실행 간 test 프로파일을 활성화 하세요.
-  - [x] JPA Audit 기능을 활성화 하기 위해 테스트 클래스에 @EnableJpaAuditing을 추가하세요.
-  - [x] 주요 레포지토리(User, Channel, Message)의 주요 쿼리 메소드에 대해 각각 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
-    - [x] 커스텀 쿼리 메소드
-    - [x] 페이징 및 정렬 메소드
-- [x] 컨트롤러 레이어의 슬라이스 테스트를 작성하세요.
-  - [x]  @WebMvcTest를 활용해 테스트를 구현하세요.
-  - [x]  WebMvcTest에서 자동으로 등록되지 않는 유형의 Bean이 필요하다면 @Import를 활용해 추가하세요.
+- [x]  회원가입 API 스펙은 유지합니다.
+- [x]  회원가입 시 비밀번호는 PasswordEncoder를 통해 해시로 저장하세요.
     ~~~text
-    예시
-    
-    @Import({ErrorCodeStatusMapper.class})
-    ~~~
-  - [x]  주요 컨트롤러(User, Channel, Message)에 대해 최소 2개 이상(성공, 실패)의 테스트 케이스를 작성하세요.
-  - [x]  MockMvc를 활용해 컨트롤러를 테스트하세요.
-  - [x]  서비스 레이어를 모의(mock)하여 컨트롤러 로직만 테스트하세요.
-  - [x]  JSON 응답을 검증하는 테스트를 포함하세요.
+    - PasswordEncoder의 구현체는 BCryptPasswordEncoder를 활용하세요.
+    ~~~~
+- [x] 회원가입 API는 인증하지 않도록 SecurityFilterChain을 리팩토링하세요.
 
-  
-4. 통합 테스트
-- [ ] 통합 테스트 환경을 구성하세요.
-  - [ ] @SpringBootTest를 활용해 Spring 애플리케이션 컨텍스트를 로드하세요.
-  - [ ] H2 인메모리 데이터베이스를 활용하세요.
-  - [ ] 테스트용 프로파일을 구성하세요.
-- [ ] 주요 API 엔드포인트에 대한 통합 테스트를 작성하세요.
-  - [ ] 주요 API에 대해 최소 2개 이상의 테스트 케이스를 작성하세요.
-    - [ ] 사용자 관련 API (생성, 수정, 삭제, 목록 조회)
-    - [ ] 채널 관련 API (생성, 수정, 삭제)
-    - [ ] 메시지 관련 API (생성, 수정, 삭제, 목록 조회)
-- [ ] 각 테스트는 @Transactional을 활용해 독립적으로 실행하세요.
---------------------------------------------------------------------------------------------
+## 기본 인증 구현
 
-5. 로그 관리
-- [x] Lombok의 @Slf4j 어노테이션을 활용해 로깅을 쉽게 추가할 수 있도록 구성하세요.
-- [x] application.yaml에 기본 로깅 레벨을 설정하세요.
-  - 기본적으로 info 레벨로 설정합니다.
-- [x] 환경 별 적절한 로깅 레벨을 프로파일 별로 설정해보세요.
-  - SQL 로그를 보기위해 설정했던 레벨은 유지합니다.
-  - 우리가 작성한 프로젝트의 로그는 개발 환경에서 debug, 운영 환경에서는 info 레벨로 설정합니다.
-- [x] Spring Boot의 기본 로깅 구현체인 Logback의 설정 파일을 구성하세요.
-  - [x]  logback-spring.xml 파일을 생성하세요.
-  - [x]  다음 예시와 같은 로그 메시지를 출력하기 위한 로깅 패턴과 출력 방식을 커스터마이징하세요.
+- 다음의 조건을 만족하는 필터와 AuthenticationProvider를 구현하세요.
+- [x]  로그인 API 스펙은 다음과 같습니다.
+  - 기존에 구현했던 로그인 관련 코드는 제거하세요.
     ~~~text
-    로그 출력 예시
-    
-    # 패턴
-    {년}-{월}-{일} {시}:{분}:{초}:{밀리초} [{스레드명}] {로그 레벨(5글자로 맞춤)} {로거 이름(최대 36글자)} - {로그 메시지}{줄바꿈}
-    
-    # 예시
-    25-01-01 10:33:55.740 [main] DEBUG c.s.m.discodeit.DiscodeitApplication - Running with Spring Boot v3.4.0, Spring v6.2.0
-    ~~~
-- [x]  **콘솔과 파일에 동시에 로그를 기록**하도록 설정하세요.
-  - [x] 파일은 {프로젝트 루트}/.logs 경로에 저장되도록 설정하세요.
-
-- [x]  로그 파일은 일자별로 롤링되도록 구성하세요.
-- [x]  로그 파일은 30일간 보관하도록 구성하세요.
-
-- [x] 서비스 레이어와 컨트롤러 레이어의 주요 메소드에 로깅을 추가하세요.
-  - [x] 로깅 레벨을 적절히 사용하세요: ERROR, WARN, INFO, DEBUG
-  - [x] 다음과 같은 메소드에 로깅을 추가하세요:
-    - [x] 사용자 생성/수정/삭제
-    - [x] 채널 생성/수정/삭제
-    - [x] 메시지 생성/수정/삭제
-    - [x] 파일 업로드/다운로드
-
-6. 예외 처리 고도화(중요)
-- [x]  커스텀 예외를 설계하고 구현하세요.
-  - 패키지명: com.sprint.mission.discodeit.exception[.{도메인}]
-- [x]  ErrorCode Enum 클래스를 통해 예외 코드명과 메시지를 정의하세요.
-- [x]  모든 예외의 기본이 되는 DiscodeitException 클래스를 정의하세요.
-  - 클래스 다이어그램
-    - details는 예외 발생 상황에 대한 추가정보를 저장하기 위한 속성입니다.
-      - 예시
-        - 조회 시도한 사용자의 ID 정보
-        - 업데이트 시도한 PRIVATE 채널의 ID 정보
-- [x]  DiscodeitException을 상속하는 주요 도메인 별 메인 예외 클래스를 정의하세요.
-  - UserException, ChannelException 등
-  - 실제로 활용되는 클래스라기보다는 예외 클래스의 계층 구조를 명확하게 하기 위한 클래스 입니다.
-- [x]  도메인 메인 예외 클래스를 상속하는 구체적인 예외 클래스를 정의하세요.
-  - UserNotFoundException, UserAlreadyExistException 등 필요한 예외를 정의하세요.
-- [x]  기존에 구현했던 예외를 커스텀 예외로 대체하세요.
-    - NoSuchElementException
-    - IllegalArgumentException...
-- [x]  ErrorResponse를 통해 일관된 예외 응답을 정의하세요.
-  - 클래스 다이어그램
-    - int status: HTTP 상태코드
-    - String exceptionType: 발생한 예외의 클래스 이름
-- [x]  앞서 정의한 ErrorResponse와 @RestControllerAdvice를 활용해 예외를 처리하는 예외 핸들러를 구현하세요.
-  - 모든 핸들러는 일관된 응답(ErrorResponse)을 가져야 합니다.
-
-
-7. 유효성 검사
-- [x] Spring Validation 의존성을 추가하세요.
-- [x] 주요 Request DTO에 제약 조건 관련 어노테이션을 추구하세요.
-  - @NotNull, @NotBlank, @Size, @Email 등
-- [x] 컨트롤러에 @Valid 를 사용해 요청 데이터를 검증하세요.
-- [x] 검증 실패 시 발생하는 MethodArgumentNotValidException을 전역 예외 핸들러에서 처리하세요.
-- [x] 유효성 검증 실패 시 상세한 오류 메시지를 포함한 응답을 반환하세요.
-
-
-8. Actuator
-- [x] Spring Boot Actuator 의존성을 추가하세요.
-- [x] 기본 Actuator 엔트포인트를 설정하세요.
-  - health, info, metrics, loggers
-- [x] Actuator info를 위한 애플리케이션 정보를 추가하세요.
+        - AuthApi.login, AuthController.login
+        - AuthService.login
+        - LoginRequest
+    ~~~~
+- [x]  다음의 주요 컴포넌트를 활용해 Spring Security의 기본 인증 플로우를 최대한 유지합니다.
     ~~~text
-    애플리케이션 이름: Discodeit
-    애플리케이션 버전: 1.7.0
-    자바 버전: 17
-    스프링 부트 버전: 3.4.0
-    주요 설정 정보
-    데이터소스: url, 드라이버 클래스 이름
-    jpa: ddl-auto
-    storage 설정: type, path
-    multipart 설정: max-file-size, max-request-size
-    ~~~
-- [x] Spring Boot 서버를 실행 후 각종 정보를 확인해보세요.
-    ~~~text
-      - /actuator/info
-      - /actuator/metrics
-      - /actuator/health
-      - /actuator/loggers
-    ~~~
+    - 인증 플로우 참고: UsernamePasswordAuthenticationFilter
+    - AuthenticationProvider: DaoAuthenticationProvider
+    - SecurityContextRespository: HttpSessionSecurityContextRepository
+    ~~~~
 
+## 세션을 활용한 현재 사용자 정보 조회
 
-## 4. 심화요구사항 
+- [x] 세션ID를 통해 사용자의 기본 정보(UserDto)를 가져올 수 있도록 API를 정의하세요.
 
-1. MDC를 활용한 로깅 고도화
-- [x] 요청 ID, 요청 URL, 요청 방식 등의 정보를 MDC에 추가하는 인터셉터를 구현하세요.
-  - [x] 클래스명: MDCLoggingInterceptor
-  - [x] 패키지명: com.**.discodeit.config
-  - [x] 요청 ID는 랜덤한 문자열로 생성합니다. (UUID)
-  - [x] 요청 ID는 응답 헤더에 포함시켜 더 많은 분석이 가능하도록 합니다.
-    - 헤더 이름: Discodeit-Request-ID
-- [x] WebMvcConfigurer를 통해 MDCLoggingInterceptor를 등록하세요.
-  - [x] 클래스명: WebMvcConfig
-  - [x] 패키지명: com.**.discodeit.config
-- [x] Logback 패턴에 MDC 값을 포함시키세요.
-      - 로그 출력 예시
-    ~~~text
-    # 패턴
-    {년}-{월}-{일} {시}:{분}:{초}:{밀리초} [{스레드명}] {로그 레벨(5글자로 맞춤)} {로거 이름(최대 36글자)} [{MDC:요청ID} | {MDC:요청 메소드} | {MDC:요청 URL}] - {로그 메시지}{줄바꿈}
-    
-    # 예시
-    25-01-01 10:33:55.740 [main] DEBUG o.s.api.AbstractOpenApiResource [827cbc0b | GET | /v3/api-docs] - Init duration for springdoc-openapi is: 216 ms
+## 로그아웃
+
+- 다음의 조건을 만족하는 필터를 구현하세요.
+- [x] 로그아웃 API 스펙은 다음과 같습니다.
+- [x] CSRF 검사는 수행하지 않도록 합니다.
+- [x] 해당 세션을 무효화 처리하세요.
+- [x] SecurityContext를 초기화하세요.
+
+## 권한 관리
+
+- [x]  다음과 같이 권한을 정의하세요.
+    ~~~ text 
+    관리자: ROLE_ADMIN
+    채널 매니저: ROLE_CHANNEL_MANAGER
+    일반 사용자: ROLE_USER
+        각 권한은 계층 구조를 가집니다.
+        관리자 > 채널 매니저 > 일반 사용자
     ~~~
-2. Spring Boot Admin을 활용한 메트릭 가시화(서버 하나 더 띄우기)
-  - [x]  Spring Boot Admin 서버를 구현할 모듈을 생성하세요.
-  - [x]  admin 모듈의 메인 클래스에 @EnableAdminServer 어노테이션을 추가하고, 서버는 9090번 포트로 설정합니다.
-  - [x]  discodeit 서버를 실행하고, admin 대시보드에 discodeit 인스턴스가 추가되었는지 확인합니다.
-  - [x]  admin 대시보드 화면을 조작해보면서 각종 메트릭 정보를 확인해보세요.
-    - 주요 API의 요청 횟수, 응답시간 등
-    - 서비스 정보
-3. 테스트 커버리지 관리
-   - [x]  JaCoCo 플러그인을 추가하세요.
-   - [x]  테스트 실행 후 생성된 리포트를 분석해보세요.
-   - [x]  com.sprint.mission.discodeit.service.basic 패키지에 대해서 60% 이상의 코드 커버리지를 달성하세요.
+- [x]  회원 가입 시 모든 사용자는 ROLE_USER 권한을 가집니다.
+- [x]  애플리케이션 실행 시 ROLE_ADMIN 권한을 가진 계정이 초기화되도록 구현하세요.
+- [x]  UserDto에 권한 정보를 포함하세요.
+- [x]  사용자 권한을 수정하는 API를 구현하세요.
+
+## 인가 처리
+
+- [x] 회원가입, 로그인, csrf 토큰 발급 등을 제외한 모든 API는 최소 ROLE_USER 권한을 가져야합니다.
+- [x] 퍼블릭 채널 생성, 수정, 삭제는 최소 ROLE_CHANNEL_MANAGER 권한을 가져야합니다.
+- [x] 사용자 권한 수정은 ROLE_ADMIN 권한을 가져야합니다.
+
+# 심화 요구사항
+
+## Remember-Me
+
+- 다음의 조건을 만족하도록 로그인 유지 기능을 구현하세요.
+- [x] 토큰은 데이터베이스에 저장하세요.
+- [x] 쿠키에 저장되는 토큰의 유효기간은 3주로 지정하세요.
+- [x] 로그아웃 시 데이터베이스에 저장된 토큰을 삭제하고, 클라이언트 쿠키도 삭제하세요.
+
+## 동시 로그인 제한
+
+- [x] 하나의 사용자 ID로 동시 로그인을 제한하세요. 새로운 로그인 발생 시 기존 세션을 무효화하세요.
+
+## 세션 고정 보호
+
+- [x] 세션 고정 보호를 위해 필요한 설정을 구현하세요.
+  - 사용자가 로그인한 순간, 기존의 세션 ID를 폐기하고 새로운 세션 ID로 바꾸는 것입니다.
+
+## 사용자 로그인 상태 고도화
+
+- [x] Session 정보를 활용해 사용자의 로그인 상태를 판단하도록 리팩토링하세요.
+  - 로그인 상태를 세션으로 확인 
+- [x] UserStatus 엔티티와 관련된 모든 코드는 삭제하세요.
+
+## 인가 고도화
+
+- [x] 사용자 정보 수정, 삭제는 본인 또는 ROLE_ADMIN 권한을 가진 사용자만 호출할 수 있습니다.
+- [x] 메시지 수정은 메시지를 작성한 사람만 호출할 수 있습니다.
+- [x] 메시지 삭제는 메시지를 작성한 사람 또는 ROLE_ADMIN 권한을 가진 사용자만 호출할 수 있습니다.
+- [x] 읽음 상태 생성, 수정은 본인만 호출할 수 있습니다.

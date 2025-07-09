@@ -10,4 +10,8 @@ public class UserNotFoundException extends UserException {
         super(ERROR_USER_NOT_FOUND, details);
     }
 
+    public UserNotFoundException() {
+        super(ERROR_USER_NOT_FOUND, null);
+    }
+
 }
