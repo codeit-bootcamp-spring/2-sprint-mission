@@ -30,6 +30,10 @@ discodeit:
         key: discodeitRememberKey
         token-validity-day: 30
 
+    jwt:
+        secret:
+            
+
 management:
     endpoints:
         web:

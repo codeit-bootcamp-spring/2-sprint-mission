@@ -36,6 +36,7 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -77,6 +78,7 @@ public class SecurityConfig {
                     request -> request.getRequestURI().equals("/api/auth/login"),
                     request -> request.getRequestURI().equals("/api/auth/logout")
                 )
+                .csrfTokenRepository(cookieCsrfTokenRepository())
             )
             .authenticationProvider(daoAuthenticationProvider)
             .authorizeHttpRequests(auth -> auth
@@ -157,5 +159,13 @@ public class SecurityConfig {
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         return new RegisterSessionAuthenticationStrategy(sessionRegistry());
+    }
+
+    @Bean
+    public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieName("XSRF-TOKEN");
+        repository.setHeaderName("X-XSRF-TOKEN");
+        return repository;
     }
 }
