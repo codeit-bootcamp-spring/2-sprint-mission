@@ -31,16 +31,16 @@ public class JwtService {
 
 
     @Value("${discodeit.jwt.secret}")
-    private static String secret;
+    private String secret;
 
     @Value("${discodeit.jwt.access-token-validity-minutes}")
-    private static int accessTokenValidityMinutes;
+    private int accessTokenValidityMinutes;
 
     @Value("${discodeit.jwt.refresh-token-validity-minutes}")
-    private static int refreshTokenValidityMinutes;
+    private int refreshTokenValidityMinutes;
 
-    private static final Long ACCESS_EXP = accessTokenValidityMinutes * 60L;
-    private static final Long REFRESH_EXP = refreshTokenValidityMinutes * 60L;
+    private final Long ACCESS_EXP = accessTokenValidityMinutes * 60L;
+    private final Long REFRESH_EXP = refreshTokenValidityMinutes * 60L;
 
     @Transactional
     public JwtSession createJwtSession(UserDto userDto) {

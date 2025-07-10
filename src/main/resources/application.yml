@@ -31,7 +31,7 @@ discodeit:
         token-validity-day: 30
 
     jwt:
-        secret: discodeit-secret
+        secret: d9f8e4a2b6c7d5e9f1a3b8c2d7e4f0a1
         access-token-validity-minutes: 15
         refresh-token-validity-minutes: 120
 

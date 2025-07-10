@@ -84,8 +84,6 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
         @Override
         public void init(HttpSecurity http) throws Exception {
             loginProcessingUrl("/api/auth/login");
-            successHandler(new CustomLoginSuccessHandler(objectMapper));
-            failureHandler(new CustomLoginFailureHandler(objectMapper));
         }
     }
-    }
+}

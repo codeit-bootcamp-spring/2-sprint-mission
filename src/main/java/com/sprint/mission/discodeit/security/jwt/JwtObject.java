@@ -19,8 +19,8 @@ public record JwtObject (
         ObjectMapper objectMapper = new ObjectMapper();
         var claims = jwt.getJWTClaimsSet();
 
-        String userJson = (String) claims.getClaim("userDto");
-        UserDto userDto = objectMapper.readValue(userJson, UserDto.class);
+        Object userClaim = claims.getClaim("userDto");
+        UserDto userDto = objectMapper.convertValue(userClaim, UserDto.class);
 
         return new JwtObject(
             claims.getIssueTime().toInstant(),

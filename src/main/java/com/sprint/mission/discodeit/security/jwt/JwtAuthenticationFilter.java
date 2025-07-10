@@ -35,7 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header == null || !header.startsWith("Bearer ")) {
-            handleUnauthorized(response, null, "Authorization 헤더가 없거나 형식이 잘못되었습니다.");
+            if (isPermitAllPath(request)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            handleUnauthorized(response, "", "Authorization 헤더가 없거나 형식이 잘못되었습니다.");
             return;
         }
 
@@ -78,5 +83,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+    }
+
+    private boolean isPermitAllPath(HttpServletRequest request) {
+        String method = request.getMethod();
+        String path = request.getRequestURI();
+
+        return
+            ("GET".equals(method) && path.equals("/api/auth/csrf-token")) ||
+            ("POST".equals(method) && path.equals("/api/users")) ||
+            ("POST".equals(method) && path.equals("/api/auth/login")) ||
+            ("POST".equals(method) && path.equals("/api/auth/logout")) ||
+            ("GET".equals(method) && path.equals("/api/auth/me")) ||
+            !path.startsWith("/api/");
     }
 }
