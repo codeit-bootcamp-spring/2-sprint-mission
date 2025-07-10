@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.CsrfTokenResponse;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -29,9 +30,9 @@ public class AuthController implements AuthApi {
   private final UserService userService;
 
   @GetMapping("csrf-token")
-  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+  public ResponseEntity<CsrfTokenResponse> getCsrfToken(CsrfToken csrfToken) {
     log.debug("CSRF 토큰 요청");
-    return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
+    return ResponseEntity.status(HttpStatus.OK).body(new CsrfTokenResponse(csrfToken.getToken()));
   }
 
   @GetMapping("me")

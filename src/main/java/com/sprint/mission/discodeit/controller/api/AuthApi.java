@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.CsrfTokenResponse;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,7 +24,7 @@ public interface AuthApi {
           content = @Content(schema = @Schema(implementation = CsrfToken.class))
       )
   })
-  ResponseEntity<CsrfToken> getCsrfToken(@Parameter(hidden = true) CsrfToken csrfToken);
+  ResponseEntity<CsrfTokenResponse> getCsrfToken(@Parameter(hidden = true) CsrfToken csrfToken);
 
   @Operation(summary = "세션을 활용한 현재 사용자 정보 조회")
   @ApiResponses(value = {
