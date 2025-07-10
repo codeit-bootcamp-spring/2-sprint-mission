@@ -48,6 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if(!jwtService.validateToken(token)) {
                 jwtService.invalidateJwtSession(token);
                 handleUnauthorized(response, token, "Invalid JWT");
+                return;
             }
 
             UserDto userDto = jwtObject.userDto();
