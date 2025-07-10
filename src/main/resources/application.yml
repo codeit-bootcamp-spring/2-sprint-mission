@@ -31,8 +31,9 @@ discodeit:
         token-validity-day: 30
 
     jwt:
-        secret:
-            
+        secret: discodeit-secret
+        access-token-validity-minutes: 15
+        refresh-token-validity-minutes: 120
 
 management:
     endpoints:
