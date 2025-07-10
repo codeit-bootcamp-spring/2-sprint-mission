@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -113,7 +114,8 @@ public class JwtService {
         Instant expirationTime = Instant.now().plusSeconds(expiresAt);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-            .claim("username", userDto.username())
+            .subject(userDto.username())
+            .claim("userDto", userDto)
             .issueTime(Date.from(now))
             .expirationTime(Date.from(expirationTime))
             .build();
@@ -125,10 +127,12 @@ public class JwtService {
 
         try {
             jwt.sign(new MACSigner(secret));
-            return JwtObject.toJwtObject(jwt, userDto);
+            return JwtObject.toJwtObject(jwt);
         } catch (JOSEException e) {
             throw new RuntimeException(e);
         } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
