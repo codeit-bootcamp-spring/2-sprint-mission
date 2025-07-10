@@ -95,6 +95,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ("POST".equals(method) && path.equals("/api/auth/login")) ||
             ("POST".equals(method) && path.equals("/api/auth/logout")) ||
             ("GET".equals(method) && path.equals("/api/auth/me")) ||
+            ("POST".equals(method) && path.equals("/api/auth/refresh")) ||
             !path.startsWith("/api/");
     }
 }

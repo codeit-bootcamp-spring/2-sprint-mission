@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +55,14 @@ public class AuthController implements AuthApi {
         UserDto userDto = userService.updateRole(roleUpdateRequest);
 
         return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refreshToken(
+        @CookieValue(value = "refresh_token") String refreshToken
+    ) {
+        JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
+
+        return ResponseEntity.ok(jwtSession.getRefreshToken());
     }
 }
