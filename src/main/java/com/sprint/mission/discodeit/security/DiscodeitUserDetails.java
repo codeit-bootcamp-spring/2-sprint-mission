@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -13,15 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails, Serializable {
-  private static final long serialVersionUID = 1L;
+public class DiscodeitUserDetails implements UserDetails {
 
   private final UserDto userDto;
   private final String password;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    return List.of(new SimpleGrantedAuthority("ROLE_".concat(userDto.role().name())));
   }
 
   @Override
@@ -36,8 +34,12 @@ public class CustomUserDetails implements UserDetails, Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof CustomUserDetails that)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof DiscodeitUserDetails that)) {
+      return false;
+    }
     return userDto.username().equals(that.userDto.username());
   }
 
@@ -45,5 +47,4 @@ public class CustomUserDetails implements UserDetails, Serializable {
   public int hashCode() {
     return Objects.hash(userDto.username());
   }
-
 }

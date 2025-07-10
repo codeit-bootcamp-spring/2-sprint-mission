@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -90,7 +91,9 @@ public class AWSS3Test {
           .build();
 
       s3Client.putObject(request, RequestBody.fromString(content));
+      log.info("파일 업로드 성공: {}", testKey);
     } catch (S3Exception e) {
+      log.error("파일 업로드 실패: {}", e.getMessage());
       throw e;
     }
   }
@@ -114,7 +117,9 @@ public class AWSS3Test {
           .build();
 
       String downloadedContent = s3Client.getObjectAsBytes(request).asUtf8String();
+      log.info("다운로드된 파일 내용: {}", downloadedContent);
     } catch (S3Exception e) {
+      log.error("파일 다운로드 실패: {}", e.getMessage());
       throw e;
     }
   }
@@ -145,7 +150,9 @@ public class AWSS3Test {
       PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
       URL url = presignedRequest.url();
 
+      log.info("생성된 Presigned URL: {}", url);
     } catch (S3Exception e) {
+      log.error("Presigned URL 생성 실패: {}", e.getMessage());
       throw e;
     }
   }
@@ -158,8 +165,9 @@ public class AWSS3Test {
           .key(testKey)
           .build();
       s3Client.deleteObject(request);
+      log.info("테스트 파일 정리 완료: {}", testKey);
     } catch (S3Exception e) {
-      throw e;
+      log.error("테스트 파일 정리 실패: {}", e.getMessage());
     }
   }
 }
