@@ -6,7 +6,8 @@ import java.time.Instant;
 public record JwtObject(
     Instant iat,
     Instant exp,
-    UserDto userDto
+    UserDto userDto,
+    String token
 ) {
 
 }
