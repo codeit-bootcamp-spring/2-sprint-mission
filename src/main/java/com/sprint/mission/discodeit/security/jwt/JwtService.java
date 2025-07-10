@@ -107,6 +107,12 @@ public class JwtService {
             .ifPresent(this::invalidate);
     }
 
+    @Transactional(readOnly = true)
+    public JwtSession getJwtSession(String refreshToken) {
+        return jwtSessionRepository.findByRefreshToken(refreshToken)
+            .orElseThrow(() -> new IllegalArgumentException("Not found JWT RefreshToken"));
+    }
+
     private JwtObject createToken(
         UserDto userDto, Long expiresAt
     ) {
