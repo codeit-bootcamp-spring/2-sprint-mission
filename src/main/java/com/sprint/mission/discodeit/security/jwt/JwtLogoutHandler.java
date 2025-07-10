@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security.jwt;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
@@ -28,14 +29,12 @@ public class JwtLogoutHandler implements LogoutHandler {
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-
-        for (Cookie cookie : request.getCookies()) {
-            if (REFRESH_TOKEN_NAME.equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
+        return request.getCookies() == null ? null :
+            Arrays.stream(request.getCookies())
+                .filter(cookie -> REFRESH_TOKEN_NAME.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
     }
 
     private void expireRefreshTokenCookie(HttpServletResponse response) {
