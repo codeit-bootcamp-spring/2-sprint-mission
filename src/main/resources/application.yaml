@@ -21,10 +21,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health,info,metrics,loggers,prometheus
+
   endpoint:
+    metrics:
+      enabled: true
     health:
       show-details: always
+
+  metrics:
+    enable:
+      all: true
 
 info:
   name: Discodeit
