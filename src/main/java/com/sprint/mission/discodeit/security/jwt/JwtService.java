@@ -14,4 +14,5 @@ public interface JwtService {
 
     void invalidateJwtSession(String refreshToken); // 로그아웃 처리용
 
+    JwtSession getJwtSession(String refreshToken);
 }

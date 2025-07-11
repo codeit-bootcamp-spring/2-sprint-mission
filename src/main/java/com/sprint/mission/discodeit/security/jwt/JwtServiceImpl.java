@@ -122,6 +122,13 @@ public class JwtServiceImpl implements JwtService {
         jwtSessionRepository.deleteByRefreshToken(refreshToken);
     }
 
+    @Override
+    public JwtSession getJwtSession(String refreshToken) {
+        return jwtSessionRepository.findByRefreshToken(refreshToken)
+            .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+                Map.of("refreshToken", refreshToken)));
+    }
+
     // JWT 생성 메서드
     private JwtObject generateJwtObject(UserDto userDto, long tokenValiditySeconds) {
         Instant issuedAt = Instant.now();
