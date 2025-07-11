@@ -29,6 +29,7 @@ public class JwtService {
   private final UserRepository userRepository;
   private final JwtSessionRepository jwtSessionRepository;
   private final UserMapper userMapper;
+  private final JwtBlacklist jwtBlacklist;
 
   @Value("${security.jwt.secret-key}")
   private String secret;
@@ -78,6 +79,9 @@ public class JwtService {
    * 토큰의 유효성을 검사하고, 유효하다면 토큰의 내용(Claims)을 반환합니다.
    */
   public Optional<Claims> validateToken(String token) {
+    if (jwtBlacklist.isBlacklisted(token)) {
+      return Optional.empty();
+    }
     try {
       Claims claims = Jwts.parser()
           .verifyWith(secretKey)
@@ -107,11 +111,12 @@ public class JwtService {
         });
   }
 
-  /**
-   * 리프레시 토큰을 무효화합니다. (로그아웃 시 사용)
-   */
   @Transactional
-  public void invalidateRefreshToken(String refreshToken) {
+  public void logout(String accessToken, String refreshToken) {
+    this.validateToken(accessToken).ifPresent(claims -> {
+      jwtBlacklist.add(accessToken, claims.getExpiration().toInstant());
+    });
+
     jwtSessionRepository.deleteByRefreshToken(refreshToken);
   }
 
