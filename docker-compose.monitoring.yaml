@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # 프로메테우스 서비스 설정
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - monitoring-net
+
+  # 그라파나 서비스 설정
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    # 프로메테우스가 먼저 실행된 후 실행되도록 설정
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring-net
+
+# 컨테이너들이 사용할 네트워크 정의
+networks:
+  monitoring-net:
+    driver: bridge
