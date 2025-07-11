@@ -65,6 +65,12 @@ security:
     key: ${REMEMBER_ME_KEY}
     token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
 
+jwt:
+  secret: ${TOKEN_SECRET}
+  access-token-expiration: 90000
+  refresh-token-expiration: 1296000000
+  issuer: "com.example.app"
+
 logging:
   level:
     root: info
