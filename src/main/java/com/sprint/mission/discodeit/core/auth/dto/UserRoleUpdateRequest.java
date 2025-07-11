@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.core.user.dto.request;
+package com.sprint.mission.discodeit.core.auth.dto;
 
 import com.sprint.mission.discodeit.core.user.entity.Role;
 import java.util.UUID;

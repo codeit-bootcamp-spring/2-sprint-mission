@@ -28,5 +28,9 @@ public final class SecurityMatchers {
       "/api/auth/logout", HttpMethod.POST.name()
   );
 
+  public static final RequestMatcher ACTUATOR = new AntPathRequestMatcher(
+      "/actuator/**"
+  );
+
   public static final String LOGIN_URL = "/api/auth/login";
 }

@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.core.auth.dto.LoginRequest;
 import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.dto.request.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.core.auth.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
@@ -19,10 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.jaas.AbstractJaasAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +58,8 @@ public class AuthController {
         new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
     );
 
-    UserDto userDto = (UserDto) authentication.getPrincipal();
+    CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+    UserDto userDto = userDetails.getUserDto();
     JwtSession session = jwtService.generateTokens(userDto);
 
     Cookie refreshTokenCookie = new Cookie("refreshToken", session.getRefreshToken());

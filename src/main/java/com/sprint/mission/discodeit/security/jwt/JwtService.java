@@ -112,7 +112,9 @@ public class JwtService {
         .expiration(expiration);
 
     if (userDto != null) {
-      claimsBuilder.add("userDto", userDto);
+      claimsBuilder.add("id", userDto.id());
+      claimsBuilder.add("username", userDto.username());
+      claimsBuilder.add("role", userDto.role().name());
     }
 
     return Jwts.builder()
