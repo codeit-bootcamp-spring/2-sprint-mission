@@ -28,6 +28,7 @@ public class JwtService {
     private final JwtSessionRepository jwtSessionRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final JwtBlackList blackList;
 
 
     @Value("${discodeit.jwt.secret}")
@@ -69,7 +70,7 @@ public class JwtService {
             }
 
             JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new RuntimeException("Not found JWT RefreshToken"));
+                .orElseThrow(() -> new IllegalArgumentException("Not found JWT RefreshToken"));
 
             UUID userId = jwtSession.getUserId();
             UserDto userDto = userRepository.findById(userId)
@@ -156,6 +157,10 @@ public class JwtService {
                 throw new SecurityException("Token expired");
             }
 
+            if(blackList.check(token)) {
+                throw new SecurityException("Blacklisted");
+            }
+
             return true;
         } catch (JOSEException e) {
             throw new RuntimeException(e);
@@ -166,6 +171,7 @@ public class JwtService {
 
     private void invalidate(JwtSession jwtSession) {
         jwtSessionRepository.delete(jwtSession);
+        blackList.put(jwtSession.getAccessToken(), jwtSession.getExpiresAt());
     }
 
 }
