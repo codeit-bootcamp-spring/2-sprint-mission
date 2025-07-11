@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStra
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.stream.IntStream;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,8 @@ public class SecurityConfig {
         ObjectMapper objectMapper,
         DaoAuthenticationProvider daoAuthenticationProvider,
         SessionRegistry sessionRegistry,
-        PersistentTokenBasedRememberMeServices rememberMeServices
+        PersistentTokenBasedRememberMeServices rememberMeServices,
+        JwtService jwtService
     )
         throws Exception {
         CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
@@ -79,7 +81,7 @@ public class SecurityConfig {
                     .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                     .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
             )
-            .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+            .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
                 Customizer.withDefaults())
             .sessionManagement(session ->
                 session
