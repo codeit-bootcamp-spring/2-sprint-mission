@@ -6,16 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -47,23 +44,6 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
             throw new AuthenticationServiceException("login request failed", e);
         }
 
-    }
-
-    public static DiscodeitUsernamePasswordAuthenticationFilter createDefault(
-        ObjectMapper objectMapper,
-        AuthenticationManager authenticationManager,
-        SessionAuthenticationStrategy sessionAuthenticationStrategy,
-        RememberMeServices rememberMeServices
-    ) {
-        DiscodeitUsernamePasswordAuthenticationFilter filter =
-            new DiscodeitUsernamePasswordAuthenticationFilter(objectMapper);
-        filter.setFilterProcessesUrl("/api/auth/login");
-        filter.setAuthenticationManager(authenticationManager);
-        filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
-        filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
-        filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
-        filter.setRememberMeServices(rememberMeServices);
-        return filter;
     }
 
     public static class Configurer extends
