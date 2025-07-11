@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStra
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.stream.IntStream;
 import javax.sql.DataSource;
@@ -92,9 +93,12 @@ public class SecurityConfig {
                     .expiredSessionStrategy(
                         new CustomSessionInformationExpiredStrategy(objectMapper))
             )
-            .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
-        ;
+            .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
 
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService,
+            objectMapper);
+        http.addFilterBefore(jwtAuthenticationFilter,
+            JsonUsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
