@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.filter.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
 import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import javax.sql.DataSource;
@@ -27,6 +28,9 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -42,11 +46,11 @@ public class SecurityConfig {
       "/api/auth/csrf-token");
   private static final RequestMatcher SIGN_UP = new AntPathRequestMatcher("/api/users",
       HttpMethod.POST.name());
-  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher("/api/auth/logout",
+  private static final RequestMatcher LOGOUT = new AntPathRequestMatcher("/api/auth/logout",
       HttpMethod.POST.name());
-  public static final RequestMatcher PUBLIC_CHANNEL_ACCESS = new AntPathRequestMatcher(
+  private static final RequestMatcher PUBLIC_CHANNEL_ACCESS = new AntPathRequestMatcher(
       "/api/channels/public/**");
-  public static final RequestMatcher ROLE_UPDATE = new AntPathRequestMatcher(
+  private static final RequestMatcher ROLE_UPDATE = new AntPathRequestMatcher(
       "/api/auth/role");
 
   @Bean
@@ -68,7 +72,7 @@ public class SecurityConfig {
             .requestMatchers(PUBLIC_CHANNEL_ACCESS).hasRole(Role.CHANNEL_MANAGER.name())
             .anyRequest().hasRole(Role.USER.name())
         )
-        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+        .with(new Configurer(objectMapper),
             Customizer.withDefaults())
         .authenticationProvider(daoAuthenticationProvider)
         .logout(logout -> logout
@@ -85,7 +89,12 @@ public class SecurityConfig {
                 .sessionRegistry(sessionRegistry)
                 .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
         )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(LOGOUT))
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers(LOGOUT)
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+            // TODO: 7/11/25 200은 오지만 프론트만 접속 안되는 상태
+        )
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
 
     return httpSecurity.build();

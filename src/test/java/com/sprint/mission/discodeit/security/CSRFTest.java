@@ -24,7 +24,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-public class CSRFTest extends ControllerTestSupport {
+@AutoConfigureMockMvc
+public class CSRFTest extends IntegrationTestSupport {
+
+  @Autowired
+  private MockMvcTester mockMvc;
+  @Autowired
+  private ObjectMapper objectMapper;
+  @MockitoBean
+  private UserService userService;
 
   @DisplayName("csrf 토큰을 요청하는 URL은 인증 하지 않습니다.")
   @Test
@@ -58,7 +66,7 @@ public class CSRFTest extends ControllerTestSupport {
     Assertions.assertThat(result).hasStatusOk();
   }
 
-  @DisplayName("Post 요청시, CSRF-token이 없으면 예외처리 입니다.")
+  @DisplayName("Post 요청시, CSRF-token을 쿠키에 넣어줍니다.")
   @Test
   void test_Post_NoneCsrfToken() {
     // given
@@ -70,7 +78,9 @@ public class CSRFTest extends ControllerTestSupport {
         .exchange();
 
     // then
-    Assertions.assertThat(result).hasStatus(403);
+    Assertions.assertThat(result)
+        .cookies()
+        .containsCookie("XSRF-TOKEN");
   }
 
   @DisplayName("Post 요청시, CSRF-token이 있으면 정상 처리합니다.")
@@ -104,6 +114,7 @@ public class CSRFTest extends ControllerTestSupport {
     Assertions.assertThat(result)
         .hasStatusOk();
   }
+
 
   private String convertJsonRequest(Object object) {
     try {
