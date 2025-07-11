@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.security.jwt.JwtDto;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -39,7 +41,8 @@ public class AuthController implements AuthApi {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<String> me(@CookieValue("refresh_token") String refreshToken) {
+  public ResponseEntity<String> me(
+      @CookieValue(value = "refresh_token", required = false) String refreshToken) {
     log.info("me - 정보 조회 요청");
     JwtDto jwtDto = jwtService.getJwtSession(refreshToken);
 
@@ -54,15 +57,16 @@ public class AuthController implements AuthApi {
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<String> refreshToken(@CookieValue("refresh_token") String refreshToken,
+  public ResponseEntity<?> refreshToken(@CookieValue("refresh_token") String refreshToken,
       HttpServletResponse response) {
     if (refreshToken == null || refreshToken.isBlank() || !jwtService.validateToken(refreshToken)) {
-      throw InvalidCredentialsException.invalidUser();
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(new DiscodeitException(ErrorCode.INVALID_USER_CREDENTIALS));
     }
 
     JwtDto newToken = jwtService.refreshToken(refreshToken);
 
-    Cookie cookie = new Cookie("refreshToken", newToken.refreshToken());
+    Cookie cookie = new Cookie(JwtService.REFRESH_TOKEN, newToken.refreshToken());
     cookie.setHttpOnly(true);
     response.addCookie(cookie);
 

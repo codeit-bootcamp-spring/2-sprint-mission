@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DatabaseUserDetailsService;
+import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
+import com.sprint.mission.discodeit.security.CustomLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
@@ -16,7 +15,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -60,7 +58,9 @@ public class SecurityConfig {
             .addLogoutHandler(new JwtLogoutHandler(jwtService))
         )
         .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
-            Customizer.withDefaults())
+            configurer -> configurer
+                .successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService))
+                .failureHandler(new CustomLoginFailureHandler(objectMapper)))
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
@@ -85,12 +85,6 @@ public class SecurityConfig {
     provider.setUserDetailsService(userDetailsService);
     provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
     return provider;
-  }
-
-  @Bean
-  public UserDetailsService userDetailsService(UserRepository userRepository,
-      UserMapper userMapper) {
-    return new DatabaseUserDetailsService(userRepository, userMapper);
   }
 
   @Bean

@@ -37,6 +37,7 @@ public class JwtService {
   private final JwtBlacklist jwtBlacklist;
 
   private static final int MAX_ACTIVE_TOKENS_PER_USER = 3;
+  public static final String REFRESH_TOKEN = "refresh_token";
 
   @Transactional
   public JwtSession generationToken(UserDto userDto) {

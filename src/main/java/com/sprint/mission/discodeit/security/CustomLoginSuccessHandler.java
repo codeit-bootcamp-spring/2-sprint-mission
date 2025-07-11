@@ -24,20 +24,27 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
+    log.debug("[LOGIN SUCCESS] 진입: contentType={}, Accept={}",
+        request.getContentType(), request.getHeader("Accept"));
+
     CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
 
     JwtSession jwtSession = jwtService.generationToken(principal.getUserDto());
     String accessToken = jwtSession.getAccessToken();
     String refreshToken = jwtSession.getRefreshToken();
 
-    Cookie cookie = new Cookie("refreshToken", refreshToken);
+    Cookie cookie = new Cookie(JwtService.REFRESH_TOKEN, refreshToken);
     cookie.setHttpOnly(true);
+    cookie.setPath("/");
     response.addCookie(cookie);
 
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setCharacterEncoding("UTF-8");
-    response.getWriter().write(objectMapper.writeValueAsString(accessToken));
+
+    String payload = objectMapper.writeValueAsString(accessToken);
+    response.getWriter().write(payload);
+    response.getWriter().flush();
 
     log.info("[성공 응답] {}", objectMapper.writeValueAsString(principal.getUserDto()));
   }
