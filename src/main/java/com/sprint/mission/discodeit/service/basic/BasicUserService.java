@@ -13,8 +13,9 @@ import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
+import com.sprint.mission.discodeit.security.jwt.JwtBlackList;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
@@ -26,7 +27,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,8 +42,9 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
-    private final SessionRegistry sessionRegistry;
     private final JwtService jwtService;
+    private final JwtBlackList blackList;
+    private final JwtBlackList jwtBlackList;
 
     @Override
     @Transactional
@@ -98,10 +99,9 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserDto> findAllUser() {
-        Set<UUID> onlineIds = sessionRegistry.getAllPrincipals().stream()
-            .filter(principal -> !sessionRegistry.getAllSessions(principal, false).isEmpty())
-            .filter(principal -> principal instanceof DiscodeitUserDetails)
-            .map(principal -> ((DiscodeitUserDetails) principal).getUserDto().id())
+        Set<UUID> onlineIds = jwtService.findAllActiveJwtSessions().stream()
+            .filter(jwtSession -> !jwtBlackList.check(jwtSession.getAccessToken()))
+            .map(JwtSession::getUserId)
             .collect(Collectors.toSet());
 
         return userRepository.findAllWithProfile()
@@ -215,14 +215,5 @@ public class BasicUserService implements UserService {
                 "size", profile.getSize()),
                 e);
         }
-    }
-
-    private void expireUserSession(UUID userId) {
-        sessionRegistry.getAllPrincipals().stream()
-            .filter(DiscodeitUserDetails.class::isInstance)
-            .map(DiscodeitUserDetails.class::cast)
-            .filter(u -> u.getUserId().equals(userId))
-            .flatMap(u -> sessionRegistry.getAllSessions(u, false).stream())
-            .forEach(SessionInformation::expireNow);
     }
 }

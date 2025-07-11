@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,6 +110,11 @@ public class JwtService {
     public JwtSession getJwtSession(String refreshToken) {
         return jwtSessionRepository.findByRefreshToken(refreshToken)
             .orElseThrow(() -> new IllegalArgumentException("Not found JWT RefreshToken"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<JwtSession> findAllActiveJwtSessions() {
+        return jwtSessionRepository.findAllByExpiresAtAfter(Instant.now());
     }
 
     private JwtObject createToken(
