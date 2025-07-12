@@ -57,7 +57,7 @@ public class SecurityConfig {
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
             .addLogoutHandler(new JwtLogoutHandler(jwtService))
         )
-        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
+        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             configurer -> configurer
                 .successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService))
                 .failureHandler(new CustomLoginFailureHandler(objectMapper)))
