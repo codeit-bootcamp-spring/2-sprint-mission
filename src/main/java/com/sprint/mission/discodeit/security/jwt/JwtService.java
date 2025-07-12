@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.sprint.mission.discodeit.dto.data.UserDto;
@@ -17,9 +16,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -72,6 +73,42 @@ public class JwtService {
         return new JwtObject(issueTime, expirationTime, userDto, token);
     }
 
+    public boolean validate(String token) {
+        boolean verified;
+
+        try {
+            JWSVerifier verifier = new MACVerifier(secret);
+            JWSObject jwsObject = JWSObject.parse(token);
+            verified = jwsObject.verify(verifier);
+
+            if (verified) {
+                JwtObject jwtObject = parse(token);
+                verified = !jwtObject.isExpired();
+            }
+
+        } catch (JOSEException | ParseException e) {
+            verified = false;
+        }
+
+        return verified;
+    }
+
+    public JwtObject parse(String token) {
+        try {
+            JWSObject jwsObject = JWSObject.parse(token);
+            Payload payload = jwsObject.getPayload();
+            Map<String, Object> jsonObject = payload.toJSONObject();
+            return new JwtObject(
+                    objectMapper.convertValue(jsonObject.get("iat"), Instant.class),
+                    objectMapper.convertValue(jsonObject.get("exp"), Instant.class),
+                    objectMapper.convertValue(jsonObject.get("userDto"), UserDto.class),
+                    token
+            );
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
 
 }
