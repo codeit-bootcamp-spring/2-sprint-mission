@@ -6,10 +6,8 @@ import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -19,12 +17,12 @@ public class MessageSearchService {
 
   private final JpaMessageRepository messageRepository;
 
-  @Cacheable("messages")
+  //TODO 캐시를 걸면 메시지가 안나와서 잠시 끔
+//  @Cacheable(value = "messages", key = "#channelId.toString() + ':' + #pageable.pageNumber + ':' + #pageable.pageSize")
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
       Pageable pageable) {
-    PageResponse<Message> result = messageRepository.findAllByChannelIdWithAuthor(
-        channelId,
-        Optional.ofNullable(cursor).orElse(Instant.now()), pageable);
+    PageResponse<Message> result = messageRepository.findAllByChannelIdWithAuthor(channelId, cursor,
+        pageable);
 
     List<MessageDto> messageDtoList = result.content().stream().map(MessageDto::from).toList();
 

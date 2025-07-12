@@ -51,10 +51,10 @@ public class CustomMessageRepositoryImpl implements CustomMessageRepository {
       Pageable pageable) {
     List<Message> content = queryFactory.selectFrom(message)
         .join(message.author, user).fetchJoin()
-        .leftJoin(user.profile, binaryContent).fetchJoin()
+        .leftJoin(message.channel, channel).fetchJoin()
         .where(
-            message.channel.id.eq(channelId),
-            cursor != null ? message.createdAt.lt(cursor) : null
+            message.channel.id.eq(channelId)
+//            cursor != null ? message.createdAt.lt(cursor) : null
         )
         .orderBy(getOrderSpecifiers(pageable.getSort()))
         .offset(pageable.getOffset())

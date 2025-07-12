@@ -8,4 +8,9 @@ scrape_configs:
     metrics_path: '/actuator/prometheus' # 메트릭 경로
     static_configs:
       # Spring Boot 애플리케이션 주소
-      - targets: [ 'host.docker.internal:8080' ]
+      - targets: [ 'host.docker.internal:80' ]
+  - job_name: 'windows-exporter'
+    static_configs:
+      # host.docker.internal은 컨테이너가 호스트 PC(Windows)를 가리키는 특별한 주소입니다.
+      # windows_exporter는 9182 포트를 사용합니다.
+      - targets: [ 'host.docker.internal:9182' ]
