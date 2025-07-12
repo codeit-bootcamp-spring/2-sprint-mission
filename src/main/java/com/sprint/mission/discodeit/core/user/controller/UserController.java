@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.core.user.service.UserSearchService;
 import com.sprint.mission.discodeit.core.user.service.UserService;
 import com.sprint.mission.discodeit.swagger.UserApi;
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController implements UserApi {
 
   private final UserService userService;
+  private final UserSearchService userSearchService;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserDto> create(
@@ -46,7 +48,6 @@ public class UserController implements UserApi {
       BinaryContentCreateRequest binaryRequest = BinaryContentCreateRequest.create(file);
       optional = Optional.of(binaryRequest);
     }
-
     UserDto userDto = userService.create(request, optional);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
@@ -54,7 +55,7 @@ public class UserController implements UserApi {
 
   @GetMapping
   public ResponseEntity<List<UserDto>> findAll() {
-    List<UserDto> result = userService.findAll();
+    List<UserDto> result = userSearchService.findAll();
 
     return ResponseEntity.ok(result);
   }

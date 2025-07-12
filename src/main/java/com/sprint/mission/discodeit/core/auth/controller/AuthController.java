@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.core.auth.controller;
 
 
 import com.sprint.mission.discodeit.core.auth.dto.LoginRequest;
-import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
-import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
-import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.auth.dto.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.service.UserService;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
@@ -35,10 +35,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-  private final CustomUserDetailsService userDetailsService;
   private final JwtSessionRepository jwtSessionRepository;
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
+  private final UserService userService;
 
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
@@ -48,7 +48,7 @@ public class AuthController {
   @PutMapping("/role")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<UserDto> updateRole(@RequestBody UserRoleUpdateRequest request) {
-    return ResponseEntity.ok(userDetailsService.updateRole(request));
+    return ResponseEntity.ok(userService.updateRole(request));
   }
 
   @PostMapping("/login")

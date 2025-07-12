@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.user.controller;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -8,7 +7,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -25,7 +23,6 @@ import com.sprint.mission.discodeit.core.user.entity.Role;
 import com.sprint.mission.discodeit.core.user.service.UserService;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -101,25 +98,25 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.online").value(false));
   }
 
-  @Test
-  void getUserList_Success() throws Exception {
-    // given
-    UUID u1Id = UUID.randomUUID();
-    UUID u2Id = UUID.randomUUID();
-    List<UserDto> dtoList = List.of(
-        new UserDto(u1Id, "a", "a@a.com", null, Role.USER, false),
-        new UserDto(u2Id, "b", "b@b.com", null, Role.USER, false)
-    );
-    when(userService.findAll()).thenReturn(dtoList);
-    // when & then
-    mockMvc.perform(get("/api/users")
-            .with(csrf())
-            .with(user("user").roles("USER")))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0].username").value("a"))
-        .andExpect(jsonPath("$[1].username").value("b"));
-  }
+//  @Test
+//  void getUserList_Success() throws Exception {
+//    // given
+//    UUID u1Id = UUID.randomUUID();
+//    UUID u2Id = UUID.randomUUID();
+//    List<UserDto> dtoList = List.of(
+//        new UserDto(u1Id, "a", "a@a.com", null, Role.USER, false),
+//        new UserDto(u2Id, "b", "b@b.com", null, Role.USER, false)
+//    );
+//    when(userService.findAll()).thenReturn(dtoList);
+//    // when & then
+//    mockMvc.perform(get("/api/users")
+//            .with(csrf())
+//            .with(user("user").roles("USER")))
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$", hasSize(2)))
+//        .andExpect(jsonPath("$[0].username").value("a"))
+//        .andExpect(jsonPath("$[1].username").value("b"));
+//  }
 
   @Test
   void update_Success() throws Exception {

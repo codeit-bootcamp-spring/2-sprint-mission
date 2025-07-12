@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.core.user.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sprint.mission.discodeit.core.storage.entity.QBinaryContent;
+import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.entity.QUser;
 import com.sprint.mission.discodeit.core.user.entity.User;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CustomUserRepositoryImpl implements CustomUserRepository {
 
   private final JPAQueryFactory jpaQueryFactory;
@@ -20,15 +22,24 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
   private final QBinaryContent binaryContent = QBinaryContent.binaryContent;
 
   @Override
-  @Transactional(readOnly = true)
   public List<User> findALlFromDB() {
-    return jpaQueryFactory.selectFrom(user)
-        .leftJoin(user.profile, binaryContent).fetchJoin().fetch();
+    return jpaQueryFactory
+        .selectFrom(user)
+        .leftJoin(user.profile, binaryContent)
+        .fetchJoin()
+        .fetch();
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public Optional<User> findByUserId(UUID id) {
+  public List<User> findAllByIdsFromDB(List<UUID> ids) {
+    return jpaQueryFactory.selectFrom(user)
+        .leftJoin(user.profile, binaryContent).fetchJoin()
+        .where(user.id.in(ids))
+        .fetch();
+  }
+
+  @Override
+  public User findByUserId(UUID id) {
     User fetched = jpaQueryFactory
         .selectFrom(user)
         .leftJoin(user.profile, binaryContent)
@@ -36,18 +47,26 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
         .where(user.id.eq(id))
         .fetchOne();
 
-    return Optional.ofNullable(fetched);
+    if (fetched == null) {
+      throw new UserException(ErrorCode.USER_NOT_FOUND, id);
+    }
+
+    return fetched;
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public Optional<User> findByUserName(String name) {
+  public User findByUserName(String name) {
     User fetched = jpaQueryFactory
         .selectFrom(user)
         .leftJoin(user.profile, binaryContent)
         .fetchJoin()
         .where(user.name.eq(name))
         .fetchOne();
-    return Optional.ofNullable(fetched);
+
+    if (fetched == null) {
+      throw new UserException(ErrorCode.USER_NOT_FOUND, name);
+    }
+
+    return fetched;
   }
 }

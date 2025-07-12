@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.core.user.service;
 
 
+import com.sprint.mission.discodeit.core.auth.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
@@ -11,13 +12,12 @@ import com.sprint.mission.discodeit.core.user.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.util.List;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +30,7 @@ public class BasicUserService implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JpaUserRepository userRepository;
   private final BinaryContentService binaryContentService;
+  private final JwtSessionRepository jwtSessionRepository;
 
   @Override
   @Transactional
@@ -52,22 +53,13 @@ public class BasicUserService implements UserService {
 
     return UserDto.from(user);
   }
-  
-  @Override
-  @Cacheable("users")
-  public List<UserDto> findAll() {
-    List<User> userList = userRepository.findALlFromDB();
-    return userList.stream().map(UserDto::from).toList();
-  }
 
   @Override
   @Transactional
-  @CacheEvict("users")
+  @CacheEvict(cacheNames = "users", key = "#id")
   public UserDto update(UUID id, UserUpdateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) {
-    User user = userRepository.findById(id).orElseThrow(
-        () -> new UserException(ErrorCode.USER_NOT_FOUND, id));
-
+    User user = userRepository.findByUserId(id);
     BinaryContent newProfile = binaryContentService.create(binaryContentRequest.orElse(null));
     user.update(request.newUsername(), request.newEmail(), newProfile);
 
@@ -85,20 +77,30 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @CacheEvict("users")
-  public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND, userId));
+  @CacheEvict(cacheNames = "users", key = "#request.userId()")
+  public UserDto updateRole(UserRoleUpdateRequest request) {
+    UUID id = request.userId();
+    User user = userRepository.findByUserId(id);
+    user.updateRole(request.newRole());
+    userRepository.save(user);
 
-    UUID id = user.getId();
+    jwtSessionRepository.findByUserId(id).ifPresent(jwtSessionRepository::delete);
+
+    return UserDto.from(user);
+  }
+
+  @Override
+  @Transactional
+  @CacheEvict(cacheNames = "users", key = "#id")
+  public void delete(UUID id) {
+    User user = userRepository.findByUserId(id);
     BinaryContent profile = user.getProfile();
 
     if (profile != null) {
       binaryContentService.delete(profile.getId());
     }
-
     userRepository.delete(user);
 
-    log.info("[UserService] User deleted {}", userId);
+    log.info("[UserService] User deleted {}", id);
   }
 }

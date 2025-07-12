@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface JpaUserRepository extends JpaRepository<User, UUID>, CustomUserRepository {
 
   boolean existsByNameOrEmail(String name, String email);
+
 }
