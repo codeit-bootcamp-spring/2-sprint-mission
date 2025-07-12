@@ -26,6 +26,7 @@ public class JwtService {
 
   private final JwtSessionRepository jwtSessionRepository;
   private final JpaUserRepository userRepository;
+  private final JwtBlacklist jwtBlacklist;
 
   @Value("${jwt.secret}")
   private String secretString;
@@ -63,6 +64,10 @@ public class JwtService {
   }
 
   public boolean validateToken(String token) {
+    if (jwtBlacklist.isBlacklistedIn(token)) {
+      return false;
+    }
+
     try {
       Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
       return true;
@@ -81,6 +86,9 @@ public class JwtService {
       return Optional.empty();
     }
     return jwtSessionRepository.findByRefreshToken(oldRefreshToken).map(session -> {
+          String oldAccessToken = session.getAccessToken();
+          jwtBlacklist.blacklist(oldAccessToken);
+
           User user = userRepository.findById(session.getUserId()).orElseThrow(
               () -> new UserException(ErrorCode.USER_NOT_FOUND)
           );

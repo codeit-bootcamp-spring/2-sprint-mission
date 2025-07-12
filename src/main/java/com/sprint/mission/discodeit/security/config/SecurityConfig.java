@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -26,6 +27,7 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableScheduling
 public class SecurityConfig {
 
   @Bean
