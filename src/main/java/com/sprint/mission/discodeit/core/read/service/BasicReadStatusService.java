@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.core.read.service;
 
-import com.sprint.mission.discodeit.core.channel.ChannelException;
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
 import com.sprint.mission.discodeit.core.read.ReadStatusException;
@@ -9,12 +8,10 @@ import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusCreateReques
 import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
-import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.util.List;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,24 +27,11 @@ public class BasicReadStatusService implements ReadStatusService {
   private final JpaReadStatusRepository readStatusRepository;
   private final JpaChannelRepository channelRepository;
 
-  @Transactional
   @Override
+  @Transactional
   public ReadStatusDto create(ReadStatusCreateRequest request) {
-    User user = userRepository.findById(request.userId()).orElseThrow(
-        () -> new UserException(ErrorCode.USER_NOT_FOUND, request.userId())
-    );
-
-    Channel channel = channelRepository.findById(request.channelId()).orElseThrow(
-        () -> new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, request.channelId())
-    );
-
-    //TODO. 동일한 readStatus 있는 지 체크하는 로직 추가 가능할 듯
-    if (readStatusRepository.findAllByUser_Id(request.userId()).stream()
-        .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channel.getId()))) {
-      throw new DiscodeitException(ErrorCode.READ_STATUS_ALREADY_EXISTS,
-          request.channelId());
-    }
-
+    User user = userRepository.findByUserId(request.userId());
+    Channel channel = channelRepository.findByChannelId(request.channelId());
     ReadStatus status = ReadStatus.create(user, channel, request.lastReadAt());
     readStatusRepository.save(status);
 
@@ -58,23 +42,20 @@ public class BasicReadStatusService implements ReadStatusService {
     return ReadStatusDto.from(status);
   }
 
-
   @Override
-  @Transactional(readOnly = true)
-  public List<ReadStatusDto> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUser_Id(userId).stream().map(
-        ReadStatusDto::from
-    ).toList();
+  @Transactional
+  public ReadStatusDto create(User user, Channel channel) {
+    ReadStatus status = ReadStatus.create(user, channel, Instant.MIN);
+    readStatusRepository.save(status);
+    return ReadStatusDto.from(status);
   }
-
 
   @Override
   @Transactional
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
-    ReadStatus status = readStatusRepository.findById(readStatusId).orElseThrow(
-        () -> new ReadStatusException(ErrorCode.READ_STATUS_NOT_FOUND, readStatusId)
-    );
+    ReadStatus status = readStatusRepository.findByReadStatusId(readStatusId);
     status.update(request.newLastReadAt());
+    readStatusRepository.save(status);
 
     log.info("[ReadStatusService] Read Status updated : id {}, last Read At {}", status.getId(),
         status.getLastReadAt());

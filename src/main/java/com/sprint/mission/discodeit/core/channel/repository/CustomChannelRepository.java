@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface CustomChannelRepository {
 
+  Channel findByChannelId(UUID id);
+
   List<Channel> findAllByTypeOrIdIn(ChannelType type, List<UUID> ids);
 
 }

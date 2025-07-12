@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.core.read.controller;
 import com.sprint.mission.discodeit.core.read.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.core.read.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.core.read.service.ReadStatusSearchService;
 import com.sprint.mission.discodeit.core.read.service.ReadStatusService;
 import com.sprint.mission.discodeit.swagger.ReadStatusApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReadStatusController implements ReadStatusApi {
 
   private final ReadStatusService readStatusService;
+  private final ReadStatusSearchService readStatusSearchService;
 
   @PostMapping
   @PreAuthorize("#request.userId() == authentication.principal.getUserDto().id()")
@@ -50,7 +52,7 @@ public class ReadStatusController implements ReadStatusApi {
   @GetMapping
   public ResponseEntity<List<ReadStatusDto>> findAllByUserId(
       @RequestParam("userId") UUID userId) {
-    List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
+    List<ReadStatusDto> readStatuses = readStatusSearchService.findAllByUserId(userId);
 
     return ResponseEntity.ok(readStatuses);
   }
