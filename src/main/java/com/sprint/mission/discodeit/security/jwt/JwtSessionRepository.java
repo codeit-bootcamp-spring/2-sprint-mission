@@ -12,7 +12,7 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
 
   Optional<JwtSession> findByRefreshToken(String refreshToken);
 
-  List<JwtSession> findByUser(User user);
+  Optional<JwtSession> findByAccessToken(String accessToken);
 
   @Query("SELECT COUNT(js) FROM JwtSession js WHERE js.user = :user AND js.revoked = false")
   long countActiveTokensByUser(User user);

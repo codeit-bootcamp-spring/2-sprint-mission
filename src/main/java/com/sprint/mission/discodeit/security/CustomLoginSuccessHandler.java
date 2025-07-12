@@ -22,8 +22,11 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
   private final JwtService jwtService;
 
   @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-      Authentication authentication) throws IOException, ServletException {
+  public void onAuthenticationSuccess(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      Authentication authentication
+  ) throws IOException, ServletException {
     log.debug("[LOGIN SUCCESS] 진입: contentType={}, Accept={}",
         request.getContentType(), request.getHeader("Accept"));
 
@@ -42,9 +45,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setCharacterEncoding("UTF-8");
 
-    String payload = objectMapper.writeValueAsString(accessToken);
-    response.getWriter().write(payload);
-    response.getWriter().flush();
+    response.getWriter().write(objectMapper.writeValueAsString(accessToken));
 
     log.info("[성공 응답] {}", objectMapper.writeValueAsString(principal.getUserDto()));
   }

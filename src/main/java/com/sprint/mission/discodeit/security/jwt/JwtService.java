@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.security.SecureRandom;
@@ -106,12 +105,13 @@ public class JwtService {
     return exists;
   }
 
-  public JwtDto getJwtSession(String refreshToken) {
-    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(InvalidCredentialsException::invalidUser);
-    return new JwtDto(jwtSession.getAccessToken(), jwtSession.getRefreshToken());
+  @Transactional
+  public void invalidateJwtSession(String accessToken) {
+    jwtSessionRepository.findByAccessToken(accessToken)
+        .ifPresent(this::deleteExpiredToken);
   }
 
+  @Transactional
   public JwtSession findJwtSessionByRefreshToken(String refreshToken) {
     return jwtSessionRepository.findByRefreshToken(refreshToken)
         .filter(JwtSession::isValid)
@@ -119,8 +119,7 @@ public class JwtService {
   }
 
   @Transactional
-  public void deleteExpiredTokenByRefreshToken(String refreshToken) {
-    JwtSession jwtSession = findJwtSessionByRefreshToken(refreshToken);
+  public void deleteExpiredToken(JwtSession jwtSession) {
     if (!jwtSession.isExpired()) {
       jwtBlacklist.add(jwtSession.getAccessToken(), jwtSession.getExpiresAt());
     }
@@ -128,16 +127,8 @@ public class JwtService {
     log.debug("로그아웃/만료되어 JWT 삭제");
   }
 
-  public Claims extractClaims(String token) {
-    return Jwts.parser()
-        .verifyWith(secretKey)
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
-  }
-
   @Transactional
-  public JwtDto refreshToken(String refreshToken) {
+  public JwtSession refreshToken(String refreshToken) {
     log.debug("토큰 리프레시 시작");
     JwtSession jwtSession = findJwtSessionByRefreshToken(refreshToken);
     jwtSession.setRevoked(true);
@@ -145,8 +136,27 @@ public class JwtService {
     jwtBlacklist.add(jwtSession.getAccessToken(), jwtSession.getExpiresAt());
     UserDto userDto = userService.find(jwtSession.getUser().getId());
 
-    JwtSession newJwtSession = generationToken(userDto);
-    return new JwtDto(newJwtSession.getAccessToken(), newJwtSession.getRefreshToken());
+    return generationToken(userDto);
+  }
+
+  @Transactional
+  public UserDto getUserDtoFromAccessToken(String accessToken) {
+    JwtSession jwtSession = findJwtSessionByAccessToken(accessToken);
+    return userService.find(jwtSession.getUser().getId());
+  }
+
+  @Scheduled(cron = "0 0 * * * *")
+  @Transactional
+  public void clearOldTokens() {
+    log.debug("만료된 RefreshToken을 가진 JwtSession 자동 삭제 시작");
+    Instant expiresAt = Instant.now().plusSeconds(900);
+    jwtSessionRepository.deleteAllByRevokedTrueAndExpiresAtBefore(expiresAt);
+  }
+
+  private JwtSession findJwtSessionByAccessToken(String accessToken) {
+    return jwtSessionRepository.findByAccessToken(accessToken)
+        .filter(JwtSession::isValid)
+        .orElseThrow(InvalidCredentialsException::invalidUser);
   }
 
   private String createRefreshToken(User user) {
@@ -167,12 +177,5 @@ public class JwtService {
           jwtSession.setRevoked(true);
           jwtSessionRepository.save(jwtSession);
         });
-  }
-
-  @Scheduled(cron = "0 0 * * * *")
-  public void clearOldTokens() {
-    log.debug("만료된 RefreshToken을 가진 JwtSession 자동 삭제 시작");
-    Instant expiresAt = Instant.now().plusSeconds(900);
-    jwtSessionRepository.deleteAllByRevokedTrueAndExpiresAtBefore(expiresAt);
   }
 }

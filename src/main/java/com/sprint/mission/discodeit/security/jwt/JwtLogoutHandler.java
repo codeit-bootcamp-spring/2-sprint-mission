@@ -21,7 +21,8 @@ public class JwtLogoutHandler implements LogoutHandler {
     String refreshToken = extractRefreshTokenFromCookie(request);
 
     if (refreshToken != null) {
-      jwtService.deleteExpiredTokenByRefreshToken(refreshToken);
+      JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(refreshToken);
+      jwtService.deleteExpiredToken(jwtSession);
 
       ResponseCookie expiredCookie = ResponseCookie.from("refresh_token", "")
           .path("/api/auth/refresh")

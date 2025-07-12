@@ -42,9 +42,7 @@ public class BasicAuthService implements AuthService {
 
     List<JwtSession> active = jwtSessionRepository.findAllByUserAndRevokedFalse(user);
 
-    active.forEach(jwtSession -> {
-      jwtService.deleteExpiredTokenByRefreshToken(jwtSession.getRefreshToken());
-    });
+    active.forEach(jwtService::deleteExpiredToken);
 
     return userMapper.toDto(user);
   }

@@ -5,10 +5,9 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.security.jwt.JwtDto;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ public class AuthController implements AuthApi {
 
   private final AuthService authService;
   private final JwtService jwtService;
-  private final UserService userService;
 
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> csrfToken(CsrfToken csrfToken) {
@@ -44,9 +42,9 @@ public class AuthController implements AuthApi {
   public ResponseEntity<String> me(
       @CookieValue(value = "refresh_token", required = false) String refreshToken) {
     log.info("me - 정보 조회 요청");
-    JwtDto jwtDto = jwtService.getJwtSession(refreshToken);
+    JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(refreshToken);
 
-    return ResponseEntity.ok(jwtDto.accessToken());
+    return ResponseEntity.ok(jwtSession.getAccessToken());
   }
 
   @PutMapping("/role")
@@ -64,12 +62,12 @@ public class AuthController implements AuthApi {
           .body(new DiscodeitException(ErrorCode.INVALID_USER_CREDENTIALS));
     }
 
-    JwtDto newToken = jwtService.refreshToken(refreshToken);
+    JwtSession newJwtSession = jwtService.refreshToken(refreshToken);
 
-    Cookie cookie = new Cookie(JwtService.REFRESH_TOKEN, newToken.refreshToken());
+    Cookie cookie = new Cookie(JwtService.REFRESH_TOKEN, newJwtSession.getRefreshToken());
     cookie.setHttpOnly(true);
     response.addCookie(cookie);
 
-    return ResponseEntity.ok(newToken.accessToken());
+    return ResponseEntity.ok(newJwtSession.getAccessToken());
   }
 }

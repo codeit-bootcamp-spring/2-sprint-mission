@@ -1,21 +1,25 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.ErrorResponse;
 import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.SecurityMatchers;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -31,63 +35,52 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws ServletException, IOException {
     try {
-      String jwt = extractJwtFromRequest(request);
+      String bearerToken = request.getHeader("Authorization");
 
-      if (jwt != null) {
-        validateAndProcessToken(jwt, request);
+      if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+        if (isPermitAll(request)) {
+          filterChain.doFilter(request, response);
+          return;
+        }
+        logger.error("Authorization 헤더가 없거나 형식이 잘못되어 오류가 발생");
+        handleUnauthorized(response, bearerToken);
+        return;
+      }
+
+      String token = bearerToken.substring(7);
+
+      if (jwtService.validateToken(token)) {
+        UserDto userDto = jwtService.getUserDtoFromAccessToken(token);
+        CustomUserDetails userDetails = new CustomUserDetails(userDto, null);
+        UsernamePasswordAuthenticationToken auth =
+            new UsernamePasswordAuthenticationToken(userDetails, null,
+                userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        filterChain.doFilter(request, response);
+      } else {
+        jwtService.invalidateJwtSession(token);
+        handleUnauthorized(response, token);
       }
     } catch (Exception e) {
       logger.error("JWT 인증 처리 중 예상치 못한 오류 발생", e);
-      request.setAttribute("exception", InvalidCredentialsException.class);
+      request.setAttribute("exception", new InvalidCredentialsException());
     }
-
-    filterChain.doFilter(request, response);
   }
 
-  private String extractJwtFromRequest(HttpServletRequest request) {
-    String bearerToken = request.getHeader("Authorization");
-
-    if (bearerToken == null) {
-      return null;
-    }
-
-    if (!bearerToken.startsWith("Bearer ")) {
-      throw InvalidCredentialsException.invalidUser();
-    }
-
-    String token = bearerToken.substring(7);
-
-    if (token.trim().isEmpty()) {
-      throw InvalidCredentialsException.invalidUser();
-    }
-
-    return token;
+  private void handleUnauthorized(HttpServletResponse response, String token) throws IOException {
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    Map<String, Object> errorData = token != null ? Map.of("accessToken", token) : Map.of();
+    ErrorResponse errorResponse = new ErrorResponse(
+        new DiscodeitException(ErrorCode.INVALID_TOKEN, errorData),
+        HttpServletResponse.SC_UNAUTHORIZED);
+    response.setCharacterEncoding("UTF-8");
+    response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
   }
 
-  private void validateAndProcessToken(String jwt, HttpServletRequest request) {
-    try {
-
-      if (!jwtService.validateToken(jwt)) {
-        throw InvalidCredentialsException.invalidUser();
-      }
-
-      String username = jwtService.extractClaims(jwt).getSubject();
-      String role = jwtService.extractClaims(jwt).get("role", String.class);
-
-      if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + role));
-
-        UsernamePasswordAuthenticationToken authentication =
-            new UsernamePasswordAuthenticationToken(username, null, authorities);
-
-        authentication.setDetails(
-            new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-      }
-    } catch (Exception e) {
-      throw InvalidCredentialsException.invalidUser();
-    }
+  private boolean isPermitAll(HttpServletRequest request) {
+    return Arrays.stream(SecurityMatchers.PUBLIC_MATCHERS)
+        .anyMatch(matcher -> matcher.matches(request));
   }
 }
