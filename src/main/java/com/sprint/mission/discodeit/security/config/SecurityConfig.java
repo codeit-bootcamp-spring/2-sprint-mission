@@ -48,6 +48,7 @@ public class SecurityConfig {
             .requestMatchers(SecurityMatchers.FRONT, SecurityMatchers.SIGN_UP).permitAll()
             .requestMatchers(SecurityMatchers.LOGIN, SecurityMatchers.LOGOUT).permitAll()
             .requestMatchers(SecurityMatchers.GET_CSRF_TOKEN).permitAll()
+            .requestMatchers(SecurityMatchers.CACHE).permitAll()
             .requestMatchers(SecurityMatchers.ACTUATOR).permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

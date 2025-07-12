@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,9 +25,9 @@ public class CustomUserDetailsService implements UserDetailsService {
   private final JwtSessionRepository jwtSessionRepository;
 
   @Override
-  @Transactional(readOnly = true)
+  @Cacheable("users")
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByName(username).orElseThrow(
+    User user = userRepository.findByUserName(username).orElseThrow(
         () -> new UserException(ErrorCode.USER_NOT_FOUND)
     );
 
@@ -36,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Transactional
   public UserDto updateRole(UserRoleUpdateRequest request) {
     UUID id = request.userId();
-    User user = userRepository.findById(id).orElseThrow(
+    User user = userRepository.findByUserId(id).orElseThrow(
         () -> new UserException(ErrorCode.USER_NOT_FOUND, id));
     user.updateRole(request.newRole());
     userRepository.save(user);

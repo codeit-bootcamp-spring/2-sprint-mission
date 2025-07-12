@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,17 +52,17 @@ public class BasicUserService implements UserService {
 
     return UserDto.from(user);
   }
-
-
+  
   @Override
-  @Transactional(readOnly = true)
+  @Cacheable("users")
   public List<UserDto> findAll() {
-    List<User> userList = userRepository.findAllWithProfileAndStatus();
+    List<User> userList = userRepository.findALlFromDB();
     return userList.stream().map(UserDto::from).toList();
   }
 
   @Override
   @Transactional
+  @CacheEvict("users")
   public UserDto update(UUID id, UserUpdateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) {
     User user = userRepository.findById(id).orElseThrow(
@@ -83,6 +85,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict("users")
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND, userId));
