@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationF
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.stream.IntStream;
 import javax.sql.DataSource;
@@ -80,7 +81,7 @@ public class SecurityConfig {
                 logout
                     .logoutRequestMatcher(SecurityMatchers.LOGOUT)
                     .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                    .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+                    .addLogoutHandler(new JwtLogoutHandler(jwtService)) // JWT 기반 로그아웃 처리로 교체
             )
             .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
                 Customizer.withDefaults())
