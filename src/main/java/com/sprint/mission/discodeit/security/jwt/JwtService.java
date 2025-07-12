@@ -9,6 +9,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +110,30 @@ public class JwtService {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Transactional
+    public JwtSession refreshJwtSession(String refreshToken) {
+        if (!validate(refreshToken)) {
+            throw new RuntimeException();
+        }
+        JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new RuntimeException());
+
+        UUID userId = parse(refreshToken).userDto().id();
+        UserDto userDto = userRepository.findById(userId)
+                .map(userMapper::toDto)
+                .orElseThrow(() -> UserNotFoundException.withId(userId));
+        JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
+        JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
+
+        session.update(
+                accessJwtObject.token(),
+                refreshJwtObject.token(),
+                accessJwtObject.expirationTime()
+        );
+
+        return session;
     }
 
 
