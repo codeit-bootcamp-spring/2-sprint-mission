@@ -12,8 +12,11 @@ import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
 import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
 import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.create(request.name(), request.description(), ChannelType.PUBLIC);
     channelRepository.save(channel);
     log.info("Public Channel created {}", channel.getId());
-    return ChannelDto.create(channel, messageRepository, readStatusRepository);
+    return ChannelDto.create(channel);
   }
 
   @Override
@@ -46,13 +49,16 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
-    List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
-        .map(user -> ReadStatus.create(user, channel, channel.getCreatedAt()))
-        .toList();
+    List<User> userList = userRepository.findAllById(request.participantIds());
 
+    List<ReadStatus> readStatuses = userList.stream()
+        .map(user -> ReadStatus.create(user, channel, channel.getCreatedAt())
+        ).toList();
     readStatusRepository.saveAll(readStatuses);
+    List<UserDto> userDtoList = userList.stream().map(UserDto::from).toList();
+
     log.info("Private Channel created {}", channel.getId());
-    return ChannelDto.create(channel, messageRepository, readStatusRepository);
+    return ChannelDto.create(channel, userDtoList);
   }
 
   @Override
@@ -65,9 +71,14 @@ public class BasicChannelService implements ChannelService {
 
     List<Channel> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
         mySubscribedChannelIds);
-    return channels.stream()
-        .map(channel -> ChannelDto.create(channel, messageRepository, readStatusRepository))
-        .toList();
+
+    List<UserDto> userIdList = new ArrayList<>();
+    channels.forEach(channel -> {
+      List<ReadStatus> statusList = readStatusRepository.findAllByChannel_Id(channel.getId());
+      statusList.stream().map(readStatus -> UserDto.from(readStatus.getUser()))
+          .forEach(userIdList::add);
+    });
+    return channels.stream().map(channel -> ChannelDto.create(channel, userIdList)).toList();
   }
 
   @Override
@@ -82,7 +93,13 @@ public class BasicChannelService implements ChannelService {
 
     log.info("Channel Updated: username {}, newDescription {}", channel.getName(),
         channel.getDescription());
-    return ChannelDto.create(channel, messageRepository, readStatusRepository);
+
+    List<UserDto> userDtoList = new ArrayList<>();
+    List<ReadStatus> statusList = readStatusRepository.findAllByChannel_Id(channel.getId());
+    statusList.stream().map(readStatus -> UserDto.from(readStatus.getUser()))
+        .forEach(userDtoList::add);
+
+    return ChannelDto.create(channel, userDtoList);
   }
 
   @Override

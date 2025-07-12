@@ -8,8 +8,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.Instant;
+import jdk.jfr.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @ToString
@@ -29,6 +32,11 @@ public class Channel extends BaseUpdatableEntity {
   @Column(name = "type")
   private ChannelType type;
 
+  @Setter
+  @Timestamp
+  @Column(name = "last_message_at")
+  private Instant lastMessageAt;
+
   private Channel(String name, String description, ChannelType type) {
     super();
     this.name = name;
@@ -41,7 +49,9 @@ public class Channel extends BaseUpdatableEntity {
   }
 
   public void update(String newName, String newDescription) {
-    validateType(type);
+    if (this.type == ChannelType.PRIVATE) {
+      throw new ChannelException(ErrorCode.UNMODIFIABLE_ERROR);
+    }
     this.name = updateField(this.name, newName);
     this.description = updateField(this.description, newDescription);
   }
@@ -51,12 +61,6 @@ public class Channel extends BaseUpdatableEntity {
       return replace;
     } else {
       return target;
-    }
-  }
-
-  public static void validateType(ChannelType type) {
-    if (type == ChannelType.PRIVATE) {
-      throw new ChannelException(ErrorCode.UNMODIFIABLE_ERROR);
     }
   }
 }

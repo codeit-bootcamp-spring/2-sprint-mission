@@ -52,7 +52,7 @@ public class BasicMessageService implements MessageService {
         .map(binaryContentService::create).toList();
 
     Message message = Message.create(user, channel, request.content(), binaryContentIdList);
-
+    channel.setLastMessageAt(Instant.now());
     messageRepository.save(message);
 
     log.info(
