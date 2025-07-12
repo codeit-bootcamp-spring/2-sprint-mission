@@ -15,4 +15,6 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
     List<JwtSession> findAllByUser(User user);
 
     void deleteByRefreshToken(String refreshToken);
+
+    void deleteAllByUser(User user);
 }

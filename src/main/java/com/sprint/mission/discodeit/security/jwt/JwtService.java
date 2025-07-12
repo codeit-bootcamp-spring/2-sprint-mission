@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.entity.User;
+import java.util.UUID;
 
 public interface JwtService {
 
@@ -15,4 +17,6 @@ public interface JwtService {
     void invalidateJwtSession(String refreshToken); // 로그아웃 처리용
 
     JwtSession getJwtSession(String refreshToken);
+
+    void invalidateAllJwtSessionsByUserId(UUID userId);
 }

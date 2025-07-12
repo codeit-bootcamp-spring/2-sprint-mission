@@ -17,6 +17,7 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,6 +128,13 @@ public class JwtServiceImpl implements JwtService {
         return jwtSessionRepository.findByRefreshToken(refreshToken)
             .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
                 Map.of("refreshToken", refreshToken)));
+    }
+
+    @Override
+    public void invalidateAllJwtSessionsByUserId(UUID userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> UserNotFoundException.withId(userId));
+        jwtSessionRepository.deleteAllByUser(user);
     }
 
     // JWT 생성 메서드
