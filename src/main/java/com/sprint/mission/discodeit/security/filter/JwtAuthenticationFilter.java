@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final CustomUserDetailsService userDetailsService;
   private final ObjectMapper objectMapper;
+  private final JwtSessionRepository jwtSessionRepository;
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -45,15 +47,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       Map<String, Object> userDtoMap = claims.get("userDto", Map.class);
       UserDto userDto = objectMapper.convertValue(userDtoMap, UserDto.class);
 
-      UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.username());
+      //DB에 세션이 있는지 확인
+      //세션 없거나 토큰 불일치 시 인증 절차 중단
+      boolean isTokenValidInDb = jwtSessionRepository.findByUserId(userDto.id())
+          .map(session -> session.getAccessToken().equals(accessToken))
+          .orElse(false);
 
-      Authentication authentication = new UsernamePasswordAuthenticationToken(
-          userDetails,
-          null,
-          userDetails.getAuthorities()
-      );
+      if (isTokenValidInDb) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.username());
 
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+            userDetails,
+            null,
+            userDetails.getAuthorities()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+      }
     }
 
     filterChain.doFilter(request, response);
