@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.Optional;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +56,7 @@ public class JwtService {
         .refreshToken(refreshToken)
         .build();
 
-    jwtSessionRepository.findByUser_Id(userDto.id())
+    jwtSessionRepository.findByUserId(userDto.id())
         .ifPresent(existingSession -> session.setId(existingSession.getId()));
 
     return jwtSessionRepository.save(session);
@@ -112,9 +111,7 @@ public class JwtService {
         .expiration(expiration);
 
     if (userDto != null) {
-      claimsBuilder.add("id", userDto.id());
-      claimsBuilder.add("username", userDto.username());
-      claimsBuilder.add("role", userDto.role().name());
+      claimsBuilder.add("userDto", userDto);
     }
 
     return Jwts.builder()

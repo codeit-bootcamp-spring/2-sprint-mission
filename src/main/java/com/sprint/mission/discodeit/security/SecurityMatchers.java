@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 public final class SecurityMatchers {
@@ -30,6 +31,14 @@ public final class SecurityMatchers {
 
   public static final RequestMatcher ACTUATOR = new AntPathRequestMatcher(
       "/actuator/**"
+  );
+
+  public static final RequestMatcher FRONT = new OrRequestMatcher(
+      new AntPathRequestMatcher("/", HttpMethod.GET.name()),
+      new AntPathRequestMatcher("/error", HttpMethod.GET.name()),
+      new AntPathRequestMatcher("/index.html", HttpMethod.GET.name()),
+      new AntPathRequestMatcher("/assets/**", HttpMethod.GET.name()),
+      new AntPathRequestMatcher("/favicon.ico", HttpMethod.GET.name())
   );
 
   public static final String LOGIN_URL = "/api/auth/login";

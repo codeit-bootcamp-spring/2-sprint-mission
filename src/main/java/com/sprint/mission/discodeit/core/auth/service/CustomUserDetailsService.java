@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.core.auth.service;
 
+import com.sprint.mission.discodeit.core.auth.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.auth.dto.UserRoleUpdateRequest;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -41,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     user.updateRole(request.newRole());
     userRepository.save(user);
 
-    jwtSessionRepository.findByUser_Id(id).ifPresent(jwtSessionRepository::delete);
+    jwtSessionRepository.findByUserId(id).ifPresent(jwtSessionRepository::delete);
 
     return UserDto.from(user);
   }

@@ -8,7 +8,7 @@ public interface JwtSessionRepository extends JpaRepository<JwtSession, UUID> {
 
   Optional<JwtSession> findByRefreshToken(String refreshToken);
 
-  Optional<JwtSession> findByUser_Id(UUID userId);
+  Optional<JwtSession> findByUserId(UUID userId);
 
   void deleteByRefreshToken(String refreshToken);
 

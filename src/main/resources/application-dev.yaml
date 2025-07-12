@@ -31,4 +31,3 @@ logging:
         orm.jdbc.bind: info
       springframework:
         data: info
-        security: DEBUG
