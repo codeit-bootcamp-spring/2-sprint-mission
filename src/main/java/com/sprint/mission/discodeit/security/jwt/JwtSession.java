@@ -28,5 +28,14 @@ public class JwtSession extends BaseUpdatableEntity {
     @Column(columnDefinition = "timestamp with time zone", nullable = false)
     private Instant expirationTime;
 
+    public boolean isExpired() {
+        return this.expirationTime.isBefore(Instant.now());
+    }
+
+    public void update(String accessToken, String refreshToken, Instant expirationTime) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.expirationTime = expirationTime;
+    }
 
 }
