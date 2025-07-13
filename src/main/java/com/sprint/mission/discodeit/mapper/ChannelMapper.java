@@ -28,6 +28,7 @@ public abstract class ChannelMapper {
     @Autowired
     protected ReadStatusRepository readStatusRepository;
 
+    @Mapping(source = "owner.id", target = "ownerId")
     @Mapping(target = "lastMessageAt", expression = "java(getLastMessageTime(channel))")
     @Mapping(target = "participants", expression = "java(mapParticipants(channel))")
     public abstract ChannelDto toDto(Channel channel);
