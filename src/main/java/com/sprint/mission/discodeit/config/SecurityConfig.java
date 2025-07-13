@@ -29,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Slf4j
 @Configuration
@@ -42,7 +43,8 @@ public class SecurityConfig {
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
       SessionRegistry sessionRegistry,
-      PersistentTokenBasedRememberMeServices rememberMeServices
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+     CookieCsrfTokenRepository csrfTokenRepository
   )
       throws Exception {
     http
@@ -55,7 +57,7 @@ public class SecurityConfig {
             ).permitAll()
             .anyRequest().hasRole(Role.USER.name())
         )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
+        .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository))
         .logout(logout ->
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
@@ -139,5 +141,13 @@ public class SecurityConfig {
     rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
 
     return rememberMeServices;
+  }
+
+  @Bean
+  public CookieCsrfTokenRepository csrfTokenRepository() {
+    CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    repository.setCookieName("XSRF-TOKEN");
+    repository.setHeaderName("X-XSRF-TOKEN");
+    return repository;
   }
 }
