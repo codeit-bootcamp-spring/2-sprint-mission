@@ -16,7 +16,7 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
-    show-sql: true
+    show-sql: false
     open-in-view: true
   sql:
     init:
@@ -27,8 +27,7 @@ logging:
   level:
     org:
       hibernate:
-        SQL: info
-        orm.jdbc.bind: info
+        SQL: warn
+        orm.jdbc.bind: warn
       springframework:
         data: info
-        security: DEBUG

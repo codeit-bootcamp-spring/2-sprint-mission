@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
+//TODO 어떻게 수정해야할 지 몰라서 일단 냅둡니다.
 @RequiredArgsConstructor
 public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
 

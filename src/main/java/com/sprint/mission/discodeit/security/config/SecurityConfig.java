@@ -1,74 +1,62 @@
 package com.sprint.mission.discodeit.security.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.core.auth.service.CustomUserDetailsService;
-import com.sprint.mission.discodeit.core.user.entity.Role;
-import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
-import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
-import jakarta.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Value;
+import com.sprint.mission.discodeit.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@EnableScheduling
 public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(
       HttpSecurity http,
-      ObjectMapper objectMapper,
-      SessionRegistry sessionRegistry,
-      DaoAuthenticationProvider daoAuthenticationProvider,
-      PersistentTokenBasedRememberMeServices rememberMeServices) throws Exception {
+      CsrfTokenRepository repository,
+      CsrfTokenRequestAttributeHandler requestHandler,
+      JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+
     http
-        .authenticationProvider(daoAuthenticationProvider)
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers(SecurityMatchers.LOGIN_URL)
+            .csrfTokenRepository(repository)
+            .csrfTokenRequestHandler(requestHandler))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
-                SecurityMatchers.NON_API,
-                SecurityMatchers.LOGIN,
-                SecurityMatchers.GET_CSRF_TOKEN,
-                SecurityMatchers.SIGN_UP
-            ).permitAll()
-            .anyRequest().hasRole(Role.USER.name()))
-        .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
-        .logout(logout -> logout
-            .logoutRequestMatcher(SecurityMatchers.LOGOUT)
-            .invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID", "remember-me")
-            .logoutSuccessHandler((request, response, authentication) -> response.setStatus(
-                HttpServletResponse.SC_OK)
-            ))
-        .with(new Configurer(objectMapper),
-            Customizer.withDefaults())
+                SecurityMatchers.FRONT,
+                SecurityMatchers.SIGN_UP,
+                SecurityMatchers.PUBLIC).permitAll()
+            .requestMatchers(SecurityMatchers.GET_CSRF_TOKEN, SecurityMatchers.REFRESH).permitAll()
+            .requestMatchers(SecurityMatchers.LOGIN).permitAll()
+            .requestMatchers(SecurityMatchers.DOWNLOAD).permitAll()
+            .requestMatchers(SecurityMatchers.CACHE).permitAll()
+            .requestMatchers(SecurityMatchers.ACTUATOR).permitAll()
+            .anyRequest().authenticated())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(session -> session
-            .sessionFixation().migrateSession()
-            .maximumSessions(1)
-            .maxSessionsPreventsLogin(false)
-            .sessionRegistry(sessionRegistry))
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     return http.build();
   }
 
@@ -83,16 +71,9 @@ public class SecurityConfig {
   }
 
   @Bean
-  public DaoAuthenticationProvider daoAuthenticationProvider(
-      UserDetailsService userDetailsService,
-      PasswordEncoder passwordEncoder,
-      RoleHierarchy roleHierarchy
-  ) {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setUserDetailsService(userDetailsService);
-    provider.setPasswordEncoder(passwordEncoder);
-    provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
-    return provider;
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
   }
 
   @Bean
@@ -112,25 +93,17 @@ public class SecurityConfig {
   }
 
   @Bean
-  public HttpSessionEventPublisher httpSessionEventPublisher() {
-    return new HttpSessionEventPublisher();
+  public CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
+    CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+    requestHandler.setCsrfRequestAttributeName(null);
+    return requestHandler;
   }
 
   @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      UserDetailsService userDetailsService,
-      DataSource dataSource
-  ) {
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-
-    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-        key, userDetailsService, tokenRepository);
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
+  public CsrfTokenRepository csrfTokenRepository() {
+    CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    repository.setCookieName("XSRF-TOKEN");
+    repository.setHeaderName("X-XSRF-TOKEN");
+    return repository;
   }
-
 }

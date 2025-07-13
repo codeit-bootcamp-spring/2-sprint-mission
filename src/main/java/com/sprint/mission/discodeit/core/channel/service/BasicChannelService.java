@@ -9,9 +9,10 @@ import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreate
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.core.channel.repository.JpaChannelRepository;
-import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
-import com.sprint.mission.discodeit.core.read.entity.ReadStatus;
-import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
+import com.sprint.mission.discodeit.core.read.service.ReadStatusSearchService;
+import com.sprint.mission.discodeit.core.read.service.ReadStatusService;
+import com.sprint.mission.discodeit.core.user.dto.UserDto;
+import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.util.List;
@@ -28,8 +29,12 @@ public class BasicChannelService implements ChannelService {
 
   private final JpaUserRepository userRepository;
   private final JpaChannelRepository channelRepository;
-  private final JpaMessageRepository messageRepository;
-  private final JpaReadStatusRepository readStatusRepository;
+
+  private final ReadStatusService readStatusService;
+  private final ReadStatusSearchService readStatusSearchService;
+
+//  private final JpaMessageRepository messageRepository;
+//  private final JpaReadStatusRepository readStatusRepository;
 
   @Override
   @Transactional
@@ -37,7 +42,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.create(request.name(), request.description(), ChannelType.PUBLIC);
     channelRepository.save(channel);
     log.info("Public Channel created {}", channel.getId());
-    return ChannelDto.create(channel, messageRepository, readStatusRepository);
+    return ChannelDto.create(channel);
   }
 
   @Override
@@ -46,28 +51,29 @@ public class BasicChannelService implements ChannelService {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
-    List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds()).stream()
-        .map(user -> ReadStatus.create(user, channel, channel.getCreatedAt()))
-        .toList();
+    List<User> userList = userRepository.findAllById(request.participantIds());
 
-    readStatusRepository.saveAll(readStatuses);
+    for (User user : userList) {
+      readStatusService.create(user, channel);
+    }
+
+    List<UserDto> userDtoList = userList.stream().map(UserDto::from).toList();
+
     log.info("Private Channel created {}", channel.getId());
-    return ChannelDto.create(channel, messageRepository, readStatusRepository);
+    return ChannelDto.create(channel, userDtoList);
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
-        .map(ReadStatus::getChannel)
-        .map(Channel::getId)
-        .toList();
+    List<UUID> mySubscribedChannelIds = readStatusSearchService.findChannelIdByUserId(userId);
 
     List<Channel> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
         mySubscribedChannelIds);
-    return channels.stream()
-        .map(channel -> ChannelDto.create(channel, messageRepository, readStatusRepository))
-        .toList();
+
+    List<UserDto> userDtoList = readStatusSearchService.findUsersByChannels(channels);
+
+    return channels.stream().map(channel -> ChannelDto.create(channel, userDtoList)).toList();
   }
 
   @Override
@@ -82,7 +88,10 @@ public class BasicChannelService implements ChannelService {
 
     log.info("Channel Updated: username {}, newDescription {}", channel.getName(),
         channel.getDescription());
-    return ChannelDto.create(channel, messageRepository, readStatusRepository);
+
+    List<UserDto> userDtoList = readStatusSearchService.findUsersByChannelId(channelId);
+
+    return ChannelDto.create(channel, userDtoList);
   }
 
   @Override
@@ -93,8 +102,8 @@ public class BasicChannelService implements ChannelService {
     );
 
     channelRepository.delete(channel);
-    messageRepository.deleteAllByChannelId(channelId);
-    readStatusRepository.deleteAllByChannel(channel);
+//    messageRepository.deleteAllByChannelId(channelId);
+//    readStatusRepository.deleteAllByChannel(channel);
     log.info("Channel deleted {}", channelId);
   }
 }

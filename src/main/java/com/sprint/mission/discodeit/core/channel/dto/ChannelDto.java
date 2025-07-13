@@ -2,13 +2,9 @@ package com.sprint.mission.discodeit.core.channel.dto;
 
 import com.sprint.mission.discodeit.core.channel.entity.Channel;
 import com.sprint.mission.discodeit.core.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
-import com.sprint.mission.discodeit.core.read.repository.JpaReadStatusRepository;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
@@ -33,27 +29,22 @@ public record ChannelDto(
     Instant lastMessageAt
 ) {
 
-  public static ChannelDto create(Channel channel, JpaMessageRepository messageRepository,
-      JpaReadStatusRepository readStatusRepository) {
-    Instant lastMessageAt = messageRepository.findLastMessageAtByChannelId(channel.getId())
-        .orElse(Instant.MIN);
-
-    List<UserDto> userIdList = new ArrayList<>();
-    readStatusRepository.findAllByChannel_Id(channel.getId())
-        .stream().map(readStatus -> {
-          User user = readStatus.getUser();
-          return UserDto.from(user);
-        })
-        .forEach(userIdList::add);
-
+  public static ChannelDto create(Channel channel) {
     return ChannelDto.builder()
         .id(channel.getId())
         .type(channel.getType())
         .name(channel.getName())
         .description(channel.getDescription())
-        .participants(userIdList)
-        .lastMessageAt(lastMessageAt)
         .build();
   }
 
+  public static ChannelDto create(Channel channel, List<UserDto> userDtoList) {
+    return ChannelDto.builder()
+        .id(channel.getId())
+        .type(channel.getType())
+        .name(channel.getName())
+        .description(channel.getDescription())
+        .participants(userDtoList)
+        .build();
+  }
 }

@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+//TODO 어떻게 수정해야할 지 몰라서 일단 냅둡니다.
 @Component("customSecurity")
 @RequiredArgsConstructor
 public class CustomSecurity {

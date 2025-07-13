@@ -69,7 +69,7 @@ public class User extends BaseUpdatableEntity {
     return new User(name, email, password, profile, Role.CHANNEL_MANAGER);
   }
 
-  private <T> T updateFiled(T target, T replace) {
+  private <T> T updateField(T target, T replace) {
     if (replace != null && !replace.equals(target)) {
       return replace;
     } else {
@@ -84,13 +84,13 @@ public class User extends BaseUpdatableEntity {
   }
 
   public void update(String newUserName, String newEmail, BinaryContent newProfile) {
-    this.name = updateFiled(this.name, newUserName);
-    this.email = updateFiled(this.email, newEmail);
-    this.profile = updateFiled(this.profile, newProfile);
+    this.name = updateField(this.name, newUserName);
+    this.email = updateField(this.email, newEmail);
+    this.profile = updateField(this.profile, newProfile);
   }
 
   public void updateRole(Role newRole) {
-    this.role = updateFiled(this.role, newRole);
+    this.role = updateField(this.role, newRole);
   }
 
 }
