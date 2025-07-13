@@ -9,6 +9,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -33,8 +35,11 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     JwtSession jwtSession = jwtService.generateSession(principal.getUserResult());
     Cookie cookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
     response.addCookie(cookie);
-    response.getWriter()
-        .write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
+
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("accessToken", jwtSession.getAccessToken());
+    response.setContentType("application/json");
+    response.getWriter().write(objectMapper.writeValueAsString(responseBody));
   }
 
 }

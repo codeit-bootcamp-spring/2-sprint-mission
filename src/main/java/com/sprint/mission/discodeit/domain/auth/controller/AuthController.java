@@ -34,8 +34,7 @@ public class AuthController {
   public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
     String refreshToken = extractRefreshTokenFromCookie(request);
     if (refreshToken == null) {
-      return ResponseEntity.status(401)
-          .body("리프레시 토큰이 없습니다.");
+      return ResponseEntity.status(401).body("리프레시 토큰이 없습니다.");
     }
     String accessToken = jwtService.getAccessTokenByRefreshToken(refreshToken);
 
@@ -44,12 +43,9 @@ public class AuthController {
 
   @PutMapping("/role")
   public ResponseEntity<UserResult> updateRole(
-      HttpServletRequest request,
       RoleUpdateRequest roleUpdateRequest
   ) {
     UserResult userResult = authService.updateRole(roleUpdateRequest);
-    String refreshToken = extractRefreshTokenFromCookie(request);
-    jwtService.inValidateSession(refreshToken);
 
     return ResponseEntity.ok(userResult);
   }

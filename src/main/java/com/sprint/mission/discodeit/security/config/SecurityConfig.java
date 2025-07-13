@@ -26,6 +26,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -48,7 +49,6 @@ public class SecurityConfig {
       HttpSecurity httpSecurity,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      SessionRegistry sessionRegistry,
       PersistentTokenBasedRememberMeServices rememberMeServices,
       JwtService jwtService,
       JwtAuthenticationFilter jwtAuthenticationFilter
@@ -71,6 +71,9 @@ public class SecurityConfig {
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
             .addLogoutHandler(new TokenLogoutHandler(jwtService))
             .addLogoutHandler(rememberMeServices)
+        )
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(LOGOUT)
@@ -97,11 +100,6 @@ public class SecurityConfig {
     provider.setUserDetailsService(userDetailsService);
     provider.setPasswordEncoder(passwordEncoder);
     return provider;
-  }
-
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
   }
 
   @Bean

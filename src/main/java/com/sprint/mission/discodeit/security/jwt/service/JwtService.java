@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.security.jwt.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
@@ -30,6 +32,7 @@ public class JwtService {
   private final JwtProperties jwtProperties;
   private final JwtSessionRepository jwtSessionRepository;
   private final UserRepository userRepository;
+  private final ObjectMapper objectMapper;
 
   @Transactional
   public JwtSession generateSession(UserResult userResult) {
@@ -52,10 +55,10 @@ public class JwtService {
   @Transactional
   public JwtSession refreshSession(String refreshToken) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(() -> new RuntimeException("유효하지 않은 리프레시 토큰입니다."));
+        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
 
-    if (!validateAccessToken(refreshToken)) {
-      throw new RuntimeException("리프레시 토큰이 만료되었습니다.");
+    if (validateAccessToken(refreshToken)) {
+      throw new IllegalArgumentException("리프레시 토큰이 만료되었습니다.");
     }
 
     User user = jwtSession.getUser();
@@ -114,27 +117,34 @@ public class JwtService {
         .parseSignedClaims(token)
         .getPayload();
 
-    return claims.get("user", UserResult.class);
+    return claims.get("userDto", UserResult.class);
   }
 
   @Scheduled(fixedRate = 1800000)
   void cleanExpiredBlacklistTokens() {
     Instant now = Instant.now();
-    JwtBlacklist.entrySet()
-        .removeIf(entry -> entry.getValue().isBefore(now));
+    JwtBlacklist.entrySet().removeIf(entry -> entry.getValue().isBefore(now));
   }
 
-  private String createToken(UserResult user, Instant now, Instant expiresAt) {
+  private String createToken(UserResult userResult, Instant now, Instant expiresAt) {
     return Jwts.builder()
-        .subject(user.username())
+        .subject(userResult.username())
         .issuedAt(Date.from(now))
         .issuer(jwtProperties.issuer())
         .expiration(Date.from(expiresAt))
-        .claim("user", user)
+        .claim("userDto", getJsonUser(userResult))
         .claim("iat", now.getEpochSecond())
         .claim("exp", expiresAt.getEpochSecond())
         .signWith(secretKey)
         .compact();
+  }
+
+  private String getJsonUser(UserResult userResult) {
+    try {
+      return objectMapper.writeValueAsString(userResult);
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException("userResult -> 파싱에러");
+    }
   }
 
 }

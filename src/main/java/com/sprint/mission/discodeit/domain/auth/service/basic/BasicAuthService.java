@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.repository.JwtSessionRepository;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
-  private final SessionRegistry sessionRegistry;
+  private final JwtSessionRepository jwtSessionRepository;
 
   private final String adminUsername = "adminUsername";
   private final String adminPassword = "adminPassword";
@@ -56,10 +57,7 @@ public class BasicAuthService implements AuthService {
     user.updateRole(roleUpdateRequest.newRole());
     User savedUser = userRepository.save(user);
 
-    List<SessionInformation> sessions = sessionRegistry.getAllSessions(savedUser.getName(), false);
-    for (SessionInformation session : sessions) {
-      session.expireNow();
-    }
+    jwtSessionRepository.deleteById(savedUser.getId());
 
     return UserResult.fromEntity(savedUser, false);
   }

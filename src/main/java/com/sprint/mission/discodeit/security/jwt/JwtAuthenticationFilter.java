@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import static com.sprint.mission.discodeit.security.config.SecurityMatchers.GET_CSRF_TOKEN;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGIN;
 import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGOUT;
 import static com.sprint.mission.discodeit.security.config.SecurityMatchers.NON_API;
 import static com.sprint.mission.discodeit.security.config.SecurityMatchers.SIGN_UP;
@@ -29,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
 
   private static final List<RequestMatcher> EXCLUDE_MATCHERS = Arrays.asList(
-      NON_API, GET_CSRF_TOKEN, SIGN_UP, LOGOUT
+      NON_API, GET_CSRF_TOKEN, SIGN_UP, LOGOUT, LOGIN
   );
 
   @Override
@@ -51,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     String token = authHeader.substring(7);
-
     if (isInvalidToken(token)) {
       response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "유효하지 않은 토큰입니다.");
       return;
