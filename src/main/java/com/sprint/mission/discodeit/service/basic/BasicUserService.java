@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateWithFileRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateWithFileRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Role;
@@ -14,20 +15,13 @@ import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserOperationRestrictedException;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.SessionOnlineService;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +30,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -46,16 +46,17 @@ public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final BinaryContentMapper binaryContentMapper;
     private final BinaryContentRepository binaryContentRepository;
     private final MessageRepository messageRepository;
     private final BinaryContentService binaryContentService;
     private final PasswordEncoder passwordEncoder;
-    private final SessionOnlineService sessionOnlineService;
+    private final JwtService jwtService;
 
     @Transactional
     @Override
-    public UserDto create(UserCreateRequest userCreateRequest, MultipartFile profileImageFile) {
+    public UserDto create(UserCreateWithFileRequest request) {
+        UserCreateRequest userCreateRequest = request.userCreateRequest();
+        MultipartFile profileImageFile = request.profileImage();
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
@@ -70,20 +71,18 @@ public class BasicUserService implements UserService {
                 profile = processProfileImage(profileImageFile);
             } catch (Exception e) {
                 log.error("프로필 이미지 처리 중 오류 발생, User는 프로필 없이 생성됨", e);
-                profile = null;
             }
         }
 
         // User를 프로필과 함께 생성/저장
         User user = User.builder().username(username).email(email).password(encodedPassword)
-            .profile(profile).role(Role.ROLE_USER).build();
+                .profile(profile).role(Role.ROLE_USER).build();
 
         User savedUser = userRepository.save(user);
 
         boolean isOnline = isUserOnline(savedUser);
-        UserDto result = userMapper.toDto(savedUser, isOnline);
 
-        return result;
+        return userMapper.toDto(savedUser, isOnline);
     }
 
     private BinaryContent processProfileImage(MultipartFile profileImageFile) {
@@ -105,7 +104,6 @@ public class BasicUserService implements UserService {
             return null;
         }
 
-        // 데이터베이스에서 저장된 Entity를 조회
         BinaryContent result = null;
         try {
             result = binaryContentRepository.findById(profileDto.id()).orElse(null);
@@ -124,16 +122,13 @@ public class BasicUserService implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto find(UUID userId) {
-        log.info("🔍 사용자 조회 시작 - userId: {}", userId);
 
         User user = userRepository.findByIdWithProfile(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
-        log.info("🔍 사용자 조회 완료 - username: {}", user.getUsername());
-        log.info("🔍 프로필 상태 - profile null?: {}", user.getProfile() == null);
         if (user.getProfile() != null) {
             log.info("🔍 프로필 정보 - ID: {}, 파일명: {}, 크기: {}", user.getProfile().getId(),
-                user.getProfile().getFileName(), user.getProfile().getSize());
+                    user.getProfile().getFileName(), user.getProfile().getSize());
         }
 
         boolean isOnline = isUserOnline(user);
@@ -156,10 +151,9 @@ public class BasicUserService implements UserService {
             return Collections.emptyList();
         }
 
-        Set<String> onlineUsernames = sessionOnlineService.getAllOnlineUser();
-
         return users.stream().map(user -> {
-            boolean isOnline = onlineUsernames.contains(user.getUsername());
+
+            boolean isOnline = jwtService.isUserLoggedIn(user.getId());
             return userMapper.toDto(user, isOnline);
         }).collect(Collectors.toList());
     }
@@ -168,14 +162,14 @@ public class BasicUserService implements UserService {
     @PreAuthorize("authentication.principal.user.id == #userId or hasRole('ADMIN')")
     @Transactional
     @Override
-    public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
-        Optional<MultipartFile> profileRequest) {
+    public UserDto update(UUID userId, UserUpdateWithFileRequest request) {
+        UserUpdateRequest userUpdateRequest = request.getSafeUserUpdateRequest();
+        Optional<MultipartFile> profileRequest = Optional.ofNullable(request.profileImage());
 
         User user = userRepository.findByIdWithProfile(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if ("admin".equalsIgnoreCase(user.getUsername())) {
-            log.warn("관리자 계정 수정 불가");
             throw new UserOperationRestrictedException();
         }
 
@@ -187,7 +181,6 @@ public class BasicUserService implements UserService {
                 throw new UserAlreadyExistException();
             }
             user.setUsername(username);
-            log.info("사용자 수정");
         }
 
         if (email != null && !email.isEmpty() && !user.getEmail().equals(email)) {
@@ -195,13 +188,11 @@ public class BasicUserService implements UserService {
                 throw new UserAlreadyExistException();
             }
             user.setEmail(email);
-            log.info("사용자 수정");
         }
 
         if (userUpdateRequest.password() != null && !userUpdateRequest.password().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(userUpdateRequest.password());
             user.setPassword(encodedPassword);
-            log.info("사용자 수정");
         }
 
         BinaryContent oldProfile = user.getProfile();
@@ -234,38 +225,13 @@ public class BasicUserService implements UserService {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @Transactional
-    @Override
-    public UserDto updateRole(RoleUpdateRequest roleUpdateRequest) {
-        UUID targetUserId = roleUpdateRequest.userId();
-        Role newRole = roleUpdateRequest.newRole();
-
-        User targetUser = userRepository.findByIdWithProfile(targetUserId)
-            .orElseThrow(() -> new UserNotFoundException(targetUserId));
-
-        if (Role.ROLE_ADMIN.equals(targetUser.getRole())) {
-            throw new UserOperationRestrictedException();
-        }
-
-        if ("admin".equalsIgnoreCase(targetUser.getUsername())) {
-            throw new UserOperationRestrictedException();
-        }
-
-        targetUser.setRole(newRole);
-        User updatedUser = userRepository.save(targetUser);
-
-        boolean isOnline = isUserOnline(updatedUser);
-        return userMapper.toDto(updatedUser, isOnline);
-    }
-
     @PreAuthorize("authentication.principal.user.id == #userId or hasRole('ADMIN')")
     @Transactional
     @Override
     public void delete(UUID userId) {
 
         User user = userRepository.findByIdWithProfile(userId)
-            .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         if ("admin".equalsIgnoreCase(user.getUsername())) {
             throw new UserOperationRestrictedException();
@@ -306,6 +272,6 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean isUserOnline(User user) {
-        return sessionOnlineService.isUserOnline(user.getUsername());
+        return jwtService.isUserLoggedIn(user.getId());
     }
 }
