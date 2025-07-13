@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
@@ -33,23 +34,19 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(
       HttpSecurity http,
+      CsrfTokenRepository repository,
       CsrfTokenRequestAttributeHandler requestHandler,
       JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
 
     http
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers(
-                SecurityMatchers.ACTUATOR,
-                SecurityMatchers.SIGN_UP,
-                SecurityMatchers.LOGIN,
-                SecurityMatchers.LOGOUT
-            )
-            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .ignoringRequestMatchers(SecurityMatchers.LOGOUT_URL)
+            .csrfTokenRepository(repository)
             .csrfTokenRequestHandler(requestHandler))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(SecurityMatchers.FRONT, SecurityMatchers.SIGN_UP).permitAll()
-            .requestMatchers(SecurityMatchers.LOGIN, SecurityMatchers.LOGOUT).permitAll()
-            .requestMatchers(SecurityMatchers.GET_CSRF_TOKEN).permitAll()
+            .requestMatchers(SecurityMatchers.GET_CSRF_TOKEN, SecurityMatchers.REFRESH).permitAll()
+            .requestMatchers(SecurityMatchers.LOGIN).permitAll()
             .requestMatchers(SecurityMatchers.CACHE).permitAll()
             .requestMatchers(SecurityMatchers.ACTUATOR).permitAll()
             .anyRequest().authenticated())
@@ -94,7 +91,15 @@ public class SecurityConfig {
   @Bean
   public CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
     CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-    requestHandler.setCsrfRequestAttributeName(null);
+    requestHandler.setCsrfRequestAttributeName("_csrf");
     return requestHandler;
+  }
+
+  @Bean
+  public CsrfTokenRepository csrfTokenRepository() {
+    CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    repository.setCookieName("XSRF-TOKEN");
+    repository.setHeaderName("X-XSRF-TOKEN");
+    return repository;
   }
 }

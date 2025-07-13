@@ -21,12 +21,16 @@ public final class SecurityMatchers {
       "/api/auth/login", HttpMethod.POST.name()
   );
 
-  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher(
-      "/api/auth/logout", HttpMethod.POST.name()
-  );
+//  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher(
+//      "/api/auth/logout", HttpMethod.POST.name()
+//  );
 
   public static final RequestMatcher ACTUATOR = new AntPathRequestMatcher(
       "/actuator/**"
+  );
+
+  public static RequestMatcher REFRESH = new AntPathRequestMatcher(
+      "/api/auth/refresh", HttpMethod.POST.name()
   );
 
   public static final RequestMatcher CACHE = new AntPathRequestMatcher(
@@ -42,4 +46,5 @@ public final class SecurityMatchers {
   );
 
   public static final String LOGIN_URL = "/api/auth/login";
+  public static final String LOGOUT_URL = "/api/auth/logout";
 }

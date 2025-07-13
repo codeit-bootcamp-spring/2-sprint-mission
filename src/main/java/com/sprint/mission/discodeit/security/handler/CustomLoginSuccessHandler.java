@@ -18,6 +18,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final ObjectMapper objectMapper;
 
+  //TODO 어떻게 수정해야할 지 몰라서 일단 냅둡니다.
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {

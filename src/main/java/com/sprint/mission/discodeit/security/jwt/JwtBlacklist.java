@@ -31,7 +31,7 @@ public class JwtBlacklist {
     blacklist.put(accessToken, claims.getExpiration());
   }
 
-  public boolean isBlacklistedIn(String accessToken) {
+  public boolean isBlacklisted(String accessToken) {
     return blacklist.containsKey(accessToken);
   }
 

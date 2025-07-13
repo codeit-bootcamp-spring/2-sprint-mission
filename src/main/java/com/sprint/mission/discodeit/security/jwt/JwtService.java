@@ -64,7 +64,7 @@ public class JwtService {
   }
 
   public boolean validateToken(String token) {
-    if (jwtBlacklist.isBlacklistedIn(token)) {
+    if (jwtBlacklist.isBlacklisted(token)) {
       return false;
     }
 
