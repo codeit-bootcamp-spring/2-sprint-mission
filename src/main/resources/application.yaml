@@ -70,3 +70,7 @@ security:
   remember-me:
     key: ${SECURITY_REMEMBER_ME_KEY}
     token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+  jwt:
+    secret-key: ${SECURITY_JWT_SECRET_KEY}
+    expiration: ${SECURITY_JWT_EXPIRATION}
+    issuer: ${SECURITY_JWT_ISSUER}
