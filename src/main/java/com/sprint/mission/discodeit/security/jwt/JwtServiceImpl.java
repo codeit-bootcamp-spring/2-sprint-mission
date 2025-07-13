@@ -155,6 +155,13 @@ public class JwtServiceImpl implements JwtService {
         jwtSessionRepository.deleteAll(sessions);
     }
 
+    @Override
+    public List<JwtSession> getActiveJwtSessions() {
+        return jwtSessionRepository.findAll().stream()
+            .filter(session -> !session.isExpired())
+            .toList();
+    }
+
     // JWT 생성 메서드
     private JwtObject generateJwtObject(UserDto userDto, long tokenValiditySeconds) {
         Instant issuedAt = Instant.now();

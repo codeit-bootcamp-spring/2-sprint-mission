@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security.jwt;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import java.util.List;
 import java.util.UUID;
 
 public interface JwtService {
@@ -19,4 +20,6 @@ public interface JwtService {
     JwtSession getJwtSession(String refreshToken);
 
     void invalidateAllJwtSessionsByUserId(UUID userId);
+
+    List<JwtSession> getActiveJwtSessions();
 }
