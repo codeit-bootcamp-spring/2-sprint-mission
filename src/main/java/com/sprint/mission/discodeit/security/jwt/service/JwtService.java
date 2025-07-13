@@ -72,6 +72,14 @@ public class JwtService {
     jwtSessionRepository.delete(jwtSession);
   }
 
+  @Transactional(readOnly = true)
+  public String getAccessTokenByRefreshToken(String refreshToken) {
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new IllegalArgumentException("해당 jwt 세션이 없습니다."));
+
+    return jwtSession.getAccessToken();
+  }
+
   public boolean validateToken(String token) {
     try {
       Jwts.parser()

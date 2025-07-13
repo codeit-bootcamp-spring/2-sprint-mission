@@ -3,7 +3,10 @@ package com.sprint.mission.discodeit.domain.auth.controller;
 import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
   private final AuthService authService;
+  private final JwtService jwtService;
 
   @GetMapping("/csrf-token")
   public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
@@ -24,14 +28,28 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserResult> getCurrentUser(
-      @AuthenticationPrincipal CustomUserDetails userDetails
-  ) {
-    if (userDetails == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    if (refreshToken == null) {
+      return ResponseEntity.status(401)
+          .body("리프레시 토큰이 없습니다.");
+    }
+    String accessToken = jwtService.getAccessTokenByRefreshToken(refreshToken);
+
+    return ResponseEntity.ok(accessToken);
+  }
+
+  private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+    if (request.getCookies() == null) {
+      return null;
     }
 
-    return ResponseEntity.ok(userDetails.getUserResult());
+    for (Cookie cookie : request.getCookies()) {
+      if ("refresh_token".equals(cookie.getName())) {
+        return cookie.getValue();
+      }
+    }
+    return null;
   }
 
   @PutMapping("/role")
