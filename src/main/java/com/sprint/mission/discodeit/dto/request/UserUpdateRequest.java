@@ -16,5 +16,12 @@ public record UserUpdateRequest(
     Boolean online,
     String role
 ) {
+    public boolean isEmpty() {
+        return username == null && email == null && password == null 
+               && online == null && role == null;
+    }
 
+    public static UserUpdateRequest empty() {
+        return new UserUpdateRequest(null, null, null, null, null);
+    }
 }
