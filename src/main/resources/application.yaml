@@ -6,6 +6,9 @@ spring:
       maxFileSize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB  # 한 번에 최대 업로드 가능 용량
   datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -70,3 +73,8 @@ security:
   remember-me:
     key: ${SECURITY_REMEMBER_ME_KEY}
     token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+
+jwt:
+  secret: R7Y1UzXzC8KZ2IbTmj6l4Yxph8NulIWev9EzUTrsX3M=
+  access-token-expiry-seconds: 3600
+  refresh-token-expiry-seconds: 1209600
