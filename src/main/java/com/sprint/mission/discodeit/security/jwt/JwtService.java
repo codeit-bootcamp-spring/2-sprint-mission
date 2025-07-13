@@ -124,17 +124,25 @@ public class JwtService {
         UserDto userDto = userRepository.findById(userId)
                 .map(userMapper::toDto)
                 .orElseThrow(() -> UserNotFoundException.withId(userId));
-        JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
-        JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
+        JwtObject newAccessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
+        JwtObject newRefreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
         session.update(
-                accessJwtObject.token(),
-                refreshJwtObject.token(),
-                accessJwtObject.expirationTime()
+                newAccessJwtObject.token(),
+                newRefreshJwtObject.token(),
+                newAccessJwtObject.expirationTime()
         );
 
         return session;
     }
 
+    @Transactional
+    public JwtSession invalidateJwtSession(String refreshToken) {
+        JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new RuntimeException());
+
+        jwtSessionRepository.delete(session);
+        return session;
+    }
 
 }
