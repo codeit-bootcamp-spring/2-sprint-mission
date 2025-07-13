@@ -11,8 +11,8 @@
 
 ## JWT 다루기
 
-- [ ] 적절한 JWT 라이브러리를 추가하세요.
-- [ ] 다음의 요구사항을 만족하는 JwtSession을 구현하세요.
+- [x] 적절한 JWT 라이브러리를 추가하세요.
+- [x] 다음의 요구사항을 만족하는 JwtSession을 구현하세요.
     ~~~text
     패키지명: com.sprint.mission.discodeit.security.jwt
     다음의 정보를 포함하세요.
@@ -21,7 +21,7 @@
       발급된 리프레시 토큰
     데이터베이스를 통해 관리할 수 있습니다.(왜 토큰을 DB로 관리하지?)
     ~~~
-- [ ] 다음의 요구사항을 만족하는 JwtService를 구현하세요.
+- [x] 다음의 요구사항을 만족하는 JwtService를 구현하세요.
     ~~~text
     패키지명: com.sprint.mission.discodeit.security.jwt
     UserDto 정보로 토큰을 생성할 수 있습니다.
@@ -29,7 +29,7 @@
   
     토큰의 유효성을 검사할 수 있습니다.
     리프레시 토큰을 활용해 엑세스 토큰을 재발급할 수 있습니다.
-      리프레시 토큰 Rotation 전략을 활용합니다.(로테이션 전략 찾아보기)
+      리프레시 토큰 Rotation 전략을 활용합니다.(로테이션 전략은 access 갱신시 같이 갱신)
       JwtSession을 같이 수정하세요.
     리프레시 토큰을 무효화할 수 있습니다.
       JwtSession을 같이 삭제하세요.

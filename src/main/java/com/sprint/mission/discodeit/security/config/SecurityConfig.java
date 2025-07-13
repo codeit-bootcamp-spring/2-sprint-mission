@@ -93,7 +93,6 @@ public class SecurityConfig {
             .ignoringRequestMatchers(LOGOUT)
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-            // TODO: 7/11/25 200은 오지만 프론트만 접속 안되는 상태
         )
         .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
 
