@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,9 @@ public class JwtService {
   private final UserRepository userRepository;
 
   @Transactional
-  public JwtSession generateAccessToken(UserResult userResult) {
+  public JwtSession generateSession(UserResult userResult) {
+    jwtSessionRepository.deleteById(userResult.id());
+
     Instant now = Instant.now();
     Instant accessExp = now.plusSeconds(jwtProperties.accessTokenExpiration());
     Instant refreshExp = now.plusSeconds(jwtProperties.refreshTokenExpiration());
@@ -43,13 +44,13 @@ public class JwtService {
 
     User user = userRepository.findById(userResult.id())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
-
     JwtSession session = new JwtSession(accessToken, refreshToken, user);
+
     return jwtSessionRepository.save(session);
   }
 
   @Transactional
-  public JwtSession refreshAccessToken(String refreshToken) {
+  public JwtSession refreshSession(String refreshToken) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new RuntimeException("유효하지 않은 리프레시 토큰입니다."));
 

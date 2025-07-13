@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.security.filter;
 
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGIN;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGIN_URL;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.auth.dto.LogInRequest;
 import com.sprint.mission.discodeit.security.jwt.service.JwtService;
@@ -17,17 +20,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @RequiredArgsConstructor
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
-  private static final String LOGIN_URL = "/api/auth/login";
-  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(LOGIN_URL,
-      HttpMethod.POST.name());
 
   private final ObjectMapper objectMapper;
 
@@ -81,7 +78,6 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   public static JsonUsernamePasswordAuthenticationFilter createDefault(
       ObjectMapper objectMapper,
       AuthenticationManager authenticationManager,
-      SessionAuthenticationStrategy sessionAuthenticationStrategy,
       PersistentTokenBasedRememberMeServices rememberMeServices,
       JwtService jwtService
   ) {
@@ -91,8 +87,6 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     filter.setAuthenticationManager(authenticationManager);
     filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
-    filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
-    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
     filter.setRememberMeServices(rememberMeServices);
     return filter;
   }

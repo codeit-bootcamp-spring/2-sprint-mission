@@ -30,7 +30,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     response.getWriter()
         .write(objectMapper.writeValueAsString(principal.getUserResult()));
 
-    JwtSession jwtSession = jwtService.generateAccessToken(principal.getUserResult());
+    JwtSession jwtSession = jwtService.generateSession(principal.getUserResult());
     Cookie cookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
     response.addCookie(cookie);
     response.getWriter()

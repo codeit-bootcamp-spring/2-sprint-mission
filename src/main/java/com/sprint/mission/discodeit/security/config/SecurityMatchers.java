@@ -22,5 +22,8 @@ public final class SecurityMatchers {
       "/api/channels/public/**");
   public static final RequestMatcher ROLE_UPDATE = new AntPathRequestMatcher(
       "/api/auth/role");
+  public static final String LOGIN_URL = "/api/auth/login";
+  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(LOGIN_URL,
+      HttpMethod.POST.name());
 
 }

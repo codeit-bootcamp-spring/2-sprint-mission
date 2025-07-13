@@ -60,7 +60,7 @@ public class AuthController {
       HttpServletResponse response
   ) {
     String refreshToken = extractRefreshTokenFromCookie(request);
-    JwtSession jwtSession = jwtService.refreshAccessToken(refreshToken);
+    JwtSession jwtSession = jwtService.refreshSession(refreshToken);
 
     Cookie newRefreshCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
     response.addCookie(newRefreshCookie);
