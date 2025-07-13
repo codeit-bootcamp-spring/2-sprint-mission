@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
-import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
@@ -23,8 +21,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,7 +43,6 @@ public class SecurityConfig {
         HttpSecurity http,
         ObjectMapper objectMapper,
         DaoAuthenticationProvider daoAuthenticationProvider,
-        SessionRegistry sessionRegistry,
         PersistentTokenBasedRememberMeServices rememberMeServices,
         JwtService jwtService
     )
@@ -87,12 +83,7 @@ public class SecurityConfig {
                 Customizer.withDefaults())
             .sessionManagement(session ->
                 session
-                    .sessionFixation().migrateSession()
-                    .maximumSessions(1)
-                    .maxSessionsPreventsLogin(false)
-                    .sessionRegistry(sessionRegistry)
-                    .expiredSessionStrategy(
-                        new CustomSessionInformationExpiredStrategy(objectMapper))
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
 
@@ -142,11 +133,6 @@ public class SecurityConfig {
             .implies(Role.USER.name())
 
             .build();
-    }
-
-    @Bean
-    public SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
     }
 
     @Bean
