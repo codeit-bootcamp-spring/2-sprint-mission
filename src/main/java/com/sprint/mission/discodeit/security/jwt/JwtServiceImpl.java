@@ -15,8 +15,8 @@ import io.jsonwebtoken.security.Keys;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +40,7 @@ public class JwtServiceImpl implements JwtService {
     private final JwtSessionRepository jwtSessionRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final JwtBlacklist jwtBlacklist;
 
     @Override
     public JwtSession registerJwtSession(UserDto userDto) {
@@ -62,6 +63,12 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean validate(String token) {
+
+        if (jwtBlacklist.contains(token)) {
+            log.warn("블랙리스트에 등록된 토큰입니다.");
+            return false;
+        }
+
         try {
             SecretKey key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
             Jwts.parser()
@@ -103,6 +110,7 @@ public class JwtServiceImpl implements JwtService {
             ));
 
         if (session.isExpired()) {
+            jwtBlacklist.add(session.getAccessToken(), session.getExpirationTime());
             jwtSessionRepository.delete(session);
             throw new DiscodeitException(
                 ErrorCode.EXPIRED_TOKEN,
@@ -120,7 +128,11 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public void invalidateJwtSession(String refreshToken) {
-        jwtSessionRepository.deleteByRefreshToken(refreshToken);
+        jwtSessionRepository.findByRefreshToken(refreshToken)
+            .ifPresent(session -> {
+                jwtBlacklist.add(session.getAccessToken(), session.getExpirationTime());
+                jwtSessionRepository.delete(session);
+            });
     }
 
     @Override
@@ -134,7 +146,13 @@ public class JwtServiceImpl implements JwtService {
     public void invalidateAllJwtSessionsByUserId(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> UserNotFoundException.withId(userId));
-        jwtSessionRepository.deleteAllByUser(user);
+
+        List<JwtSession> sessions = jwtSessionRepository.findAllByUser(user);
+
+        sessions.forEach(session ->
+            jwtBlacklist.add(session.getAccessToken(), session.getExpirationTime())
+        );
+        jwtSessionRepository.deleteAll(sessions);
     }
 
     // JWT 생성 메서드
