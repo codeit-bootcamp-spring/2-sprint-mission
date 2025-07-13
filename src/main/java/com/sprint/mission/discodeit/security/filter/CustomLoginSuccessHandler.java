@@ -23,23 +23,20 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
   private final JwtService jwtService;
 
   @Override
-  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+  public void onAuthenticationSuccess(
+      HttpServletRequest request,
+      HttpServletResponse response,
       Authentication authentication
   ) throws IOException, ServletException {
     CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.getWriter()
-        .write(objectMapper.writeValueAsString(principal.getUserResult()));
 
     JwtSession jwtSession = jwtService.generateSession(principal.getUserResult());
     Cookie cookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
     response.addCookie(cookie);
 
-    Map<String, String> responseBody = new HashMap<>();
-    responseBody.put("accessToken", jwtSession.getAccessToken());
-    response.setContentType("application/json");
-    response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+    response.getWriter().write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
   }
 
 }

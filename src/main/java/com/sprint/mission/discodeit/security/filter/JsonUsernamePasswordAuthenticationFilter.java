@@ -29,10 +29,12 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   private final ObjectMapper objectMapper;
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request,
-      HttpServletResponse response) throws AuthenticationException {
+  public Authentication attemptAuthentication(
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) throws AuthenticationException {
 
-    if (!request.getMethod().equals("POST")) {
+    if (!request.getMethod().equals(HttpMethod.POST.name())) {
       throw new AuthenticationServiceException(
           "Authentication method not supported: " + request.getMethod());
     }

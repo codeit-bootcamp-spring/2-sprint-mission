@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.security.jwt.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.User;
@@ -117,7 +118,8 @@ public class JwtService {
         .parseSignedClaims(token)
         .getPayload();
 
-    return claims.get("userDto", UserResult.class);
+    Map<String, Object> userMap = claims.get("userDto", Map.class);
+    return objectMapper.convertValue(userMap, UserResult.class);
   }
 
   @Scheduled(fixedRate = 1800000)
@@ -127,24 +129,19 @@ public class JwtService {
   }
 
   private String createToken(UserResult userResult, Instant now, Instant expiresAt) {
+    Map<String, Object> userMap = objectMapper.convertValue(userResult, new TypeReference<>() {
+    });
+
     return Jwts.builder()
         .subject(userResult.username())
         .issuedAt(Date.from(now))
         .issuer(jwtProperties.issuer())
         .expiration(Date.from(expiresAt))
-        .claim("userDto", getJsonUser(userResult))
+        .claim("userDto", userMap)
         .claim("iat", now.getEpochSecond())
         .claim("exp", expiresAt.getEpochSecond())
         .signWith(secretKey)
         .compact();
-  }
-
-  private String getJsonUser(UserResult userResult) {
-    try {
-      return objectMapper.writeValueAsString(userResult);
-    } catch (JsonProcessingException e) {
-      throw new IllegalArgumentException("userResult -> 파싱에러");
-    }
   }
 
 }
