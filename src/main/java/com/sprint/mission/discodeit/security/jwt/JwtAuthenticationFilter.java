@@ -65,8 +65,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  private boolean isInvalidToken(String token) {
-    return !jwtService.validateToken(token);
+  private boolean isInvalidToken(String accessToken) {
+    return !jwtService.validateAccessToken(accessToken);
   }
 
 }

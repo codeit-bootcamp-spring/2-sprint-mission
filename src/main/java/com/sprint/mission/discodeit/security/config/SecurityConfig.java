@@ -72,7 +72,7 @@ public class SecurityConfig {
             .addLogoutHandler(new TokenLogoutHandler(jwtService))
             .addLogoutHandler(rememberMeServices)
         )
-        .sessionManagement(session ->
+        .sessionManagement(session -> // 다 없애야하나?
             session
                 .sessionFixation().migrateSession()
                 .maximumSessions(1)
