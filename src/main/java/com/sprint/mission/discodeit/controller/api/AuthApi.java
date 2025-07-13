@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 
 @Tag(name = "Auth", description = "인증 API")
 public interface AuthApi {
@@ -35,7 +36,7 @@ public interface AuthApi {
           responseCode = "401", description = "인증되지 않은 세션"
       )
   })
-  ResponseEntity<UserDto> me(@Parameter(hidden = true) DiscodeitUserDetails userDetails);
+  ResponseEntity<String> me(@CookieValue(name = "refresh_token", required = false) String refreshToken);
 
   @Operation(summary = "사용자 권한 수정")
   @ApiResponses(value = {
@@ -45,4 +46,4 @@ public interface AuthApi {
       )
   })
   ResponseEntity<UserDto> role(@Parameter(description = "권한 수정 요청 정보") RoleUpdateRequest request);
-} 
+}
