@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security.jwt.service;
 
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ public class JwtService {
     String refreshToken = createToken(userResult, now, refreshExp);
 
     User user = userRepository.findById(userResult.id())
-        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
     JwtSession session = new JwtSession(accessToken, refreshToken, user);
     return jwtSessionRepository.save(session);

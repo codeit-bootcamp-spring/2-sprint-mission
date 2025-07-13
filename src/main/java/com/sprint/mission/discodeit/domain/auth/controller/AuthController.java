@@ -3,16 +3,21 @@ package com.sprint.mission.discodeit.domain.auth.controller;
 import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,13 +45,24 @@ public class AuthController {
   }
 
   @PutMapping("/role")
-  public ResponseEntity<UserResult> updateRole(
-      RoleUpdateRequest roleUpdateRequest,
-      @AuthenticationPrincipal CustomUserDetails userDetails
-  ) {
+  public ResponseEntity<UserResult> updateRole(RoleUpdateRequest roleUpdateRequest) {
     UserResult userResult = authService.updateRole(roleUpdateRequest);
 
     return ResponseEntity.ok(userResult);
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<String> revokeAccessToken(
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    JwtSession jwtSession = jwtService.refreshAccessToken(refreshToken);
+
+    Cookie newRefreshCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
+    response.addCookie(newRefreshCookie);
+
+    return ResponseEntity.ok(jwtSession.getAccessToken());
   }
 
   private String extractRefreshTokenFromCookie(HttpServletRequest request) {
