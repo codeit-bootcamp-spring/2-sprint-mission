@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
-import com.sprint.mission.discodeit.security.SessionManager;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.FileUtil;
 import jakarta.validation.Valid;
@@ -18,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController implements UserApi {
 
   private final UserService userService;
-  private final SessionManager sessionManager;
 
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<UserDto> create(
@@ -48,9 +43,6 @@ public class UserController implements UserApi {
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
         .flatMap(FileUtil::toBinaryRequest);
     UserDto createdUser = userService.createUser(request, profileRequest);
-
-    boolean online = isUserOnline(createdUser.id());
-    createdUser = createdUser.toBuilder().online(online).build();
 
     log.debug("사용자 생성 응답: {}", createdUser);
     return ResponseEntity
@@ -69,9 +61,6 @@ public class UserController implements UserApi {
         .flatMap(FileUtil::toBinaryRequest);
     UserDto updatedUser = userService.updateUser(userId, request, profileRequest);
 
-    boolean online = isUserOnline(updatedUser.id());
-    updatedUser = updatedUser.toBuilder().online(online).build();
-
     log.debug("사용자 수정 응답: {}", updatedUser);
     return ResponseEntity.ok(updatedUser);
   }
@@ -79,16 +68,8 @@ public class UserController implements UserApi {
   @GetMapping
   public ResponseEntity<List<UserDto>> getAll() {
     List<UserDto> users = userService.findAll();
-
-    List<UUID> onlineUserIds = sessionManager.getOnlineUserIds();
-    List<UserDto> updatedUsers = users.stream()
-        .map(dto -> dto.toBuilder()
-            .online(onlineUserIds.contains(dto.id()))
-            .build())
-        .toList();
-
-    log.debug("사용자 목록 조회 응답: count={}", updatedUsers.size());
-    return ResponseEntity.ok(updatedUsers);
+    log.debug("사용자 목록 조회 응답: count={}", users.size());
+    return ResponseEntity.ok(users);
   }
 
   @DeleteMapping("/{userId}")
@@ -99,13 +80,5 @@ public class UserController implements UserApi {
     return ResponseEntity.noContent().build();
   }
 
-  private boolean isUserOnline(UUID userId) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-      return false;
-    }
 
-    CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-    return Optional.of(userDetails.getUserDto().id()).map(id -> id.equals(userId)).orElse(false);
-  }
 }
