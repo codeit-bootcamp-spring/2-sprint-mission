@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.security.filter.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
-import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.filter.TokenLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import javax.sql.DataSource;
@@ -69,7 +69,7 @@ public class SecurityConfig {
         .logout(logout -> logout
             .logoutRequestMatcher(LOGOUT)
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-            .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+            .addLogoutHandler(new TokenLogoutHandler(jwtService))
             .addLogoutHandler(rememberMeServices)
         )
         .sessionManagement(session ->

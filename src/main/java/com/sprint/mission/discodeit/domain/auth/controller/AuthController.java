@@ -39,6 +39,16 @@ public class AuthController {
     return ResponseEntity.ok(accessToken);
   }
 
+  @PutMapping("/role")
+  public ResponseEntity<UserResult> updateRole(
+      RoleUpdateRequest roleUpdateRequest,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    UserResult userResult = authService.updateRole(roleUpdateRequest);
+
+    return ResponseEntity.ok(userResult);
+  }
+
   private String extractRefreshTokenFromCookie(HttpServletRequest request) {
     if (request.getCookies() == null) {
       return null;
@@ -50,16 +60,6 @@ public class AuthController {
       }
     }
     return null;
-  }
-
-  @PutMapping("/role")
-  public ResponseEntity<UserResult> updateRole(
-      RoleUpdateRequest roleUpdateRequest,
-      @AuthenticationPrincipal CustomUserDetails userDetails
-  ) {
-    UserResult userResult = authService.updateRole(roleUpdateRequest);
-
-    return ResponseEntity.ok(userResult);
   }
 
 }
