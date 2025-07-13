@@ -8,9 +8,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.stream.IntStream;
-import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -27,8 +25,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -43,7 +39,6 @@ public class SecurityConfig {
         HttpSecurity http,
         ObjectMapper objectMapper,
         DaoAuthenticationProvider daoAuthenticationProvider,
-        PersistentTokenBasedRememberMeServices rememberMeServices,
         JwtService jwtService
     )
         throws Exception {
@@ -84,8 +79,7 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+            );
 
         JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService,
             objectMapper);
@@ -133,22 +127,5 @@ public class SecurityConfig {
             .implies(Role.USER.name())
 
             .build();
-    }
-
-    @Bean
-    public PersistentTokenBasedRememberMeServices rememberMeServices(
-        @Value("${security.remember-me.key}") String key,
-        @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-        UserDetailsService userDetailsService,
-        DataSource dataSource
-    ) {
-        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-        tokenRepository.setDataSource(dataSource);
-
-        PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-            key, userDetailsService, tokenRepository);
-        rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-        return rememberMeServices;
     }
 }
