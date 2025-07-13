@@ -4,13 +4,11 @@ import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +48,6 @@ public class BasicAuthService implements AuthService {
     String encodedPassword = passwordEncoder.encode(password);
     User admin = new User(username, email, encodedPassword, null);
     admin.updateRole(Role.ADMIN);
-
-    Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(admin, now);
-
     userRepository.save(admin);
 
     UserDto adminDto = userMapper.toDto(admin);
