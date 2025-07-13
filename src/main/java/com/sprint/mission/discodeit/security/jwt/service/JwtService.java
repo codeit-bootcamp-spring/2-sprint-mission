@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security.jwt.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
@@ -37,7 +36,10 @@ public class JwtService {
 
   @Transactional
   public JwtSession generateSession(UserResult userResult) {
-    jwtSessionRepository.deleteById(userResult.id());
+    JwtSession jwtSession = jwtSessionRepository.findById(userResult.id())
+        .orElseThrow(() -> new IllegalArgumentException("해당 jwt 세션이 없습니다."));
+    jwtSessionRepository.delete(jwtSession);
+    JwtBlacklist.put(jwtSession.getAccessToken(), Instant.now());
 
     Instant now = Instant.now();
     Instant accessExp = now.plusSeconds(jwtProperties.accessTokenExpiration());
@@ -58,7 +60,7 @@ public class JwtService {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
 
-    if (validateAccessToken(refreshToken)) {
+    if (isInvalidAccessToken(refreshToken)) {
       throw new IllegalArgumentException("리프레시 토큰이 만료되었습니다.");
     }
 
@@ -77,7 +79,7 @@ public class JwtService {
   }
 
   @Transactional
-  public void inValidateSession(String refreshToken) {
+  public void invalidateSession(String refreshToken) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
         .orElseThrow(() -> new IllegalArgumentException("해당 jwt 세션이 없습니다."));
 
@@ -93,9 +95,9 @@ public class JwtService {
     return jwtSession.getAccessToken();
   }
 
-  public boolean validateAccessToken(String accessToken) {
+  public boolean isInvalidAccessToken(String accessToken) {
     if (JwtBlacklist.containsKey(accessToken)) {
-      return false;
+      return true;
     }
 
     try {
@@ -104,9 +106,9 @@ public class JwtService {
           .requireIssuer(jwtProperties.issuer())
           .build()
           .parseSignedClaims(accessToken);
-      return true;
-    } catch (JwtException e) {
       return false;
+    } catch (JwtException e) {
+      return true;
     }
   }
 

@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private boolean isInvalidToken(String accessToken) {
-    return !jwtService.validateAccessToken(accessToken);
+    return jwtService.isInvalidAccessToken(accessToken);
   }
 
 }

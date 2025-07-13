@@ -20,7 +20,7 @@ public class TokenLogoutHandler implements LogoutHandler {
       Authentication authentication
   ) {
     String refreshToken = extractRefreshTokenFromCookie(request);
-    jwtService.inValidateSession(refreshToken);
+    jwtService.invalidateSession(refreshToken);
   }
 
   private String extractRefreshTokenFromCookie(HttpServletRequest request) {
