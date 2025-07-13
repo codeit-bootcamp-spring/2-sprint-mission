@@ -45,8 +45,13 @@ public class AuthController {
   }
 
   @PutMapping("/role")
-  public ResponseEntity<UserResult> updateRole(RoleUpdateRequest roleUpdateRequest) {
+  public ResponseEntity<UserResult> updateRole(
+      HttpServletRequest request,
+      RoleUpdateRequest roleUpdateRequest
+  ) {
     UserResult userResult = authService.updateRole(roleUpdateRequest);
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    jwtService.inValidateSession(refreshToken);
 
     return ResponseEntity.ok(userResult);
   }
