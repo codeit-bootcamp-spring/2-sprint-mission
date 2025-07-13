@@ -118,7 +118,7 @@ public class JwtService {
   }
 
   @Scheduled(fixedRate = 1800000)
-  private void cleanExpiredBlacklistTokens() {
+  void cleanExpiredBlacklistTokens() {
     Instant now = Instant.now();
     JwtBlacklist.entrySet()
         .removeIf(entry -> entry.getValue().isBefore(now));
