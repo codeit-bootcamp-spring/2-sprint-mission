@@ -25,17 +25,17 @@ public interface AuthApi {
   })
   ResponseEntity<CsrfToken> getCsrfToken(@Parameter(hidden = true) CsrfToken csrfToken);
 
-  @Operation(summary = "세션을 활용한 현재 사용자 정보 조회")
+  @Operation(summary = "리프레시 토큰을 활용한 현재 엑세스 토큰 조회")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "조회 성공",
-          content = @Content(schema = @Schema(implementation = UserDto.class))
+          content = @Content(schema = @Schema(implementation = String.class))
       ),
       @ApiResponse(
-          responseCode = "401", description = "인증되지 않은 세션"
+          responseCode = "401", description = "인증되지 않은 토큰"
       )
   })
-  ResponseEntity<UserDto> me(@Parameter(hidden = true) DiscodeitUserDetails userDetails);
+  ResponseEntity<String> me(@Parameter(hidden = true) String refreshToken);
 
   @Operation(summary = "사용자 권한 수정")
   @ApiResponses(value = {
