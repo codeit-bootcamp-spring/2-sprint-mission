@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import java.util.stream.IntStream;
 import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Slf4j
 @Configuration
@@ -53,9 +56,15 @@ public class SecurityConfig {
                 SecurityMatchers.GET_CSRF_TOKEN,
                 SecurityMatchers.SIGN_UP
             ).permitAll()
-            .anyRequest().hasRole(Role.USER.name())
+            .anyRequest().hasRole("USER")
+        ).csrf(csrf -> csrf
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .ignoringRequestMatchers(
+                SecurityMatchers.LOGOUT,
+                SecurityMatchers.SIGN_UP,
+                new AntPathRequestMatcher("/api/auth/login", "POST")
+            )
         )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT))
         .logout(logout ->
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
@@ -79,7 +88,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  public String debugFilterChain(SecurityFilterChain chain) {
+  public String debugFilterChain(@Qualifier("filterChain") SecurityFilterChain chain) {
     log.debug("Debug Filter Chain...");
     int filterSize = chain.getFilters().size();
     IntStream.range(0, filterSize)
