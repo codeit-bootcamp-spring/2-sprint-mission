@@ -3,9 +3,10 @@ package com.sprint.mission.discodeit.security.jwt.service;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
 import com.sprint.mission.discodeit.security.jwt.repository.JwtSessionRepository;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import java.time.Instant;
@@ -71,7 +72,7 @@ public class JwtService {
     jwtSessionRepository.delete(jwtSession);
   }
 
-  private boolean validateToken(String token) {
+  public boolean validateToken(String token) {
     try {
       Jwts.parser()
           .verifyWith(secretKey)
@@ -82,6 +83,17 @@ public class JwtService {
     } catch (JwtException e) {
       return false;
     }
+  }
+
+  public UserResult parseUser(String token) {
+    Claims claims = Jwts.parser()
+        .verifyWith(secretKey)
+        .requireIssuer(jwtProperties.issuer())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return claims.get("user", UserResult.class);
   }
 
   private String createToken(UserResult user, Instant now, Instant expiresAt) {

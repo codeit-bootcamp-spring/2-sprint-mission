@@ -1,16 +1,24 @@
 package com.sprint.mission.discodeit.security.config;
 
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.GET_CSRF_TOKEN;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGOUT;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.NON_API;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.PUBLIC_CHANNEL_ACCESS;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.ROLE_UPDATE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.SIGN_UP;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.security.filter.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
 import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
-import com.sprint.mission.discodeit.domain.user.entity.Role;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,27 +37,11 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-
-  private static final RequestMatcher NON_API = new NegatedRequestMatcher(
-      new AntPathRequestMatcher("/api/**"));
-  private static final RequestMatcher GET_CSRF_TOKEN = new AntPathRequestMatcher(
-      "/api/auth/csrf-token");
-  private static final RequestMatcher SIGN_UP = new AntPathRequestMatcher("/api/users",
-      HttpMethod.POST.name());
-  private static final RequestMatcher LOGOUT = new AntPathRequestMatcher("/api/auth/logout",
-      HttpMethod.POST.name());
-  private static final RequestMatcher PUBLIC_CHANNEL_ACCESS = new AntPathRequestMatcher(
-      "/api/channels/public/**");
-  private static final RequestMatcher ROLE_UPDATE = new AntPathRequestMatcher(
-      "/api/auth/role");
 
   @Bean
   public SecurityFilterChain configure(
@@ -58,7 +50,8 @@ public class SecurityConfig {
       DaoAuthenticationProvider daoAuthenticationProvider,
       SessionRegistry sessionRegistry,
       PersistentTokenBasedRememberMeServices rememberMeServices,
-      JwtService jwtService
+      JwtService jwtService,
+      JwtAuthenticationFilter jwtAuthenticationFilter
   ) throws Exception {
     httpSecurity
         .authorizeHttpRequests(auth -> auth
@@ -92,7 +85,8 @@ public class SecurityConfig {
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+        .addFilterBefore(jwtAuthenticationFilter, JsonUsernamePasswordAuthenticationFilter.class);
 
     return httpSecurity.build();
   }
