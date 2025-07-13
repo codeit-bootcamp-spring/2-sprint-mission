@@ -5,9 +5,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
 import java.util.Objects;
-import java.util.UUID;
+
 import lombok.Getter;
 
 @Getter
@@ -25,34 +29,35 @@ public class Channel extends BaseEntity {
     @Column(nullable = true)
     private String description;
 
-    @Column(name = "owner_id", nullable = false)
-    private UUID ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     protected Channel() {
         super();
     }
 
-    public Channel(ChannelType type, String name, String description, UUID ownerId) {
+    public Channel(ChannelType type, String name, String description, User owner) {
         super();
         this.type = type;
         this.name = name;
         this.description = description;
-        this.ownerId = ownerId;
+        this.owner = owner;
     }
 
     public boolean update(String newName, String newDescription) {
         boolean updated = false;
-        
+
         if (newName != null && !newName.equals(this.name)) {
             this.name = newName;
             updated = true;
         }
-        
+
         if (!Objects.equals(this.description, newDescription)) {
             this.description = newDescription;
             updated = true;
         }
-        
+
         return updated;
     }
 

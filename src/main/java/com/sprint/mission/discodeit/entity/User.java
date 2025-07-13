@@ -7,6 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -15,7 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
-public class User extends BaseUpdatableEntity {
+public class User extends BaseUpdatableEntity implements UserDetails {
 
     @Column(nullable = false)
     private String username;
@@ -35,24 +41,29 @@ public class User extends BaseUpdatableEntity {
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private BinaryContent profile;
 
-    public User(String username, String email, String password,
-        BinaryContent nullableProfileObject) {
-        super();
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.profile = nullableProfileObject;
-        this.role = Role.ROLE_USER;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(this.role.name()));
     }
 
-    public User(String username, String email, String password,
-        BinaryContent nullableProfileObject, Role role) {
-        super();
-        this.email = email;
-        this.password = password;
-        this.username = username;
-        this.profile = nullableProfileObject;
-        this.role = role != null ? role : Role.ROLE_USER;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
 
