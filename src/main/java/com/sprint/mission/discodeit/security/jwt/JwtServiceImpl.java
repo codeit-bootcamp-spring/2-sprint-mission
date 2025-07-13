@@ -44,12 +44,15 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public JwtSession registerJwtSession(UserDto userDto) {
+        // 기존 로그인 세션이 있으면 삭제 (동시 로그인 제한)
+        User user = userRepository.findById(userDto.id())
+            .orElseThrow(() -> UserNotFoundException.withId(userDto.id()));
+
+        jwtSessionRepository.deleteAllByUser(user); // 동시 로그인 제한 처리
+
         // access, refresh 토큰 생성
         JwtObject accessJwt = generateJwtObject(userDto, accessTokenValiditySeconds);
         JwtObject refreshJwt = generateJwtObject(userDto, refreshTokenValiditySeconds);
-
-        User user = userRepository.findById(userDto.id())
-            .orElseThrow(() -> UserNotFoundException.withId(userDto.id()));
 
         JwtSession session = JwtSession.builder()
             .user(user)
