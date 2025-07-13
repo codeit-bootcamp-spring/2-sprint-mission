@@ -44,6 +44,4 @@ public class AuthController {
     return ResponseEntity.ok(userResult);
   }
 
-  // 로그인
-
 }

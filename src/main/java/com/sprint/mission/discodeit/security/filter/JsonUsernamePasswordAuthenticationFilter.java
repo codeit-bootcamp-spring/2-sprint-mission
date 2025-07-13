@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.auth.dto.LogInRequest;
+import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,9 +26,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private static final String LOGIN_URL = "/api/auth/login";
-
-  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(
-      "/api/auth/login", HttpMethod.POST.name());
+  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(LOGIN_URL,
+      HttpMethod.POST.name());
 
   private final ObjectMapper objectMapper;
 
@@ -57,10 +57,12 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
     private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
 
-    public Configurer(ObjectMapper objectMapper) {
+    public Configurer(ObjectMapper objectMapper, JwtService jwtService) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), LOGIN_URL);
       this.objectMapper = objectMapper;
+      this.jwtService = jwtService;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     @Override
     public void init(HttpSecurity http) {
       loginProcessingUrl(LOGIN_URL);
-      successHandler(new CustomLoginSuccessHandler(objectMapper));
+      successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
       failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
   }
@@ -80,13 +82,14 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       ObjectMapper objectMapper,
       AuthenticationManager authenticationManager,
       SessionAuthenticationStrategy sessionAuthenticationStrategy,
-      PersistentTokenBasedRememberMeServices rememberMeServices
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+      JwtService jwtService
   ) {
     JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
         objectMapper);
     filter.setRequiresAuthenticationRequestMatcher(LOGIN);
     filter.setAuthenticationManager(authenticationManager);
-    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
     filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
     filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);

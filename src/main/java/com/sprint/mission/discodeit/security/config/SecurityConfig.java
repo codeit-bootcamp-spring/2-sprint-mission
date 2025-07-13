@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.filter.CustomSessionInformationExpiredStrategy;
-import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
 import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
+import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,12 +25,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -59,7 +57,8 @@ public class SecurityConfig {
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
       SessionRegistry sessionRegistry,
-      PersistentTokenBasedRememberMeServices rememberMeServices
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+      JwtService jwtService
   ) throws Exception {
     httpSecurity
         .authorizeHttpRequests(auth -> auth
@@ -72,8 +71,7 @@ public class SecurityConfig {
             .requestMatchers(PUBLIC_CHANNEL_ACCESS).hasRole(Role.CHANNEL_MANAGER.name())
             .anyRequest().hasRole(Role.USER.name())
         )
-        .with(new Configurer(objectMapper),
-            Customizer.withDefaults())
+        .with(new Configurer(objectMapper, jwtService), Customizer.withDefaults())
         .authenticationProvider(daoAuthenticationProvider)
         .logout(logout -> logout
             .logoutRequestMatcher(LOGOUT)
