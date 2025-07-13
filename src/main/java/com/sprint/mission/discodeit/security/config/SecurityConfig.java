@@ -40,13 +40,17 @@ public class SecurityConfig {
 
     http
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers(SecurityMatchers.LOGOUT_URL)
+            .ignoringRequestMatchers(SecurityMatchers.LOGIN_URL)
             .csrfTokenRepository(repository)
             .csrfTokenRequestHandler(requestHandler))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(SecurityMatchers.FRONT, SecurityMatchers.SIGN_UP).permitAll()
+            .requestMatchers(
+                SecurityMatchers.FRONT,
+                SecurityMatchers.SIGN_UP,
+                SecurityMatchers.PUBLIC).permitAll()
             .requestMatchers(SecurityMatchers.GET_CSRF_TOKEN, SecurityMatchers.REFRESH).permitAll()
             .requestMatchers(SecurityMatchers.LOGIN).permitAll()
+            .requestMatchers(SecurityMatchers.DOWNLOAD).permitAll()
             .requestMatchers(SecurityMatchers.CACHE).permitAll()
             .requestMatchers(SecurityMatchers.ACTUATOR).permitAll()
             .anyRequest().authenticated())
@@ -91,7 +95,7 @@ public class SecurityConfig {
   @Bean
   public CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
     CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-    requestHandler.setCsrfRequestAttributeName("_csrf");
+    requestHandler.setCsrfRequestAttributeName(null);
     return requestHandler;
   }
 

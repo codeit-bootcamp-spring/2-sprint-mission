@@ -17,8 +17,15 @@ public final class SecurityMatchers {
   public static final RequestMatcher SIGN_UP = new AntPathRequestMatcher(
       "/api/users", HttpMethod.POST.name());
 
+  public static final RequestMatcher PUBLIC = new AntPathRequestMatcher(
+      "/api/channels/public", HttpMethod.POST.name());
+
   public static final RequestMatcher LOGIN = new AntPathRequestMatcher(
       "/api/auth/login", HttpMethod.POST.name()
+  );
+
+  public static final RequestMatcher DOWNLOAD = new AntPathRequestMatcher(
+      "/api/binaryContents/**", HttpMethod.GET.name()
   );
 
 //  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher(
