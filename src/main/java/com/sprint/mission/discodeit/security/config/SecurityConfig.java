@@ -72,14 +72,6 @@ public class SecurityConfig {
             .addLogoutHandler(new TokenLogoutHandler(jwtService))
             .addLogoutHandler(rememberMeServices)
         )
-        .sessionManagement(session -> // 다 없애야하나?
-            session
-                .sessionFixation().migrateSession()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-                .sessionRegistry(sessionRegistry)
-                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
-        )
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(LOGOUT)
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())

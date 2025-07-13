@@ -134,7 +134,7 @@
 
 ## 사용자 로그인 상태 리팩토링
 
-- [ ] SessionRegistry로 확인하던 사용자 로그인 상태를 JwtSession을 활용하도록 리팩토링하세요.
+- [x] SessionRegistry로 확인하던 사용자 로그인 상태를 JwtSession을 활용하도록 리팩토링하세요.
 
 ## 동시 로그인 제한 리팩토링
 
