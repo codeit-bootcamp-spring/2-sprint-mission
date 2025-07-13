@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS channels CASCADE;
 DROP TABLE IF EXISTS messages CASCADE;
-DROP TABLE IF EXISTS user_statuses CASCADE;
 DROP TABLE IF EXISTS read_statuses CASCADE;
 DROP TABLE IF EXISTS message_attachments CASCADE;
 DROP TABLE IF EXISTS binary_contents CASCADE;
 DROP TABLE IF EXISTS persistent_logins CASCADE;
+DROP TABLE IF EXISTS jwt_sessions CASCADE;
 
 -- 테이블
 -- User
@@ -74,6 +74,20 @@ CREATE TABLE read_statuses
     last_read_at timestamp with time zone NOT NULL,
     UNIQUE (user_id, channel_id)
 );
+
+-- JWT 세션 테이블
+CREATE TABLE jwt_sessions
+(
+    id              UUID PRIMARY KEY,
+    access_token    TEXT                     NOT NULL,
+    refresh_token   TEXT                     NOT NULL,
+    created_at      TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at      TIMESTAMP WITH TIME ZONE NOT NULL,
+    expiration_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    user_id         UUID                     NOT NULL,
+    CONSTRAINT fk_jwt_session_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
 
 
 -- 제약 조건
