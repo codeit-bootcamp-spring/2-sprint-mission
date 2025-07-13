@@ -17,12 +17,14 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -43,6 +45,7 @@ public class JwtServiceImpl implements JwtService {
     private final JwtBlacklist jwtBlacklist;
 
     @Override
+    @Transactional
     public JwtSession registerJwtSession(UserDto userDto) {
         // 기존 로그인 세션이 있으면 삭제 (동시 로그인 제한)
         User user = userRepository.findById(userDto.id())
@@ -54,6 +57,8 @@ public class JwtServiceImpl implements JwtService {
         JwtObject accessJwt = generateJwtObject(userDto, accessTokenValiditySeconds);
         JwtObject refreshJwt = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
+        log.debug("저장 전 refreshToken = {}", refreshJwt.token());
+
         JwtSession session = JwtSession.builder()
             .user(user)
             .accessToken(accessJwt.token())
@@ -61,7 +66,11 @@ public class JwtServiceImpl implements JwtService {
             .expirationTime(accessJwt.exp())
             .build();
 
-        return jwtSessionRepository.save(session);
+        JwtSession saved = jwtSessionRepository.save(session);
+        jwtSessionRepository.flush();
+        log.debug("저장 완료 refreshToken = {}", saved.getRefreshToken());
+
+        return saved;
     }
 
     @Override
@@ -105,14 +114,23 @@ public class JwtServiceImpl implements JwtService {
 
     // 리프레쉬 토큰 활용 -> 새로운 액세스 토큰 및 리프래쉬 토큰 발급
     @Override
+    @Transactional
     public JwtSession refreshJwtSession(String refreshToken) {
-        JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
-            .orElseThrow(() -> new DiscodeitException(
+        log.debug("리프레시 토큰 재발급 요청: {}", refreshToken);
+
+        Optional<JwtSession> optionalSession = jwtSessionRepository.findByRefreshToken(
+            refreshToken);
+        log.debug("조회 결과 존재 여부 = {}", optionalSession.isPresent());
+
+        JwtSession session = optionalSession.orElseThrow(() -> {
+            log.warn("해당 refreshToken으로 JwtSession을 찾을 수 없음");
+            return new DiscodeitException(
                 ErrorCode.INVALID_TOKEN,
-                Map.of("refreshToken", refreshToken)
-            ));
+                Map.of("refreshToken", refreshToken));
+        });
 
         if (session.isExpired()) {
+            log.warn("refreshToken 만료됨: {}", refreshToken);
             jwtBlacklist.add(session.getAccessToken(), session.getExpirationTime());
             jwtSessionRepository.delete(session);
             throw new DiscodeitException(
@@ -125,11 +143,15 @@ public class JwtServiceImpl implements JwtService {
         JwtObject newAccessJwt = generateJwtObject(userDto, accessTokenValiditySeconds);
         JwtObject newRefreshJwt = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
+        log.debug("새 accessToken = {}", newAccessJwt.token());
+        log.debug("새 refreshToken = {}", newRefreshJwt.token());
+
         session.update(newAccessJwt.token(), newRefreshJwt.token(), newRefreshJwt.exp());
         return session;
     }
 
     @Override
+    @Transactional
     public void invalidateJwtSession(String refreshToken) {
         jwtSessionRepository.findByRefreshToken(refreshToken)
             .ifPresent(session -> {
@@ -146,6 +168,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    @Transactional
     public void invalidateAllJwtSessionsByUserId(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> UserNotFoundException.withId(userId));

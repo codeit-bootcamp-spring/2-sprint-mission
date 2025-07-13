@@ -56,7 +56,11 @@ public class SecurityConfig {
                     SecurityMatchers.NON_API,
                     SecurityMatchers.GET_CSRF_TOKEN,
                     SecurityMatchers.SIGN_UP,
-                    SecurityMatchers.LOGIN
+                    SecurityMatchers.LOGIN,
+                    SecurityMatchers.LOGOUT,
+                    SecurityMatchers.ME,
+                    SecurityMatchers.REFRESH,
+                    SecurityMatchers.DOWNLOAD
                 ).permitAll()
                 .anyRequest().hasRole(Role.USER.name())
             )
@@ -65,7 +69,8 @@ public class SecurityConfig {
                 .csrfTokenRequestHandler(requestHandler)
                 .ignoringRequestMatchers(
                     SecurityMatchers.LOGIN,
-                    SecurityMatchers.LOGOUT
+                    SecurityMatchers.LOGOUT,
+                    SecurityMatchers.REFRESH
                 )
             )
             .logout(logout ->
