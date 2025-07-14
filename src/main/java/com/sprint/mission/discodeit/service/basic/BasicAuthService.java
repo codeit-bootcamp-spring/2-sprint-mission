@@ -8,17 +8,15 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.time.Instant;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
-  private final SessionRegistry sessionRegistry;
+  private final JwtService jwtService;
 
   @Value("${discodeit.admin.username}")
   private String adminUsername;
@@ -69,8 +67,8 @@ public class BasicAuthService implements AuthService {
     user.setRole(request.role());
     userRepository.save(user);
 
-    List<SessionInformation> sessions = sessionRegistry.getAllSessions(user.getUsername(), false);
-    sessions.forEach(SessionInformation::expireNow);
+    jwtService.invalidateAllUserSessions(user.getId());
+    log.info("User role updated and all sessions invalidated for user ID: {}", user.getId());
 
     return userMapper.toDto(user);
   }
