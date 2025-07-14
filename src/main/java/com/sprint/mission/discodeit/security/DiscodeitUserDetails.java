@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class DiscodeitUserDetails implements UserDetails {
 
   private final UserDto userDto;
   private final String password;
@@ -37,7 +37,7 @@ public class CustomUserDetails implements UserDetails {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof CustomUserDetails that)) {
+    if (!(o instanceof DiscodeitUserDetails that)) {
       return false;
     }
     return userDto.username().equals(that.userDto.username());
@@ -47,5 +47,4 @@ public class CustomUserDetails implements UserDetails {
   public int hashCode() {
     return Objects.hash(userDto.username());
   }
-
 }

@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.security.jwt;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
+import lombok.SneakyThrows;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @RequiredArgsConstructor
@@ -15,40 +15,28 @@ public class JwtLogoutHandler implements LogoutHandler {
 
   private final JwtService jwtService;
 
+  @SneakyThrows
   @Override
-  public void logout(
-      HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-    String refreshToken = extractRefreshTokenFromCookie(request);
-
-    if (refreshToken != null) {
-      JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(refreshToken);
-      jwtService.deleteExpiredToken(jwtSession);
-
-      ResponseCookie expiredCookie = ResponseCookie.from("refresh_token", "")
-          .path("/api/auth/refresh")
-          .httpOnly(true)
-          .maxAge(0)
-          .build();
-
-      response.addHeader(HttpHeaders.SET_COOKIE, expiredCookie.toString());
-    }
-
-    SecurityContextHolder.clearContext();
+  public void logout(HttpServletRequest request, HttpServletResponse response,
+      Authentication authentication) {
+    resolveRefreshToken(request)
+        .ifPresent(refreshToken -> {
+          jwtService.invalidateJwtSession(refreshToken);
+          invalidateRefreshTokenCookie(response);
+        });
   }
 
-  private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies == null) {
-      return null;
-    }
-
-    for (Cookie cookie : cookies) {
-      if (cookie.getName().equals("refresh_token")) {
-        return cookie.getValue();
-      }
-    }
-
-    return null;
+  private Optional<String> resolveRefreshToken(HttpServletRequest request) {
+    return Arrays.stream(request.getCookies())
+        .filter(cookie -> cookie.getName().equals(JwtService.REFRESH_TOKEN_COOKIE_NAME))
+        .findFirst()
+        .map(Cookie::getValue);
   }
 
+  private void invalidateRefreshTokenCookie(HttpServletResponse response) {
+    Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME, "");
+    refreshTokenCookie.setMaxAge(0);
+    refreshTokenCookie.setHttpOnly(true);
+    response.addCookie(refreshTokenCookie);
+  }
 }

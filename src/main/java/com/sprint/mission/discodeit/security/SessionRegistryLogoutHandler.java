@@ -5,24 +5,20 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @RequiredArgsConstructor
-public class SessionInvalidateLogoutHandler implements LogoutHandler {
+public class SessionRegistryLogoutHandler implements LogoutHandler {
 
   private final SessionRegistry sessionRegistry;
 
   @Override
-  public void logout(
-      HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+  public void logout(HttpServletRequest request, HttpServletResponse response,
+      Authentication authentication) {
     HttpSession session = request.getSession(false);
-
     if (session != null) {
       sessionRegistry.getSessionInformation(session.getId()).expireNow();
-      session.invalidate();
-      SecurityContextHolder.clearContext();
     }
   }
 }

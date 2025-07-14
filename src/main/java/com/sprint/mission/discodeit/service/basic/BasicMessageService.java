@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -45,8 +45,8 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
 
-  @Override
   @Transactional
+  @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
     log.debug("메시지 생성 시작: request={}", messageCreateRequest);
@@ -85,16 +85,16 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
-  @Override
   @Transactional(readOnly = true)
+  @Override
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
         .orElseThrow(() -> MessageNotFoundException.withId(messageId));
   }
 
-  @Override
   @Transactional(readOnly = true)
+  @Override
   public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
       Pageable pageable) {
     Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
@@ -111,9 +111,9 @@ public class BasicMessageService implements MessageService {
     return pageResponseMapper.fromSlice(slice, nextCursor);
   }
 
-  @Override
-  @Transactional
   @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @Transactional
+  @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     log.debug("메시지 수정 시작: id={}, request={}", messageId, request);
     Message message = messageRepository.findById(messageId)
@@ -124,9 +124,9 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(message);
   }
 
-  @Override
-  @Transactional
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @Transactional
+  @Override
   public void delete(UUID messageId) {
     log.debug("메시지 삭제 시작: id={}", messageId);
     if (!messageRepository.existsById(messageId)) {
