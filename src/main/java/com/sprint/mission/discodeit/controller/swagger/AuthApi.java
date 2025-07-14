@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Auth", description = "인증 API")
@@ -39,12 +40,12 @@ public interface AuthApi {
             description = "자동 로그인 성공",
             content = @Content(
                 mediaType = "*/*",
-                schema = @Schema(implementation = UserDto.class)
+                schema = @Schema(implementation = String.class)
             )
         )
     })
-    ResponseEntity<UserDto> getCurrentUser(
-        @AuthenticationPrincipal DiscodeitUserDetails userDetails
+    ResponseEntity<String> getCurrentUser(
+        @CookieValue(value = "refresh_token") String refreshToken
     );
 
     @Operation(summary = "사용자 권한 수정", operationId = "update_role")
@@ -62,4 +63,6 @@ public interface AuthApi {
     ResponseEntity<UserDto> updateRole(
         @RequestBody RoleUpdateRequest roleUpdateRequest
     );
+
+
 }

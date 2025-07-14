@@ -6,36 +6,43 @@ import static org.springframework.http.HttpMethod.POST;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.constant.Role;
-import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.DiscodeitUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.time.Duration;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -53,34 +60,30 @@ public class SecurityConfig {
         HttpSecurity http,
         DaoAuthenticationProvider daoAuthenticationProvider,
         ObjectMapper objectMapper,
-        SessionRegistry sessionRegistry,
-        PersistentTokenBasedRememberMeServices rememberMeServices
+        JwtService jwtService
     ) throws Exception {
 
         http
             .formLogin(AbstractHttpConfigurer::disable)
             .logout(logout -> logout
                 .logoutUrl("/api/auth/logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    SecurityContextHolder.clearContext();
-                    rememberMeServices.logout(request, response, authentication);
-                })
-                .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
-                .clearAuthentication(true)
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+                .addLogoutHandler(new JwtLogoutHandler(jwtService))
                 .permitAll()
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(
-                    request -> "POST".equals(request.getMethod()) && request.getRequestURI().equals("/api/users"),
-                    request -> request.getRequestURI().equals("/api/auth/login"),
-                    request -> request.getRequestURI().equals("/api/auth/logout")
+                    new AntPathRequestMatcher("/api/users", "POST"),
+                    new AntPathRequestMatcher("/api/auth/login"),
+                    new AntPathRequestMatcher("/api/auth/logout")
                 )
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
             )
             .authenticationProvider(daoAuthenticationProvider)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/csrf-token", "/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me", "/api/auth/refresh").permitAll()
                 .requestMatchers(POST, "/api/users").permitAll()
                 .requestMatchers(PATCH, "/api/auth/role").hasRole(Role.ADMIN.name())
                 .requestMatchers(POST, "/api/channels/public", "/api/channels/private").hasRole(Role.CHANNEL_MANAGER.name())
@@ -89,15 +92,18 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").hasRole(Role.USER.name())
                 .anyRequest().permitAll()
             )
-            .sessionManagement(session -> session
-                .sessionFixation().migrateSession()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-                .sessionRegistry(sessionRegistry)
-                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+            .sessionManagement(session ->
+                session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .with(new DiscodeitUsernamePasswordAuthenticationFilter.Configurer(objectMapper), Customizer.withDefaults())
-            .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+            .with(new DiscodeitUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+                configurer ->
+                    configurer
+                        .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
+                        .failureHandler(new CustomLoginFailureHandler(objectMapper))
+            )
+            .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
+                DiscodeitUsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
