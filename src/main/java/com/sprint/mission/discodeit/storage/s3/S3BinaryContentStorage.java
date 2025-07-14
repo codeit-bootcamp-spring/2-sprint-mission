@@ -2,11 +2,15 @@ package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.FileStorageAsyncTaskExecutor;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,6 +40,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   private final String region;
   private final String bucket;
 
+  private final FileStorageAsyncTaskExecutor asyncTaskExecutor;
+
   @Value("${discodeit.storage.s3.presigned-url-expiration:600}") // 기본값 10분
   private long presignedUrlExpirationSeconds;
 
@@ -43,32 +49,54 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
       @Value("${discodeit.storage.s3.access-key}") String accessKey,
       @Value("${discodeit.storage.s3.secret-key}") String secretKey,
       @Value("${discodeit.storage.s3.region}") String region,
-      @Value("${discodeit.storage.s3.bucket}") String bucket
+      @Value("${discodeit.storage.s3.bucket}") String bucket,
+      FileStorageAsyncTaskExecutor asyncTaskExecutor
+
   ) {
     this.accessKey = accessKey;
     this.secretKey = secretKey;
     this.region = region;
     this.bucket = bucket;
+    this.asyncTaskExecutor = asyncTaskExecutor;
   }
 
   @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     String key = binaryContentId.toString();
+
+    Supplier<UUID> putTask = () -> {
+      try {
+        S3Client s3Client = getS3Client();
+
+        PutObjectRequest request = PutObjectRequest.builder()
+            .bucket(bucket)
+            .key(key)
+            .build();
+
+        s3Client.putObject(request, RequestBody.fromBytes(bytes));
+        log.info("S3에 파일 업로드 성공: {}", key);
+
+        return binaryContentId;
+      } catch (S3Exception e) {
+        log.error("S3에 파일 업로드 실패 (비동기 스레드): {}", e.getMessage());
+        throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+      }
+    };
+
+    CompletableFuture<UUID> putFuture = asyncTaskExecutor.executeAsync(putTask);
+
     try {
-      S3Client s3Client = getS3Client();
+      return putFuture.join();
+    } catch (CompletionException e) {
+      Throwable actualCause = e.getCause();
+      log.error("S3 바이너리 컨텐츠 저장 중 최종 오류 발생: binaryContentId={}, cause={}",
+          binaryContentId, actualCause.getMessage(), actualCause);
 
-      PutObjectRequest request = PutObjectRequest.builder()
-          .bucket(bucket)
-          .key(key)
-          .build();
-
-      s3Client.putObject(request, RequestBody.fromBytes(bytes));
-      log.info("S3에 파일 업로드 성공: {}", key);
-
-      return binaryContentId;
-    } catch (S3Exception e) {
-      log.error("S3에 파일 업로드 실패: {}", e.getMessage());
-      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+      if (actualCause instanceof RuntimeException) {
+        throw (RuntimeException) actualCause;
+      } else {
+        throw new RuntimeException("알 수 없는 비동기 저장 오류 발생", actualCause);
+      }
     }
   }
 
