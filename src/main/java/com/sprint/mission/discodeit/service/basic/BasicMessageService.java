@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -17,11 +19,14 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.MdcSecurityAwareExecutor;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.notification.NotificationEventPublisher;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,6 +53,8 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
     private final MdcSecurityAwareExecutor mdcSecurityAwareExecutor;
+    private final ReadStatusRepository readStatusRepository;
+    private final NotificationEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -100,6 +107,23 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.save(message);
         log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
+
+        // --- 여기서 알림 이벤트 발행 ---
+        List<UUID> notifiedUserIds = readStatusRepository.findUserIdsByChannelIdAndNotificationEnabled(
+            channelId);
+        for (UUID userId : notifiedUserIds) {
+            Notification event = new Notification(
+                userRepository.findById(userId)
+                    .orElseThrow(() -> UserNotFoundException.withId(userId)),
+                channel.getName(),
+                content,
+                NotificationType.NEW_MESSAGE,
+                channelId,
+                LocalDateTime.now()
+            );
+            eventPublisher.publish(event);
+        }
+
         return messageMapper.toDto(message);
     }
 

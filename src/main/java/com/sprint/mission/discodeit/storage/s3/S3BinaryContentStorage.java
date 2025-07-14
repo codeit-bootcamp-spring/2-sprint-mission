@@ -3,15 +3,21 @@ package com.sprint.mission.discodeit.storage.s3;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.UploadStatus;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.notification.NotificationEventPublisher;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.core.annotation.Timed;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -51,6 +57,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private final String bucket;
     private final AsyncTaskFailureRepository asyncTaskFailureRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserRepository userRepository;
+    private final NotificationEventPublisher eventPublisher;
 
     @Value("${discodeit.storage.s3.presigned-url-expiration:600}") // 기본값 10분
     private long presignedUrlExpirationSeconds;
@@ -61,7 +69,9 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         @Value("${discodeit.storage.s3.region}") String region,
         @Value("${discodeit.storage.s3.bucket}") String bucket,
         AsyncTaskFailureRepository asyncTaskFailureRepository,
-        BinaryContentRepository binaryContentRepository
+        BinaryContentRepository binaryContentRepository,
+        UserRepository userRepository,
+        NotificationEventPublisher eventPublisher
     ) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
@@ -69,6 +79,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         this.bucket = bucket;
         this.asyncTaskFailureRepository = asyncTaskFailureRepository;
         this.binaryContentRepository = binaryContentRepository;
+        this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -167,6 +179,20 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
         content.setUploadStatus(UploadStatus.FAILED);
         binaryContentRepository.save(content);
+
+        Notification event = new Notification(
+            userRepository.findById(UUID.fromString(requestId)).orElseThrow(
+                () -> new UserNotFoundException()
+            )
+            ,
+            content.getFileName(),
+            "content async failed",
+            NotificationType.ASYNC_FAILED,
+            null,
+            LocalDateTime.now()
+        );
+        eventPublisher.publish(event);
+
     }
 
     private String generatePresignedUrl(String key, String contentType) {
