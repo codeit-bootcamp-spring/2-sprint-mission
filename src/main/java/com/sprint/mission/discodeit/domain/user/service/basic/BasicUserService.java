@@ -6,20 +6,16 @@ import com.sprint.mission.discodeit.domain.binarycontent.service.basic.BinaryCon
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.mapper.UserResultMapper;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.domain.user.service.UserService;
-import com.sprint.mission.discodeit.security.util.SecurityUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,11 +92,10 @@ public class BasicUserService implements UserService {
   ) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
-    validateIsCurrentUser(user, Role.ADMIN.name());
-
     if (user.getBinaryContent() != null) {
       binaryContentService.delete(user.getBinaryContent().getId());
     }
+
     BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
         passwordEncoder.encode(userUpdateRequest.newPassword()), binaryContent);
@@ -112,9 +107,7 @@ public class BasicUserService implements UserService {
   @Transactional
   @Override
   public void delete(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException(Map.of()));
-    validateIsCurrentUser(user, Role.ADMIN.name());
+    validateUserExist(userId);
 
     userRepository.deleteById(userId);
   }
@@ -131,12 +124,11 @@ public class BasicUserService implements UserService {
     }
   }
 
-  private void validateIsCurrentUser(User user, String role) {
-    UUID currentUserId = SecurityUtil.getCurrentUserId();
-    if (user.getId().equals(currentUserId) || SecurityUtil.hasRole(role)) {
+  private void validateUserExist(UUID userId) {
+    if (userRepository.existsById(userId)) {
       return;
     }
-    throw new AccessDeniedException("권한 없음");
+    throw new UserNotFoundException(Map.of());
   }
 
 }

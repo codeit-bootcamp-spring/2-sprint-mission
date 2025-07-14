@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -50,6 +52,8 @@ public class AuthController {
     return ResponseEntity.ok(userResult);
   }
 
+  // 현재 Bear토큰이 해당 API 요청시 헤더에 첨부되지 않습니다.
+  // 추후,문제를 찾아보겠습니다.
   @PostMapping("/refresh")
   public ResponseEntity<String> revokeAccessToken(
       HttpServletRequest request,

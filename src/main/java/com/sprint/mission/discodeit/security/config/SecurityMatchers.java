@@ -25,5 +25,17 @@ public final class SecurityMatchers {
   public static final String LOGIN_URL = "/api/auth/login";
   public static final RequestMatcher LOGIN = new AntPathRequestMatcher(LOGIN_URL,
       HttpMethod.POST.name());
+  public static final RequestMatcher USER_DELETE = new AntPathRequestMatcher("/api/users/{userId}",
+      HttpMethod.DELETE.name());
+  public static final RequestMatcher USER_UPDATE = new AntPathRequestMatcher("/api/users/{userId}",
+      HttpMethod.PATCH.name());
+  public static final RequestMatcher MESSAGE_UPDATE = new AntPathRequestMatcher(
+      "/api/messages/{messageId}", HttpMethod.PATCH.name());
+  public static final RequestMatcher MESSAGE_DELETE = new AntPathRequestMatcher(
+      "/api/messages/{messageId}", HttpMethod.DELETE.name());
+  public static final RequestMatcher READ_STATUS_CREATE = new AntPathRequestMatcher(
+      "/api/readStatuses", HttpMethod.POST.name());
+  public static final RequestMatcher READ_STATUS_UPDATE = new AntPathRequestMatcher(
+      "/api/readStatuses/{readStatusId}", HttpMethod.PATCH.name());
 
 }
