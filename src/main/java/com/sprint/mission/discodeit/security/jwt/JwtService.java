@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.InvalidCredentialsException;
@@ -13,8 +12,6 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,29 +44,12 @@ public class JwtService {
     User user = userRepository.findById(userDto.id())
         .orElseThrow(() -> UserNotFoundException.withId(userDto.id()));
 
-    Map<String, Object> claims = new HashMap<>();
-    claims.put("id", userDto.id().toString());
-    claims.put("username", userDto.username());
-    claims.put("email", userDto.email());
-    claims.put("role", userDto.role().name());
-
-    BinaryContentDto profile = userDto.profile();
-    if (profile != null) {
-      Map<String, Object> profileMap = new HashMap<>();
-      profileMap.put("id", profile.id().toString());
-      profileMap.put("fileName", profile.fileName());
-      profileMap.put("size", profile.size());
-      profileMap.put("contentType", profile.contentType());
-
-      claims.put("profile", profileMap);
-    }
-
     var accessBuilder = Jwts.builder()
         .subject(userDto.username())
         .issuer(jwtProperties.issuer())
         .issuedAt(Date.from(now))
         .expiration(Date.from(exp))
-        .claims(claims);
+        .claim("userDto", userDto);
 
     String accessToken = accessBuilder.signWith(secretKey).compact();
     String refreshToken = createRefreshToken(user);
