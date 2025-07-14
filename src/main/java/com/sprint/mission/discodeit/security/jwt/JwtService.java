@@ -87,7 +87,7 @@ public class JwtService {
     }
     return jwtSessionRepository.findByRefreshToken(oldRefreshToken).map(session -> {
           String oldAccessToken = session.getAccessToken();
-          jwtBlacklist.blacklist(oldAccessToken);
+          jwtBlacklist.addBlacklist(oldAccessToken);
 
           User user = userRepository.findById(session.getUserId()).orElseThrow(
               () -> new UserException(ErrorCode.USER_NOT_FOUND)

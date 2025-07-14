@@ -28,9 +28,9 @@ public final class SecurityMatchers {
       "/api/binaryContents/**", HttpMethod.GET.name()
   );
 
-//  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher(
-//      "/api/auth/logout", HttpMethod.POST.name()
-//  );
+  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher(
+      "/api/auth/logout", HttpMethod.POST.name()
+  );
 
   public static final RequestMatcher ACTUATOR = new AntPathRequestMatcher(
       "/actuator/**"

@@ -17,7 +17,7 @@ public class UserSearchService {
 
   @Cacheable(cacheNames = "users")
   public List<UserDto> findAll() {
-    List<User> userList = userRepository.findALlFromDB();
+    List<User> userList = userRepository.findAllFromDB();
     return userList.stream().map(UserDto::from).toList();
   }
 

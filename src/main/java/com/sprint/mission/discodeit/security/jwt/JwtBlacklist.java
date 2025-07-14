@@ -22,7 +22,7 @@ public class JwtBlacklist {
     this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
   }
 
-  public void blacklist(String accessToken) {
+  public void addBlacklist(String accessToken) {
     Claims claims = Jwts.parser()
         .verifyWith(secretKey)
         .build()

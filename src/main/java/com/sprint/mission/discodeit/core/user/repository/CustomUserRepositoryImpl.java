@@ -22,7 +22,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
   private final QBinaryContent binaryContent = QBinaryContent.binaryContent;
 
   @Override
-  public List<User> findALlFromDB() {
+  public List<User> findAllFromDB() {
     return jpaQueryFactory
         .selectFrom(user)
         .leftJoin(user.profile, binaryContent)

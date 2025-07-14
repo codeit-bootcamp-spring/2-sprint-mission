@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.core.auth.dto.LoginRequest;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
-import com.sprint.mission.discodeit.security.handler.CustomLoginFailureHandler;
-import com.sprint.mission.discodeit.security.handler.CustomLoginSuccessHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
-//TODO 어떻게 수정해야할 지 몰라서 일단 냅둡니다.
 @RequiredArgsConstructor
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -64,10 +61,6 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     @Override
     public void init(HttpSecurity http) throws Exception {
       loginProcessingUrl(SecurityMatchers.LOGIN_URL);
-      //성공했을 시 핸들러
-      successHandler(new CustomLoginSuccessHandler(objectMapper));
-      //실패했을 시 핸들러
-      failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
   }
 }
