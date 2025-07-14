@@ -50,21 +50,6 @@ public class AuthController {
     return csrfToken;
   }
 
-  @PostMapping(path = "/login")
-  public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest,
-                                       HttpServletRequest request) {
-    log.info("로그인 요청: {}", loginRequest.username());
-
-    try {
-      UserDto user = authService.login(loginRequest, request);
-      log.info("로그인 성공: {}", user.username());
-      return ResponseEntity.ok(user);
-    } catch (Exception e) {
-      log.error("로그인 실패", e);
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-  }
-
   @GetMapping("/me")
   public ResponseEntity<UserDto> getCurrentUser(
           @AuthenticationPrincipal UserDetails userDetails) {
@@ -81,18 +66,6 @@ public class AuthController {
     }catch (Exception e){
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
-  }
-
-  @PostMapping("/logout")
-  public ResponseEntity<Void> logout(HttpServletRequest request) {
-    try {
-      authService.logout(request);
-
-    } catch (Exception e) {
-      log.error("로그아웃 실패", e);
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
-    return ResponseEntity.ok().build();
   }
 
   @PutMapping("/role")
