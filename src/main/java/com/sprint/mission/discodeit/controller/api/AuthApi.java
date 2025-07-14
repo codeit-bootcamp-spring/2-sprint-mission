@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -34,32 +32,26 @@ public interface AuthApi {
       @Parameter(description = "수정할 권한 정보") @Valid RoleUpdateRequest request
   );
 
-  @Operation(summary = "CSRF 토큰 조회")
+  @Operation(summary = "CSRF 토큰 발급")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "CSRF 토큰 조회 성공",
+          responseCode = "200", description = "발급 성공",
           content = @Content(schema = @Schema(implementation = CsrfToken.class))
-      ),
-      @ApiResponse(
-          responseCode = "500", description = "CSRF 토큰 생성 실패",
-          content = @Content(examples = @ExampleObject(value = "Could not generate CSRF token"))
       )
   })
-  ResponseEntity<CsrfToken> getCsrfToken(HttpServletRequest request);
+  ResponseEntity<CsrfToken> getCsrfToken(@Parameter(hidden = true) CsrfToken csrfToken);
 
-  @Operation(summary = "세션ID로 사용자 조회")
+  @Operation(summary = "리프레시 토큰을 활용한 엑세스 토큰 조회")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "현재 로그인한 사용자 정보 반환",
-          content = @Content(schema = @Schema(implementation = UserDto.class))
+          responseCode = "200", description = "조회 성공",
+          content = @Content(schema = @Schema(implementation = String.class))
       ),
       @ApiResponse(
-          responseCode = "401", description = "인증되지 않음",
-          content = @Content(examples = @ExampleObject(value = "Unauthorized"))
+          responseCode = "401", description = "유효하지 않은 리프레시 토큰"
       )
   })
-  UserDto me(
-      @Parameter(hidden = true) CustomUserDetails principal
-  );
+  ResponseEntity<String> me(@Parameter(hidden = true) String refreshToken);
+
 
 }

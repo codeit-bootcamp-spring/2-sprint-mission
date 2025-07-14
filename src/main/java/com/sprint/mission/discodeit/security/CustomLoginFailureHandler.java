@@ -35,6 +35,7 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
         status
     );
 
+    response.setCharacterEncoding("UTF-8");
     objectMapper.writeValue(response.getWriter(), errorResponse);
   }
 }

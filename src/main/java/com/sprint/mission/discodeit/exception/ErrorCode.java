@@ -30,7 +30,10 @@ public enum ErrorCode {
   DUPLICATE_READ_STATUS("이미 존재하는 읽음 상태입니다.", HttpStatus.CONFLICT),
 
   USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-  DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다.", HttpStatus.CONFLICT);
+  DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다.", HttpStatus.CONFLICT),
+
+  TOKEN_NOT_FOUND("토큰을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+  INVALID_TOKEN("유효하지 않은 토큰입니다.", HttpStatus.BAD_REQUEST);
 
   private final String message;
   private final HttpStatus status;

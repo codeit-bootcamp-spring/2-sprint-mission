@@ -11,11 +11,15 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +37,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
 
   @Transactional
   @Override
@@ -79,9 +84,13 @@ public class BasicUserService implements UserService {
   @PreAuthorize("hasRole('USER')")
   @Override
   public List<UserDto> findAll() {
+    Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
+        .map(JwtSession::getUserId)
+        .collect(Collectors.toSet());
+
     return userRepository.findAll()
         .stream()
-        .map(userMapper::toDto)
+        .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
         .toList();
   }
 
@@ -127,7 +136,8 @@ public class BasicUserService implements UserService {
 
     user.update(newUsername, newEmail, encodedNewPassword, nullableProfile);
 
-    return userMapper.toDto(user);
+    boolean isOnline = jwtService.isUserOnline(user.getId());
+    return userMapper.toDto(user, isOnline);
   }
 
   @Transactional
