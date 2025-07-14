@@ -14,8 +14,8 @@ import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.LoginStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.util.MaskingUtil;
@@ -44,8 +44,8 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final LoginStatusService loginStatusService;
   private final BinaryContentService binaryContentService;
+  private final JwtSessionRepository jwtSessionRepository;
   private final UserMapper userMapper;
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
@@ -91,8 +91,7 @@ public class BasicUserService implements UserService {
   @Cacheable(value = "user", key = "#p0")
   public FindUserResult find(UUID userId) {
     User findUser = findUserById(userId, "find");
-    return userMapper.toFindUserResult(findUser, loginStatusService.isUserOnline(
-        findUser.getUsername()));
+    return userMapper.toFindUserResult(findUser, jwtSessionRepository.existsByUserId(userId));
   }
 
   @Cacheable("allUsers")
@@ -105,7 +104,7 @@ public class BasicUserService implements UserService {
   public List<FindUserResult> findAll() {
     return getCachedUsers().stream()
         .map(user -> userMapper.toFindUserResult(user,
-            loginStatusService.isUserOnline(user.getUsername())))
+            jwtSessionRepository.existsByUserId(user.getId())))
         .toList();
   }
 

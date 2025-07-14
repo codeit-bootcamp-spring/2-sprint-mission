@@ -3,12 +3,11 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
-import com.sprint.mission.discodeit.exception.auth.CustomAccessDeniedHandler;
-import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Value;
+import com.sprint.mission.discodeit.security.jwt.JwtAccessDeniedHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationEntryPoint;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -21,21 +20,16 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @Profile("!test")
@@ -45,20 +39,36 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper objectMapper,
-      SessionRegistry sessionRegistry,
-      CustomAccessDeniedHandler accessDeniedHandler,
-      PersistentTokenBasedRememberMeServices rememberMeServices)
+      JwtService jwtService,
+      JwtAccessDeniedHandler jwtAccessDeniedHandler,
+      JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+      JwtAuthenticationFilter jwtAuthenticationFilter)
       throws Exception {
 
-    // 프론트에서 X-CSRF-TOKEN 헤더로 토큰을 보내주지만, CookieCsrfTokenRepository에선 X-XSRF-TOKEN을 기대함 -> 헤더명 명시적 지정
+    // CSRF 토큰은 원래 세션 저장소 (spring_session_attributes의 attributes_bytes에 저장됨)
+    // 요청 -> 헤더에 있는 CSRF 토큰을 꺼내 Session 저장소를 확인해서 검증
+    // JWT는 Session을 사용하지 않음 (stateless) -> 토큰 검증이 세션에서 불가능 하므로,
+    // CSRF 토큰을 쿠키에 저장 -> 클라이언트는 이 쿠키에서 CSRF 토큰 값을 읽어 요청 헤더에 포함시켜 서버에 전송
+    // 쿠키는 브라우저가 자동으로 넣지만, 헤더는 JS로 명시적으로 넣어야만 전송됨
+    // 서버는 요청 헤더에 포함된 CSRF 토큰 값과 쿠키에 저장된 CSRF 토큰을 비교하여 검증
+    // 공격자는 쿠키에 있는 CSRF 토큰 값을 볼 수는 있지만, 헤더에 이 토큰 값을 넣어서 요청을 보낼 수는 없음 (헤더에 토큰 값을 넣는 것은 정상적인 JS 코드(정상 웹사이트)에서만 가능)
     CookieCsrfTokenRepository repository =
-        CookieCsrfTokenRepository.withHttpOnlyFalse();
-    repository.setHeaderName("X-CSRF-TOKEN");
+        CookieCsrfTokenRepository.withHttpOnlyFalse(); // 프론트엔드(JS)에서 토큰을 헤더에 포함할 수 있도록 함. (따로 띄우지 않았으므로 CORS는 필요 X)
+    repository.setCookieName("XSRF-TOKEN");
+    repository.setHeaderName("X-XSRF-TOKEN");
+
+    // Spring Security 6.x의 기본 CSRF 처리 방식은 HTML 폼 기반 요청에 최적화
+    // 기본 핸들러(XorCsrfTokenRequestAttributeHandler)는 주로 폼 데이터에서 토큰을 추출하고, JSON 요청(예: Content-Type: application/json)에서는 CSRF 토큰을 제대로 검증하지 못하는 경우가 많음
+    // 이 때문에, 프론트엔드에서 JSON으로 로그인이나 기타 POST 요청을 보낼 때 CSRF 토큰이 있어도 403 Forbidden이 발생할 수 있다.
+    // 핸들러를 명시적으로 등록하면, 헤더(X-XSRF-TOKEN 등)나 파라미터에서 CSRF 토큰을 추출해 JSON 요청도 정상적으로 검증할 수 있다.
+    CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+    requestHandler.setCsrfRequestAttributeName("_csrf");
 
     http
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/csrf-token").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/channels/public")
             .hasRole(Role.CHANNEL_MANAGER.name())
@@ -70,39 +80,29 @@ public class SecurityConfig {
             .requestMatchers("/api/**").hasRole(Role.USER.name())
             .anyRequest().permitAll()
         )
-        .exceptionHandling(exception -> exception
-            .accessDeniedHandler(accessDeniedHandler)
-        )
         // 명시적으로 설정 안해줘도 자동으로 사용됨 (HttpSession을 통해 SecurityContext를 저장하고 복원)
         .securityContext(context ->
             context.securityContextRepository(new HttpSessionSecurityContextRepository()))
         .csrf(csrf -> csrf
+            .csrfTokenRequestHandler(requestHandler)
             .csrfTokenRepository(repository)
             .ignoringRequestMatchers("/api/auth/logout"))
-        .logout(logout -> logout
-            .logoutRequestMatcher(new AntPathRequestMatcher("/api/auth/logout", "POST"))
-            .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-            .addLogoutHandler(new SecurityContextLogoutHandler())
-            .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
-            .addLogoutHandler(rememberMeServices)
-        )
-        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
-            Customizer.withDefaults())
         .sessionManagement(session ->
-            session
-                .sessionFixation().migrateSession()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-                .sessionRegistry(sessionRegistry)
-                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
-        )
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        // Filter 인증 예외가 EntryPoint까지 도달 못하는 버그 발생 -> 엑세스 토큰 만료 시 401 에러가 터지지 않아 Refresh API 호출이 안됨
+        // jwtAuthenticationFilter에서 예외가 터짐 -> ExceptionTranslationFilter에서 잡음 -> EntryPoint로 전달
+        // ExceptionTranslationFilter는 뒤에 위치한 필터의 예외만 잡을 수 있다.
+        // .addFilterAfter(new JwtAuthenticationFilter(), ExceptionTranslationFilter.class)
+        // 하지만, FilterChanin의 순서는 jwtAuthenticationFilter -> UsernamePasswordAuthenticationFilter -> ExceptionTranslationFilter가 되는게 바람직함
+        // -> jwtAuthenticationFilter에서 Commence 메서드를 직접 호출하는 식으로 수정
+        // https://stackoverflow.com/questions/77694705/spring-security-exceptiontranslationfilter-doest-handle-thrown-in-custom-filter
+        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
+            Customizer.withDefaults())
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .accessDeniedHandler(jwtAccessDeniedHandler));
     return http.build();
-  }
-
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
   }
 
 
@@ -120,12 +120,6 @@ public class SecurityConfig {
   }
 
   @Bean
-  public SessionAuthenticationStrategy sessionAuthenticationStrategy(
-      SessionRegistry sessionRegistry) {
-    return new RegisterSessionAuthenticationStrategy(sessionRegistry);
-  }
-
-  @Bean
   public RoleHierarchy roleHierarchy() {
     return RoleHierarchyImpl.withDefaultRolePrefix()
         .role(Role.ADMIN.name())
@@ -138,22 +132,5 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      UserDetailsService userDetailsService,
-      DataSource dataSource
-  ) {
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-
-    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-        key, userDetailsService, tokenRepository);
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
   }
 }

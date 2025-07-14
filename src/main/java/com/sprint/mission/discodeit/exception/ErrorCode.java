@@ -4,6 +4,19 @@ public enum ErrorCode implements Code {
 
   BAD_REQUEST(400, "BAD REQUEST"),
 
+  // Jwt EntryPoint
+  INVALID_JWT_TOKEN(401, "Jwt token invalid"),
+  JWT_INTERNAL_ERROR(500, "Internal error occurs processing jwt token"),
+  INVALID_JWT_SIGNATURE(401, "Jwt signature invalid"),
+  EXPIRED_JWT_TOKEN(401, "Jwt token expired"),
+  MALFORMED_JWT_TOKEN(400, "Jwt token malformed"),
+  MISSING_JWT_TOKEN(401, "Jwt token missing"),
+  UNSUPPORTED_JWT_TOKEN(400, "jwt token unsupported"),
+
+
+  // Jwt
+  INVALID_REFRESH_TOKEN(401, "Invalid or expired refresh token"),
+
   // Auth
   AUTHENTICATION_FAILED(401, "Authentication failed"),
   SESSION_EXPIRED(401, "Session expired"),

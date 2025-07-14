@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.DiscodeitApplication;
 import com.sprint.mission.discodeit.config.TestSecurityConfig;
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageRequestDTO;
 import com.sprint.mission.discodeit.dto.controller.message.CreateMessageResponseDTO;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.storage.s3.S3Config;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -43,6 +44,9 @@ public class MessageIntegrationTest {
 
   @Autowired
   private TestRestTemplate restTemplate;
+
+  @Autowired
+  JwtService jwtService;
 
   @MockitoBean
   private S3Config s3Config;
