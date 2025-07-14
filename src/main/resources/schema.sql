@@ -65,14 +65,17 @@ CREATE TABLE read_statuses
     UNIQUE (user_id, channel_id)
 );
 
-CREATE TABLE persistent_logins
+-- JwtSession
+CREATE TABLE jwt_sessions
 (
-    username  varchar(64) not null,
-    series    varchar(64) primary key,
-    token     varchar(64) not null,
-    last_used timestamp   not null
+    id            uuid PRIMARY KEY,
+    user_id       uuid                     NOT NULL,
+    access_token  VARCHAR(500)             NOT NULL UNIQUE,
+    refresh_token VARCHAR(500)             NOT NULL UNIQUE,
+    created_at    timestamp with time zone NOT NULL,
+    expires_at    timestamp with time zone NOT NULL,
+    revoked       boolean                  NOT NULL DEFAULT FALSE
 );
-
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
@@ -116,6 +119,14 @@ ALTER TABLE read_statuses
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
             ON DELETE CASCADE;
+
+-- JwtSession (N) -> User (1)
+ALTER TABLE jwt_sessions
+    ADD CONSTRAINT fk_jwt_session_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE;
+
 
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
