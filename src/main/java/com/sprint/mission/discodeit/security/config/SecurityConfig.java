@@ -69,9 +69,6 @@ public class SecurityConfig {
             .addLogoutHandler(new TokenLogoutHandler(jwtService))
             .addLogoutHandler(rememberMeServices)
         )
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(LOGOUT)
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())

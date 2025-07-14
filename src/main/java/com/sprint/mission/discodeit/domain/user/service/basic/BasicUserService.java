@@ -103,7 +103,7 @@ public class BasicUserService implements UserService {
     }
     BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
-        userUpdateRequest.newPassword(), binaryContent);
+        passwordEncoder.encode(userUpdateRequest.newPassword()), binaryContent);
     User updatedUser = userRepository.save(user);
 
     return userResultMapper.convertToUserResult(updatedUser);

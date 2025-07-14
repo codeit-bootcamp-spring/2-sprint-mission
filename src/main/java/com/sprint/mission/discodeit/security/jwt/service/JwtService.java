@@ -15,6 +15,7 @@ import io.jsonwebtoken.Jwts;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +37,11 @@ public class JwtService {
 
   @Transactional
   public JwtSession generateSession(UserResult userResult) {
-    JwtSession jwtSession = jwtSessionRepository.findById(userResult.id())
-        .orElseThrow(() -> new IllegalArgumentException("해당 jwt 세션이 없습니다."));
-    jwtSessionRepository.delete(jwtSession);
-    JwtBlacklist.put(jwtSession.getAccessToken(), Instant.now());
+    Optional<JwtSession> jwtSession = jwtSessionRepository.findById(userResult.id());
+    if (jwtSession.isPresent()) {
+      jwtSessionRepository.delete(jwtSession.get());
+      JwtBlacklist.put(jwtSession.get().getAccessToken(), Instant.now());
+    }
 
     Instant now = Instant.now();
     Instant accessExp = now.plusSeconds(jwtProperties.accessTokenExpiration());
