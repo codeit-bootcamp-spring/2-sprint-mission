@@ -1,42 +1,44 @@
 package com.sprint.mission.discodeit.exception;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
-@RequiredArgsConstructor
 @Getter
 public enum ErrorCode {
+  // User 관련 에러 코드
+  USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
+  DUPLICATE_USER("이미 존재하는 사용자입니다."),
+  INVALID_USER_CREDENTIALS("잘못된 사용자 인증 정보입니다."),
 
-  // USER ERROR CODE
-  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
-  DUPLICATE_USER_EMAIL(HttpStatus.CONFLICT, "U002", "Duplicate user email"),
-  DUPLICATE_USER_USERNAME(HttpStatus.CONFLICT, "U003", "Duplicate user username"),
-  PROFILE_UPLOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, "U004", "Profile upload failure"),
-  INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "U005", "Invalid password"),
+  // Channel 관련 에러 코드
+  CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다."),
+  PRIVATE_CHANNEL_UPDATE("비공개 채널은 수정할 수 없습니다."),
 
-  // CHANNEL ERROR CODE
-  CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "C001", "Channel not found"),
-  CHANNEL_UPDATE_ALLOWED(HttpStatus.FORBIDDEN, "C002", "Channel update is not allowed"),
+  // Message 관련 에러 코드
+  MESSAGE_NOT_FOUND("메시지를 찾을 수 없습니다."),
 
-  // MESSAGE ERROR CODE
-  MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "M003", "Message not found"),
+  // BinaryContent 관련 에러 코드
+  BINARY_CONTENT_NOT_FOUND("바이너리 컨텐츠를 찾을 수 없습니다."),
 
-  // USERSTATUS ERROR CODE
-  USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "US001", "User status not found"),
-  USER_STATUS_ALREADY_EXIST(HttpStatus.CONFLICT, "US002", "User status already exist"),
+  // ReadStatus 관련 에러 코드
+  READ_STATUS_NOT_FOUND("읽음 상태를 찾을 수 없습니다."),
+  DUPLICATE_READ_STATUS("이미 존재하는 읽음 상태입니다."),
 
-  // READSTATUS ERROR CODE
-  READ_STATUS_ALREADY_EXIST(HttpStatus.CONFLICT, "R001", "Read status already exist"),
-  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "R002", "Read status not found"),
+  // UserStatus 관련 에러 코드
+  USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다."),
+  DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다."),
 
-  // BINARYCONTENT ERROR CODE
-  BINARY_CONTENT_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "B001",
-      "Binary content processing error"),
-  BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, "B002", "Binary content not found");
+  // Server 에러 코드
+  INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
+  INVALID_REQUEST("잘못된 요청입니다."),
 
+  // 인증/인가 에러 코드
+  INVALID_TOKEN_SECRET("유효하지 않은 시크릿입니다."),
+  INVALID_TOKEN("유효하지 않은 토큰입니다."),
+  TOKEN_NOT_FOUND("토큰을 찾을 수 없습니다.");
 
-  private final HttpStatus status;
-  private final String code;
   private final String message;
-}
+
+  ErrorCode(String message) {
+    this.message = message;
+  }
+} 
