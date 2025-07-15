@@ -20,6 +20,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -81,6 +83,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    @Cacheable(cacheNames = "readstatuses", key = "'all'")
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         log.debug("사용자별 읽음 상태 목록 조회 시작: userId={}", userId);
         List<ReadStatusDto> dtos = readStatusRepository.findAllByUserId(userId).stream()
@@ -92,6 +95,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @PostAuthorize("principal.userDto.id == returnObject.userId()")
     @Transactional
+    @CacheEvict(cacheNames = "readstatuses", key = "'all'")
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
         log.debug("읽음 상태 수정 시작: id={}, newLastReadAt={}", readStatusId, request.newLastReadAt());
@@ -105,6 +109,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "readstatuses", key = "'all'")
     @Override
     public void delete(UUID readStatusId) {
         log.debug("읽음 상태 삭제 시작: id={}", readStatusId);

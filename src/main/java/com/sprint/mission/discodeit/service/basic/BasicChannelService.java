@@ -15,6 +15,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
+    private final ReadStatusService readStatusService;
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
@@ -61,6 +64,7 @@ public class BasicChannelService implements ChannelService {
         List<ReadStatus> readStatuses = userRepository.findAllById(request.participantIds())
             .stream()
             .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
+            .peek(readStatus -> readStatus.setNotificationEnabled(false))
             .toList();
         readStatusRepository.saveAll(readStatuses);
 
