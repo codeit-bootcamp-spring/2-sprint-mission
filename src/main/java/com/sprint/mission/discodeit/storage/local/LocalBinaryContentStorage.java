@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.event.BinaryContentPutFailedEvent;
+import com.sprint.mission.discodeit.event.BinaryContentPutSuccessEvent;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.storage.FileStorageAsyncTaskExecutor;
 import jakarta.annotation.PostConstruct;
@@ -17,12 +19,12 @@ import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -33,12 +35,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   private final Path root;
   private final FileStorageAsyncTaskExecutor asyncTaskExecutor;
 
+  private final ApplicationEventPublisher eventPublisher;
+
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") Path root,
-      FileStorageAsyncTaskExecutor asyncTaskExecutor
+      FileStorageAsyncTaskExecutor asyncTaskExecutor,
+      ApplicationEventPublisher eventPublisher
   ) {
     this.root = root;
     this.asyncTaskExecutor = asyncTaskExecutor;
+    this.eventPublisher = eventPublisher;
   }
 
   @PostConstruct
@@ -73,10 +79,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       // 3. 비동기 작업의 완료를 기다리고 결과 또는 예외를 받습니다.
       // .join() 사용 시 CompletionException 발생
-      return putFuture.join();
+      UUID resultBinaryContentId = putFuture.join();
+
+      eventPublisher.publishEvent(new BinaryContentPutSuccessEvent(resultBinaryContentId));
+
+      return resultBinaryContentId;
 
     } catch (CompletionException e) { // 비동기 작업 중 발생한 예외
       Throwable actualCause = e.getCause(); // 실제 발생한 원본 예외를 얻습니다.
+
+      eventPublisher.publishEvent(new BinaryContentPutFailedEvent(binaryContentId));
 
       log.error("바이너리 컨텐츠 저장 중 오류 발생. DB 롤백 예정: binaryContentId={}, cause={}",
           binaryContentId, actualCause.getMessage(), actualCause);

@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.event.BinaryContentPutFailedEvent;
+import com.sprint.mission.discodeit.event.BinaryContentPutSuccessEvent;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.storage.FileStorageAsyncTaskExecutor;
 import java.io.ByteArrayInputStream;
@@ -14,6 +16,7 @@ import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,12 +48,15 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   @Value("${discodeit.storage.s3.presigned-url-expiration:600}") // 기본값 10분
   private long presignedUrlExpirationSeconds;
 
+  private final ApplicationEventPublisher eventPublisher;
+
   public S3BinaryContentStorage(
       @Value("${discodeit.storage.s3.access-key}") String accessKey,
       @Value("${discodeit.storage.s3.secret-key}") String secretKey,
       @Value("${discodeit.storage.s3.region}") String region,
       @Value("${discodeit.storage.s3.bucket}") String bucket,
-      FileStorageAsyncTaskExecutor asyncTaskExecutor
+      FileStorageAsyncTaskExecutor asyncTaskExecutor,
+      ApplicationEventPublisher eventPublisher
 
   ) {
     this.accessKey = accessKey;
@@ -58,6 +64,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     this.region = region;
     this.bucket = bucket;
     this.asyncTaskExecutor = asyncTaskExecutor;
+    this.eventPublisher = eventPublisher;
   }
 
   @Override
@@ -86,9 +93,16 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     CompletableFuture<UUID> putFuture = asyncTaskExecutor.executeAsync(putTask);
 
     try {
-      return putFuture.join();
+      UUID resultBinaryContentId = putFuture.join();
+
+      eventPublisher.publishEvent(new BinaryContentPutSuccessEvent(resultBinaryContentId));
+
+      return resultBinaryContentId;
     } catch (CompletionException e) {
       Throwable actualCause = e.getCause();
+
+      eventPublisher.publishEvent(new BinaryContentPutFailedEvent(binaryContentId));
+
       log.error("S3 바이너리 컨텐츠 저장 중 최종 오류 발생: binaryContentId={}, cause={}",
           binaryContentId, actualCause.getMessage(), actualCause);
 
