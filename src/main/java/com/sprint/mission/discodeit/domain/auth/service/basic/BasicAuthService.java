@@ -57,8 +57,6 @@ public class BasicAuthService implements AuthService {
     user.updateRole(roleUpdateRequest.newRole());
     User savedUser = userRepository.save(user);
 
-    jwtSessionRepository.deleteById(savedUser.getId());
-
     return UserResult.fromEntity(savedUser, false);
   }
 
