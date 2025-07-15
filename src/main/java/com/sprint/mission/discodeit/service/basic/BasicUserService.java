@@ -43,7 +43,6 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final JwtBlackList blackList;
     private final JwtBlackList jwtBlackList;
 
     @Override

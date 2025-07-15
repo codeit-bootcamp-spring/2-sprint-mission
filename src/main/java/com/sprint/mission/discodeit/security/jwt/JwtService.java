@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -35,18 +36,17 @@ public class JwtService {
     @Value("${discodeit.jwt.secret}")
     private String secret;
 
-    @Value("${discodeit.jwt.access-token-validity-seconds}")
-    private Long accessTokenValiditySeconds;
-
-    @Value("${discodeit.jwt.refresh-token-validity-seconds}")
-    private Long refreshTokenValiditySeconds;
+    private static final Duration ACCESS_TOKEN_VALIDITY = Duration.ofMinutes(15);
+    private static final Duration REFRESH_TOKEN_VALIDITY = Duration.ofMinutes(45);
 
     @Transactional
     public JwtSession createJwtSession(UserDto userDto) {
 
         try {
-            JwtObject accessJwtObject = createToken(userDto, accessTokenValiditySeconds);
-            JwtObject refreshJwtObject = createToken(userDto, refreshTokenValiditySeconds);
+
+
+            JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_VALIDITY);
+            JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_VALIDITY);
 
             JwtSession jwtSession = new JwtSession(
                 userDto.id(),
@@ -78,8 +78,8 @@ public class JwtService {
                 .map(userMapper::toDto)
                 .orElseThrow(() -> UserNotFoundException.forId(userId.toString()));
 
-            JwtObject accessJwtObject = createToken(userDto, accessTokenValiditySeconds);
-            JwtObject refreshJwtObject = createToken(userDto, refreshTokenValiditySeconds);
+            JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_VALIDITY);
+            JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_VALIDITY);
 
             jwtSession.updateJwtSession(
                 accessJwtObject.token(),
@@ -118,10 +118,10 @@ public class JwtService {
     }
 
     private JwtObject createToken(
-        UserDto userDto, Long expiresAt
+        UserDto userDto, Duration expirationMinutes
     ) {
         Instant now = Instant.now();
-        Instant expirationTime = Instant.now().plusSeconds(expiresAt);
+        Instant expirationTime = Instant.now().plus(expirationMinutes);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
             .subject(userDto.username())
