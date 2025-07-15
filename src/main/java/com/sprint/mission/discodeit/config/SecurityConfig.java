@@ -3,38 +3,33 @@ package com.sprint.mission.discodeit.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
-import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
-import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import java.util.List;
 import java.util.stream.IntStream;
-import javax.sql.DataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -78,12 +73,14 @@ public class SecurityConfig {
                 configurer
                     .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
                     .failureHandler(new CustomLoginFailureHandler(objectMapper))
-        ).sessionManagement(session ->
+        )
+        .sessionManagement(session ->
             session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
-            JsonUsernamePasswordAuthenticationFilter.class);
+            JsonUsernamePasswordAuthenticationFilter.class)
+    ;
 
     return http.build();
   }
@@ -118,6 +115,12 @@ public class SecurityConfig {
   }
 
   @Bean
+  public AuthenticationManager authenticationManager(
+      List<AuthenticationProvider> authenticationProviders) {
+    return new ProviderManager(authenticationProviders);
+  }
+
+  @Bean
   public RoleHierarchy roleHierarchy() {
     return RoleHierarchyImpl.withDefaultRolePrefix()
         .role(Role.ADMIN.name())
@@ -127,27 +130,5 @@ public class SecurityConfig {
         .implies(Role.USER.name())
 
         .build();
-  }
-
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
-  }
-
-  @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      UserDetailsService userDetailsService,
-      DataSource dataSource
-  ) {
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-
-    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-        key, userDetailsService, tokenRepository);
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
   }
 }

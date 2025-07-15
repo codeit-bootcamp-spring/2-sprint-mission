@@ -72,11 +72,8 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   public static class Configurer extends
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
-    private final ObjectMapper objectMapper;
-
     public Configurer(ObjectMapper objectMapper) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), SecurityMatchers.LOGIN_URL);
-      this.objectMapper = objectMapper;
     }
 
     @Override

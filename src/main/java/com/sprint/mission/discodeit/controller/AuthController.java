@@ -3,19 +3,15 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +46,6 @@ public class AuthController implements AuthApi {
         .body(jwtSession.getAccessToken());
   }
 
-
   @PutMapping("role")
   public ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request) {
     log.info("권한 수정 요청");
@@ -76,6 +71,7 @@ public class AuthController implements AuthApi {
 
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(jwtSession.getAccessToken());
+        .body(jwtSession.getAccessToken())
+        ;
   }
 }

@@ -51,7 +51,6 @@ class MessageRepositoryTest {
   private User createTestUser(String username, String email) {
     BinaryContent profile = new BinaryContent("profile.jpg", 1024L, "image/jpeg");
     User user = new User(username, email, "password123!@#", profile);
-
     return userRepository.save(user);
   }
 

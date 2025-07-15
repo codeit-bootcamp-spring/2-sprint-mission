@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.hibernate.Hibernate;
@@ -100,5 +99,34 @@ class UserRepositoryTest {
     assertThat(exists).isFalse();
   }
 
+  @Test
+  @DisplayName("모든 사용자를 프로필과 상태 정보와 함께 조회할 수 있다")
+  void findAllWithProfileAndStatus_ReturnsUsersWithProfileAndStatus() {
+    // given
+    User user1 = createTestUser("user1", "user1@example.com");
+    User user2 = createTestUser("user2", "user2@example.com");
 
+    userRepository.saveAll(List.of(user1, user2));
+
+    // 영속성 컨텍스트 초기화 - 1차 캐시 비우기
+    entityManager.flush();
+    entityManager.clear();
+
+    // when
+    List<User> users = userRepository.findAllWithProfile();
+
+    // then
+    assertThat(users).hasSize(2);
+    assertThat(users).extracting("username").containsExactlyInAnyOrder("user1", "user2");
+
+    // 프로필과 상태 정보가 함께 조회되었는지 확인 - 프록시 초기화 없이도 접근 가능한지 테스트
+    User foundUser1 = users.stream().filter(u -> u.getUsername().equals("user1")).findFirst()
+        .orElseThrow();
+    User foundUser2 = users.stream().filter(u -> u.getUsername().equals("user2")).findFirst()
+        .orElseThrow();
+
+    // 프록시 초기화 여부 확인
+    assertThat(Hibernate.isInitialized(foundUser1.getProfile())).isTrue();
+    assertThat(Hibernate.isInitialized(foundUser2.getProfile())).isTrue();
+  }
 } 

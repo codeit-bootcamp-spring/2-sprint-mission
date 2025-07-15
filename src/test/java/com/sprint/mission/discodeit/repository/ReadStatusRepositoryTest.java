@@ -45,7 +45,6 @@ class ReadStatusRepositoryTest {
   private User createTestUser(String username, String email) {
     BinaryContent profile = new BinaryContent("profile.jpg", 1024L, "image/jpeg");
     User user = new User(username, email, "password123!@#", profile);
-    // UserStatus 생성 및 연결
     return userRepository.save(user);
   }
 

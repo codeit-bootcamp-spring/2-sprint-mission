@@ -7,31 +7,33 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Table(name = "jwt_sessions")
 @Entity
 public class JwtSession extends BaseUpdatableEntity {
 
-  @Column(nullable = false)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
   private UUID userId;
-
-  @Column(nullable = false)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String accessToken;
-
-  @Column(nullable = false)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String refreshToken;
-
-  @Column(nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant expirationTime;
 
+  public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
+    this.userId = userId;
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
+  }
+
   public boolean isExpired() {
-    return expirationTime.isBefore(Instant.now());
+    return this.expirationTime.isBefore(Instant.now());
   }
 
   public void update(String accessToken, String refreshToken, Instant expirationTime) {
