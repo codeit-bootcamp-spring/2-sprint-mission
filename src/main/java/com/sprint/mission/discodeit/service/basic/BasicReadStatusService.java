@@ -14,15 +14,16 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -59,7 +60,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusDto find(UUID readStatusId) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-            .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
+                .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
 
         return readStatusMapper.toDto(readStatus);
     }
@@ -84,7 +85,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-            .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
+                .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
 
         Instant newLastReadAt = request.newLastReadAt();
         if (newLastReadAt != null) {
@@ -103,7 +104,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private Channel findChannelOrThrow(UUID channelId) {
         return channelRepository.findById(channelId)
-            .orElseThrow(() -> new ChannelNotFoundException(channelId));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
     }
 
 }

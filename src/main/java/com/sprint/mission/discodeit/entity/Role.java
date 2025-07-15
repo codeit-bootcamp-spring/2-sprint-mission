@@ -16,4 +16,10 @@ public enum Role {
         this.hierarchy = hierarchy;
     }
 
+    public boolean hasAuthorityOver(Role other) {
+        if (other == null) {
+            return false;
+        }
+        return this.hierarchy < other.getHierarchy();
+    }
 }

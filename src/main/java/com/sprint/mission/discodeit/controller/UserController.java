@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateWithFileRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateWithFileRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -38,26 +40,21 @@ public class UserController {
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserDto> create(
         @Valid @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
-        @RequestPart(value = "profile", required = false) MultipartFile profile) {
-        UserDto userDto = userService.create(userCreateRequest, profile);
+        @RequestPart(value = "profileImage", required = false) MultipartFile profileImage) {
+        
+        UserCreateWithFileRequest request = UserCreateWithFileRequest.of(userCreateRequest, profileImage);
+        UserDto userDto = userService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
     @PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<UserDto> update(@PathVariable("userId") UUID userId,
         @RequestPart(value = "userUpdateRequest", required = false) UserUpdateRequest userUpdateRequest,
-        @RequestPart(value = "profile", required = false) MultipartFile profile,
         @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-        @RequestPart(value = "file", required = false) MultipartFile file,
-        HttpServletRequest request) {
+        @RequestPart(value = "removeProfileImage", required = false) Boolean removeProfileImage) {
 
-        UserUpdateRequest safeRequest = userUpdateRequest != null ? userUpdateRequest
-            : new UserUpdateRequest(null, null, null, null, null);
-
-        MultipartFile actualFile =
-            profile != null ? profile : (profileImage != null ? profileImage : (file));
-        Optional<MultipartFile> profileRequest = Optional.ofNullable(actualFile);
-        UserDto updatedUser = userService.update(userId, safeRequest, profileRequest);
+        UserUpdateWithFileRequest request = UserUpdateWithFileRequest.of(userUpdateRequest, profileImage, removeProfileImage);
+        UserDto updatedUser = userService.update(userId, request);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
