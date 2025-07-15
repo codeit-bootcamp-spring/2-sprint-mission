@@ -1,21 +1,18 @@
 package com.sprint.mission.discodeit.controller;
 
-//import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +30,7 @@ public class AuthController {
   private final AuthService authService;
   private final UserRepository userRepository;
   private final UserMapper userMapper;
+  private final JwtService jwtService;
 
   @GetMapping(path = "/csrf-token")
   public CsrfToken getCsrfToken(HttpServletRequest request) {
@@ -51,21 +49,13 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<UserDto> getCurrentUser(
-          @AuthenticationPrincipal UserDetails userDetails) {
+  public ResponseEntity<String> getCurrentUser(
+          @CookieValue(value = "refresh_token") String refreshToken) {
 
-    if (userDetails == null) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-    }
-
-    try{
-      User user = userRepository.findByEmail(userDetails.getUsername())
-              .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을수가 없습니다."));
-      UserDto dto = userMapper.toDto(user);
-      return ResponseEntity.ok(dto);
-    }catch (Exception e){
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+    JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
+    return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(jwtSession.getAccessToken());
   }
 
   @PutMapping("/role")
