@@ -36,8 +36,8 @@ public class JwtService {
     @Value("${discodeit.jwt.secret}")
     private String secret;
 
-    private static final Duration ACCESS_TOKEN_VALIDITY = Duration.ofMinutes(15);
-    private static final Duration REFRESH_TOKEN_VALIDITY = Duration.ofMinutes(45);
+    private static final Duration ACCESS_TOKEN_DURATION = Duration.ofMinutes(15);
+    private static final Duration REFRESH_TOKEN_DURATION = Duration.ofMinutes(45);
 
     @Transactional
     public JwtSession createJwtSession(UserDto userDto) {
@@ -45,8 +45,8 @@ public class JwtService {
         try {
 
 
-            JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_VALIDITY);
-            JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_VALIDITY);
+            JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_DURATION);
+            JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_DURATION);
 
             JwtSession jwtSession = new JwtSession(
                 userDto.id(),
@@ -78,8 +78,8 @@ public class JwtService {
                 .map(userMapper::toDto)
                 .orElseThrow(() -> UserNotFoundException.forId(userId.toString()));
 
-            JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_VALIDITY);
-            JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_VALIDITY);
+            JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_DURATION);
+            JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_DURATION);
 
             jwtSession.updateJwtSession(
                 accessJwtObject.token(),
