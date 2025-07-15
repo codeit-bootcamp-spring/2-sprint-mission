@@ -26,16 +26,15 @@ public class FileUploadService {
   @Retryable(
       retryFor = {IOException.class},
       maxAttempts = 3,
-      backoff = @Backoff(delay = 2000),
-      recover = "recoverFileUpload"
+      backoff = @Backoff(delay = 2000)
   )
   public CompletableFuture<UUID> uploadWithRetry(UUID id, byte[] bytes) throws IOException {
     log.info("[FileUploadService] 파일 업로드 시도 (ID: {})", id);
     // 테스트를 위해 의도적으로 예외 발생
-//    if (true) {
-//      log.warn("[FileUploadService] 의도적인 예외 발생! (ID: {})", id);
-//      throw new IOException("의도적인 스토리지 연결 실패!");
-//    }
+    if (true) {
+      log.warn("[FileUploadService] 의도적인 예외 발생! (ID: {})", id);
+      throw new IOException("의도적인 스토리지 연결 실패!");
+    }
     binaryContentStorage.put(id, bytes);
     return CompletableFuture.completedFuture(id);
   }
