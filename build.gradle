@@ -59,7 +59,7 @@ dependencies {
 
     //비동기 작업을 위한 micrometer 설치
     implementation 'org.springframework.retry:spring-retry'
-    implementation 'io.micrometer:micrometer-context-propagation'
+    implementation 'io.micrometer:context-propagation:1.1.3'
 
     //비동기 작업을 위한 WebClient 사용
     implementation 'org.springframework.boot:spring-boot-starter-webflux'

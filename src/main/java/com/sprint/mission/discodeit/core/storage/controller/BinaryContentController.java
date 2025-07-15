@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.repository.BinaryContentStoragePort;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.swagger.BinaryContentApi;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,8 @@ public class BinaryContentController implements BinaryContentApi {
   }
 
   @GetMapping("/{binaryContentId}/download")
-  public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<?> download(@PathVariable UUID binaryContentId)
+      throws FileNotFoundException {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
     return binaryContentStorage.download(BinaryContentDto.create(binaryContent));
   }

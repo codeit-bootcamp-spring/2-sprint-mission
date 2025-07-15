@@ -12,6 +12,8 @@ import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +40,14 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelRepository.findByChannelId(request.channelId());
 
     List<BinaryContent> binaryContentIdList = binaryContentCommands.stream()
-        .map(binaryContentService::create).toList();
-
+        .map(command -> {
+          try {
+            return binaryContentService.create(command);
+          } catch (IOException e) {
+            log.error("BinaryContent 생성 중 파일 처리 오류 발생", e);
+            throw new UncheckedIOException(e);
+          }
+        }).toList();
     Message message = Message.create(user, channel, request.content(), binaryContentIdList);
     channel.setLastMessageAt(Instant.now());
     messageRepository.save(message);

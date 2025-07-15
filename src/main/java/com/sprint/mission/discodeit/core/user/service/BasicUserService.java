@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public UserDto create(UserCreateRequest request,
-      Optional<BinaryContentCreateRequest> binaryContentRequest) {
+      Optional<BinaryContentCreateRequest> binaryContentRequest) throws IOException {
     if (userRepository.existsByNameOrEmail(request.username(), request.email())) {
       throw new UserException(ErrorCode.USER_NAME_ALREADY_EXISTS);
     }
@@ -58,7 +59,7 @@ public class BasicUserService implements UserService {
   @Transactional
   @CacheEvict(cacheNames = "users", key = "#id")
   public UserDto update(UUID id, UserUpdateRequest request,
-      Optional<BinaryContentCreateRequest> binaryContentRequest) {
+      Optional<BinaryContentCreateRequest> binaryContentRequest) throws IOException {
     User user = userRepository.findByUserId(id);
     BinaryContent newProfile = binaryContentService.create(binaryContentRequest.orElse(null));
     user.update(request.newUsername(), request.newEmail(), newProfile);

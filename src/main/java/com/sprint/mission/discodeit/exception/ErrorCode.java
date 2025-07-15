@@ -28,7 +28,7 @@ public enum ErrorCode {
   MESSAGE_INVALID_REQUEST(400, "M000", "error.message.invalid-input"),
   MESSAGE_NOT_FOUND(404, "M001", "error.message.not-found"),
 
-  FILE_NOT_FOUND(404, "F001", "error.channel.not-found");
+  FILE_NOT_FOUND(404, "F001", "error.file.not-found");
 
 
   private final int httpStatus;
