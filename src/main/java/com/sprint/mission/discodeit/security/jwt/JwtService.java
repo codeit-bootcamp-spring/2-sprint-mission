@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.core.user.UserException;
 import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ClaimsBuilder;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -63,35 +62,37 @@ public class JwtService {
     return jwtSessionRepository.save(session);
   }
 
-  public boolean validateToken(String token) {
+  public Jws<Claims> validateToken(String token) {
     if (jwtBlacklist.isBlacklisted(token)) {
-      return false;
+      return null;
     }
 
     try {
-      Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-      return true;
+      return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
     } catch (Exception e) {
-      return false;
+      return null;
     }
   }
 
   public Claims getClaims(String token) {
-    return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
+    Jws<Claims> jws = validateToken(token);
+    if (jws != null) {
+      return jws.getPayload();
+    } else {
+      return null;
+    }
   }
 
   @Transactional
   public Optional<JwtSession> refreshAccessToken(String oldRefreshToken) {
-    if (!validateToken(oldRefreshToken)) {
+    if (validateToken(oldRefreshToken) == null) {
       return Optional.empty();
     }
     return jwtSessionRepository.findByRefreshToken(oldRefreshToken).map(session -> {
           String oldAccessToken = session.getAccessToken();
           jwtBlacklist.addBlacklist(oldAccessToken);
 
-          User user = userRepository.findById(session.getUserId()).orElseThrow(
-              () -> new UserException(ErrorCode.USER_NOT_FOUND)
-          );
+          User user = userRepository.findByUserId(session.getUserId());
           Instant now = Instant.now();
           UserDto userDto = UserDto.from(user);
 
