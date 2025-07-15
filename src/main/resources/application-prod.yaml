@@ -3,10 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://discodeit-db.c36mgyg8y6v9.ap-northeast-2.rds.amazonaws.com:5432/discodeit
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     properties:
       hibernate:
