@@ -35,6 +35,8 @@ public class JwtService {
     @Value("${discodeit.security.jwt.refresh-token-validity-seconds}")
     private long refreshTokenValiditySeconds;
 
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+
     private final JwtSessionRepository jwtSessionRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;

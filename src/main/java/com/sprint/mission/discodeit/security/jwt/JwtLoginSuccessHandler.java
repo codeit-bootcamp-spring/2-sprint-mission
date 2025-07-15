@@ -27,7 +27,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
         JwtSession jwtSession = jwtService.createJwtSession(principal.getUserDto());
 
-        Cookie refreshTokenCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
+        Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME, jwtSession.getRefreshToken());
         refreshTokenCookie.setHttpOnly(true);
         response.addCookie(refreshTokenCookie);
 
