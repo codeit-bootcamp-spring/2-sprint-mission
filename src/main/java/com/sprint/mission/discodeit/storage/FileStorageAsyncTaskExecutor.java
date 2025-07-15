@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.dto.data.AsyncTaskFailure;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -8,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+@Slf4j
 @Service
 public class FileStorageAsyncTaskExecutor {
 
@@ -41,5 +46,20 @@ public class FileStorageAsyncTaskExecutor {
   @Async("fileExecutor")
   public void executeAsync(Runnable task) {
     task.run();
+  }
+
+  @Recover
+  public <T> CompletableFuture<T> recover(RuntimeException e, Supplier<T> task) {
+    String taskName = "BinaryContentStorage.put";
+    String requestId = MDC.get("requestId");
+    if (requestId == null) {
+      requestId = "N/A";
+    }
+    String failureReason = "파일 업로드 실패: " + e.getMessage() + " - 스택트레이스: " + e.toString();
+
+    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
+    log.error("Async Task Failure : " + failureReason);
+
+    return CompletableFuture.failedFuture(new RuntimeException(e));
   }
 }
