@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStra
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +52,8 @@ public class SecurityConfig {
             ObjectMapper objectMapper,
             DaoAuthenticationProvider daoAuthenticationProvider,
             SessionRegistry sessionRegistry,
-            PersistentTokenBasedRememberMeServices rememberMeServices
+            PersistentTokenBasedRememberMeServices rememberMeServices,
+            JwtService jwtService
     )
             throws Exception {
         http
@@ -81,6 +84,8 @@ public class SecurityConfig {
                                 .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
                 )
                 .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+                .addFilterBefore(new JwtAuthenticationFilter(objectMapper, jwtService),
+                        JsonUsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();

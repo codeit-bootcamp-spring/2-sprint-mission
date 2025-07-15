@@ -145,4 +145,13 @@ public class JwtService {
         return session;
     }
 
+    @Transactional
+    public JwtSession invalidateJwtSession(UUID userId) {
+        JwtSession session = jwtSessionRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException());
+
+        jwtSessionRepository.delete(session);
+        return session;
+    }
+
 }
