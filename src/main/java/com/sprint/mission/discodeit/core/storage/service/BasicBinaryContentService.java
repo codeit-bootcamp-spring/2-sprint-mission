@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.core.storage.service;
 import com.sprint.mission.discodeit.core.storage.BinaryContentException;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
+import com.sprint.mission.discodeit.core.storage.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.core.storage.repository.JpaBinaryContentRepository;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +21,11 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final JpaBinaryContentRepository binaryContentMetaRepository;
   private final FileUploadService fileUploadService;
+  private final BinaryContentUpdater binaryContentUpdater;
 
   @Override
   @Transactional
-  public BinaryContent create(BinaryContentCreateRequest request) {
+  public BinaryContent create(BinaryContentCreateRequest request) throws IOException {
     if (request == null) {
       log.warn("[BinaryContentService] Parameter is empty");
       return null;
@@ -30,14 +33,19 @@ public class BasicBinaryContentService implements BinaryContentService {
     BinaryContent binaryContent = BinaryContent.create(request.fileName(),
         (long) request.bytes().length, request.contentType());
     binaryContentMetaRepository.save(binaryContent);
+    UUID binaryContentId = binaryContent.getId();
     log.info("[BinaryContentService] Binary Content Created: {}. 비동기 업로드를 시작합니다.",
-        binaryContent.getId());
-    fileUploadService.uploadWithRetry(binaryContent.getId(), request.bytes())
+        binaryContentId);
+
+    fileUploadService.uploadWithRetry(binaryContentId, request.bytes())
         .whenComplete((result, ex) -> {
           if (ex == null) {
             log.info("파일 업로드 성공 : 스레드명 {}", Thread.currentThread().getName());
+            binaryContentUpdater.updateStatus(binaryContent, BinaryContentUploadStatus.SUCCESS);
           } else {
-            log.error("파일 업로드 실패 : 스레드명 {}", Thread.currentThread().getName());
+            log.error("파일 업로드 실패 : 스레드명 {}, 이유 {}", Thread.currentThread().getName(),
+                ex.getMessage());
+            binaryContentUpdater.updateStatus(binaryContent, BinaryContentUploadStatus.FAILED);
           }
         });
 

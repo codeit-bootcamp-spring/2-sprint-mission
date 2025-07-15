@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.config;
 import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -12,7 +13,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableRetry
 public class AsyncConfig {
 
-  @Bean
+  @Bean(name = "AsyncExecutor")
   public Executor executor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     //i5-14400F
@@ -23,7 +24,8 @@ public class AsyncConfig {
     //P코어 할당될 경우, 3스레드로 줄일 예정
     executor.setCorePoolSize(4); // 기본 스레드 수
     executor.setMaxPoolSize(8); //최대 스레드 수
-//    executor.setThreadNamePrefix("Async-");
+    executor.setThreadNamePrefix("Async-");
+    executor.setTaskDecorator(new ContextPropagatingTaskDecorator());
     executor.initialize();
     return executor;
   }

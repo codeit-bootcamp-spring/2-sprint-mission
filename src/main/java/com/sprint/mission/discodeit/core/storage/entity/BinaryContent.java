@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.core.storage.entity;
 import com.sprint.mission.discodeit.core.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,16 +29,24 @@ public class BinaryContent extends BaseEntity {
   @Column(name = "extension", nullable = false)
   private String extension;
 
+  @Enumerated(EnumType.STRING)
+  private BinaryContentUploadStatus status;
+
   private BinaryContent(String fileName, Long size, String contentType) {
     super();
     this.fileName = fileName;
     this.contentType = contentType;
     this.extension = extractExtension(fileName);
     this.size = size;
+    this.status = BinaryContentUploadStatus.WAITING;
   }
 
   public static BinaryContent create(String fileName, Long size, String contentType) {
     return new BinaryContent(fileName, size, contentType);
+  }
+
+  public void updateStatus(BinaryContentUploadStatus uploadStatus) {
+    this.status = uploadStatus;
   }
 
   private static String extractExtension(String fileName) {
