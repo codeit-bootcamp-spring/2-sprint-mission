@@ -130,3 +130,14 @@ CREATE TABLE jwt_sessions
     expiration_time timestamp with time zone NOT NULL
 );
 
+ALTER TABLE read_statuses
+    ADD COLUMN notification_enabled BOOLEAN;
+
+
+UPDATE read_statuses
+SET notification_enabled = TRUE
+WHERE notification_enabled IS NULL;
+
+ALTER TABLE read_statuses
+    ALTER COLUMN notification_enabled SET NOT NULL;
+
