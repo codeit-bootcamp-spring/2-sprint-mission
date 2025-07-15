@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,11 @@ public class FileStorageAsyncTaskExecutor {
    * @return 작업 결과를 담는 CompletableFuture
    */
   @Async("fileExecutor") // AsyncConfig에 정의된 fileExecutor를 사용하도록 명시
+  @Retryable(
+      retryFor = { RuntimeException.class },
+      maxAttempts = 5,
+      backoff = @Backoff(delay = 1000, multiplier = 2, random = true)
+  )
   public <T> CompletableFuture<T> executeAsync(Supplier<T> task) {
     // 여기서는 CompletableFuture.supplyAsync()를 사용하지 않습니다.
     // @Async가 이미 이 메서드 호출을 비동기 스레드로 넘겨주기 때문입니다.
