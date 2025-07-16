@@ -7,13 +7,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
     open-in-view: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        use_sql_comments: true
 
   servlet:
     multipart:
@@ -38,6 +36,8 @@ logging:
     root: info
     com.sprint.mission.discodeit: debug
     org.springframework.security: trace
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
 
 management:
   endpoints:

@@ -11,8 +11,8 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,14 +92,13 @@ public class BasicUserService implements UserService {
     public List<UserDto> findAll() {
         log.debug("모든 사용자 조회 시작");
         Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
-            .map(session -> session.getUser().getId())
+            .map(JwtSession::getUserId)
             .collect(Collectors.toSet());
 
         List<UserDto> userDtos = userRepository.findAllWithProfile()
             .stream()
             .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
             .toList();
-        
         log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
         return userDtos;
     }
