@@ -2,11 +2,15 @@ package com.sprint.mission.discodeit.service.notification;
 
 import com.sprint.mission.discodeit.dto.data.NotificationMessage;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -32,10 +36,15 @@ public class NotificationEventListener {
         maxAttempts = 3,
         backoff = @Backoff(delay = 2000)
     )
-    public void consume(NotificationMessage message) {
+    public void consume(NotificationMessage message) throws NotFoundException {
         try {
             log.info("Kafka 메시지 수신 - 사용자 ID: {}", message.getReceiverId());
-            notificationService.sendNotification(message.toEntity(userRepository));
+            User receiver = userRepository.findById(message.getReceiverId())
+                .orElseThrow(() -> UserNotFoundException.withId(message.getReceiverId()));
+
+            Notification notification = message.toEntity(receiver);
+            notificationService.sendNotification(notification);
+
         } catch (Exception e) {
             throw e; // Retryable이 처리
         }

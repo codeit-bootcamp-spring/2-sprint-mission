@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.data;
 
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -34,9 +35,9 @@ public class NotificationMessage implements Serializable {
         );
     }
 
-    public Notification toEntity(UserRepository userRepository) {
+    public Notification toEntity(User receiver) {
         return new Notification(
-            userRepository.findById(receiverId).get(),
+            receiver,
             title,
             content,
             NotificationType.valueOf(type),
