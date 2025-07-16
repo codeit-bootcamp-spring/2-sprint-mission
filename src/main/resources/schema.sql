@@ -132,3 +132,16 @@ CREATE TABLE jwt_sessions
     expiration_time timestamp with time zone NOT NULL
 );
 
+
+CREATE TABLE notifications
+(
+    id              uuid PRIMARY KEY,
+    created_at      timestamp with time zone NOT NULL,
+    receiver_id     uuid NOT NULL,
+    title           TEXT NOT NULL,
+    content         TEXT NOT NULL,
+    type            varchar(255) NOT NULL,
+    target_id       UUID,
+
+    CONSTRAINT fk_notifications_receiver FOREIGN KEY (receiver_id) REFERENCES users(id)
+)
