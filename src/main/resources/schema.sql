@@ -159,4 +159,14 @@ AND c.type = 'PRIVATE';
 -- 3) 기본 DEFAULT 제거 (애플리케이션 코드에서 명시적으로 세팅하도록)
 ALTER TABLE read_statuses
 
-ALTER COLUMN notification_enabled DROP DEFAULT;
+CREATE TABLE notifications (
+       id UUID PRIMARY KEY, -- BaseUpdatableEntity에서 상속된 PK
+       created_at      timestamp with time zone NOT NULL,
+       updated_at      timestamp with time zone,
+
+       receiver_id UUID NOT NULL,
+       title VARCHAR(255) NOT NULL,
+       content TEXT NOT NULL,
+       type VARCHAR(255) NOT NULL, -- EnumType.STRING
+       target_id UUID
+);

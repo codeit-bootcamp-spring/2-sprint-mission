@@ -20,6 +20,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -45,11 +48,14 @@ public class BasicMessageService implements MessageService {
   private final PageResponseMapper pageResponseMapper;
 
   private final ApplicationEventPublisher publisher;
+  private final CacheManager cacheManager;
 
   @Transactional
   @Override
+  @CacheEvict(value="messages", key="#p0.channelId() + '_'")
   public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+
     log.debug("메시지 생성 시작: request={}", messageCreateRequest);
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
@@ -101,8 +107,8 @@ public class BasicMessageService implements MessageService {
 
   @Transactional(readOnly = true)
   @Override
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt,
-      Pageable pageable) {
+  @Cacheable(value="messages", key="#p0 + '_'")
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant createAt, Pageable pageable) {
     Slice<MessageDto> slice = messageRepository.findAllByChannelIdWithAuthor(channelId,
             Optional.ofNullable(createAt).orElse(Instant.now()),
             pageable)
@@ -118,6 +124,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @CacheEvict(value = "messages", allEntries = true)
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
@@ -126,11 +133,15 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> MessageNotFoundException.withId(messageId));
 
     message.update(request.newContent());
+
+    MessageDto messageDto = messageMapper.toDto(message);
+
     log.info("메시지 수정 완료: id={}, channelId={}", messageId, message.getChannel().getId());
-    return messageMapper.toDto(message);
+    return messageDto;
   }
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @CacheEvict(value = "messages", allEntries = true)
   @Transactional
   @Override
   public void delete(UUID messageId) {
@@ -138,7 +149,12 @@ public class BasicMessageService implements MessageService {
     if (!messageRepository.existsById(messageId)) {
       throw MessageNotFoundException.withId(messageId);
     }
+
+    Message message = messageRepository.findById(messageId)
+            .orElseThrow(() -> MessageNotFoundException.withId(messageId));
+
     messageRepository.deleteById(messageId);
+
     log.info("메시지 삭제 완료: id={}", messageId);
   }
 }
