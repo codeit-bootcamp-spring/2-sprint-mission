@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.core.user.service;
 
 
 import com.sprint.mission.discodeit.core.auth.dto.UserRoleUpdateRequest;
+import com.sprint.mission.discodeit.core.notification.dto.NotificationEvent;
+import com.sprint.mission.discodeit.core.notification.entity.NotificationTitle;
+import com.sprint.mission.discodeit.core.notification.entity.NotificationType;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
@@ -19,6 +22,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,7 @@ public class BasicUserService implements UserService {
   private final JpaUserRepository userRepository;
   private final BinaryContentService binaryContentService;
   private final JwtSessionRepository jwtSessionRepository;
+  private final ApplicationEventPublisher eventPublisher; // 이벤트 발행을 위한 객체
 
   @Override
   @Transactional
@@ -84,8 +89,13 @@ public class BasicUserService implements UserService {
     User user = userRepository.findByUserId(id);
     user.updateRole(request.newRole());
     userRepository.save(user);
-
     jwtSessionRepository.findByUserId(id).ifPresent(jwtSessionRepository::delete);
+
+    eventPublisher.publishEvent(new NotificationEvent(id,
+        NotificationTitle.UPDATE.getTitle(),
+        "권한이 변경되었습니다",
+        NotificationType.ROLE_CHANGED,
+        id));
 
     return UserDto.from(user);
   }

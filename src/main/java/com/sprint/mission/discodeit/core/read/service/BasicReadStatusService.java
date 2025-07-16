@@ -54,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
     ReadStatus status = readStatusRepository.findByReadStatusId(readStatusId);
-    status.update(request.newLastReadAt());
+    status.update(request.newLastReadAt(), request.newNotificationEnabled());
     readStatusRepository.save(status);
 
     log.info("[ReadStatusService] Read Status updated : id {}, last Read At {}", status.getId(),

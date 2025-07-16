@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.event;
+package com.sprint.mission.discodeit.core.notification.event;
 
 import com.sprint.mission.discodeit.core.auth.entity.CustomUserDetails;
 import com.sprint.mission.discodeit.core.user.service.UserStatusService;
