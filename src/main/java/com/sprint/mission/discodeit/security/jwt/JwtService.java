@@ -44,7 +44,6 @@ public class JwtService {
 
         try {
 
-
             JwtObject accessJwtObject = createToken(userDto, ACCESS_TOKEN_DURATION);
             JwtObject refreshJwtObject = createToken(userDto, REFRESH_TOKEN_DURATION);
 

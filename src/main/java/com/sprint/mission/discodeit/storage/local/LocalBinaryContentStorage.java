@@ -15,6 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -22,8 +24,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(
     name = "discodeit.storage.type",
@@ -53,13 +57,19 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public UUID put(UUID id, byte[] bytes) {
+    @Async("fileUploadExecutor")
+    public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
+        String threadName = Thread.currentThread().getName();
+        log.info("파일 업로드 진행 시작: id={}, thread={}", id, threadName);
         try (OutputStream os = Files.newOutputStream(resolvePath(id))) {
+            log.info("파일 업로드 진행중: id={}, thread={}", id, threadName);
             os.write(bytes);
+            log.info("파일 업로드 완료: id={}, thread={}", id, threadName);
         } catch (IOException e) {
+            log.info("파일 업로드 실패: id={}, thread={}", id, threadName);
             throw BinaryStoragePutException.forId(id.toString(), e);
         }
-        return id;
+        return CompletableFuture.completedFuture(id);
     }
 
     @Override

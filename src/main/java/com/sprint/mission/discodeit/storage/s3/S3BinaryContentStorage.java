@@ -8,6 +8,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,7 +44,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private long PRESIGED_URL_EXPIRATION;
 
     @Override
-    public UUID put(UUID id, byte[] bytes) {
+    public CompletableFuture<UUID> put(UUID id, byte[] bytes) {
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(BUCKET_NAME)
@@ -52,7 +53,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
 
-            return id;
+            return CompletableFuture.completedFuture(id);
         } catch (S3Exception e) {
             throw new RuntimeException("S3에 파일 업로드 실패: " + e.awsErrorDetails().errorMessage(), e);
         } catch (SdkClientException e) {

@@ -18,10 +18,10 @@ public class JwtSession extends BaseUpdatableEntity {
     @Column(nullable = false)
     private UUID userId;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false, unique = true)
     private String accessToken;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", nullable = false, unique = true)
     private String refreshToken;
 
     @Column(name = "expires_at", nullable = false)

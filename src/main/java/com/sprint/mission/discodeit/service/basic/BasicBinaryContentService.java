@@ -20,7 +20,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentMapper binaryContentMapper;
-    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     @Transactional(readOnly = true)
@@ -28,18 +27,14 @@ public class BasicBinaryContentService implements BinaryContentService {
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
             .orElseThrow(
                 () -> BinaryContentNotFoundException.forId(binaryContentId.toString()));
-        InputStream is = binaryContentStorage.get(binaryContent.getId());
-        return binaryContentMapper.toDto(binaryContent, is);
+        return binaryContentMapper.toDto(binaryContent);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<BinaryContentDto> findByIdIn(List<UUID> binaryContentIdList) {
         return binaryContentRepository.findByIdIn(binaryContentIdList).stream()
-            .map(binaryContent -> {
-                InputStream is = binaryContentStorage.get(binaryContent.getId());
-                return binaryContentMapper.toDto(binaryContent, is);
-            })
+            .map(binaryContentMapper::toDto)
             .toList();
     }
 }

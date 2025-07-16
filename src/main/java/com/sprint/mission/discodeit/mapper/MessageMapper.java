@@ -30,8 +30,7 @@ public class MessageMapper {
 
   private List<BinaryContentDto> attachments(Message message) {
     return message.getAttachments().stream()
-        .map(binaryContent -> binaryContentMapper.toDto(binaryContent,
-            binaryContentStorage.get(binaryContent.getId())))
+        .map(binaryContentMapper::toDto)
         .toList();
   }
 }

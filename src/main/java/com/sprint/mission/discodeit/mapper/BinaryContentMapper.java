@@ -9,20 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class BinaryContentMapper {
 
-  public BinaryContentDto toDto(BinaryContent binaryContent, InputStream is) {
-    try {
-      byte[] bytes = is.readAllBytes();
-      is.close();
-      return new BinaryContentDto(
-          binaryContent.getId(),
-          binaryContent.getFileName(),
-          binaryContent.getSize(),
-          binaryContent.getContentType(),
-          bytes
-      );
-    } catch (IOException e) {
-      System.err.println(e.getMessage());
-      throw new RuntimeException("파일 변환 중 오류 발생 : ", e);
+    public BinaryContentDto toDto(BinaryContent binaryContent) {
+        return new BinaryContentDto(
+            binaryContent.getId(),
+            binaryContent.getFileName(),
+            binaryContent.getSize(),
+            binaryContent.getContentType()
+        );
     }
-  }
 }

@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS read_statuses
 (
     id           UUID PRIMARY KEY,
     created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
-    update_at    TIMESTAMP WITH TIME ZONE,
+    updated_at    TIMESTAMP WITH TIME ZONE,
     user_id      UUID,
     channel_id   UUID,
     last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
