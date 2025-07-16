@@ -1,17 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.async.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.constant.Role;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.event.FileUploadEvent;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.FileUploadEventHandler;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryDataUploadStorageException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryMetadataUploadException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtBlackList;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
@@ -27,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +49,7 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final JwtBlackList jwtBlackList;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -61,11 +67,13 @@ public class BasicUserService implements UserService {
             throw UserAlreadyExistsException.forEmail(userCreateRequest.email());
         }
 
-        BinaryContent binaryContent = null;
+        BinaryContent binaryContent;
         if (profile != null && !profile.isEmpty()) {
             log.info("사용자 생성 중 프로필 이미지 메타데이터 저장: filename = {}, contentType = {}, size = {}",
                 profile.getOriginalFilename(), profile.getContentType(), profile.getSize());
             binaryContent = extractBinaryContent(profile);
+        } else {
+            binaryContent = null;
         }
 
         String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
@@ -81,7 +89,8 @@ public class BasicUserService implements UserService {
         if (binaryContent != null) {
             log.info("사용자 생성 중 프로필 저장: profileId = {}", binaryContent.getId());
             try {
-                binaryContentStorage.put(binaryContent.getId(), profile.getBytes());
+                byte[] bytes = profile.getBytes();
+                eventPublisher.publishEvent(new FileUploadEvent(binaryContent.getId(), bytes));
             } catch (IOException e) {
                 throw new BinaryDataUploadStorageException(Map.of(
                     "filename", Objects.requireNonNull(profile.getOriginalFilename(), "파일 명 null"),

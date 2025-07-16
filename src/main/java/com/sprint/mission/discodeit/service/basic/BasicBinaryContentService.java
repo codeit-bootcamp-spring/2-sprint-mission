@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.async.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
@@ -36,5 +37,16 @@ public class BasicBinaryContentService implements BinaryContentService {
         return binaryContentRepository.findByIdIn(binaryContentIdList).stream()
             .map(binaryContentMapper::toDto)
             .toList();
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(UUID id, BinaryContentUploadStatus uploadStatus) {
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
+            .orElseThrow(
+                () -> BinaryContentNotFoundException.forId(id.toString()));
+
+        binaryContent.updateStatus(uploadStatus);
+        binaryContentRepository.save(binaryContent);
     }
 }

@@ -10,30 +10,32 @@
 
 CREATE TABLE IF NOT EXISTS jwt_sessions
 (
-    id              uuid PRIMARY KEY,
-    user_id         uuid                     NOT NULL,
-    access_token    TEXT UNIQUE              NOT NULL,
-    refresh_token   TEXT UNIQUE              NOT NULL,
-    expires_at      timestamp with time zone NOT NULL,
-    created_at      timestamp with time zone NOT NULL,
-    updated_at      timestamp with time zone
+    id            uuid PRIMARY KEY,
+    user_id       uuid                     NOT NULL,
+    access_token  TEXT UNIQUE              NOT NULL,
+    refresh_token TEXT UNIQUE              NOT NULL,
+    expires_at    timestamp with time zone NOT NULL,
+    created_at    timestamp with time zone NOT NULL,
+    updated_at    timestamp with time zone
 );
 
 CREATE TABLE IF NOT EXISTS persistent_logins
 (
-    username VARCHAR(64) NOT NULL,
-    series   VARCHAR(64) PRIMARY KEY,
-    token VARCHAR(64) NOT NULL,
-    last_used TIMESTAMP NOT NULL
+    username  VARCHAR(64) NOT NULL,
+    series    VARCHAR(64) PRIMARY KEY,
+    token     VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP   NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS binary_contents
 (
-    id           UUID PRIMARY KEY,
-    created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
-    file_name    VARCHAR(255),
-    size         BIGINT                   NOT NULL,
-    content_type varchar(100)             NOT NULL
+    id            UUID PRIMARY KEY,
+    created_at    TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at    TIMESTAMP WITH TIME ZONE,
+    file_name     VARCHAR(255),
+    size          BIGINT                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status VARCHAR(20) CHECK ( upload_status IN ('WAITING', 'SUCCESS', 'FAILED')) DEFAULT 'WAITING'
 );
 
 CREATE TABLE IF NOT EXISTS users
@@ -63,7 +65,7 @@ CREATE TABLE IF NOT EXISTS read_statuses
 (
     id           UUID PRIMARY KEY,
     created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at    TIMESTAMP WITH TIME ZONE,
+    updated_at   TIMESTAMP WITH TIME ZONE,
     user_id      UUID,
     channel_id   UUID,
     last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
