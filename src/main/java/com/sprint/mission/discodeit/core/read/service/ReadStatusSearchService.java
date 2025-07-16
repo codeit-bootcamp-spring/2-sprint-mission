@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,12 +16,10 @@ public class ReadStatusSearchService {
 
   private final JpaReadStatusRepository readStatusRepository;
 
-  @Cacheable(cacheNames = "readStatus", key = "#userId")
   public List<ReadStatusDto> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllByUserId(userId).stream().map(ReadStatusDto::from).toList();
   }
 
-  @Cacheable(cacheNames = "channelUsers", key = "#channelId")
   public List<UserDto> findUsersByChannelId(UUID channelId) {
     List<ReadStatus> statusList = readStatusRepository.findAllByChannelId(channelId);
     return statusList.stream().map(readStatus -> UserDto.from(readStatus.getUser()))

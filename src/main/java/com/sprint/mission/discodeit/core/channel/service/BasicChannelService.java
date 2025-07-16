@@ -61,19 +61,6 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<ChannelDto> findAllByUserId(UUID userId) {
-    List<UUID> mySubscribedChannelIds = readStatusSearchService.findChannelIdByUserId(userId);
-
-    List<Channel> channels = channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC,
-        mySubscribedChannelIds);
-
-    List<UserDto> userDtoList = readStatusSearchService.findUsersByChannels(channels);
-
-    return channels.stream().map(channel -> ChannelDto.create(channel, userDtoList)).toList();
-  }
-
-  @Override
   @Transactional
   public ChannelDto update(UUID channelId, ChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId).orElseThrow(

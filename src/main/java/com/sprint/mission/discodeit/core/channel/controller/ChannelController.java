@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.core.channel.dto.ChannelDto;
 import com.sprint.mission.discodeit.core.channel.dto.request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.core.channel.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.core.channel.service.ChannelSearchService;
 import com.sprint.mission.discodeit.core.channel.service.ChannelService;
 import com.sprint.mission.discodeit.swagger.ChannelApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChannelController implements ChannelApi {
 
   private final ChannelService channelService;
+  private final ChannelSearchService channelSearchService;
 
   @PostMapping("/public")
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
@@ -49,7 +51,7 @@ public class ChannelController implements ChannelApi {
 
   @GetMapping
   public ResponseEntity<List<ChannelDto>> findAll(@RequestParam("userId") UUID userId) {
-    List<ChannelDto> result = channelService.findAllByUserId(userId);
+    List<ChannelDto> result = channelSearchService.findAllByUserId(userId);
     return ResponseEntity.ok(result);
   }
 

@@ -6,9 +6,10 @@ spring:
 
   cache:
     cache-names:
-      - users
-      - channels
-      - messages
+      - userNotifications
+      - channelUsers
+      - readStatus
+      - ChannelId
 
 discodeit:
   storage:
