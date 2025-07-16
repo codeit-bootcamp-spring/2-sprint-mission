@@ -39,7 +39,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
   private final S3Client s3Client;
   private final S3Presigner s3Presigner;
-  private final BinaryContentRepository binaryContentRepository;
 
   @Value("${discodeit.storage.s3.bucket}")
   private String bucket;

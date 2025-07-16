@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.mapper.UserMapperImpl;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.time.Instant;
+import com.sprint.mission.discodeit.storage.s3.event.S3UploadEvent;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +27,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -49,6 +50,8 @@ public class BasicUserServiceTest {
   BinaryContentStorage binaryContentStorage;
   @Mock
   PasswordEncoder passwordEncoder;
+  @Mock
+  ApplicationEventPublisher eventPublisher;
 
   // DB 접근(프로세스 외부 의존성?)도 아닌, 단순 Mapper이므로 Spy 객체 사용
   // -> 공유 의존성이 없으므로 Spy 객체나 실제 객체를 사용해도 단위 테스트의 조건을 깨뜨리지 않는다. (고전파)
@@ -115,7 +118,7 @@ public class BasicUserServiceTest {
 
     then(userRepository).should(times(1)).save(any(User.class));
     then(binaryContentService).should(times(1)).create(any());
-    then(binaryContentStorage).should(times(1)).put(any(), any());
+    then(eventPublisher).should(times(1)).publishEvent(any(S3UploadEvent.class));
   }
 
   @Test
@@ -178,7 +181,7 @@ public class BasicUserServiceTest {
     then(userRepository).should(times(1)).findById(user.getId());
     then(userRepository).should(times(1)).save(any(User.class));
     then(binaryContentService).should(times(1)).create(any());
-    then(binaryContentStorage).should(times(1)).put(any(), any());
+    then(eventPublisher).should(times(1)).publishEvent(any(S3UploadEvent.class));
   }
 
   @Test

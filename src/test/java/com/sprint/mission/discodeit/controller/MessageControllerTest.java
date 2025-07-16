@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.service.message.CreateMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
 import com.sprint.mission.discodeit.dto.service.user.FindUserResult;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapperImpl;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -93,7 +94,7 @@ public class MessageControllerTest {
 
     FindBinaryContentResult findBinaryContentResult = new FindBinaryContentResult(
         binaryContent.getId(), binaryContent.getFilename(), binaryContent.getSize(),
-        binaryContent.getContentType());
+        binaryContent.getContentType(), BinaryContentUploadStatus.SUCCESS);
 
     FindUserResult findUserResult = new FindUserResult(authorId, findBinaryContentResult, "user",
         "user@email.com", true);
@@ -185,7 +186,7 @@ public class MessageControllerTest {
 
     FindBinaryContentResult findBinaryContentResult = new FindBinaryContentResult(
         binaryContent.getId(), binaryContent.getFilename(), binaryContent.getSize(),
-        binaryContent.getContentType());
+        binaryContent.getContentType(), BinaryContentUploadStatus.SUCCESS);
 
     FindUserResult findUserResult = new FindUserResult(authorId, findBinaryContentResult, "user",
         "user@email.com", true);

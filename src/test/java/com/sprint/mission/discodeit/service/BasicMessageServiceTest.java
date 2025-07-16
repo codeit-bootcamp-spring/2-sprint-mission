@@ -19,7 +19,9 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.s3.event.S3UploadEvent;
 import java.time.Instant;
+import org.hibernate.mapping.Any;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +31,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -57,6 +60,9 @@ public class BasicMessageServiceTest {
 
   @Mock
   BinaryContentStorage binaryContentStorage;
+
+  @Mock
+  ApplicationEventPublisher eventPublisher;
 
   @Spy
   MessageMapper messageMapper = new MessageMapperImpl();
@@ -96,10 +102,7 @@ public class BasicMessageServiceTest {
 
     then(messageRepository).should(times(1)).save(any(Message.class));
     then(binaryContentService).should(times(1)).create(any(BinaryContent.class));
-    // 실제 메서드에서는 DB를 이용하기 때문에, GeneratedValue UUID로 Id가 생성되지만, 테스트 환경에서는 생성이 되지 않음
-    // binaryContentStorage.put(binaryContent.getId())를 할 때, null로 들어가기 때문에 any(UUID.class)를 넣어주면 테스트가 실패
-    // 호출 정도만 확인하는 것이기 때문에 any() 사용
-    then(binaryContentStorage).should(times(1)).put(any(), any());
+    then(eventPublisher).should(times(1)).publishEvent(any(S3UploadEvent.class));
   }
 
   @Test
@@ -235,8 +238,8 @@ public class BasicMessageServiceTest {
     then(binaryContentService).should(times(1)).delete(any());
     then(binaryContentStorage).should(times(1)).delete(any());
     then(binaryContentService).should(times(1)).create(any());
-    then(binaryContentStorage).should(times(1)).put(any(), any());
     then(messageRepository).should(times(1)).save(message);
+    then(eventPublisher).should(times(1)).publishEvent(any(S3UploadEvent.class));
   }
 
   @Test

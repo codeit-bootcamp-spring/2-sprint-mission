@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentResult;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.exception.s3.S3DeleteException;
 import com.sprint.mission.discodeit.exception.s3.S3DownloadException;
 import com.sprint.mission.discodeit.exception.s3.S3UploadException;
@@ -148,7 +149,7 @@ class S3BinaryContentStorageTest {
     UUID id = UUID.randomUUID();
     String presignedUrl = "https://example.com/file";
     FindBinaryContentResult findResult = new FindBinaryContentResult(id, "test.txt", 5L,
-        "text/plain");
+        "text/plain", BinaryContentUploadStatus.SUCCESS);
 
     PresignedGetObjectRequest presignedRequest = mock(PresignedGetObjectRequest.class);
     given(presignedRequest.url()).willReturn(new URL(presignedUrl));
