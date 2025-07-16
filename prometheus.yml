@@ -1,0 +1,11 @@
+# 전역 설정
+global:
+  scrape_interval: 15s # 15초마다 메트릭을 수집
+
+# 메트릭을 수집할 대상(Endpoint) 목록
+scrape_configs:
+  - job_name: 'spring-actuator' # 잡(Job) 이름
+    metrics_path: '/actuator/prometheus' # 메트릭 경로
+    static_configs:
+      # Spring Boot 애플리케이션 주소
+      - targets: [ 'host.docker.internal:8080' ]
