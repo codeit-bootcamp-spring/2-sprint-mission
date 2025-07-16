@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.event.BinaryContentUploadEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -42,6 +43,7 @@ public class BasicMessageService implements MessageService {
   private final MessageMapper messageMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
+
   private final ApplicationEventPublisher publisher;
 
   @Transactional
@@ -64,11 +66,11 @@ public class BasicMessageService implements MessageService {
           byte[] bytes = attachmentRequest.bytes();
 
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, BinaryContentUploadStatus.WAITING);
+
           binaryContentRepository.save(binaryContent);
 
-          publisher.publishEvent(
-                  new BinaryContentUploadEvent(binaryContent.getId(), bytes)
-          );
+          publisher.publishEvent(new BinaryContentUploadEvent(binaryContent.getId(), bytes));
+
           return binaryContent;
         })
         .toList();
@@ -82,6 +84,9 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+
+    publisher.publishEvent(new MessageCreatedEvent(channelId, message.getContent()));
+
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
     return messageMapper.toDto(message);
   }

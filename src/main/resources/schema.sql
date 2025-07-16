@@ -143,3 +143,20 @@ CREATE TABLE async_task_failure (
 
 ALTER TABLE binary_contents
     ADD COLUMN upload_status VARCHAR(50) NOT NULL DEFAULT 'WAITING';
+
+
+-- 1) 컬럼 추가 (NOT NULL, 기본값 false)
+ALTER TABLE read_statuses
+    ADD COLUMN notification_enabled BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- 2) 기존 데이터 보정: PRIVATE 채널은 기본 true, PUBLIC 채널은 false
+UPDATE read_statuses rs
+SET notification_enabled = TRUE
+FROM channels c
+WHERE rs.channel_id = c.id
+AND c.type = 'PRIVATE';
+
+-- 3) 기본 DEFAULT 제거 (애플리케이션 코드에서 명시적으로 세팅하도록)
+ALTER TABLE read_statuses
+
+ALTER COLUMN notification_enabled DROP DEFAULT;
