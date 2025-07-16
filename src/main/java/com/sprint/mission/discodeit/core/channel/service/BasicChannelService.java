@@ -33,9 +33,6 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusService readStatusService;
   private final ReadStatusSearchService readStatusSearchService;
 
-//  private final JpaMessageRepository messageRepository;
-//  private final JpaReadStatusRepository readStatusRepository;
-
   @Override
   @Transactional
   public ChannelDto create(PublicChannelCreateRequest request) {

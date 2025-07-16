@@ -8,6 +8,8 @@ public interface CustomReadStatusRepository {
 
   ReadStatus findByReadStatusId(UUID readStatusId);
 
+  ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId);
+
   List<UUID> findChannelIdByUserId(UUID userId);
 
   List<ReadStatus> findAllByUserId(UUID userId);

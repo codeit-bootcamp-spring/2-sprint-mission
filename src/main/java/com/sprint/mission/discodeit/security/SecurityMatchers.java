@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.security;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 public final class SecurityMatchers {
@@ -10,6 +10,9 @@ public final class SecurityMatchers {
   private SecurityMatchers() {
 
   }
+
+  public static final RequestMatcher NON_API = new NegatedRequestMatcher(
+      new AntPathRequestMatcher("/api/**"));
 
   public static final RequestMatcher GET_CSRF_TOKEN = new AntPathRequestMatcher(
       "/api/auth/csrf-token", HttpMethod.GET.name());
@@ -32,8 +35,8 @@ public final class SecurityMatchers {
       "/api/auth/logout", HttpMethod.POST.name()
   );
 
-  public static final RequestMatcher ACTUATOR = new AntPathRequestMatcher(
-      "/actuator/**"
+  public static final RequestMatcher ME = new AntPathRequestMatcher(
+      "/api/auth/me", HttpMethod.GET.name()
   );
 
   public static RequestMatcher REFRESH = new AntPathRequestMatcher(
@@ -44,13 +47,9 @@ public final class SecurityMatchers {
       "/api/cache/stats", HttpMethod.GET.name()
   );
 
-  public static final RequestMatcher FRONT = new OrRequestMatcher(
-      new AntPathRequestMatcher("/", HttpMethod.GET.name()),
-      new AntPathRequestMatcher("/error", HttpMethod.GET.name()),
-      new AntPathRequestMatcher("/index.html", HttpMethod.GET.name()),
-      new AntPathRequestMatcher("/assets/**", HttpMethod.GET.name()),
-      new AntPathRequestMatcher("/favicon.ico", HttpMethod.GET.name())
-  );
+  public static final RequestMatcher[] PUBLIC_MATCHERS = new RequestMatcher[]{
+      NON_API, GET_CSRF_TOKEN, SIGN_UP, LOGIN, LOGOUT, ME, REFRESH, CACHE, PUBLIC, DOWNLOAD
+  };
 
   public static final String LOGIN_URL = "/api/auth/login";
   public static final String LOGOUT_URL = "/api/auth/logout";

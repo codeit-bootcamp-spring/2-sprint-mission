@@ -32,20 +32,34 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusDto create(ReadStatusCreateRequest request) {
     User user = userRepository.findByUserId(request.userId());
     Channel channel = channelRepository.findByChannelId(request.channelId());
-    ReadStatus status = ReadStatus.create(user, channel, request.lastReadAt());
+
+    ReadStatus status = readStatusRepository.findByUserIdAndChannelId(
+        request.userId(), request.channelId());
+    if (status == null) {
+      status = ReadStatus.create(user, channel, request.lastReadAt(), false);
+      log.info("읽기 상태 생성 (request) : user Id{} channel Id{} read at{}", request.userId(),
+          request.channelId(),
+          request.lastReadAt());
+    } else {
+      status.update(request.lastReadAt(), true);
+    }
+
     readStatusRepository.save(status);
-
-    log.info(
-        "[ReadStatusService] ReadStatus Created: id: {}, user id: {}, channel id: {}, last Read At : {} ",
-        status.getId(), user.getId(), channel.getId(), status.getLastReadAt());
-
     return ReadStatusDto.from(status);
   }
 
   @Override
   @Transactional
   public ReadStatusDto create(User user, Channel channel) {
-    ReadStatus status = ReadStatus.create(user, channel, Instant.MIN);
+    ReadStatus status = readStatusRepository.findByUserIdAndChannelId(user.getId(),
+        channel.getId());
+    if (status == null) {
+      status = ReadStatus.create(user, channel, Instant.MIN, true);
+      log.info("읽기 상태 생성 : user Id{} channel Id{} read at{}", user.getId(), channel.getId(),
+          channel.getLastMessageAt());
+    } else {
+      status.update(Instant.MIN, true);
+    }
     readStatusRepository.save(status);
     return ReadStatusDto.from(status);
   }
@@ -53,6 +67,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   @Transactional
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    log.info("읽기 상태 업데이트 실행");
     ReadStatus status = readStatusRepository.findByReadStatusId(readStatusId);
     status.update(request.newLastReadAt(), request.newNotificationEnabled());
     readStatusRepository.save(status);

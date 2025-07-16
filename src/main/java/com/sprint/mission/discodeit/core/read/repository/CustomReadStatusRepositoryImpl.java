@@ -38,6 +38,16 @@ public class CustomReadStatusRepositoryImpl implements CustomReadStatusRepositor
   }
 
   @Override
+  public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+    return queryFactory
+        .selectFrom(readStatus)
+        .leftJoin(readStatus.user, user).fetchJoin()
+        .leftJoin(readStatus.channel, channel).fetchJoin()
+        .where(readStatus.user.id.eq(userId), readStatus.channel.id.eq(channelId))
+        .fetchOne();
+  }
+
+  @Override
   public List<ReadStatus> findAllByUserId(UUID userId) {
     return queryFactory
         .selectFrom(readStatus)
