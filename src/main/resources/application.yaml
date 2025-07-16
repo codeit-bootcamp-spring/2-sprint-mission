@@ -38,3 +38,7 @@ security:
   remember-me:
     key: RememberMeKey
     token-validity-seconds: 1814400 # 3주
+  jwt:
+    secret: mySecretKey12345678901234567890123456789012345678901234567890
+    access-token-validity-seconds: 1800       # 30분
+    refresh-token-validity-seconds: 1209600   # 14일

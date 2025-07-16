@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.exception.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
 
-// 세션이 만료되었을 때 실행되는 커스텀 핸들러
 @RequiredArgsConstructor
 public class CustomSessionInformationExpiredStrategy implements SessionInformationExpiredStrategy {
 
@@ -19,17 +19,16 @@ public class CustomSessionInformationExpiredStrategy implements SessionInformati
     @Override
     public void onExpiredSessionDetected(SessionInformationExpiredEvent event)
         throws IOException, ServletException {
-
+        int status = HttpServletResponse.SC_UNAUTHORIZED;
         HttpServletResponse response = event.getResponse();
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        Map<String, Object> simpleError = Map.of(
-            "code", "SESSION_EXPIRED",
-            "message", "Your session has expired.",
-            "status", HttpServletResponse.SC_UNAUTHORIZED
+        ErrorResponse errorResponse = new ErrorResponse(
+            new SessionAuthenticationException("Session is expired."),
+            status
         );
+        errorResponse.getDetails().put("sessionId", event.getSessionInformation().getSessionId());
 
-        objectMapper.writeValue(response.getWriter(), simpleError);
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

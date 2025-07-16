@@ -1,28 +1,24 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.file.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.user.UserDto;
-
-import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
 
-    UserDto createUser(CreateUserRequest request, Optional<CreateBinaryContentRequest> profileOpt);
+  UserDto create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-    Optional<UserDto> getUserById(UUID userId);
+  UserDto find(UUID userId);
 
-    List<UserDto> getUsersByName(String name);
+  List<UserDto> findAll();
 
-    List<UserDto> getAllUsers();
+  UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-    UserDto updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> profileOpt);
-
-    void deleteUser(UUID userId);
-
-    UserDto updateUserRole(UUID userId, Role newRole);
+  void delete(UUID userId);
 }

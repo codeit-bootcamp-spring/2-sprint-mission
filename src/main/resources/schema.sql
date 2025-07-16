@@ -1,99 +1,142 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS channels CASCADE;
 DROP TABLE IF EXISTS messages CASCADE;
-DROP TABLE IF EXISTS user_statuses CASCADE;
 DROP TABLE IF EXISTS read_statuses CASCADE;
 DROP TABLE IF EXISTS message_attachments CASCADE;
 DROP TABLE IF EXISTS binary_contents CASCADE;
 DROP TABLE IF EXISTS persistent_logins CASCADE;
+DROP TABLE IF EXISTS jwt_sessions CASCADE;
 
-CREATE TABLE binary_contents
-(
-    id           UUID PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    VARCHAR(255)             NOT NULL,
-    size         BIGINT                   NOT NULL,
-    content_type VARCHAR(100)             NOT NULL
-);
-
--- users
+-- 테이블
+-- User
 CREATE TABLE users
 (
-    id         UUID PRIMARY KEY,
+    id         uuid PRIMARY KEY,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone,
-    username   VARCHAR(50)              NOT NULL UNIQUE,
-    email      VARCHAR(100)             NOT NULL UNIQUE,
-    password   VARCHAR(60)              NOT NULL,
-    profile_id UUID,
-    role       VARCHAR(50)              NOT NULL DEFAULT 'ROLE_USER',
-    CONSTRAINT fk_profile FOREIGN KEY (profile_id) REFERENCES binary_contents (id) ON DELETE SET NULL
+    username   varchar(50) UNIQUE       NOT NULL,
+    email      varchar(100) UNIQUE      NOT NULL,
+    password   varchar(60)              NOT NULL,
+    profile_id uuid,
+    role       varchar(20)              NOT NULL
 );
 
--- channels
+-- BinaryContent
+CREATE TABLE binary_contents
+(
+    id           uuid PRIMARY KEY,
+    created_at   timestamp with time zone NOT NULL,
+    file_name    varchar(255)             NOT NULL,
+    size         bigint                   NOT NULL,
+    content_type varchar(100)             NOT NULL
+--     ,bytes        bytea        NOT NULL
+);
+
+
+-- Channel
 CREATE TABLE channels
 (
-    id          UUID PRIMARY KEY,
+    id          uuid PRIMARY KEY,
     created_at  timestamp with time zone NOT NULL,
     updated_at  timestamp with time zone,
-    name        VARCHAR(100),
-    description VARCHAR(500),
-    type        VARCHAR(10)              NOT NULL
+    name        varchar(100),
+    description varchar(500),
+    type        varchar(10)              NOT NULL
 );
 
--- messages
+-- Message
 CREATE TABLE messages
 (
-    id         UUID PRIMARY KEY,
+    id         uuid PRIMARY KEY,
     created_at timestamp with time zone NOT NULL,
     updated_at timestamp with time zone,
-    content    TEXT,
-    channel_id UUID                     NOT NULL,
-    author_id  UUID,
-    CONSTRAINT fk_channel FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
-    CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users (id) ON DELETE SET NULL
+    content    text,
+    channel_id uuid                     NOT NULL,
+    author_id  uuid
 );
 
--- user_statuses
-CREATE TABLE user_statuses
-(
-    id             UUID PRIMARY KEY,
-    created_at     timestamp with time zone NOT NULL,
-    updated_at     timestamp with time zone,
-    user_id        UUID                     NOT NULL UNIQUE,
-    last_active_at timestamp with time zone NOT NULL,
-    CONSTRAINT fk_user_status_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-
--- read_statuses
-CREATE TABLE read_statuses
-(
-    id           UUID PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      UUID                     NOT NULL,
-    channel_id   UUID                     NOT NULL,
-    last_read_at timestamp with time zone NOT NULL,
-    CONSTRAINT fk_read_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    CONSTRAINT fk_read_channel FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE,
-    CONSTRAINT uk_read UNIQUE (user_id, channel_id)
-);
-
--- message_attachments
+-- Message.attachments
 CREATE TABLE message_attachments
 (
-    message_id    UUID NOT NULL,
-    attachment_id UUID NOT NULL,
-    PRIMARY KEY (message_id, attachment_id),
-    CONSTRAINT fk_attach_message FOREIGN KEY (message_id) REFERENCES messages (id) ON DELETE CASCADE,
-    CONSTRAINT fk_attach_file FOREIGN KEY (attachment_id) REFERENCES binary_contents (id) ON DELETE CASCADE
+    message_id    uuid,
+    attachment_id uuid,
+    PRIMARY KEY (message_id, attachment_id)
 );
 
--- Remember Me 관련 테이블
-CREATE TABLE persistent_logins
+-- ReadStatus
+CREATE TABLE read_statuses
 (
-    username  varchar(64) NOT NULL,
-    series    varchar(64) PRIMARY KEY,
-    token     varchar(64) NOT NULL,
-    last_used timestamp   NOT NULL
+    id           uuid PRIMARY KEY,
+    created_at   timestamp with time zone NOT NULL,
+    updated_at   timestamp with time zone,
+    user_id      uuid                     NOT NULL,
+    channel_id   uuid                     NOT NULL,
+    last_read_at timestamp with time zone NOT NULL,
+    UNIQUE (user_id, channel_id)
+);
+
+-- JWT 세션 테이블
+CREATE TABLE jwt_sessions
+(
+    id              UUID PRIMARY KEY,
+    access_token    TEXT                     NOT NULL,
+    refresh_token   TEXT                     NOT NULL,
+    created_at      TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at      TIMESTAMP WITH TIME ZONE NOT NULL,
+    expiration_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    user_id         UUID                     NOT NULL,
+    CONSTRAINT fk_jwt_session_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+
+
+-- 제약 조건
+-- User (1) -> BinaryContent (1)
+ALTER TABLE users
+    ADD CONSTRAINT fk_user_binary_content
+        FOREIGN KEY (profile_id)
+            REFERENCES binary_contents (id)
+            ON DELETE SET NULL;
+
+-- Message (N) -> Channel (1)
+ALTER TABLE messages
+    ADD CONSTRAINT fk_message_channel
+        FOREIGN KEY (channel_id)
+            REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+-- Message (N) -> Author (1)
+ALTER TABLE messages
+    ADD CONSTRAINT fk_message_user
+        FOREIGN KEY (author_id)
+            REFERENCES users (id)
+            ON DELETE SET NULL;
+
+-- MessageAttachment (1) -> BinaryContent (1)
+ALTER TABLE message_attachments
+    ADD CONSTRAINT fk_message_attachment_binary_content
+        FOREIGN KEY (attachment_id)
+            REFERENCES binary_contents (id)
+            ON DELETE CASCADE;
+
+-- ReadStatus (N) -> User (1)
+ALTER TABLE read_statuses
+    ADD CONSTRAINT fk_read_status_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE;
+
+-- ReadStatus (N) -> User (1)
+ALTER TABLE read_statuses
+    ADD CONSTRAINT fk_read_status_channel
+        FOREIGN KEY (channel_id)
+            REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+create table persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
 );
