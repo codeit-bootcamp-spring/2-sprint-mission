@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.storage.local;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -9,7 +12,11 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -17,18 +24,26 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
+  private final AsyncTaskFailureRepository asyncTaskFailureRepository;
   private final Path root;
 
   public LocalBinaryContentStorage(
-      @Value("${discodeit.storage.local.root-path}") Path root
+      @Value("${discodeit.storage.local.root-path}") Path root,
+      AsyncTaskFailureRepository asyncTaskFailureRepository
   ) {
     this.root = root;
+    this.asyncTaskFailureRepository = asyncTaskFailureRepository;
   }
 
   @PostConstruct
@@ -49,11 +64,47 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
     }
     try (OutputStream outputStream = Files.newOutputStream(filePath)) {
+      //Thread.sleep(2000);
       outputStream.write(bytes);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
     return binaryContentId;
+  }
+
+  private Path resolvePath(UUID key) {
+    return root.resolve(key.toString());
+  }
+
+  @Override
+  //@Timed(value = "upload.time.async", description = "파일 업로드 시간 측정", longTask = true)
+  @Async
+  @Retryable(
+      retryFor = {IOException.class, RuntimeException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
+  public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+    return CompletableFuture.completedFuture(put(binaryContentId, bytes));
+  }
+
+  @Recover
+  public CompletableFuture<UUID> recoverPutAsync(RuntimeException ex, UUID binaryContentId,
+      byte[] bytes) {
+    String taskName = "BinaryContentStorage_FilePut";
+    String requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID)).map(
+        Object::toString).orElse("none");
+    String failureReason = String.format(
+        "Failed to store binary content in local storage (key=%s) : %s",
+        binaryContentId, ex.getMessage());
+
+    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, failureReason, requestId);
+    asyncTaskFailureRepository.save(failure);
+
+    log.error("Failed to store binary content in local storage : {}",
+        binaryContentId, ex);
+    throw new RuntimeException(
+        "Failed to store binary content in local storage : " + binaryContentId, ex);
   }
 
   public InputStream get(UUID binaryContentId) {
@@ -67,10 +118,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
-  }
-
-  private Path resolvePath(UUID key) {
-    return root.resolve(key.toString());
   }
 
   @Override

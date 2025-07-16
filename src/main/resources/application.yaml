@@ -25,6 +25,9 @@ management:
   endpoint:
     health:
       show-details: always
+  metrics:
+    enable:
+      all: true
 
 info:
   name: Discodeit

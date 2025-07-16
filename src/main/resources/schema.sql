@@ -15,12 +15,12 @@ CREATE TABLE users
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
---     ,bytes        bytea        NOT NULL
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(10)              NOT NULL
 );
 
 
@@ -129,3 +129,17 @@ CREATE TABLE jwt_sessions
     refresh_token   TEXT UNIQUE              NOT NULL,
     expiration_time timestamp with time zone NOT NULL
 );
+
+CREATE TABLE async_task_failure
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    updated_at     timestamp with time zone,
+
+    task_name      varchar(255)             NOT NULL,
+    request_id     varchar(255)             NOT NULL,
+    failure_reason text                     NOT NULL
+);
+
+--DROP SCHEMA public CASCADE;
+--CREATE SCHEMA public;
