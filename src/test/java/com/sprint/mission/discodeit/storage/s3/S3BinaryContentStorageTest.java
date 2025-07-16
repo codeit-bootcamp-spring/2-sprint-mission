@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentR
 import com.sprint.mission.discodeit.exception.s3.S3DeleteException;
 import com.sprint.mission.discodeit.exception.s3.S3DownloadException;
 import com.sprint.mission.discodeit.exception.s3.S3UploadException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import java.net.MalformedURLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +39,8 @@ class S3BinaryContentStorageTest {
   private S3Client s3Client;
   @Mock
   private S3Presigner s3Presigner;
+  @Mock
+  private BinaryContentRepository binaryContentRepository;
   @InjectMocks
   private S3BinaryContentStorage s3BinaryContentStorage;
 
@@ -56,11 +59,9 @@ class S3BinaryContentStorageTest {
     PutObjectResponse response = PutObjectResponse.builder().build();
     given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
         .willReturn(response);
-
     // when
-    UUID result = s3BinaryContentStorage.put(id, bytes);
+    s3BinaryContentStorage.put(id, bytes);
 
-    assertThat(result).isEqualTo(id);
     then(s3Client).should(times(1)).putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }
 
@@ -77,6 +78,7 @@ class S3BinaryContentStorageTest {
     assertThatThrownBy(() -> s3BinaryContentStorage.put(id, bytes))
         .isInstanceOf(S3UploadException.class);
   }
+
 
   @Test
   @DisplayName("s3에서 파일 읽어오기 성공")

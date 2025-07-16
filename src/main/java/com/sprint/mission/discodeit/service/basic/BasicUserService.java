@@ -18,14 +18,13 @@ import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.s3.event.S3UploadEvent;
 import com.sprint.mission.discodeit.util.MaskingUtil;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,12 +47,12 @@ public class BasicUserService implements UserService {
   private final JwtSessionRepository jwtSessionRepository;
   private final UserMapper userMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final ApplicationEventPublisher eventPublisher;
   private final PasswordEncoder passwordEncoder;
 
 
   @Override
   @Transactional
-  @CacheEvict(value = "allUsers", allEntries = true)
   public CreateUserResult create(CreateUserCommand createUserCommand, MultipartFile multipartFile) {
     checkDuplicateUsername(createUserCommand);
     checkDuplicateEmail(createUserCommand);
@@ -65,8 +64,8 @@ public class BasicUserService implements UserService {
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
-        // 로그를 binaryContentStorage 내부에서 남기기 떄문에 추적이 어려움 - MDC traceId로 해결
-        binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
+        eventPublisher.publishEvent(new S3UploadEvent(createBinaryContentResult.id(),
+            multipartFile.getBytes()));
       } catch (IOException e) {
         log.error("User create failed: multipartFile read failed (filename: {})",
             multipartFile.getOriginalFilename());
@@ -94,15 +93,11 @@ public class BasicUserService implements UserService {
     return userMapper.toFindUserResult(findUser, jwtSessionRepository.existsByUserId(userId));
   }
 
-  @Cacheable("allUsers")
-  public List<User> getCachedUsers() {
-    return userRepository.findAllFetch();
-  }
 
   @Override
   @Transactional(readOnly = true)
   public List<FindUserResult> findAll() {
-    return getCachedUsers().stream()
+    return userRepository.findAllFetch().stream()
         .map(user -> userMapper.toFindUserResult(user,
             jwtSessionRepository.existsByUserId(user.getId())))
         .toList();
@@ -110,8 +105,6 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @CachePut(value = "user", key = "#p0")
-  @CacheEvict(value = "allUsers", allEntries = true)
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   public UpdateUserResult update(@Param("userId") UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
@@ -129,7 +122,8 @@ public class BasicUserService implements UserService {
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
-        binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
+        eventPublisher.publishEvent(
+            new S3UploadEvent(createBinaryContentResult.id(), multipartFile.getBytes()));
       } catch (IOException e) {
         log.error("User update failed: multipartFile read failed (filename: {})",
             multipartFile.getOriginalFilename());
@@ -149,10 +143,6 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @Caching(evict = {
-      @CacheEvict(value = "user", key = "#p0"),
-      @CacheEvict(value = "allUsers", allEntries = true)
-  })
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   public void delete(@Param("userId") UUID userId) {
     User user = findUserById(userId, "delete");

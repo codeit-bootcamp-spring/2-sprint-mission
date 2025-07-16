@@ -17,14 +17,12 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.s3.event.S3UploadEvent;
 import java.time.Instant;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -52,15 +50,11 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
 
   @Override
   @Transactional
-  @Caching(evict = {
-      @CacheEvict(value = "allMessages", allEntries = true),
-      @CacheEvict(value = "allChannels", allEntries = true)
-  }
-  )
   public CreateMessageResult create(CreateMessageCommand createMessageCommand,
       List<MultipartFile> multipartFiles) {
     // 유저와 채널이 실제로 존재하는지 검증
@@ -76,7 +70,8 @@ public class BasicMessageService implements MessageService {
 
         binaryContentService.create(binaryContent);
         try {
-          binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
+          eventPublisher.publishEvent(
+              new S3UploadEvent(binaryContent.getId(), multipartFile.getBytes()));
         } catch (IOException e) {
           log.error("Message create failed: multipartFile read failed (filename: {})",
               multipartFile.getOriginalFilename());
@@ -95,7 +90,6 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
-  @Cacheable(value = "message", key = "#p0")
   public FindMessageResult find(UUID messageId) {
     Message message = findMessageById(messageId, "find");
     return messageMapper.toFindMessageResult(message);
@@ -104,7 +98,6 @@ public class BasicMessageService implements MessageService {
   // 첫 페이징인 경우 (cursor 존재 X)
   @Override
   @Transactional(readOnly = true)
-  @Cacheable(value = "allMessages", key = "#p0")
   public Slice<FindMessageResult> findAllByChannelIdInitial(UUID channelId, int limit) {
     Pageable pageable = PageRequest.of(0, limit);
     Slice<Message> messages = messageRepository.findAllByChannelIdInitial(channelId, pageable);
@@ -114,7 +107,6 @@ public class BasicMessageService implements MessageService {
   // cursor가 존재할 경우
   @Override
   @Transactional(readOnly = true)
-  @Cacheable(value = "allMessages", key = "#p0 + '_' + #p1")
   // 프론트엔드 웹소켓 기반 실시간 통신이라 그런지 조회 쿼리가 시간마다 반복적으로 호출됨 -> 캐싱을 통해 해결
   public Slice<FindMessageResult> findAllByChannelIdAfterCursor(UUID channelId, Instant cursor,
       int limit) {
@@ -126,8 +118,6 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  @CachePut(value = "message", key = "#p0")
-  @CacheEvict(value = "allMessages", allEntries = true)
   @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author().id()")
   public UpdateMessageResult update(@Param("messageId") UUID messageId,
       UpdateMessageCommand updateMessageCommand,
@@ -142,10 +132,6 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional
-  @Caching(evict = {
-      @CacheEvict(value = "allMessages", allEntries = true),
-      @CacheEvict(value = "message", key = "#p0")
-  })
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author().id()")
   public void delete(@Param("messageId") UUID messageId) {
     Message message = findMessageById(messageId, "delete");
@@ -179,7 +165,8 @@ public class BasicMessageService implements MessageService {
 
       binaryContentService.create(binaryContent);
       try {
-        binaryContentStorage.put(binaryContent.getId(), multipartFile.getBytes());
+        eventPublisher.publishEvent(
+            new S3UploadEvent(binaryContent.getId(), multipartFile.getBytes()));
       } catch (IOException e) {
         log.error("Message update failed: multipartFile read failed (filename: {})",
             multipartFile.getOriginalFilename());
