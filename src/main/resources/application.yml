@@ -50,6 +50,13 @@ discodeit:
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 
+app:
+  jwt:
+    secret: ${JWT_SECRET_KEY}""
+    access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
+    refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
+    issuer: ${ISSUER}
+
 management:
   endpoints:
     web:

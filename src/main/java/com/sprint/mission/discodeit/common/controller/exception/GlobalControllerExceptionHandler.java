@@ -20,6 +20,7 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponse>> handleValidationErrors(MethodArgumentNotValidException ex) {
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        log.error("Wrong Method Argument: {}", ex.getMessage());
 
         return ResponseEntity.badRequest()
                 .body(ErrorResponse.ofCustomException(fieldErrors));
@@ -34,17 +35,19 @@ public class GlobalControllerExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Object> handleNoResourceFound(NoResourceFoundException noResourceFoundException) {
+    public ResponseEntity<Object> handleNoResourceFound(NoResourceFoundException ex) {
+        log.error("No static Resource: {}", ex.getMessage());
+
         return ResponseEntity.badRequest()
-                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), noResourceFoundException, HttpStatus.BAD_REQUEST.value()));
+                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST.toString(), ex, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(DiscodeitException.class)
-    public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException discodeitException) {
-        log.error("Illegal argument: {}", discodeitException.getMessage());
+    public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException ex) {
+        log.error("Illegal argument: {}", ex.getMessage());
 
         return ResponseEntity.badRequest()
-                .body(ErrorResponse.ofCustomException(HttpStatus.BAD_REQUEST.toString(), discodeitException, HttpStatus.BAD_REQUEST.value()));
+                .body(ErrorResponse.ofCustomException(HttpStatus.BAD_REQUEST.toString(), ex, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(Exception.class)

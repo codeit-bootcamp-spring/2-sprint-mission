@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.0-M9'
+version = '2.2-M10'
 
 
 java {
@@ -20,6 +20,11 @@ configurations {
         extendsFrom annotationProcessor
     }
 }
+
+ext {
+    JJWT_VERSION = "0.12.3"
+}
+
 
 repositories {
     mavenCentral()
@@ -50,6 +55,10 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation "org.springframework.security:spring-security-test"
+
+    implementation "io.jsonwebtoken:jjwt-api:${JJWT_VERSION}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${JJWT_VERSION}"
+    runtimeOnly "io.jsonwebtoken:jjwt-gson:${JJWT_VERSION}"
 }
 
 test {

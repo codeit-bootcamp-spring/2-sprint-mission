@@ -1,15 +1,33 @@
 package com.sprint.mission.discodeit.security.config;
 
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.GET_CSRF_TOKEN;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGOUT;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.MESSAGE_DELETE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.MESSAGE_UPDATE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.NON_API;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.PUBLIC_CHANNEL_ACCESS;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.READ_STATUS_CREATE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.READ_STATUS_UPDATE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.ROLE_UPDATE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.SIGN_UP;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.USER_DELETE;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.USER_UPDATE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.security.filter.CustomSessionInformationExpiredStrategy;
-import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
-import com.sprint.mission.discodeit.security.filter.SessionRegistryLogoutHandler;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter.Configurer;
+import com.sprint.mission.discodeit.security.filter.TokenLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.accessmanager.MessageDeleteAuthorizationManager;
+import com.sprint.mission.discodeit.security.jwt.accessmanager.MessageOwnerAuthorizationManager;
+import com.sprint.mission.discodeit.security.jwt.accessmanager.ReadStatusSelfAuthorizationManager;
+import com.sprint.mission.discodeit.security.jwt.accessmanager.UserSelfAuthorizationManager;
+import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,45 +35,33 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  private static final RequestMatcher NON_API = new NegatedRequestMatcher(
-      new AntPathRequestMatcher("/api/**"));
-  private static final RequestMatcher GET_CSRF_TOKEN = new AntPathRequestMatcher(
-      "/api/auth/csrf-token");
-  private static final RequestMatcher SIGN_UP = new AntPathRequestMatcher("/api/users",
-      HttpMethod.POST.name());
-  public static final RequestMatcher LOGOUT = new AntPathRequestMatcher("/api/auth/logout",
-      HttpMethod.POST.name());
-  public static final RequestMatcher PUBLIC_CHANNEL_ACCESS = new AntPathRequestMatcher(
-      "/api/channels/public/**");
-  public static final RequestMatcher ROLE_UPDATE = new AntPathRequestMatcher(
-      "/api/auth/role");
-
   @Bean
   public SecurityFilterChain configure(
       HttpSecurity httpSecurity,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      SessionRegistry sessionRegistry,
-      PersistentTokenBasedRememberMeServices rememberMeServices
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+      JwtService jwtService,
+      JwtAuthenticationFilter jwtAuthenticationFilter,
+      UserSelfAuthorizationManager userSelfAuthorizationManager,
+      MessageOwnerAuthorizationManager messageOwnerAuthorizationManager,
+      MessageDeleteAuthorizationManager messageDeleteAuthorizationManager,
+      ReadStatusSelfAuthorizationManager readStatusSelfAuthorizationManager
   ) throws Exception {
     httpSecurity
         .authorizeHttpRequests(auth -> auth
@@ -66,27 +72,27 @@ public class SecurityConfig {
             ).permitAll()
             .requestMatchers(ROLE_UPDATE).hasRole(Role.ADMIN.name())
             .requestMatchers(PUBLIC_CHANNEL_ACCESS).hasRole(Role.CHANNEL_MANAGER.name())
+            .requestMatchers(USER_DELETE, USER_UPDATE).access(userSelfAuthorizationManager)
+            .requestMatchers(MESSAGE_UPDATE).access(messageOwnerAuthorizationManager)
+            .requestMatchers(MESSAGE_DELETE).access(messageDeleteAuthorizationManager)
+            .requestMatchers(READ_STATUS_CREATE, READ_STATUS_UPDATE).access(readStatusSelfAuthorizationManager)
             .anyRequest().hasRole(Role.USER.name())
         )
-        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
-            Customizer.withDefaults())
+        .with(new Configurer(objectMapper, jwtService), Customizer.withDefaults())
         .authenticationProvider(daoAuthenticationProvider)
         .logout(logout -> logout
             .logoutRequestMatcher(LOGOUT)
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-            .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+            .addLogoutHandler(new TokenLogoutHandler(jwtService))
             .addLogoutHandler(rememberMeServices)
         )
-        .sessionManagement(session ->
-            session
-                .sessionFixation().migrateSession()
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
-                .sessionRegistry(sessionRegistry)
-                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+        .csrf(csrf -> csrf
+            .ignoringRequestMatchers(LOGOUT)
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
-        .csrf(csrf -> csrf.ignoringRequestMatchers(LOGOUT))
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices));
+        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+        .addFilterBefore(jwtAuthenticationFilter, JsonUsernamePasswordAuthenticationFilter.class);
 
     return httpSecurity.build();
   }
@@ -105,11 +111,6 @@ public class SecurityConfig {
     provider.setUserDetailsService(userDetailsService);
     provider.setPasswordEncoder(passwordEncoder);
     return provider;
-  }
-
-  @Bean
-  public SessionRegistry sessionRegistry() {
-    return new SessionRegistryImpl();
   }
 
   @Bean

@@ -13,13 +13,11 @@ import com.sprint.mission.discodeit.domain.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.security.util.SecurityUtil;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +39,6 @@ public class BasicReadStatusService implements ReadStatusService {
     if (readStatusRepository.existsByChannelIdAndUserId(channel.getId(), user.getId())) {
       throw new ReadStatusAlreadyExistsException(Map.of());
     }
-    validateIsCurrentUser(user);
 
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel));
 
@@ -59,9 +56,8 @@ public class BasicReadStatusService implements ReadStatusService {
   @Transactional
   @Override
   public ReadStatusResult updateLastReadTime(UUID readStatusId, Instant time) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
+    ReadStatus readStatus = readStatusRepository.findFetchUserById(readStatusId)
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of()));
-    validateIsCurrentUser(readStatus);
 
     readStatus.updateLastReadTime(time);
     readStatusRepository.save(readStatus);
@@ -71,27 +67,16 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public void delete(UUID readStatusId) {
-    ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-        .orElseThrow(() -> new ReadStatusNotFoundException(Map.of()));
-    validateIsCurrentUser(readStatus);
+    validateReadStatusExist(readStatusId);
 
     readStatusRepository.deleteById(readStatusId);
   }
 
-  private void validateIsCurrentUser(ReadStatus readStatus) {
-    UUID currentUserId = SecurityUtil.getCurrentUserId();
-    if (readStatus.getUser().getId().equals(currentUserId)) {
+  private void validateReadStatusExist(UUID readStatusId) {
+    if (readStatusRepository.existsById(readStatusId)) {
       return;
     }
-    throw new AccessDeniedException("권한 없음");
-  }
-
-  private void validateIsCurrentUser(User user) {
-    UUID currentUserId = SecurityUtil.getCurrentUserId();
-    if (user.getId().equals(currentUserId)) {
-      return;
-    }
-    throw new AccessDeniedException("권한 없음");
+    throw new ReadStatusNotFoundException(Map.of());
   }
 
 }

@@ -15,22 +15,18 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
-import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import com.sprint.mission.discodeit.security.util.SecurityUtil;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,7 +87,6 @@ public class BasicMessageService implements MessageService {
   public MessageResult updateContext(UUID id, String context) {
     Message message = messageRepository.findById(id)
         .orElseThrow(() -> new MessageNotFoundException(Map.of()));
-    validateIsCurrentUser(message, null);
 
     message.updateContext(context);
     Message savedMessage = messageRepository.save(message);
@@ -101,12 +96,10 @@ public class BasicMessageService implements MessageService {
 
   @Transactional
   @Override
-  public void delete(UUID id) {
-    Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new MessageNotFoundException(Map.of()));
-    validateIsCurrentUser(message, Role.ADMIN.name());
+  public void delete(UUID messageId) {
+    validateMessageExist(messageId);
 
-    messageRepository.deleteById(id);
+    messageRepository.deleteById(messageId);
   }
 
   private Pageable createPageable(ChannelMessagePageRequest request) {
@@ -129,16 +122,11 @@ public class BasicMessageService implements MessageService {
     return messages.getContent().get(messages.getContent().size() - 1).getCreatedAt();
   }
 
-  private void validateIsCurrentUser(Message message, String roleName) {
-    UUID currentUserId = SecurityUtil.getCurrentUserId();
-    if (message.getUser().getId().equals(currentUserId)) {
+  private void validateMessageExist(UUID messageId) {
+    if (messageRepository.existsById(messageId)) {
       return;
     }
-    if (roleName != null && SecurityUtil.hasRole(roleName)) {
-      return;
-    }
-
-    throw new AccessDeniedException("권한 없음");
+    throw new MessageNotFoundException(Map.of());
   }
 
 }

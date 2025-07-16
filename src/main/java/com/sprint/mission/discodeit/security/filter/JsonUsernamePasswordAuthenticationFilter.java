@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.security.filter;
 
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGIN;
+import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGIN_URL;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.domain.auth.dto.LogInRequest;
+import com.sprint.mission.discodeit.security.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,26 +20,21 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @RequiredArgsConstructor
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-  private static final String LOGIN_URL = "/api/auth/login";
-
-  public static final RequestMatcher LOGIN = new AntPathRequestMatcher(
-      "/api/auth/login", HttpMethod.POST.name());
-
   private final ObjectMapper objectMapper;
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request,
-      HttpServletResponse response) throws AuthenticationException {
+  public Authentication attemptAuthentication(
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) throws AuthenticationException {
 
-    if (!request.getMethod().equals("POST")) {
+    if (!request.getMethod().equals(HttpMethod.POST.name())) {
       throw new AuthenticationServiceException(
           "Authentication method not supported: " + request.getMethod());
     }
@@ -57,10 +56,12 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
       AbstractAuthenticationFilterConfigurer<HttpSecurity, Configurer, JsonUsernamePasswordAuthenticationFilter> {
 
     private final ObjectMapper objectMapper;
+    private final JwtService jwtService;
 
-    public Configurer(ObjectMapper objectMapper) {
+    public Configurer(ObjectMapper objectMapper, JwtService jwtService) {
       super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), LOGIN_URL);
       this.objectMapper = objectMapper;
+      this.jwtService = jwtService;
     }
 
     @Override
@@ -71,7 +72,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
     @Override
     public void init(HttpSecurity http) {
       loginProcessingUrl(LOGIN_URL);
-      successHandler(new CustomLoginSuccessHandler(objectMapper));
+      successHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
       failureHandler(new CustomLoginFailureHandler(objectMapper));
     }
   }
@@ -79,17 +80,15 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
   public static JsonUsernamePasswordAuthenticationFilter createDefault(
       ObjectMapper objectMapper,
       AuthenticationManager authenticationManager,
-      SessionAuthenticationStrategy sessionAuthenticationStrategy,
-      PersistentTokenBasedRememberMeServices rememberMeServices
+      PersistentTokenBasedRememberMeServices rememberMeServices,
+      JwtService jwtService
   ) {
     JsonUsernamePasswordAuthenticationFilter filter = new JsonUsernamePasswordAuthenticationFilter(
         objectMapper);
     filter.setRequiresAuthenticationRequestMatcher(LOGIN);
     filter.setAuthenticationManager(authenticationManager);
-    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper));
+    filter.setAuthenticationSuccessHandler(new CustomLoginSuccessHandler(objectMapper, jwtService));
     filter.setAuthenticationFailureHandler(new CustomLoginFailureHandler(objectMapper));
-    filter.setSecurityContextRepository(new HttpSessionSecurityContextRepository());
-    filter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
     filter.setRememberMeServices(rememberMeServices);
     return filter;
   }
