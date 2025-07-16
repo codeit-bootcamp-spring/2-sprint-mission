@@ -18,6 +18,6 @@ public class KafkaNotificationRelayHandler {
     @EventListener
     public void handle(Notification event) {
         NotificationMessage message = NotificationMessage.from(event);
-        kafkaTemplate.send(TOPIC, message.getReceiverId(), message);
+        kafkaTemplate.send(TOPIC, message.getReceiverId().toString(), message);
     }
 }
