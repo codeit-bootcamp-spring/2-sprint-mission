@@ -1,5 +1,12 @@
 package com.sprint.mission.discodeit.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.security.CustomSessionInformationExpiredStrategy;
+import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.SecurityMatchers;
+import com.sprint.mission.discodeit.security.SessionRegistryLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +16,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthor
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +29,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -38,44 +47,46 @@ import javax.sql.DataSource;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           DaoAuthenticationProvider daoAuthenticationProvider,
-                                           PersistentTokenBasedRememberMeServices rememberMeServices)
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            ObjectMapper objectMapper,
+            DaoAuthenticationProvider daoAuthenticationProvider,
+            SessionRegistry sessionRegistry,
+            PersistentTokenBasedRememberMeServices rememberMeServices,
+            JwtService jwtService
+    )
             throws Exception {
-
-
         http
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers(
-                                "/api/users",
-                                "/api/auth/login"
-                        )
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                )
-                .sessionManagement(session -> session
-                        .sessionFixation().migrateSession()
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(false)
-                        .sessionRegistry(sessionRegistry())
-                )
-                .securityContext(context -> context
-                        .securityContextRepository(new HttpSessionSecurityContextRepository())
-                        .requireExplicitSave(false)
-                )
-                .formLogin(AbstractHttpConfigurer::disable)
                 .authenticationProvider(daoAuthenticationProvider)
-                .logout(logout -> logout.disable())
-                .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
-                                new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**")),
-                                new AntPathRequestMatcher("/api/auth/**"),
-                                new AntPathRequestMatcher("/api/users", "POST")
+                                SecurityMatchers.NON_API,
+                                SecurityMatchers.GET_CSRF_TOKEN,
+                                SecurityMatchers.SIGN_UP
                         ).permitAll()
-                        .anyRequest().hasRole("USER")
-                );
+                        .anyRequest().hasRole(Role.USER.name())
+                )
+                .csrf(csrf -> csrf.ignoringRequestMatchers(SecurityMatchers.LOGOUT, SecurityMatchers.SIGN_UP, SecurityMatchers.LOGIN ))
+                .logout(logout ->
+                        logout
+                                .logoutRequestMatcher(SecurityMatchers.LOGOUT)
+                                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                                .addLogoutHandler(new SessionRegistryLogoutHandler(sessionRegistry))
+                )
+                .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+                        Customizer.withDefaults())
+                .sessionManagement(session ->
+                        session
+                                .sessionFixation().migrateSession()
+                                .maximumSessions(1)
+                                .maxSessionsPreventsLogin(false)
+                                .sessionRegistry(sessionRegistry)
+                                .expiredSessionStrategy(new CustomSessionInformationExpiredStrategy(objectMapper))
+                )
+                .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
+                .addFilterBefore(new JwtAuthenticationFilter(objectMapper, jwtService),
+                        JsonUsernamePasswordAuthenticationFilter.class)
+        ;
 
         return http.build();
     }
