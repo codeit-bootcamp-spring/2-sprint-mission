@@ -14,6 +14,8 @@ spring:
   profiles:
     active:
       - dev
+  config:
+    import: optional:file:.env[.properties]
 
 management:
   endpoints:
@@ -55,16 +57,20 @@ discodeit:
       region: ${AWS_S3_REGION}
       bucket: ${AWS_S3_BUCKET}
       presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600} # (기본값: 10분)
-
-security:
   admin:
-    username: admin0001
-    email: admin0001@email.com
-    password: "admin0001@"
-  remember-me:
-    key: remembermeKey
-    token-validity-seconds: 1209600
+    username: ${DISCODEIT_ADMIN_USERNAME}
+    email: ${DISCODEIT_ADMIN_EMAIL}
+    password: ${DISCODEIT_ADMIN_PASSWORD}
 
 logging:
   level:
     root: info
+
+security:
+  remember-me:
+    key: ${SECURITY_REMEMBER_ME_KEY}
+    token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+  jwt:
+    secret-key: ${SECURITY_JWT_SECRET_KEY}
+    expiration: ${SECURITY_JWT_EXPIRATION}
+    issuer: ${SECURITY_JWT_ISSUER}

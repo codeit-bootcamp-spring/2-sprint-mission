@@ -2,13 +2,12 @@ package com.sprint.mission.discodeit.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.exception.ErrorResponse;
-import com.sprint.mission.discodeit.exception.security.SessionExpiredException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
 
@@ -24,8 +23,12 @@ public class CustomSessionInformationExpiredStrategy implements SessionInformati
     HttpServletResponse response = event.getResponse();
     response.setStatus(status);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    ErrorResponse errorResponse = new ErrorResponse(SessionExpiredException.sessionExpired(), HttpStatus.UNAUTHORIZED.value());
-
+    ErrorResponse errorResponse = new ErrorResponse(
+        new SessionAuthenticationException("Session is expired."),
+        status
+    );
+    errorResponse.getDetails().put("sessionId", event.getSessionInformation().getSessionId());
+    
     response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
   }
 }
