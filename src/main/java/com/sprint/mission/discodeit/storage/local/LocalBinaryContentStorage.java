@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -17,8 +19,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
 @Component
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -44,17 +48,35 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   public UUID put(UUID binaryContentId, byte[] bytes) {
-    Path filePath = resolvePath(binaryContentId);
-    if (Files.exists(filePath)) {
-      throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
-    }
-    try (OutputStream outputStream = Files.newOutputStream(filePath)) {
-      outputStream.write(bytes);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    log.info("로컬 파일 저장 요청: {} ({}bytes)", binaryContentId, bytes.length);
+
+    saveFileAsync(binaryContentId, bytes);
+
     return binaryContentId;
   }
+
+  @Async("storageTaskExecutor")
+  void saveFileAsync(UUID binaryContentId, byte[] bytes) {
+    try {
+      Path filePath = resolvePath(binaryContentId);
+
+      if (Files.exists(filePath)) {
+        log.warn("파일이 이미 존재합니다: {}", binaryContentId);
+        return;
+      }
+
+      log.info("로컬 파일 저장 시작: {}", binaryContentId);
+
+      try (OutputStream outputStream = Files.newOutputStream(filePath)) {
+        outputStream.write(bytes);
+        log.info("로컬 파일 저장 성공: {}", binaryContentId);
+      }
+
+    } catch (IOException e) {
+      log.error("로컬 파일 저장 실패: {}", binaryContentId, e);
+    }
+  }
+
 
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
