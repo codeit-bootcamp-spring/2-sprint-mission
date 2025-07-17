@@ -35,6 +35,9 @@ public class ReadStatus extends BaseUpdatableEntity {
   @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
+  @Column(name ="notification_enabled")
+  private boolean notificationEnabled;
+
   public void updateLastReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
   }

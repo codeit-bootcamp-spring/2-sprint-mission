@@ -46,7 +46,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 readStatusRequest.userId().toString(), readStatusRequest.channelId().toString());
         }
 
-        ReadStatus readStatus = new ReadStatus(user, channel, readStatusRequest.lastReadAt());
+        ReadStatus readStatus = new ReadStatus(user, channel, readStatusRequest.lastReadAt(), false);
 
         readStatusRepository.save(readStatus);
         return readStatusMapper.toDto(readStatus);

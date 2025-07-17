@@ -56,7 +56,7 @@ class ChannelRepositoryTest {
         privateChannel = new Channel(null, null, ChannelType.PRIVATE);
         channelRepository.save(privateChannel);
 
-        readStatus = new ReadStatus(privateUser, privateChannel, Instant.now());
+        readStatus = new ReadStatus(privateUser, privateChannel, Instant.now(), true);
         readStatusRepository.save(readStatus);
 
         testEntityManager.flush();

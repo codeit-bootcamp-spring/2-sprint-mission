@@ -55,9 +55,9 @@ public class ChannelIntegrationTest extends BaseIntegrationTest {
             new Channel("setPublic", "setPublicTest", ChannelType.PUBLIC));
         setPrivateChannel = channelRepository.save(new Channel(null, null, ChannelType.PRIVATE));
         setReadStatus1 = readStatusRepository.save(
-            new ReadStatus(setUser1, setPrivateChannel, Instant.now()));
+            new ReadStatus(setUser1, setPrivateChannel, Instant.now(), true));
         setReadStatus2 = readStatusRepository.save(
-            new ReadStatus(setUser2, setPrivateChannel, Instant.now()));
+            new ReadStatus(setUser2, setPrivateChannel, Instant.now(), true));
 
         entityManager.flush();
         entityManager.clear();

@@ -7,6 +7,21 @@
 -- DROP TABLE IF EXISTS binary_contents;
 -- DROP TABLE IF EXISTS persistent_logins;
 -- DROP TABLE IF EXISTS jwt_sessions;
+-- DROP TABLE IF EXISTS notification
+
+CREATE TABLE IF NOT EXISTS notification
+(
+    id                UUID PRIMARY KEY,
+    created_at        timestamp with time zone NOT NULL,
+    updated_at        timestamp with time zone,
+    receiver_id       UUID                     NOT NULL,
+    title             VARCHAR(100)             NOT NULL,
+    content           VARCHAR(250),
+    notification_type VARCHAR(30) CHECK (
+        notification_type IN ('NEW_MESSAGE', 'ROLE_CHANGED', 'ASYNC_FAILED')
+        ),
+    target_id         UUID
+);
 
 CREATE TABLE IF NOT EXISTS jwt_sessions
 (
@@ -63,12 +78,13 @@ CREATE TABLE IF NOT EXISTS channels
 
 CREATE TABLE IF NOT EXISTS read_statuses
 (
-    id           UUID PRIMARY KEY,
-    created_at   TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at   TIMESTAMP WITH TIME ZONE,
-    user_id      UUID,
-    channel_id   UUID,
-    last_read_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    id                   UUID PRIMARY KEY,
+    created_at           TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at           TIMESTAMP WITH TIME ZONE,
+    user_id              UUID,
+    channel_id           UUID,
+    last_read_at         TIMESTAMP WITH TIME ZONE NOT NULL,
+    notification_enabled BOOLEAN,
     CONSTRAINT fk_read_status_users FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     CONSTRAINT fk_read_status_channels FOREIGN KEY (channel_id) REFERENCES channels (id) ON DELETE CASCADE
 );

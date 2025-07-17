@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.async.BinaryContentUploadStatus;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BinaryContent extends BaseEntity {
+public class BinaryContent extends BaseUpdatableEntity {
 
   @Column(name = "file_name", nullable = false)
   private String fileName;

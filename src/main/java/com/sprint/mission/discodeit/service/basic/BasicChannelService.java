@@ -60,12 +60,24 @@ public class BasicChannelService implements ChannelService {
                     log.error("비공개 채널 생성 중 대상 사용자를 찾을 수 없음:  userId = {}", userId);
                     return UserNotFoundException.forId(userId.toString());
                 });
-            ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
+            ReadStatus readStatus = new ReadStatus(user, channel, Instant.now(), true);
             log.info("비공개 채널 생성 중 읽음 상태 저장 완료: userId = {}, readStatus = {}", userId, readStatus);
             readStatusRepository.save(readStatus);
         });
         log.info("비공개 채널 생성 완료: channelId = {}", channel.getId());
         return channelMapper.toDto(channel);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ChannelDto findById(UUID channelId) {
+        log.info("채널 조회 시작: channelId = {}", channelId);
+        return channelRepository.findById(channelId)
+            .map(channelMapper::toDto)
+            .orElseThrow(() -> {
+                log.error("채널 조회 실패: channelId = {}", channelId);
+                return ChannelNotFoundException.forId(channelId.toString());
+            });
     }
 
     @Override

@@ -58,11 +58,11 @@ class ReadStatusRepositoryTest {
         channel2 = new Channel("channel2", "test2", ChannelType.PRIVATE);
         channelRepository.save(channel2);
 
-        readStatus1 = new ReadStatus(user1, channel1, Instant.now());
+        readStatus1 = new ReadStatus(user1, channel1, Instant.now(), true);
         readStatusRepository.save(readStatus1);
-        readStatus2 = new ReadStatus(user2, channel1, Instant.now());
+        readStatus2 = new ReadStatus(user2, channel1, Instant.now(), true);
         readStatusRepository.save(readStatus2);
-        readStatus3 = new ReadStatus(user2, channel2, Instant.now());
+        readStatus3 = new ReadStatus(user2, channel2, Instant.now(), true);
         readStatusRepository.save(readStatus3);
 
         testEntityManager.flush();

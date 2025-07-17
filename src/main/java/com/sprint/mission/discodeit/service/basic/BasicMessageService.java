@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.event.FileUploadEvent;
+import com.sprint.mission.discodeit.dto.event.NotificationNewMessageEvent;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
@@ -48,7 +49,6 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final MessageMapper messageMapper;
-    private final BinaryContentStorage binaryContentStorage;
     private final PageResponseMapper pageResponseMapper;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -121,8 +121,10 @@ public class BasicMessageService implements MessageService {
             log.info("메세지 생성 중 파일 실제 데이터 저장: binaryContentId = {}", entry.getKey().getId());
             eventPublisher.publishEvent(new FileUploadEvent(entry.getKey().getId(), entry.getValue()));
         });
+        MessageDto messageDto = messageMapper.toDto(message);
+        eventPublisher.publishEvent(new NotificationNewMessageEvent(messageDto));
 
-        return messageMapper.toDto(message);
+        return messageDto;
     }
 
     @Override

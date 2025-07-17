@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.async.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.dto.event.FileUploadEvent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
