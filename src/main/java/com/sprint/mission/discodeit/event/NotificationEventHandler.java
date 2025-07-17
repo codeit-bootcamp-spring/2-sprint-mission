@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.event;
 
 import com.sprint.mission.discodeit.constant.NotificationType;
+import com.sprint.mission.discodeit.constant.Role;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.event.NotificationNewMessageEvent;
+import com.sprint.mission.discodeit.dto.event.NotificationRoleUpdateEvent;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.notification.NotificationCreateAllDto;
+import com.sprint.mission.discodeit.dto.notification.NotificationCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -74,6 +77,42 @@ public class NotificationEventHandler {
             log.info("메세지 알람 비동기 처리 완료: messageId = {}", event.messageDto().id());
         } catch (Exception e) {
             log.error("메세지 알람 비동기 처리 실패: error = {}", e.getMessage());
+        }
+    }
+
+    @Async("notificationExecutor")
+    @Retryable(
+        value = { Exception.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000)
+    )
+    @TransactionalEventListener(
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    public void handleUpdateRole(NotificationRoleUpdateEvent event) {
+        try {
+            log.info("사용자 권한 변경 알람 비동기 처리 시작: userId = {}", event.userDto().id());
+            UserDto userDto = event.userDto();
+
+            UUID receiverId = userDto.id();
+            Role previousRole = event.previousRole();
+            String title = String.format("권한 변경: %s", userDto.role().name());
+            String content = String.format("%s 권한에서 %s 권한으로 변경", previousRole.name(), userDto.role().name());
+            NotificationType type = NotificationType.ROLE_CHANGED;
+            UUID targetId = userDto.id();
+
+            NotificationCreateDto notificationCreateDto = new NotificationCreateDto(
+                receiverId,
+                title,
+                content,
+                type,
+                targetId
+            );
+
+            notificationService.createNotification(notificationCreateDto);
+            log.info("사용자 권한 변경 알람 비동기 처리 완료: userId = {}", event.userDto().id());
+        } catch (Exception e) {
+            log.error("사용자 권한 변경 알람 비동기 처리 실패: error = {}", e.getMessage());
         }
     }
 }

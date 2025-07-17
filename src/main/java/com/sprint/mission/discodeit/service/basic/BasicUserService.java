@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.async.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.constant.Role;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.event.FileUploadEvent;
+import com.sprint.mission.discodeit.dto.event.NotificationRoleUpdateEvent;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
@@ -189,6 +190,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateRole(RoleUpdateRequest roleUpdateRequest) {
 
         UUID userId = roleUpdateRequest.userId();
@@ -199,12 +201,15 @@ public class BasicUserService implements UserService {
                 log.error("사용자 권한 수정 중 사용자를 찾을 수 없음: userId = {}", userId);
                 return UserNotFoundException.forId(userId.toString());
             });
+        Role previousRole = user.getRole();
 
         user.updateRole(newRole);
         userRepository.save(user);
         jwtService.invalidateJwtSession(userId);
 
-        return userMapper.toDto(user);
+        UserDto userDto = userMapper.toDto(user);
+        eventPublisher.publishEvent(new NotificationRoleUpdateEvent(userDto, previousRole));
+        return userDto;
     }
 
     private BinaryContent extractBinaryContent(MultipartFile profile) {

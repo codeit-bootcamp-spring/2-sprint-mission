@@ -29,6 +29,7 @@ public class BasicNotificationService implements NotificationService {
     @Override
     @Transactional
     public void createNotification(NotificationCreateDto notificationCreateDto) {
+        log.info("알람 서비스 시작: userId = {}", notificationCreateDto.targetId());
         Notification notification = new Notification(
             notificationCreateDto.receiverId(),
             notificationCreateDto.title(),
@@ -37,6 +38,7 @@ public class BasicNotificationService implements NotificationService {
             notificationCreateDto.targetId()
         );
         notificationRepository.save(notification);
+        log.info("알람 서비스 종료: userId = {}", notificationCreateDto.targetId());
     }
 
     @Override
