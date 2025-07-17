@@ -13,6 +13,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -64,6 +66,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   }
 
   @Async("storageTaskExecutor")
+  @Retryable(
+          retryFor = {S3Exception.class, RuntimeException.class},
+          maxAttempts = 5,
+          backoff = @Backoff(delay = 2000, multiplier = 1.5, maxDelay = 30000)
+  )
   void uploadToS3Async(UUID binaryContentId, byte[] bytes) {
 
     String key = binaryContentId.toString();
