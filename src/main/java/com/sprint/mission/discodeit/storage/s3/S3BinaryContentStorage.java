@@ -66,6 +66,26 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     this.bucket = bucket;
   }
 
+  public UUID put(UUID binaryContentId, byte[] bytes) {
+    String key = binaryContentId.toString();
+    try {
+      S3Client s3Client = getS3Client();
+
+      PutObjectRequest request = PutObjectRequest.builder()
+          .bucket(bucket)
+          .key(key)
+          .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(bytes));
+      log.info("S3에 파일 업로드 성공: {}", key);
+
+      return binaryContentId;
+    } catch (S3Exception e) {
+      log.error("S3에 파일 업로드 실패: {}", e.getMessage());
+      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+    }
+  }
+
   @Override
   @Async
   @Retryable(
@@ -141,26 +161,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     } catch (Exception e) {
       log.error("Presigned URL 생성 실패: {}", e.getMessage());
       throw new RuntimeException("Presigned URL 생성 실패", e);
-    }
-  }
-
-  public UUID put(UUID binaryContentId, byte[] bytes) {
-    String key = binaryContentId.toString();
-    try {
-      S3Client s3Client = getS3Client();
-
-      PutObjectRequest request = PutObjectRequest.builder()
-          .bucket(bucket)
-          .key(key)
-          .build();
-
-      s3Client.putObject(request, RequestBody.fromBytes(bytes));
-      log.info("S3에 파일 업로드 성공: {}", key);
-
-      return binaryContentId;
-    } catch (S3Exception e) {
-      log.error("S3에 파일 업로드 실패: {}", e.getMessage());
-      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
     }
   }
 

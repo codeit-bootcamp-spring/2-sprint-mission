@@ -20,8 +20,15 @@ logging:
 
 management:
   endpoint:
+    metrics:
+      enable: true
     health:
       show-details: always
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
   info:
     env:
       enabled: true

@@ -69,7 +69,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
     }
     try (OutputStream outputStream = Files.newOutputStream(filePath)) {
-      //Thread.sleep(2000);
       outputStream.write(bytes);
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -82,7 +81,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  //@Timed(value = "upload.time.async", description = "파일 업로드 시간 측정", longTask = true)
   @Async
   @Retryable(
       retryFor = {IOException.class, RuntimeException.class},

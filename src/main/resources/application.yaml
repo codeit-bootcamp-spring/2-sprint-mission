@@ -20,9 +20,12 @@ spring:
 management:
   endpoints:
     web:
+      base-path: /actuator
       exposure:
         include: health,info,metrics,loggers
   endpoint:
+    metrics:
+      enable: true
     health:
       show-details: always
   metrics:
