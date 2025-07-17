@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.annotation.AsyncTaskLabel;
 import com.sprint.mission.discodeit.dto.data.AsyncTaskFailure;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -26,6 +27,7 @@ public class FileStorageAsyncTaskExecutor {
    * @return 작업 결과를 담는 CompletableFuture
    */
   @Async("fileExecutor") // AsyncConfig에 정의된 fileExecutor를 사용하도록 명시
+  @AsyncTaskLabel("파일 업로드")
   @Retryable(
       retryFor = { RuntimeException.class },
       maxAttempts = 5,
