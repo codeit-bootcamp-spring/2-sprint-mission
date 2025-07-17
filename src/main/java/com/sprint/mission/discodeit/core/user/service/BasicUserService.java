@@ -40,6 +40,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "users", allEntries = true)
   public UserDto create(UserCreateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) throws IOException {
     if (userRepository.existsByNameOrEmail(request.username(), request.email())) {
@@ -62,7 +63,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @CacheEvict(cacheNames = "users", key = "#id")
+  @CacheEvict(cacheNames = "users", allEntries = true)
   public UserDto update(UUID id, UserUpdateRequest request,
       Optional<BinaryContentCreateRequest> binaryContentRequest) throws IOException {
     User user = userRepository.findByUserId(id);
@@ -83,7 +84,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @CacheEvict(cacheNames = "users", key = "#request.userId()")
+  @CacheEvict(cacheNames = "users", allEntries = true)
   public UserDto updateRole(UserRoleUpdateRequest request) {
     UUID id = request.userId();
     User user = userRepository.findByUserId(id);
@@ -102,7 +103,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @CacheEvict(cacheNames = "users", key = "#id")
+  @CacheEvict(cacheNames = "users", allEntries = true)
   public void delete(UUID id) {
     User user = userRepository.findByUserId(id);
     BinaryContent profile = user.getProfile();

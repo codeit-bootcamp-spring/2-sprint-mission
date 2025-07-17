@@ -8,8 +8,6 @@ public interface CustomUserRepository {
 
   List<User> findAllFromDB();
 
-  List<User> findAllByIdsFromDB(List<UUID> ids);
-
   User findByUserId(UUID id);
 
   User findByUserName(String name);

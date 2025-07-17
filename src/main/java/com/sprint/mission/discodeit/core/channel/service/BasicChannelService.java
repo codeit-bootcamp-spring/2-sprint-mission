@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "channels", allEntries = true)
   public ChannelDto create(PublicChannelCreateRequest request) {
     Channel channel = Channel.create(request.name(), request.description(), ChannelType.PUBLIC);
     channelRepository.save(channel);
@@ -44,6 +46,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "channels", allEntries = true)
   public ChannelDto create(PrivateChannelCreateRequest request) {
     Channel channel = Channel.create(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
@@ -62,6 +65,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "channels")
   public ChannelDto update(UUID channelId, ChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId).orElseThrow(
         () -> new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, channelId)
@@ -80,6 +84,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   @Transactional
+  @CacheEvict(cacheNames = "channels")
   public void delete(UUID channelId) {
     Channel channel = channelRepository.findById(channelId).orElseThrow(
         () -> new ChannelException(ErrorCode.CHANNEL_NOT_FOUND, channelId)

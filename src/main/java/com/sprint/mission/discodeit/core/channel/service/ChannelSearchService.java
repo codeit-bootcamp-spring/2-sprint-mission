@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.core.user.dto.UserDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +19,7 @@ public class ChannelSearchService {
   private final ReadStatusSearchService readStatusSearchService;
   private final JpaChannelRepository channelRepository;
 
+  @Cacheable(value = "channels", key = "#userId")
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusSearchService.findChannelIdByUserId(userId);
 

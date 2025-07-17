@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class BasicNotificationService implements NotificationService {
   private final JpaNotificationRepository notificationRepository;
 
   @Override
+  @CacheEvict(cacheNames = "notifications", allEntries = true)
   public void create(NotificationEvent event) {
     User receiver = userRepository.findByUserId(event.receiverId());
     Notification notification = Notification.create(receiver, event.title(), event.content(),
@@ -30,7 +32,7 @@ public class BasicNotificationService implements NotificationService {
   }
 
   @Override
-  @Cacheable(value = "userNotifications", key = "#userId")
+  @Cacheable(cacheNames = "notifications", key = "#userId")
   public List<NotificationDto> findAll(UUID userId) {
     List<Notification> notificationList = notificationRepository.findAllByUserId(userId);
     return notificationList.stream().map(NotificationDto::from).toList();
