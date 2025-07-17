@@ -24,7 +24,7 @@ public class BinaryContent extends BaseEntity {
   private String contentType;
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  BinaryContentUploadStatus uploadStatus = BinaryContentUploadStatus.WAITING;
+  private BinaryContentUploadStatus uploadStatus = BinaryContentUploadStatus.WAITING;
 
   public BinaryContent(String fileName, Long size, String contentType) {
     this.fileName = fileName;

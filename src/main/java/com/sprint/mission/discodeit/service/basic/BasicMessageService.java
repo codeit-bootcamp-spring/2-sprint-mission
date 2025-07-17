@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -30,6 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,6 +53,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
   private final BinaryContentService binaryContentService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   @Override
@@ -111,7 +114,9 @@ public class BasicMessageService implements MessageService {
           }
         });
 
-    return messageMapper.toDto(message);
+    MessageDto res = messageMapper.toDto(message);
+    eventPublisher.publishEvent(new NewMessageEvent(res));
+    return res;
   }
 
   @Transactional(readOnly = true)

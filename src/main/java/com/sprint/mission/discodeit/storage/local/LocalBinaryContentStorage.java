@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.event.AsyncFailureEvent;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -36,14 +38,17 @@ import org.springframework.stereotype.Component;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private final ApplicationEventPublisher eventPublisher;
   private final Path root;
 
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") Path root,
-      AsyncTaskFailureRepository asyncTaskFailureRepository
+      AsyncTaskFailureRepository asyncTaskFailureRepository,
+      ApplicationEventPublisher eventPublisher
   ) {
     this.root = root;
     this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+    this.eventPublisher = eventPublisher;
   }
 
   @PostConstruct
@@ -98,11 +103,14 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         "Failed to store binary content in local storage (key=%s) : %s",
         binaryContentId, ex.getMessage());
 
-    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, failureReason, requestId);
-    asyncTaskFailureRepository.save(failure);
+    AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(taskName, failureReason, requestId);
+    asyncTaskFailureRepository.save(asyncTaskFailure);
 
     log.error("Failed to store binary content in local storage : {}",
         binaryContentId, ex);
+
+    eventPublisher.publishEvent(new AsyncFailureEvent(asyncTaskFailure));
+
     throw new RuntimeException(
         "Failed to store binary content in local storage : " + binaryContentId, ex);
   }

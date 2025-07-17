@@ -54,7 +54,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     Instant lastReadAt = request.lastReadAt();
-    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
+    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt, false);
     readStatusRepository.save(readStatus);
 
     log.info("읽음 상태 생성 완료: id={}, userId={}, channelId={}",
