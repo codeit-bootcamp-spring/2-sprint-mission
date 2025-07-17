@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -82,6 +85,13 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     } catch (IOException e) {
       log.error("로컬 파일 저장 실패: {}", binaryContentId, e);
     }
+  }
+
+  @Recover
+  public void recoverSaveFileAsync(RuntimeException e, UUID binaryContentId, byte[] bytes) {
+    String requestId = MDC.get("requestId");
+    AsyncTaskFailure failure = new AsyncTaskFailure("saveFileAsyncLocal" , requestId , e.getMessage());
+    log.error("비동기 로컬 파일 저장 복구 로직 실행: {}", failure, e);
   }
 
 
