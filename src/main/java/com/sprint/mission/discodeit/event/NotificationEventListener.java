@@ -23,6 +23,8 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -39,7 +41,7 @@ public class NotificationEventListener {
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  @EventListener
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handleCreateMessageEvent(NewMessageEvent event) {
     try {
       MessageDto messageDto = event.messageDto();
@@ -57,7 +59,7 @@ public class NotificationEventListener {
       String author = messageDto.author().username();
       String title = channel.type().equals(ChannelType.PUBLIC)
           ? String.format("[공개] %s - %s", channel.name(), author)
-          : String.format("[비밀] %s", author);
+          : String.format("[비공개] %s", author);
       String content = messageDto.content();
 
       notificationService.createAll(receivers, title, content, NotificationType.NEW_MESSAGE,
@@ -73,7 +75,7 @@ public class NotificationEventListener {
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  @EventListener
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handleUpdateRoleEvent(RoleChangedEvent event) {
     try {
       UserDto userDto = event.userDto();
@@ -96,6 +98,7 @@ public class NotificationEventListener {
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
+  @EventListener
   public void handleAsyncFailureEvent(AsyncFailureEvent event) {
     try {
       AsyncTaskFailure asyncTaskFailure = event.failure();

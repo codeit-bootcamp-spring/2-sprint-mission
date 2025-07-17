@@ -27,8 +27,8 @@ public class NotificationController {
   public ResponseEntity<List<NotificationDto>> findAll(
       @AuthenticationPrincipal DiscodeitUserDetails userDetails) {
     log.debug("사용자 전체 알림 조회 요청");
-    UUID userID = userDetails.getUserDto().id();
-    List<NotificationDto> res = notificationService.findAll(userID);
+    UUID receiverId = userDetails.getUserDto().id();
+    List<NotificationDto> res = notificationService.findAll(receiverId);
 
     log.debug("사용자 전체 알림 조회 응답 - 결과 크기 : {}", res.size());
     return ResponseEntity.ok(res);

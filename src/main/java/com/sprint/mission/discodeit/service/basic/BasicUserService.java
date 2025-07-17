@@ -24,6 +24,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ public class BasicUserService implements UserService {
   private final JwtService jwtService;
   private final BinaryContentService binaryContentService;
 
+  @CacheEvict(value = "users", key = "'allUsers'")
   @Transactional
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
@@ -109,6 +112,7 @@ public class BasicUserService implements UserService {
     return userDto;
   }
 
+  @Cacheable(value = "users", key = "'allUsers'")
   @Override
   public List<UserDto> findAll() {
     log.debug("모든 사용자 조회 시작");
@@ -124,6 +128,7 @@ public class BasicUserService implements UserService {
     return userDtos;
   }
 
+  @CacheEvict(value = "users", key = "'allUsers'")
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
   @Override
@@ -189,6 +194,7 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @CacheEvict(value = "users", key = "'allUsers'")
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
   @Override

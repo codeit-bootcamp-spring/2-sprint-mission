@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
 
-  List<Notification> findAllByReceiverId(UUID userId);
+  List<Notification> findAllByReceiverId(UUID receiverId);
 
   @Modifying
   @Query("DELETE FROM Notification n WHERE n.id = :notificationId AND n.receiverId = :receiverId")
