@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -20,6 +21,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -45,6 +49,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
 
+  @Timed(value = "message.create.time", description = "Message creation execution time")
   @Transactional
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -67,7 +72,7 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          updateUploadStatusAfterPut(binaryContent, bytes);
           return binaryContent;
         })
         .toList();
@@ -134,5 +139,36 @@ public class BasicMessageService implements MessageService {
     }
     messageRepository.deleteById(messageId);
     log.info("메시지 삭제 완료: id={}", messageId);
+  }
+
+  private void updateUploadStatusAfterPut(BinaryContent binaryContent, byte[] bytes) {
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronizationAdapter() {
+          public void afterCommit() {
+            try {
+              // 비동기 put 호출
+              UUID uploadedId = binaryContentStorage.put(
+                  binaryContent.getId(), bytes);
+
+              // BinaryContent 조회 및 상태 업데이트
+              BinaryContent updatedContent = binaryContentRepository.findById(
+                      binaryContent.getId())
+                  .orElseThrow(
+                      () -> BinaryContentNotFoundException.withId(binaryContent.getId()));
+
+              if (uploadedId != null) {
+                updatedContent.markUploadSuccess();
+              } else {
+                updatedContent.markUploadFailed();
+              }
+              binaryContentRepository.save(updatedContent); // 상태 저장
+              log.info("업로드 상태 업데이트 완료: ID = {}, 상태 = {}",
+                  binaryContent.getId(), updatedContent.getUploadStatus());
+            } catch (Exception e) {
+              log.error("afterCommit 중 업로드 실패: ID = {}, 오류 = {}",
+                  binaryContent.getId(), e.getMessage());
+            }
+          }
+        });
   }
 }

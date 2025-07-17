@@ -25,6 +25,11 @@ management:
   endpoint:
     health:
       show-details: always
+    logfile:
+      external-file:
+    web:
+      exposure:
+        include: metrics
 
 info:
   name: Discodeit
