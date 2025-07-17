@@ -34,6 +34,8 @@ spring:
         spring.json.trusted.packages: "*"
     listener:
       missing-topics-fatal: false
+  cache:
+    type: redis
   data:
     redis:
       host: localhost
