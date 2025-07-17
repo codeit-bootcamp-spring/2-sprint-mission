@@ -35,14 +35,19 @@ public class ReadStatus extends BaseUpdatableEntity implements Serializable, Ide
   @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt; // 마지막으로 메시지를 읽은 시간
 
+  @Column(name = "notification_enabled")
+  private boolean notificationEnabled = false;
+
   @Builder
   public ReadStatus(User user, Channel channel, Instant lastReadAt) {
     this.user = user;
     this.channel = channel;
-    this.lastReadAt = lastReadAt;
+    this.lastReadAt = lastReadAt != null ? lastReadAt : Instant.now();
   }
 
-  public void updateReadStatus(Instant newLastReadAt) {
-    this.lastReadAt = newLastReadAt;
+  public void updateReadStatus(Instant newLastReadAt, Boolean notificationEnabled) {
+    this.lastReadAt = newLastReadAt != null ? newLastReadAt : Instant.now();
+    this.notificationEnabled =
+        notificationEnabled != null ? notificationEnabled : this.notificationEnabled;
   }
 }

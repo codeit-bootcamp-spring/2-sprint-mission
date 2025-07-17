@@ -12,44 +12,37 @@ CREATE TABLE users
     profile_id uuid
 );
 
--- SPRING_SESSION 테이블 생성
-CREATE TABLE spring_session
+-- jwt
+CREATE TABLE jwt_sessions
 (
-    primary_id            CHAR(36) NOT NULL PRIMARY KEY,
-    session_id            CHAR(36) NOT NULL UNIQUE,
-    creation_time         BIGINT   NOT NULL,
-    last_access_time      BIGINT   NOT NULL,
-    max_inactive_interval INT      NOT NULL,
-    expiry_time           BIGINT   NOT NULL,
-    principal_name        VARCHAR(100)
+    id                       UUID PRIMARY KEY,
+    user_id                  UUID         NOT NULL,
+    access_token             VARCHAR(500) NOT NULL,
+    refresh_token            VARCHAR(500) NOT NULL,
+    issued_at                TIMESTAMP    NOT NULL,
+    refresh_token_expires_at TIMESTAMP,
+    CONSTRAINT fk_jwt_sessions_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
--- SPRING_SESSION_ATTRIBUTES 테이블 생성
-CREATE TABLE spring_session_attributes
+-- async_failure
+CREATE TABLE async_task_failure
 (
-    session_primary_id CHAR(36)     NOT NULL REFERENCES spring_session (primary_id) ON DELETE CASCADE,
-    attribute_name     VARCHAR(200) NOT NULL,
-    attribute_bytes    BYTEA        NOT NULL,
-    PRIMARY KEY (session_primary_id, attribute_name)
-);
-
--- remember-me
-CREATE TABLE persistent_logins
-(
-    username  VARCHAR(64) NOT NULL,
-    series    VARCHAR(64) PRIMARY KEY,
-    token     VARCHAR(64) NOT NULL,
-    last_used TIMESTAMP   NOT NULL
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    task_name      varchar(255)             NOT NULL,
+    request_id     varchar(255)             NOT NULL,
+    failure_reason varchar(500)             NOT NULL
 );
 
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(100)
 --     ,bytes        bytea        NOT NULL
 );
 
@@ -74,6 +67,21 @@ CREATE TABLE channels
     type        varchar(10)              NOT NULL
 );
 
+-- Notification
+CREATE TABLE notifications
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    title       varchar(100)             NOT NULL,
+    content     varchar(500)             NOT NULL,
+    type        varchar(20)              NOT NULL,
+    target_id   uuid,
+    receiver_id uuid                     NOT NULL,
+    CONSTRAINT fk_notifications_receiver
+        FOREIGN KEY (receiver_id) REFERENCES users (id)
+            ON DELETE CASCADE
+);
+
 -- Message
 CREATE TABLE messages
 (
@@ -96,12 +104,13 @@ CREATE TABLE message_attachments
 -- ReadStatus
 CREATE TABLE read_statuses
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      uuid                     NOT NULL,
-    channel_id   uuid                     NOT NULL,
-    last_read_at timestamp with time zone NOT NULL,
+    id                   uuid PRIMARY KEY,
+    created_at           timestamp with time zone NOT NULL,
+    updated_at           timestamp with time zone,
+    user_id              uuid                     NOT NULL,
+    channel_id           uuid                     NOT NULL,
+    last_read_at         timestamp with time zone NOT NULL,
+    notification_enabled boolean,
     UNIQUE (user_id, channel_id)
 );
 

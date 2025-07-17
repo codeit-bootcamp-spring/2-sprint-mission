@@ -6,13 +6,16 @@ import com.sprint.mission.discodeit.dto.service.message.FindMessageResult;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageCommand;
 import com.sprint.mission.discodeit.dto.service.message.UpdateMessageResult;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.event.CreateNotificationEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.file.FileReadException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -48,6 +51,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
+  private final ReadStatusRepository readStatusRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final MessageMapper messageMapper;
   private final ApplicationEventPublisher eventPublisher;
@@ -85,6 +89,22 @@ public class BasicMessageService implements MessageService {
     Message message = createMessageEntity(user, channel, createMessageCommand, binaryContentList);
     messageRepository.save(message);
 
+    // 메시지 생성 -> 채널 내 NotificationEnable = true인 모든 사용자에게 알림 발행
+    List<User> channelUserList = readStatusRepository.findAllByChannelIdAndNotificationEnabledTrue(
+            channel.getId()).stream()
+        .map(ReadStatus::getUser)
+        .toList();
+
+    for (User channelUser : channelUserList) {
+      eventPublisher.publishEvent(CreateNotificationEvent.builder()
+          .type(NotificationType.NEW_MESSAGE)
+          .content(message.getContent())
+          .title(channel.getType().equals(ChannelType.PUBLIC) ? user.getUsername() + " (# "
+              + channel.getName() + ")" : user.getUsername())
+          .receiverId(channelUser.getId())
+          .targetId(channel.getId())
+          .build());
+    }
     return messageMapper.toCreateMessageResult(message);
   }
 
@@ -227,6 +247,13 @@ public class BasicMessageService implements MessageService {
     return channelRepository.findById(channelId).orElseThrow(() -> {
       log.warn("Message create failed: channel not found (channelId: : {})", channelId);
       return new ChannelNotFoundException(Map.of("channelId", channelId));
+    });
+  }
+
+  private ReadStatus findReadStatusByIds(UUID userId, UUID channelId) {
+    return readStatusRepository.findByUserIdAndChannelId(userId, channelId).orElseThrow(() -> {
+      log.warn("Message create failed: readStatus not found (channelId: : {})", channelId);
+      return new ReadStatusNotFoundException(Map.of("userId", userId, "channelId", channelId));
     });
   }
 }

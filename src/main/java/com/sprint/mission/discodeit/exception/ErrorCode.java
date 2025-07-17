@@ -13,7 +13,6 @@ public enum ErrorCode implements Code {
   MISSING_JWT_TOKEN(401, "Jwt token missing"),
   UNSUPPORTED_JWT_TOKEN(400, "jwt token unsupported"),
 
-
   // Jwt
   INVALID_REFRESH_TOKEN(401, "Invalid or expired refresh token"),
 
@@ -61,7 +60,10 @@ public enum ErrorCode implements Code {
   // S3
   S3_UPLOAD_FAILED(500, "S3 upload failed"),
   S3_DOWNLOAD_FAILED(500, "S3 download failed"),
-  S3_DELETE_FAILED(500, "S3 delete failed");
+  S3_DELETE_FAILED(500, "S3 delete failed"),
+
+  // Notification
+  NOTIFICATION_NOT_FOUND(404, "Notification not found");
 
 
   private final int status;

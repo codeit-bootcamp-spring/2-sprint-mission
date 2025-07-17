@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.controller.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.controller.user.UserDto;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.CreateNotificationEvent;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -12,6 +14,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +34,7 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
@@ -61,7 +65,16 @@ public class BasicAuthService implements AuthService {
               roleUpdateRequest.userId());
           return new UserNotFoundException(Map.of("userId", roleUpdateRequest.userId()));
         });
+    Role priorRole = user.getRole();
     user.updateRole(roleUpdateRequest.newRole());
+
+    eventPublisher.publishEvent(CreateNotificationEvent.builder()
+        .type(NotificationType.ROLE_CHANGED)
+        .content("[" + priorRole + "] -> " + "[" + roleUpdateRequest.newRole() + "]")
+        .title("권한이 변경되었습니다.")
+        .receiverId(user.getId())
+        .targetId(user.getId())
+        .build());
     return userMapper.toUserDto(user);
   }
 }

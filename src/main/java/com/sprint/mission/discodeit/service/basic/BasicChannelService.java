@@ -175,7 +175,7 @@ public class BasicChannelService implements ChannelService {
   private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
     List<CreateReadStatusCommand> createReadStatusParams = userIds.stream()
         .map(userId -> new CreateReadStatusCommand(userId,
-            channelId, Instant.now()))
+            channelId, Instant.now(), true))
         .toList();
     // DTO를 이용해 readStatus 생성
     createReadStatusParams.forEach(readStatusService::create);

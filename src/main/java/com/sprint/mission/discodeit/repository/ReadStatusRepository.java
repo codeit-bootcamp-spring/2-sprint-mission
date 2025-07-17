@@ -26,5 +26,10 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
   Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
 
-
+  @Query("select distinct rs from ReadStatus rs"
+      + " join fetch rs.user"
+      + " join fetch rs.channel"
+      + " where rs.channel.id = :channelId"
+      + " and rs.notificationEnabled = true")
+  List<ReadStatus> findAllByChannelIdAndNotificationEnabledTrue(@Param("channelId") UUID channelId);
 }
