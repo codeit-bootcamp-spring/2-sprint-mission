@@ -9,13 +9,13 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +29,7 @@ public class BasicNotificationService {
   private final NotificationMapper notificationMapper;
 
   @Transactional
+  @CacheEvict(value = "notificationsByUser", key = "#p0.receiverId()")
   public NotificationDto create(CreateNotificationParam param) {
     Notification notification = Notification.builder()
         .title(param.title())
@@ -47,11 +48,9 @@ public class BasicNotificationService {
     return notificationMapper.toNotificationDto(notificationRepository.save(notification));
   }
 
-  @Transactional
-  public List<NotificationDto> findAll() {
-    // 현재 인증 정보 꺼내서
-    UUID userId = getCurrentUserId();
-
+  @Transactional(readOnly = true)
+  @Cacheable(value = "notificationsByUser", key = "#p0")
+  public List<NotificationDto> findAll(UUID userId) {
     // 본인의 알림만 조회
     return notificationRepository.findAllByReceiver_Id(userId).stream()
         .map(notificationMapper::toNotificationDto)
@@ -59,7 +58,8 @@ public class BasicNotificationService {
   }
 
   @Transactional
-  public void delete(UUID notificationId) {
+  @CacheEvict(value = "notificationsByUser", key = "#p1")
+  public void delete(UUID notificationId, UUID userId) {
     Notification notification = notificationRepository.findById(notificationId)
         .orElseThrow(() -> {
           log.warn("Notification not found - id:{}, details:{}", notificationId,
@@ -67,18 +67,10 @@ public class BasicNotificationService {
           return new NotificationNotFoundException(Map.of("id", notificationId));
         });
 
-    UUID userId = getCurrentUserId();
-
     // 자신의 것이 아닌 알림을 지우려고 하면 예외 발생
     if (!notification.getReceiver().getId().equals(userId)) {
       throw new AccessDeniedException(Map.of("id", userId, "details", "notification delete"));
     }
     notificationRepository.delete(notification);
-  }
-
-  private UUID getCurrentUserId() {
-    return ((CustomUserDetails) SecurityContextHolder.getContext()
-        .getAuthentication()
-        .getPrincipal()).getUserDto().id();
   }
 }
