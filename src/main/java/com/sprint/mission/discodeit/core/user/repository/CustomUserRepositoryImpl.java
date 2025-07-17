@@ -31,14 +31,6 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
   }
 
   @Override
-  public List<User> findAllByIdsFromDB(List<UUID> ids) {
-    return jpaQueryFactory.selectFrom(user)
-        .leftJoin(user.profile, binaryContent).fetchJoin()
-        .where(user.id.in(ids))
-        .fetch();
-  }
-
-  @Override
   public User findByUserId(UUID id) {
     User fetched = jpaQueryFactory
         .selectFrom(user)

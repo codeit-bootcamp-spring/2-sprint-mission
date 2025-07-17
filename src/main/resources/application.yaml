@@ -3,7 +3,6 @@ spring:
     name: discodeit
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
-
   cache:
     cache-names:
       - notifications
@@ -39,6 +38,10 @@ management:
   metrics:
     tags:
       application: my-cache-app
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 security:
   remember-me:
