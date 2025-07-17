@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.CustomUserDetails;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,21 +91,23 @@ public class BasicMessageService implements MessageService {
     Message message = createMessageEntity(user, channel, createMessageCommand, binaryContentList);
     messageRepository.save(message);
 
-    // 메시지 생성 -> 채널 내 NotificationEnable = true인 모든 사용자에게 알림 발행
+    // 메시지 생성 -> 채널 내 NotificationEnable = true인 모든 사용자에게 알림 발행 (본인 제외)
     List<User> channelUserList = readStatusRepository.findAllByChannelIdAndNotificationEnabledTrue(
             channel.getId()).stream()
         .map(ReadStatus::getUser)
         .toList();
 
     for (User channelUser : channelUserList) {
-      eventPublisher.publishEvent(CreateNotificationEvent.builder()
-          .type(NotificationType.NEW_MESSAGE)
-          .content(message.getContent())
-          .title(channel.getType().equals(ChannelType.PUBLIC) ? user.getUsername() + " (# "
-              + channel.getName() + ")" : user.getUsername())
-          .receiverId(channelUser.getId())
-          .targetId(channel.getId())
-          .build());
+      if (!channelUser.getId().equals(getCurrentId())) {
+        eventPublisher.publishEvent(CreateNotificationEvent.builder()
+            .type(NotificationType.NEW_MESSAGE)
+            .content(message.getContent())
+            .title(channel.getType().equals(ChannelType.PUBLIC) ? user.getUsername() + " (# "
+                + channel.getName() + ")" : user.getUsername())
+            .receiverId(channelUser.getId())
+            .targetId(channel.getId())
+            .build());
+      }
     }
     return messageMapper.toCreateMessageResult(message);
   }
@@ -255,5 +259,10 @@ public class BasicMessageService implements MessageService {
       log.warn("Message create failed: readStatus not found (channelId: : {})", channelId);
       return new ReadStatusNotFoundException(Map.of("userId", userId, "channelId", channelId));
     });
+  }
+
+  private UUID getCurrentId() {
+    return ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal()).getUserDto().id();
   }
 }
