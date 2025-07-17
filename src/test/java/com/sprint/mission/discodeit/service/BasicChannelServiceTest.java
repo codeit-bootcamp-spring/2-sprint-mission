@@ -164,9 +164,9 @@ public class BasicChannelServiceTest {
     UUID privateChannelId = UUID.randomUUID();
 
     FindReadStatusResult readStatusResult1 = new FindReadStatusResult(UUID.randomUUID(), userId,
-        channelId, Instant.now());
+        channelId, Instant.now(), true);
     FindReadStatusResult readStatusResult2 = new FindReadStatusResult(UUID.randomUUID(), userId,
-        privateChannelId, Instant.now());
+        privateChannelId, Instant.now(), true);
 
     Channel publicChannel = Channel.builder()
         .name("publicTest")

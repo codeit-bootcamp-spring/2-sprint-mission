@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapperImpl;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -63,6 +64,9 @@ public class BasicMessageServiceTest {
 
   @Mock
   ApplicationEventPublisher eventPublisher;
+
+  @Mock
+  ReadStatusRepository readStatusRepository;
 
   @Spy
   MessageMapper messageMapper = new MessageMapperImpl();
