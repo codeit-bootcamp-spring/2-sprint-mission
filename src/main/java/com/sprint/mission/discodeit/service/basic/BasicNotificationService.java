@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -54,7 +55,7 @@ public class BasicNotificationService {
     // 본인의 알림만 조회
     return notificationRepository.findAllByReceiver_Id(userId).stream()
         .map(notificationMapper::toNotificationDto)
-        .toList();
+        .collect(Collectors.toList());
   }
 
   @Transactional
