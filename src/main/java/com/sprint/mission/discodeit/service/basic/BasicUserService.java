@@ -27,6 +27,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,15 +66,22 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          try{
-              binaryContentStorage.put(binaryContent.getId(), bytes);
-              binaryContent.setUploadStatus(BinaryContentUploadStatus.SUCCESS);
-              binaryContentRepository.save(binaryContent);
-          } catch (Exception e) {
-              log.error(e.getMessage());
-              binaryContent.setUploadStatus(BinaryContentUploadStatus.FAILED);
-              binaryContentRepository.save(binaryContent);
-          }
+            TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization(){
+                        @Override
+                        public void afterCommit() {
+                            try{
+                                binaryContentStorage.put(binaryContent.getId(), bytes);
+                                binaryContent.setUploadStatus(BinaryContentUploadStatus.SUCCESS);
+                                binaryContentRepository.save(binaryContent);
+                            } catch (Exception e) {
+                                log.error(e.getMessage());
+                                binaryContent.setUploadStatus(BinaryContentUploadStatus.FAILED);
+                                binaryContentRepository.save(binaryContent);
+                            }
+                        }
+                    }
+            );
           return binaryContent;
         })
         .orElse(null);

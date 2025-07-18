@@ -68,6 +68,27 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     return binaryContentId;
   }
 
+  @Override
+  public UUID putSync(UUID binaryContentId, byte[] bytes) {
+    String key = binaryContentId.toString();
+    try {
+      S3Client s3Client = getS3Client();
+
+      PutObjectRequest request = PutObjectRequest.builder()
+              .bucket(bucket)
+              .key(key)
+              .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(bytes));
+      log.info("S3에 파일 업로드 성공: {}", key);
+
+      return binaryContentId;
+    } catch (S3Exception e) {
+      log.error("S3에 파일 업로드 실패: {}", e.getMessage());
+      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+    }
+  }
+
   @Async("storageTaskExecutor")
   @Retryable(
           retryFor = {S3Exception.class, RuntimeException.class},

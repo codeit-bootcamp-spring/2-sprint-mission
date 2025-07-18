@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,11 +53,32 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
+  @Timed
+  @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     log.info("로컬 파일 저장 요청: {} ({}bytes)", binaryContentId, bytes.length);
+      saveFileAsync(binaryContentId, bytes);
 
-    saveFileAsync(binaryContentId, bytes);
+    return binaryContentId;
+  }
 
+  @Timed
+  @Override
+  public UUID putSync(UUID binaryContentId, byte[] bytes) {
+    Path filePath = resolvePath(binaryContentId);
+    if (Files.exists(filePath)) {
+      throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
+    }
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    try (OutputStream outputStream = Files.newOutputStream(filePath)) {
+      outputStream.write(bytes);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     return binaryContentId;
   }
 
@@ -77,6 +99,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
       log.info("로컬 파일 저장 시작: {}", binaryContentId);
 
+      try {
+        Thread.sleep(10000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+
       try (OutputStream outputStream = Files.newOutputStream(filePath)) {
         outputStream.write(bytes);
         log.info("로컬 파일 저장 성공: {}", binaryContentId);
@@ -94,7 +122,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     log.error("비동기 로컬 파일 저장 복구 로직 실행: {}", failure, e);
   }
 
-
+  @Override
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {
