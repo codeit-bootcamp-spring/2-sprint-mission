@@ -7,10 +7,12 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "binary_contents")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
 
@@ -20,10 +22,13 @@ public class BinaryContent extends BaseEntity {
   private Long size;
   @Column(length = 100, nullable = false)
   private String contentType;
+  @Column(nullable = false)
+  private BinaryContentUploadStatus uploadStatus;
 
   public BinaryContent(String fileName, Long size, String contentType) {
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
+    this.uploadStatus = BinaryContentUploadStatus.WAITING;
   }
 }

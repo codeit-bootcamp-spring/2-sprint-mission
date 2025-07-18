@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -63,7 +64,15 @@ public class BasicUserService implements UserService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          try{
+              binaryContentStorage.put(binaryContent.getId(), bytes);
+              binaryContent.setUploadStatus(BinaryContentUploadStatus.SUCCESS);
+              binaryContentRepository.save(binaryContent);
+          } catch (Exception e) {
+              log.error(e.getMessage());
+              binaryContent.setUploadStatus(BinaryContentUploadStatus.FAILED);
+              binaryContentRepository.save(binaryContent);
+          }
           return binaryContent;
         })
         .orElse(null);
