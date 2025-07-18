@@ -29,7 +29,6 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelMapper channelMapper;
 
-
     @Transactional
     @Override
     public ChannelDto create(PrivateChannelCreateRequest request) {
@@ -48,7 +47,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(channel);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelDto create(PublicChannelCreateRequest request) {
@@ -83,7 +82,7 @@ public class BasicChannelService implements ChannelService {
                 .toList();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public ChannelDto updateChannel(UUID channelId, PublicChannelUpdateRequest request) {
@@ -104,7 +103,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(channel);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
     @Override
     public void deleteChannel(UUID channelId) {

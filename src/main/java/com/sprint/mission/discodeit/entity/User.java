@@ -37,7 +37,7 @@ public class User extends BaseUpdatableEntity implements Serializable {
         this.email = email;
         this.password = password;
         this.profile = profile;
-        this.role = Role.ROLE_USER;
+        this.role = Role.USER;
 
     }
 

@@ -14,8 +14,8 @@ public class RoleHierarchyConfig {
     @Bean
     RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.withDefaultRolePrefix()
-            .role(Role.ROLE_ADMIN.name()).implies(Role.ROLE_CHANNEL_MANAGER.name())
-            .role(Role.ROLE_CHANNEL_MANAGER.name()).implies(Role.ROLE_USER.name())
+            .role(Role.ADMIN.name()).implies(Role.CHANNEL_MANAGER.name())
+            .role(Role.CHANNEL_MANAGER.name()).implies(Role.USER.name())
             .build();
     }
 }

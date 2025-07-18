@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.security.permission;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.security.CustomUserDetails;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import java.io.Serializable;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId,
         String targetType, Object permission) {
-        if (!(authentication.getPrincipal() instanceof CustomUserDetails userDetails)) {
+        if (!(authentication.getPrincipal() instanceof DiscodeitUserDetails userDetails)) {
             return false;
         }
         UUID loginId = userDetails.getUserDto().id();
@@ -36,7 +36,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
 
         return switch (targetType) {
             case "User" ->
-                loginId.equals(targetId) || userDetails.getUserDto().role() == Role.ROLE_ADMIN;
+                loginId.equals(targetId) || userDetails.getUserDto().role() == Role.ADMIN;
 
             case "Message" -> messageRepository.findById((UUID) targetId)
                 .map(message -> {
@@ -44,7 +44,7 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                     return switch (action) {
                         case "update" -> authorId.equals(loginId);
                         case "delete" -> authorId.equals(loginId)
-                            || userDetails.getUserDto().role() == Role.ROLE_ADMIN;
+                            || userDetails.getUserDto().role() == Role.ADMIN;
                         default -> false;
                     };
                 }).orElse(false);
