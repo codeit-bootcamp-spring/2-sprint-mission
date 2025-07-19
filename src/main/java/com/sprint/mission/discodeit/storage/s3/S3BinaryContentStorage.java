@@ -1,20 +1,26 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -39,6 +45,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private final String secretKey;
     private final String region;
     private final String bucket;
+    private final AsyncTaskFailureRepository asyncTaskFailureRepository;
 
     @Value("${discodeit.storage.s3.presigned-url-expiration:600}") // 기본값 10분
     private long presignedUrlExpirationSeconds;
@@ -47,12 +54,14 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         @Value("${discodeit.storage.s3.access-key}") String accessKey,
         @Value("${discodeit.storage.s3.secret-key}") String secretKey,
         @Value("${discodeit.storage.s3.region}") String region,
-        @Value("${discodeit.storage.s3.bucket}") String bucket
+        @Value("${discodeit.storage.s3.bucket}") String bucket,
+        AsyncTaskFailureRepository asyncTaskFailureRepository
     ) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.region = region;
         this.bucket = bucket;
+        this.asyncTaskFailureRepository = asyncTaskFailureRepository;
     }
 
     @Override
@@ -85,6 +94,23 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     @Async("binaryContentTaskExecutor")
     public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
         return CompletableFuture.completedFuture(put(binaryContentId, bytes));
+    }
+
+    @Recover
+    public CompletableFuture<UUID> recover(Exception e, UUID binaryContentId, byte[] bytes) {
+        String taskName = "putAsync";
+        String requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID))
+            .orElse("UNKNOWN");
+        String failureReason = String.format(
+            "파일 업로드 실패 - binaryContentId: %s - %s",
+            binaryContentId,
+            e.getMessage());
+
+        AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
+        asyncTaskFailureRepository.save(failure);
+
+        log.error("파일 업로드 실패 - binaryContentId: {}", binaryContentId, e);
+        return CompletableFuture.failedFuture(e);
     }
 
     @Override
