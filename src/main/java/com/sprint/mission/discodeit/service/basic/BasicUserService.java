@@ -9,12 +9,11 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,8 +33,7 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserMapper userMapper;
-  private final BinaryContentRepository binaryContentRepository;
-  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentService binaryContentService;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
 
@@ -56,16 +54,7 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          return binaryContent;
-        })
+        .map(binaryContentService::createEntity)
         .orElse(null);
     String password = userCreateRequest.password();
 
@@ -128,17 +117,7 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          return binaryContent;
-        })
+        .map(binaryContentService::createEntity)
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();

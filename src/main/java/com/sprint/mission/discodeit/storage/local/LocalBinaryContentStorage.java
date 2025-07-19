@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -17,6 +18,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
@@ -43,7 +48,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
-  public UUID put(UUID binaryContentId, byte[] bytes) {
+  @Override
+  @Async("binaryContentTaskExecutor")
+  @Retryable(
+      retryFor = {RuntimeException.class, IOException.class},
+      noRetryFor = {IllegalArgumentException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000)
+  )
+  public CompletableFuture<UUID> put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
@@ -53,7 +66,13 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return binaryContentId;
+    return CompletableFuture.completedFuture(binaryContentId);
+  }
+
+  @Recover
+  public CompletableFuture<UUID> recoverPut(RuntimeException e, UUID binaryContentId,
+      byte[] bytes) {
+    return CompletableFuture.failedFuture(e);
   }
 
   public InputStream get(UUID binaryContentId) {
