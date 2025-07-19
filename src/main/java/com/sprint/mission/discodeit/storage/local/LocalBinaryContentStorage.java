@@ -2,6 +2,10 @@ package com.sprint.mission.discodeit.storage.local;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.PostConstruct;
@@ -34,11 +38,17 @@ import org.springframework.stereotype.Component;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
+  private final UserRepository userRepository;
+  private final NotificationService notificationService;
 
   public LocalBinaryContentStorage(
-      @Value("${discodeit.storage.local.root-path}") Path root
+      @Value("${discodeit.storage.local.root-path}") Path root,
+      UserRepository userRepository,
+      NotificationService notificationService
   ) {
     this.root = root;
+    this.userRepository = userRepository;
+    this.notificationService = notificationService;
   }
 
   @PostConstruct
@@ -111,6 +121,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       }
 
     } catch (IOException e) {
+
       log.error("로컬 파일 저장 실패: {}", binaryContentId, e);
     }
   }
@@ -120,6 +131,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     String requestId = MDC.get("requestId");
     AsyncTaskFailure failure = new AsyncTaskFailure("saveFileAsyncLocal" , requestId , e.getMessage());
     log.error("비동기 로컬 파일 저장 복구 로직 실행: {}", failure, e);
+
+    User user = userRepository.findByProfile_Id(binaryContentId)
+            .orElseThrow(UserNotFoundException::new);
+    UUID userId = user.getId();
+    notificationService.createNotificationAsyncFailed(userId);
   }
 
   @Override

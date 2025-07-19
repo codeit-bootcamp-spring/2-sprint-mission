@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.time.Instant;
 import java.util.List;
@@ -35,6 +36,7 @@ public class BasicReadStatusService implements ReadStatusService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final ReadStatusMapper readStatusMapper;
+  private final NotificationService notificationService;
 
   @PreAuthorize("principal.userDto.id == #request.userId()")
   @Transactional
@@ -62,6 +64,10 @@ public class BasicReadStatusService implements ReadStatusService {
       readStatus.setNotificationEnabled(true);
     }
     readStatusRepository.save(readStatus);
+
+    if(readStatus.isNotificationEnabled()){
+      notificationService.createNotificationChannel(userId, channelId);
+    }
 
     log.info("읽음 상태 생성 완료: id={}, userId={}, channelId={}",
         readStatus.getId(), userId, channelId);

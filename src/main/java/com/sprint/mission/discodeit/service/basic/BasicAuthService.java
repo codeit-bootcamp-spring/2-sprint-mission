@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
 import java.util.UUID;
+
+import com.sprint.mission.discodeit.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,7 @@ public class BasicAuthService implements AuthService {
   private final UserMapper userMapper;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final NotificationService notificationService;
 
   @Transactional
   @Override
@@ -62,6 +65,9 @@ public class BasicAuthService implements AuthService {
     user.updateRole(request.newRole());
 
     jwtService.invalidateJwtSession(user.getId());
+
+    notificationService.createNotificationRoleChanged(userId, userId);
+
     return userMapper.toDto(user);
   }
 }

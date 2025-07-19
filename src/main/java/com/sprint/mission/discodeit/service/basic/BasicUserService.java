@@ -181,4 +181,11 @@ public class BasicUserService implements UserService {
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
   }
+
+    @Override
+    public UUID transId(String receiverName) {
+      User user = userRepository.findByUsername(receiverName)
+              .orElseThrow(UserNotFoundException::new);
+      return user.getId();
+    }
 }
