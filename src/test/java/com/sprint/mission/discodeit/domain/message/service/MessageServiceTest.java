@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.domain.message.service;
 
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
-import com.sprint.mission.discodeit.testutil.AuthSupport;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
@@ -277,7 +276,6 @@ public class MessageServiceTest extends IntegrationTestSupport {
     User savedUser = userRepository.save(new User("", "", "", null));
     Message savedMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     MessageResult updatedMessage = messageService.updateContext(savedMessage.getId(), "updated");
@@ -311,7 +309,6 @@ public class MessageServiceTest extends IntegrationTestSupport {
         .stream()
         .map(BinaryContentResult::id)
         .toList();
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     messageService.delete(savedMessage.id());

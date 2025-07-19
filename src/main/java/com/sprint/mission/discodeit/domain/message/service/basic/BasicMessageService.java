@@ -23,13 +23,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -50,6 +53,7 @@ public class BasicMessageService implements MessageService {
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
+    log.info("메세지 서비스 컨텍스트 {}", SecurityContextHolder.getContext().toString());
     List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));

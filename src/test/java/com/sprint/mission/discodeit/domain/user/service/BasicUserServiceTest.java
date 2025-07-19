@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.domain.user.service;
 
-import com.sprint.mission.discodeit.testutil.AuthSupport;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
@@ -18,8 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
 
 class BasicUserServiceTest extends IntegrationTestSupport {
 
@@ -170,7 +167,6 @@ class BasicUserServiceTest extends IntegrationTestSupport {
     User user = userRepository.save(new User(USER_NAME, USER_EMAIL, USER_PASSWORD, null));
     UserUpdateRequest request = new UserUpdateRequest(
         "newName", "newEmail@example.com", "newPassword");
-    AuthSupport.setTestAuthentication(user, Role.USER);
 
     // when
     UserResult updatedUser = userService.update(user.getId(), request, null);
@@ -197,7 +193,6 @@ class BasicUserServiceTest extends IntegrationTestSupport {
   void deleteUser() {
     // given
     User user = userRepository.save(new User(USER_NAME, USER_EMAIL, USER_PASSWORD, null));
-    AuthSupport.setTestAuthentication(user, Role.USER);
 
     // when
     userService.delete(user.getId());

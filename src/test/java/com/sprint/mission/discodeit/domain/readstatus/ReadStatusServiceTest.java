@@ -2,9 +2,6 @@ package com.sprint.mission.discodeit.domain.readstatus;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.sprint.mission.discodeit.domain.user.entity.Role;
-import com.sprint.mission.discodeit.testutil.AuthSupport;
-import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
@@ -19,6 +16,7 @@ import com.sprint.mission.discodeit.domain.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +54,6 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
     Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(savedUser.getId(),
         savedChannel.getId());
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     ReadStatusResult readStatusResult = readStatusService.create(readStatusCreateRequest);
@@ -152,7 +149,6 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
     Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
     Instant instant = Instant.parse("2025-05-17T14:00:00Z");
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatus.getId(),
@@ -181,7 +177,6 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
     User savedUser = userRepository.save(new User("", "", "", null));
     Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     readStatusService.delete(readStatus.getId());

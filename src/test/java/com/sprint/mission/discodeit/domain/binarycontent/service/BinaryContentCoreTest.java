@@ -4,7 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.sprint.mission.discodeit.common.s3.S3Manager;
+import com.sprint.mission.discodeit.common.s3.S3Adapter;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
@@ -32,7 +32,7 @@ class BinaryContentCoreTest extends IntegrationTestSupport {
   @Autowired
   private BinaryContentStorage binaryContentStorage;
   @MockitoBean
-  private S3Manager s3Manager;
+  private S3Adapter s3Adapter;
 
   @AfterEach
   void tearDown() {

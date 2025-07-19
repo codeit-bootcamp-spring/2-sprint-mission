@@ -59,6 +59,8 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:${JJWT_VERSION}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${JJWT_VERSION}"
     runtimeOnly "io.jsonwebtoken:jjwt-gson:${JJWT_VERSION}"
+
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 test {

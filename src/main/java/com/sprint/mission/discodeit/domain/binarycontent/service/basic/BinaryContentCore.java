@@ -42,7 +42,7 @@ public class BinaryContentCore {
     if (binaryContentRequests == null) {
       return null;
     }
-
+    // 로직 수정 필요
     List<BinaryContent> binaryContents = new ArrayList<>();
     for (BinaryContentRequest binaryContentRequest : binaryContentRequests) {
       BinaryContent savedBinaryContent = binaryContentRepository.save(
@@ -56,11 +56,16 @@ public class BinaryContentCore {
   }
 
   public void delete(UUID id) {
-    if (!binaryContentRepository.existsById(id)) {
-      throw new BinaryContentNotFoundException(Map.of("userId", id));
-    }
+    validateBinaryContentExist(id);
 
     binaryContentRepository.deleteById(id);
+  }
+
+  private void validateBinaryContentExist(UUID id) {
+    if (binaryContentRepository.existsById(id)) {
+      return;
+    }
+    throw new BinaryContentNotFoundException(Map.of());
   }
 
 }
