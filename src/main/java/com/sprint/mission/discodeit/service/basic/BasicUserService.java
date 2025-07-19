@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -26,6 +27,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +66,33 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            // 비동기 업로드 실행 (트랜잭션 커밋 이후)
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                // 성공시 상태 변경 -> SUCCESS 로
+                                .thenAccept(result -> {
+                                    binaryContentRepository.findById(result)
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.SUCCESS);
+                                            binaryContentRepository.save(content);
+                                        });
+                                })
+                                // 실패시 상태 변경 -> FAILED 로
+                                .exceptionally(e -> {
+                                    binaryContentRepository.findById(binaryContent.getId())
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.FAILED);
+                                            binaryContentRepository.save(content);
+                                        });
+                                    return null;
+                                });
+                        }
+                    });
                 return binaryContent;
             })
             .orElse(null);
@@ -136,7 +165,33 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            // 비동기로 업로드 수행
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                // 성공시 상태 변경 -> SUCCESS 로
+                                .thenAccept(result -> {
+                                    binaryContentRepository.findById(result)
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.SUCCESS);
+                                            binaryContentRepository.save(content);
+                                        });
+                                })
+                                // 실패시 상태 변경 -> FAILED 로
+                                .exceptionally(e -> {
+                                    binaryContentRepository.findById(binaryContent.getId())
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.FAILED);
+                                            binaryContentRepository.save(content);
+                                        });
+                                    return null;
+                                });
+                        }
+                    });
                 return binaryContent;
             })
             .orElse(null);

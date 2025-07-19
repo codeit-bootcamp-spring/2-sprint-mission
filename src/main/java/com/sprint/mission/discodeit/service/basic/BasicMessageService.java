@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -31,6 +32,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -67,7 +70,30 @@ public class BasicMessageService implements MessageService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                .thenAccept(result -> {
+                                    binaryContentRepository.findById(result)
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.SUCCESS);
+                                            binaryContentRepository.save(content);
+                                        });
+                                })
+                                .exceptionally(e -> {
+                                    binaryContentRepository.findById(binaryContent.getId())
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.FAILED);
+                                            binaryContentRepository.save(content);
+                                        });
+                                    return null;
+                                });
+                        }
+                    });
                 return binaryContent;
             })
             .toList();
