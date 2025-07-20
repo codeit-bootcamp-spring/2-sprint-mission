@@ -56,7 +56,16 @@ services:
             KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
             CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
 
+    redis:
+        image: redis:7.2-alpine
+        container_name: redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-data:/data
+        command: redis-server --appendonly yes
 
 volumes:
     db_data:
     binary_data:
+    redis-data:

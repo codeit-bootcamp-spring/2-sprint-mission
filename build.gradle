@@ -48,6 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.retry:spring-retry'
     implementation 'de.codecentric:spring-boot-admin-starter-client'
 
@@ -62,8 +63,6 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     implementation 'software.amazon.awssdk:s3:2.31.7'
-
-    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     implementation 'org.springframework.kafka:spring-kafka'
 

@@ -1,41 +1,38 @@
 package com.sprint.mission.discodeit.config;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import org.springframework.cache.CacheManager;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import java.time.Duration;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCache;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 @Configuration
 @EnableCaching
 public class CacheConfig {
 
     @Bean
-    public CacheManager cacheManager() {
-        CaffeineCache userCache = new CaffeineCache("users",
-            Caffeine.newBuilder()
-                .expireAfterWrite(15, TimeUnit.MINUTES)
-                .maximumSize(500)
-                .build());
+    public RedisCacheConfiguration redisCacheConfiguration(ObjectMapper objectMapper) {
+        ObjectMapper redisObjectMapper = objectMapper.copy();
+        redisObjectMapper.activateDefaultTyping(
+            LaissezFaireSubTypeValidator.instance,
+            DefaultTyping.EVERYTHING,
+            As.PROPERTY
+        );
 
-        CaffeineCache channelCache = new CaffeineCache("channels",
-            Caffeine.newBuilder()
-                .expireAfterWrite(15, TimeUnit.MINUTES)
-                .maximumSize(1000)
-                .build());
-
-        CaffeineCache notificationCache = new CaffeineCache("notifications",
-            Caffeine.newBuilder()
-                .expireAfterAccess(5, TimeUnit.MINUTES)
-                .maximumSize(50)
-                .build());
-
-        SimpleCacheManager manager = new SimpleCacheManager();
-        manager.setCaches(List.of(userCache, channelCache, notificationCache));
-        return manager;
+        return RedisCacheConfiguration.defaultCacheConfig()
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(
+                    new GenericJackson2JsonRedisSerializer(redisObjectMapper)
+                )
+            )
+            .prefixCacheNameWith("discodeit:")
+            .entryTtl(Duration.ofMinutes(15))
+            .disableCachingNullValues();
     }
 }
