@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.async.AsyncRepository;
 import com.sprint.mission.discodeit.async.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.event.NotificationAsyncFailedEvent;
 import com.sprint.mission.discodeit.exception.storage.BinaryStorageDownloadException;
 import com.sprint.mission.discodeit.exception.storage.BinaryStorageGetException;
 import com.sprint.mission.discodeit.exception.storage.BinaryStorageMakeDirException;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -43,13 +45,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private final AsyncRepository asyncRepository;
     private final Path root;
+    private final ApplicationEventPublisher eventPublisher;
 
     private LocalBinaryContentStorage(
         @Value("${discodeit.storage.local.root-path}") Path root,
-        AsyncRepository asyncRepository
+        AsyncRepository asyncRepository,
+        ApplicationEventPublisher eventPublisher
     ) {
         this.root = root;
         this.asyncRepository = asyncRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @PostConstruct
@@ -144,6 +149,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         );
 
         asyncRepository.save(AsyncTaskFailure);
+
+        eventPublisher.publishEvent(new NotificationAsyncFailedEvent(
+            taskName, UUID.fromString(requestId), e.getMessage()
+        ));
+
         return CompletableFuture.completedFuture(id);
     }
 }

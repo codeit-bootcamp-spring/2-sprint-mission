@@ -195,13 +195,14 @@ public class BasicUserService implements UserService {
 
         UUID userId = roleUpdateRequest.userId();
         Role newRole = roleUpdateRequest.newRole();
+        Role previousRole;
 
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
                 log.error("사용자 권한 수정 중 사용자를 찾을 수 없음: userId = {}", userId);
                 return UserNotFoundException.forId(userId.toString());
             });
-        Role previousRole = user.getRole();
+        previousRole = user.getRole();
 
         user.updateRole(newRole);
         userRepository.save(user);

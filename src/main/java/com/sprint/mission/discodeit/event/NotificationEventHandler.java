@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.event;
 import com.sprint.mission.discodeit.constant.NotificationType;
 import com.sprint.mission.discodeit.constant.Role;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.event.NotificationAsyncFailedEvent;
 import com.sprint.mission.discodeit.dto.event.NotificationNewMessageEvent;
 import com.sprint.mission.discodeit.dto.event.NotificationRoleUpdateEvent;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
@@ -113,6 +115,42 @@ public class NotificationEventHandler {
             log.info("사용자 권한 변경 알람 비동기 처리 완료: userId = {}", event.userDto().id());
         } catch (Exception e) {
             log.error("사용자 권한 변경 알람 비동기 처리 실패: error = {}", e.getMessage());
+        }
+    }
+
+    @Async("notificationExecutor")
+    @Retryable(
+        value = { Exception.class },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 1000)
+    )
+    @TransactionalEventListener(
+        phase = TransactionPhase.AFTER_COMMIT
+    )
+    public void handleAsyncFailed(NotificationAsyncFailedEvent event) {
+        try {
+            log.info("비동기 작업 실패 알람 처리 시작: requestId = {}, taskName = {}, failureReason = {}",
+                event.requestId(), event.taskName(), event.failureReason());
+
+            UUID requestId = event.requestId();
+            String title = String.format("비동기 작업 실패");
+            String content = String.format("요청 ID: %s\n작업 이름: %s\n실패 사유: %s",
+                event.requestId(), event.taskName(), event.failureReason());
+            NotificationType type = NotificationType.ASYNC_FAILED;
+
+            NotificationCreateDto notificationCreateDto = new NotificationCreateDto(
+                requestId,
+                title,
+                content,
+                type,
+                null
+            );
+
+            notificationService.createNotification(notificationCreateDto);
+            log.info("비동기 작업 실패 알람 처리 완료: requestId = {}, taskName = {}, failureReason = {}",
+                event.requestId(), event.taskName(), event.failureReason());
+        } catch (Exception e) {
+            log.info("비동기 작업 실패 알람 처리 실패: error = {}", e.getMessage());
         }
     }
 }
