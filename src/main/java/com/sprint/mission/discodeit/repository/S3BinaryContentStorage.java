@@ -1,7 +1,6 @@
 //package com.sprint.mission.discodeit.repository;
 //
 //import com.sprint.mission.discodeit.entity.BinaryContent;
-//import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
 //import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 //import java.io.InputStream;
 //import java.net.URI;
@@ -22,10 +21,17 @@
 //import software.amazon.awssdk.services.s3.model.S3Exception;
 //import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 //import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+//import org.springframework.context.annotation.Profile;
+//import com.sprint.mission.discodeit.s3.S3Uploader;
+//import java.io.File;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.context.annotation.Profile;
+//import org.springframework.stereotype.Repository;
 //
 //@Slf4j
 //@Repository
 //@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
+//@Profile("!local")
 //public class S3BinaryContentStorage implements BinaryContentStorage {
 //
 //    private final S3Client s3Client;
@@ -138,4 +144,3 @@
 //
 //
 //}
-//
