@@ -48,11 +48,17 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     if (Files.exists(filePath)) {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
     }
-    try (OutputStream outputStream = Files.newOutputStream(filePath)) {
-      outputStream.write(bytes);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+
+    try {
+      Thread.sleep(3000);
+        try (OutputStream outputStream = Files.newOutputStream(filePath)) {
+          outputStream.write(bytes);
+        }
+    } catch (IOException | InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(e);
     }
+
     return binaryContentId;
   }
 

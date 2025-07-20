@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.readstatus.DuplicateReadStatusException;
 import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
@@ -105,5 +107,13 @@ public class BasicReadStatusService implements ReadStatusService {
     }
     readStatusRepository.deleteById(readStatusId);
     log.info("읽음 상태 삭제 완료: id={}", readStatusId);
+  }
+
+  @Transactional
+  @Override
+  public void updateNotificationSetting(UUID channelId, UUID userId, boolean enabled) {
+    ReadStatus status = readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.READ_STATUS_NOT_FOUND));
+    status.setNotificationEnabled(enabled);
   }
 }
