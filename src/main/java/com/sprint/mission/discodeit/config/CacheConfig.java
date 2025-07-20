@@ -28,14 +28,14 @@ public class CacheConfig {
                 .maximumSize(1000)
                 .build());
 
-        CaffeineCache productCache = new CaffeineCache("notifications",
+        CaffeineCache notificationCache = new CaffeineCache("notifications",
             Caffeine.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .maximumSize(50)
                 .build());
 
         SimpleCacheManager manager = new SimpleCacheManager();
-        manager.setCaches(List.of(userCache, productCache));
+        manager.setCaches(List.of(userCache, channelCache, notificationCache));
         return manager;
     }
 }

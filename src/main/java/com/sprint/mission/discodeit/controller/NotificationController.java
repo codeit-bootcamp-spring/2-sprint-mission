@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.notification.NotificationDto;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.List;
 import java.util.UUID;
@@ -24,9 +25,9 @@ public class NotificationController {
 
     @GetMapping()
     public ResponseEntity<List<NotificationDto>> findAllByReceiverId(
-        @AuthenticationPrincipal Authentication auth
+        @AuthenticationPrincipal DiscodeitUserDetails principal
     ) {
-        List<NotificationDto> notificationDtos = notificationService.readNotifications(auth);
+        List<NotificationDto> notificationDtos = notificationService.readNotifications(principal);
         return ResponseEntity.ok(notificationDtos);
     }
 

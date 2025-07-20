@@ -69,10 +69,9 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "notifications", key = "#auth.principal.userId")
-    public List<NotificationDto> readNotifications(Authentication auth) {
-        DiscodeitUserDetails userDetails = (DiscodeitUserDetails) auth.getPrincipal();
-        UUID userId = userDetails.getUserId();
+    @Cacheable(value = "notifications", key = "#principal.getUserId()")
+    public List<NotificationDto> readNotifications(DiscodeitUserDetails principal) {
+        UUID userId = principal.getUserId();
 
         List<Notification> notifications = notificationRepository.findByReceiverId(userId);
 
