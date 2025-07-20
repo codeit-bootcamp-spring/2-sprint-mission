@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit.service.async;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
@@ -25,6 +28,7 @@ public class BinaryContentAsyncService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @Async("asyncExecutor")
     @Retryable(
@@ -51,6 +55,14 @@ public class BinaryContentAsyncService {
             .orElseThrow(() -> new DiscodeitException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
 
         binaryContent.setUploadStatus(BinaryContentUploadStatus.FAILED);
+
+        notificationEventPublisher.publish(new NotificationEvent(
+            binaryContent.getUploader().getId(),
+            "첨부파일 업로드에 실패했습니다",
+            binaryContent.getFileName() + " 업로드 실패",
+            NotificationType.ASYNC_FAILED,
+            null
+        ));
 
         String requestId = MDC.get("requestId");
         asyncTaskFailureRepository.save(

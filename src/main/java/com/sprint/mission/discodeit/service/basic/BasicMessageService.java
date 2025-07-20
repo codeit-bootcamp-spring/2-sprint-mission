@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -48,6 +50,8 @@ public class BasicMessageService implements MessageService {
     private final PageResponseMapper pageResponseMapper;
 
     private final BinaryContentAsyncService binaryContentAsyncService;
+    private final ReadStatusRepository readStatusRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @Transactional
     @Override
@@ -87,7 +91,8 @@ public class BasicMessageService implements MessageService {
                     new TransactionSynchronization() {
                         @Override
                         public void afterCommit() {
-                            binaryContentAsyncService.uploadFile(binaryContent.getId(), request.bytes());
+                            binaryContentAsyncService.uploadFile(binaryContent.getId(),
+                                request.bytes());
                         }
                     }
                 );
@@ -104,6 +109,20 @@ public class BasicMessageService implements MessageService {
         messageRepository.save(message);
 
         log.info("Message created successfully: id = {}", message.getId());
+
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelIdWithUser(channelId);
+        for (ReadStatus readStatus : readStatuses) {
+            if (readStatus.isNotificationEnabled() && !readStatus.getUser().getId()
+                .equals(author.getId())) {
+                notificationEventPublisher.publish(new NotificationEvent(
+                    readStatus.getUser().getId(),
+                    "[" + channel.getName() + "]에 새로운 메시지가 도착했습니다.",
+                    content,
+                    NotificationType.NEW_MESSAGE,
+                    channelId
+                ));
+            }
+        }
 
         return messageMapper.toDto(message);
     }

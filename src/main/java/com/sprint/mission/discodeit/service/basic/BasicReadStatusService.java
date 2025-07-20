@@ -76,7 +76,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest dto) {
         Instant newReadAt = dto.newLastReadAt();
         ReadStatus readStatus = getReadStatus(readStatusId);
-        readStatus.updateReadAt(newReadAt);
+        readStatus.update(newReadAt,dto.newNotificationEnabled());
 
         return readStatusMapper.toDto(readStatus);
     }
