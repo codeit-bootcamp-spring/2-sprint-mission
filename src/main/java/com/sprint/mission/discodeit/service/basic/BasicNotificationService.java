@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "notificationList", key = "#userId")
     public List<NotificationDto> getNotifications(UUID userId) {
         return notificationRepository.findByReceiverIdOrderByCreatedAtDesc(userId).stream()
             .map(notificationMapper::toDto)

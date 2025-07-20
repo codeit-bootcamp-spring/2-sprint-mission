@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,6 +111,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
+    @Cacheable(cacheNames = "userList")
     public List<UserDto> findAll() {
         log.debug("모든 사용자 조회 시작");
         Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()

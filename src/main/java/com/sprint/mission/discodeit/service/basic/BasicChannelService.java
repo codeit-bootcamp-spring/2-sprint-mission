@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,6 +72,7 @@ public class BasicChannelService implements ChannelService {
 
     @Transactional(readOnly = true)
     @Override
+    @Cacheable(cacheNames = "channelList", key = "#userId")
     public List<ChannelDto> findAllChannelsByUserId(UUID userId) {
         List<UUID> subscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
                 .map(readStatus -> readStatus.getChannel().getId())
