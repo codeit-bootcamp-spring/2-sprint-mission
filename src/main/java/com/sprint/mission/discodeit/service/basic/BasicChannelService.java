@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.NotificationUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -224,5 +225,18 @@ public class BasicChannelService implements ChannelService {
         return publicChannels.stream()
                 .map(channelMapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @Transactional
+    @Override
+    public void updateNotificationSetting(UUID channelId, User user, NotificationUpdateRequest request) {
+        Channel channel = findChannelByIdOrThrow(channelId);
+        ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(user.getId(), channel.getId())
+                .orElseThrow(() -> new ChannelException(ErrorCode.READ_STATUS_NOT_FOUND));
+
+        if (readStatus.updateNotificationEnabled(request.notificationEnabled())) {
+            readStatusRepository.save(readStatus);
+        }
     }
 }

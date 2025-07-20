@@ -26,4 +26,5 @@ public interface UserService {
 
     boolean isUserOnline(User user);
 
+    void updateRole(UUID userId, RoleUpdateRequest request);
 }

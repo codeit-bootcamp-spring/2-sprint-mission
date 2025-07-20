@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.NotificationEvent;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateWithFileRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateWithFileRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.file.FileException;
@@ -25,6 +29,9 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -51,6 +58,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -64,7 +72,6 @@ public class BasicUserService implements UserService {
 
         String encodedPassword = passwordEncoder.encode(userCreateRequest.password());
 
-        // 프로필 이미지가 있으면 먼저 처리
         BinaryContent profile = null;
         if (profileImageFile != null && !profileImageFile.isEmpty()) {
             try {
@@ -74,9 +81,12 @@ public class BasicUserService implements UserService {
             }
         }
 
-        // User를 프로필과 함께 생성/저장
-        User user = User.builder().username(username).email(email).password(encodedPassword)
-                .profile(profile).role(Role.ROLE_USER).build();
+        User user = User.builder()
+                .username(username)
+                .email(email)
+                .password(encodedPassword)
+                .profile(profile)
+                .role(Role.ROLE_USER).build();
 
         User savedUser = userRepository.save(user);
 
@@ -85,13 +95,30 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(savedUser, isOnline);
     }
 
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void updateRole(UUID userId, RoleUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        user.updateRole(request.newRole());
+        userRepository.save(user);
+
+        eventPublisher.publishEvent(new NotificationEvent(
+                userId,
+                NotificationType.ROLE_CHANGED,
+                userId,
+                "당신의 역할이 " + request.newRole().name() + " (으)로 변경되었습니다."
+        ));
+    }
+
     private BinaryContent processProfileImage(MultipartFile profileImageFile) {
         if (profileImageFile == null || profileImageFile.isEmpty()) {
             log.warn("프로필 이미지 파일이 null이거나 비어있음");
             return null;
         }
 
-        BinaryContentDto profileDto = null;
+        BinaryContentDto profileDto;
         try {
             profileDto = binaryContentService.create(profileImageFile);
         } catch (Exception e) {
@@ -104,12 +131,19 @@ public class BasicUserService implements UserService {
             return null;
         }
 
-        BinaryContent result = null;
+        BinaryContent result;
         try {
             result = binaryContentRepository.findById(profileDto.id()).orElse(null);
             if (result == null) {
                 log.error("데이터베이스에서 BinaryContent를 찾을 수 없음 - ID: {}", profileDto.id());
+                return null;
             }
+
+            // 업로드 상태 확인
+            if (result.getUploadStatus() != BinaryContentUploadStatus.SUCCESS) {
+                return null;
+            }
+
         } catch (Exception e) {
             log.error("데이터베이스 조회 중 오류 발생 - ID: {}", profileDto.id(), e);
             return null;
@@ -118,6 +152,7 @@ public class BasicUserService implements UserService {
         return result;
     }
 
+    @Cacheable(value = "user", key = "#userId")
     @PreAuthorize("hasRole('USER')")
     @Transactional(readOnly = true)
     @Override
@@ -126,10 +161,6 @@ public class BasicUserService implements UserService {
         User user = userRepository.findByIdWithProfile(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (user.getProfile() != null) {
-            log.info("🔍 프로필 정보 - ID: {}, 파일명: {}, 크기: {}", user.getProfile().getId(),
-                    user.getProfile().getFileName(), user.getProfile().getSize());
-        }
 
         boolean isOnline = isUserOnline(user);
         UserDto result = userMapper.toDto(user, isOnline);
@@ -139,6 +170,7 @@ public class BasicUserService implements UserService {
         return result;
     }
 
+    @Cacheable("users")
     @PreAuthorize("hasRole('USER')")
     @Transactional(readOnly = true)
     @Override
@@ -159,6 +191,7 @@ public class BasicUserService implements UserService {
     }
 
 
+    @CacheEvict(value = {"user", "users"}, allEntries = true, key = "#userId")
     @PreAuthorize("authentication.principal.user.id == #userId or hasRole('ADMIN')")
     @Transactional
     @Override
@@ -173,47 +206,35 @@ public class BasicUserService implements UserService {
             throw new UserOperationRestrictedException();
         }
 
-        String username = userUpdateRequest.username();
-        String email = userUpdateRequest.email();
+        String newUsername = userUpdateRequest.username();
+        String newEmail = userUpdateRequest.email();
+        String newPassword = userUpdateRequest.password() != null && !userUpdateRequest.password().isEmpty()
+                ? passwordEncoder.encode(userUpdateRequest.password()) : null;
 
-        if (username != null && !username.isEmpty() && !user.getUsername().equals(username)) {
-            if (userRepository.existsByUsername(username)) {
+
+        if (newUsername != null && !newUsername.isEmpty() && !user.getUsername().equals(newUsername)) {
+            if (userRepository.existsByUsername(newUsername)) {
                 throw new UserAlreadyExistException();
             }
-            user.setUsername(username);
         }
 
-        if (email != null && !email.isEmpty() && !user.getEmail().equals(email)) {
-            if (userRepository.existsByEmail(email)) {
+        if (newEmail != null && !newEmail.isEmpty() && !user.getEmail().equals(newEmail)) {
+            if (userRepository.existsByEmail(newEmail)) {
                 throw new UserAlreadyExistException();
             }
-            user.setEmail(email);
         }
 
-        if (userUpdateRequest.password() != null && !userUpdateRequest.password().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(userUpdateRequest.password());
-            user.setPassword(encodedPassword);
-        }
-
-        BinaryContent oldProfile = user.getProfile();
+        user.update(newUsername, newEmail, newPassword);
 
         if (profileRequest.isPresent()) {
             MultipartFile profileFile = profileRequest.get();
-
             try {
                 BinaryContent newProfile = processProfileImage(profileFile);
-
                 if (newProfile != null) {
-                    if (oldProfile != null) {
-                        log.info("기존 프로필 제거");
-                    }
                     user.setProfile(newProfile);
-
-                } else {
-                    log.error(" 프로필 이미지 처리 실패");
                 }
-            } catch (FileProcessingCustomException e) {
-                throw new FileProcessingCustomException();
+            } catch (Exception e) {
+                log.error("프로필 이미지 처리 중 오류 발생", e);
             }
         }
 
@@ -225,6 +246,7 @@ public class BasicUserService implements UserService {
     }
 
 
+    @CacheEvict(value = {"user", "users"}, allEntries = true, key = "#userId")
     @PreAuthorize("authentication.principal.user.id == #userId or hasRole('ADMIN')")
     @Transactional
     @Override
@@ -240,7 +262,7 @@ public class BasicUserService implements UserService {
         List<Message> messagesToUpdate = messageRepository.findByAuthorId(userId);
         if (!messagesToUpdate.isEmpty()) {
             for (Message message : messagesToUpdate) {
-                message.setAuthor(null);
+                message.removeAuthor();
             }
             messageRepository.saveAll(messagesToUpdate);
         } else {
