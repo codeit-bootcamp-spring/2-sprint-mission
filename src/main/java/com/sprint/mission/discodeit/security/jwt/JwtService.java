@@ -4,15 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,8 +74,8 @@ public class JwtService {
         try {
             return Jwts.builder()
                     .claim("userDto", objectMapper.writeValueAsString(userDto))
-                    .issuedAt(Date.from(now))
-                    .expiration(Date.from(now.plusMillis(expiration)))
+                    .setIssuedAt(Date.from(now))
+                    .setExpiration(Date.from(now.plusMillis(expiration)))
                     .signWith(secretKey)
                     .compact();
         } catch (JsonProcessingException e) {
@@ -95,7 +94,7 @@ public class JwtService {
         }
 
         try {
-            JwtParser parser = Jwts.parser().setSigningKey(secretKey).build();
+            JwtParser parser = Jwts.parserBuilder().setSigningKey(secretKey).build();
             Claims claims = parser.parseClaimsJws(token).getBody();
             return Optional.of(claims);
         } catch (Exception e) {
@@ -114,33 +113,33 @@ public class JwtService {
     }
 
     @Transactional
-    public Optional<JwtToken> refreshAccessToken(String refreshToken) {
-        if (!StringUtils.hasText(refreshToken)) {
-            return Optional.empty();
+    public JwtToken refreshAccessToken(String refreshToken) {
+        if (!StringUtils.hasText(refreshToken) || validateToken(refreshToken).isEmpty()) {
+            throw new DiscodeitException(ErrorCode.INVALID_TOKEN);
         }
 
-        return jwtSessionRepository.findByRefreshToken(refreshToken)
-                .flatMap(session -> validateToken(refreshToken)
-                        .map(claims -> {
-                            try {
-                                String userDtoStr = claims.get("userDto", String.class);
-                                UserDto userDto = objectMapper.readValue(userDtoStr, UserDto.class);
+        JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new DiscodeitException(ErrorCode.INVALID_TOKEN));
 
-                                String newAccessToken = generateToken(userDto, ACCESS_TOKEN_EXPIRATION);
-                                String newRefreshToken = generateToken(userDto, REFRESH_TOKEN_EXPIRATION);
+        try {
+            Claims claims = validateToken(refreshToken)
+                    .orElseThrow(() -> new DiscodeitException(ErrorCode.INVALID_TOKEN));
 
-                                // 기존 엑세스 토큰을 블랙리스트에 추가
-                                addTokenToBlacklist(session.getAccessToken());
+            String userDtoStr = claims.get("userDto", String.class);
+            UserDto userDto = objectMapper.readValue(userDtoStr, UserDto.class);
 
-                                session.updateTokens(newAccessToken, newRefreshToken);
-                                jwtSessionRepository.save(session);
+            String newAccessToken = generateToken(userDto, ACCESS_TOKEN_EXPIRATION);
+            String newRefreshToken = generateToken(userDto, REFRESH_TOKEN_EXPIRATION);
 
-                                return new JwtToken(newAccessToken, newRefreshToken);
-                            } catch (JsonProcessingException e) {
-                                throw new RuntimeException("사용자 정보 처리 실패", e);
-                            }
-                        })
-                );
+            addTokenToBlacklist(session.getAccessToken());
+
+            session.updateTokens(newAccessToken, newRefreshToken);
+            jwtSessionRepository.save(session);
+
+            return new JwtToken(newAccessToken, newRefreshToken);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("사용자 정보 처리 실패", e);
+        }
     }
 
     @Transactional
