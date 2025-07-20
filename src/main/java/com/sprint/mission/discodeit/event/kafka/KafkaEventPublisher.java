@@ -22,7 +22,7 @@ public class KafkaEventPublisher {
     log.info("Spring Event 수신 -> Kafka 발행: receiverId={}, type={}", event.receiverId(),
         event.notificationType());
     try {
-      String jsonPayload = objectMapper.writeValueAsString(event); // 이 부분이 추가/변경
+      String jsonPayload = objectMapper.writeValueAsString(event);
       kafkaTemplate.send(TOPIC_NOTIFICATION, jsonPayload); // String으로 전송
     } catch (Exception e) {
       log.error("Kafka 메시지 발행 실패. event: {}, error: {}", event, e.getMessage());
