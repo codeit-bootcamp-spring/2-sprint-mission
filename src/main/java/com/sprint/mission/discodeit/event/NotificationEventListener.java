@@ -17,14 +17,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -41,7 +39,7 @@ public class NotificationEventListener {
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @KafkaListener(topics = "new-message")
   public void handleCreateMessageEvent(NewMessageEvent event) {
     try {
       MessageDto messageDto = event.messageDto();
@@ -75,7 +73,7 @@ public class NotificationEventListener {
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @KafkaListener(topics = "role-changed")
   public void handleUpdateRoleEvent(RoleChangedEvent event) {
     try {
       UserDto userDto = event.userDto();
@@ -98,7 +96,7 @@ public class NotificationEventListener {
       maxAttempts = 3,
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  @EventListener
+  @KafkaListener(topics = "async-failure")
   public void handleAsyncFailureEvent(AsyncFailureEvent event) {
     try {
       AsyncTaskFailure asyncTaskFailure = event.failure();
