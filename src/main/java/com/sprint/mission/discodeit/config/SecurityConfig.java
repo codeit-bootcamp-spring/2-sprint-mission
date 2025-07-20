@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.filter.LoginFilter;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -32,10 +38,11 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final UserMapper userMapper;
     private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
 
     @Bean
     public LoginFilter loginFilter(AuthenticationManager authManager) {
-        return new LoginFilter(authManager, jwtService, userMapper);
+        return new LoginFilter(authManager, jwtService, userMapper, userRepository);
     }
 
     @Bean
@@ -48,7 +55,9 @@ public class SecurityConfig {
         return http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                )
                 .sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(EndpointMatchers.getPublicEndpoints()).permitAll()
@@ -69,7 +78,11 @@ public class SecurityConfig {
     @Bean
     public RoleHierarchy roleHierarchy() {
         RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy("ROLE_ADMIN > ROLE_CHANNEL_MANAGER \n ROLE_CHANNEL_MANAGER > ROLE_USER");
+        String hierarchy = Arrays.stream(Role.values())
+                .sorted(Comparator.comparingInt(Role::getHierarchy))
+                .map(Role::name)
+                .collect(Collectors.joining(" > "));
+        RoleHierarchyImpl.fromHierarchy(hierarchy);
         return roleHierarchy;
     }
 
