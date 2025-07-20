@@ -3,12 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.Message;
+import com.sprint.mission.discodeit.domain.NotificationType;
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -17,15 +20,18 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,8 +48,10 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final ReadStatusRepository readStatusRepository;
   private final MessageMapper messageMapper;
   private final PageResponseMapper pageResponseMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   @Override
@@ -74,6 +82,25 @@ public class BasicMessageService implements MessageService {
 
     Message message = Message.create(author, channel, content, attachments);
     Message createdMessage = messageRepository.save(message);
+
+    List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+
+    readStatuses.stream()
+        .filter(ReadStatus::isNotificationEnabled) // 알림 활성화 여부 확인
+        .map(ReadStatus::getUser) // ReadStatus에서 User 객체 가져오기
+        .filter(user -> !user.getId().equals(authorId)) // 메시지 작성자는 제외
+        .forEach(user -> {
+          eventPublisher.publishEvent(new NotificationEvent(
+              user.getId(), // 수신자 ID
+              NotificationType.NEW_MESSAGE,
+              channelId,
+              Map.of(
+                  "authorName", author.getUsername(),
+                  "message", content
+              )
+          ));
+        });
+
     return messageMapper.toDto(createdMessage);
   }
 
