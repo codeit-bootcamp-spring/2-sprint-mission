@@ -17,25 +17,33 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "channel_id", nullable = false)
-    private Channel channel;
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-    @Column(name = "last_read_at", nullable = false)
-    private Instant lastReadTime;
+  @Column(name = "last_read_at", nullable = false)
+  private Instant lastReadTime;
 
-    public ReadStatus(User user, Channel channel) {
-        this.user = user;
-        this.channel = channel;
-        this.lastReadTime = ZonedDateTime.now().toInstant();
-    }
+  @Column(name = "notification_enabled", nullable = false)
+  private boolean notificationEnabled;
 
-    public void updateLastReadTime(Instant time) {
-        this.lastReadTime = time;
-    }
+  public ReadStatus(User user, Channel channel) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadTime = ZonedDateTime.now().toInstant();
+    this.notificationEnabled = createNotificationEnabled(channel);
+  }
+
+  public void updateLastReadTime(Instant time) {
+    this.lastReadTime = time;
+  }
+
+  private boolean createNotificationEnabled(Channel channel) {
+    return channel.isPublic();
+  }
 
 }

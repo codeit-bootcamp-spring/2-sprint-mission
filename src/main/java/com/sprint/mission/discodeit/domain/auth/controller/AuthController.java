@@ -15,6 +15,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,7 +45,7 @@ public class AuthController {
 
   @PutMapping("/role")
   public ResponseEntity<UserResult> updateRole(
-      RoleUpdateRequest roleUpdateRequest
+      @RequestBody RoleUpdateRequest roleUpdateRequest
   ) {
     UserResult userResult = authService.updateRole(roleUpdateRequest);
 
