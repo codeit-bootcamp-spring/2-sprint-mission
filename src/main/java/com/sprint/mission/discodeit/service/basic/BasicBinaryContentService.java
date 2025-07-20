@@ -1,19 +1,35 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
+import com.sprint.mission.discodeit.dto.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.event.AsyncFailedNotificationEvent;
+import com.sprint.mission.discodeit.service.event.FileUploadEvent;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,27 +39,76 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   @Override
-  public BinaryContentDto create(BinaryContentCreateRequest request) {
-    log.debug("바이너리 컨텐츠 생성 시작: fileName={}, size={}, contentType={}", 
-        request.fileName(), request.bytes().length, request.contentType());
+  public BinaryContent create(BinaryContentCreateRequest request) {
+    log.debug("바이너리 컨텐츠 생성 및 이벤트 발행 시작");
 
-    String fileName = request.fileName();
-    byte[] bytes = request.bytes();
-    String contentType = request.contentType();
     BinaryContent binaryContent = new BinaryContent(
-        fileName,
-        (long) bytes.length,
-        contentType
+        request.fileName(),
+        (long) request.bytes().length,
+        request.contentType()
     );
     binaryContentRepository.save(binaryContent);
-    binaryContentStorage.put(binaryContent.getId(), bytes);
 
-    log.info("바이너리 컨텐츠 생성 완료: id={}, fileName={}, size={}", 
-        binaryContent.getId(), fileName, bytes.length);
-    return binaryContentMapper.toDto(binaryContent);
+    // DB 트랜잭션이 성공적으로 commit된 후에 실행될 이벤트를 발행!
+    eventPublisher.publishEvent(new FileUploadEvent(binaryContent.getId(), request.bytes()));
+
+    log.info("바이너리 컨텐츠 생성 및 업로드 이벤트 발행 완료: id={}", binaryContent.getId());
+    return binaryContent;
+  }
+
+  // uploadAsync 메서드는 이벤트 리스너로 대체되었으므로 삭제합니다.
+  // public void uploadAsync(...) {}
+
+  @Async("fileUploadTaskExecutor")
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @Retryable(
+      value = { IOException.class, RuntimeException.class },
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 2000)
+  )
+  @Transactional(propagation = Propagation.REQUIRES_NEW) // 상태 업데이트를 위한 새로운 트랜잭션
+  public void handleFileUpload(FileUploadEvent event) {
+    UUID binaryContentId = event.binaryContentId();
+    log.info("파일 업로드 이벤트 수신 (비동기 처리 시작): id={}", binaryContentId);
+
+    // 실제 파일 저장
+    binaryContentStorage.put(binaryContentId, event.bytes());
+
+    // 성공 시 상태 업데이트
+    BinaryContent content = binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> BinaryContentNotFoundException.withId(binaryContentId));
+    content.changeStatusToSuccess();
+    log.info("비동기 파일 업로드 성공 및 상태 SUCCESS로 업데이트: id={}", binaryContentId);
+  }
+
+  @Recover
+  @Transactional(propagation = Propagation.REQUIRES_NEW) // 상태 업데이트를 위한 새로운 트랜잭션
+  public void recoverUploadFailure(Throwable e, FileUploadEvent event) {
+    UUID binaryContentId = event.binaryContentId();
+    String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
+    AsyncTaskFailure failureInfo = new AsyncTaskFailure("file-upload", requestId, e.getMessage());
+    log.error("파일 업로드 최종 실패. 복구 로직 실행. 실패 정보: {}", failureInfo, e);
+
+    // 실패 시 상태 업데이트
+    binaryContentRepository.findById(binaryContentId).ifPresent(content -> {
+      content.changeStatusToFailed();
+      log.info("파일 업로드 실패 상태 FAILED로 업데이트: id={}", binaryContentId);
+    });
+
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof DiscodeitUserDetails userDetails) {
+      UUID userId = userDetails.getUserDto().id();
+
+      // 알림 이벤트 발행
+      eventPublisher.publishEvent(
+          new AsyncFailedNotificationEvent(userId, "파일 업로드", e.getMessage())
+      );
+      log.info("{} 사용자에게 비동기 작업 실패 알림 이벤트 발행", userId);
+    }
   }
 
   @Override
@@ -52,7 +117,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     BinaryContentDto dto = binaryContentRepository.findById(binaryContentId)
         .map(binaryContentMapper::toDto)
         .orElseThrow(() -> BinaryContentNotFoundException.withId(binaryContentId));
-    log.info("바이너리 컨텐츠 조회 완료: id={}, fileName={}", 
+    log.info("바이너리 컨텐츠 조회 완료: id={}, fileName={}",
         dto.id(), dto.fileName());
     return dto;
   }
