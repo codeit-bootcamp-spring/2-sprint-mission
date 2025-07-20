@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -32,11 +33,14 @@ import org.springframework.stereotype.Component;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
+  private final ApplicationEventPublisher eventPublisher;
 
   public LocalBinaryContentStorage(
-      @Value("${discodeit.storage.local.root-path}") Path root
+      @Value("${discodeit.storage.local.root-path}") Path root,
+      ApplicationEventPublisher eventPublisher
   ) {
     this.root = root;
+    this.eventPublisher = eventPublisher;
   }
 
   @PostConstruct
@@ -85,7 +89,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     return null;
   }
-  
+
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {

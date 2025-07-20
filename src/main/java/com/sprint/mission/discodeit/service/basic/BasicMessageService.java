@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -28,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,6 +51,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Timed(value = "message.create.time", description = "Message creation execution time")
   @Transactional
@@ -86,6 +90,16 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
+
+    NotificationEvent event = new NotificationEvent(
+        author.getId(),
+        NotificationType.NEW_MESSAGE,
+        "새 메시지 도착",
+        "메시지가 채팅방에 등록되었습니다.",
+        channel.getId()
+    );
+    eventPublisher.publishEvent(event);
+
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
     return messageMapper.toDto(message);
   }
