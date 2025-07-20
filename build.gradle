@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.sprint.mission'
-version = '2.2-M10'
+version = '2.3-M11'
 
 
 java {
@@ -34,6 +34,13 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'software.amazon.awssdk:s3:2.31.7'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    //implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -1,3 +1,13 @@
+DROP TABLE IF EXISTS jwt_sessions;
+DROP TABLE IF EXISTS async_task_failures;
+DROP TABLE IF EXISTS message_attachments;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS read_statuses;
+DROP TABLE IF EXISTS channels;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS binary_contents;
+
 -- 테이블
 -- User
 CREATE TABLE users
@@ -25,14 +35,26 @@ CREATE TABLE jwt_sessions
     expires_at    timestamp with time zone NOT NULL
 );
 
+
+-- AsyncTaskFailure
+CREATE TABLE async_task_failures
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    task_name      varchar(255)             NOT NULL,
+    request_id     varchar(255)             NOT NULL,
+    failure_reason varchar(1000)            NOT NULL
+);
+
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(100)
 --     ,bytes        bytea        NOT NULL
 );
 
@@ -58,6 +80,19 @@ CREATE TABLE messages
     author_id  uuid
 );
 
+-- Notification
+CREATE TABLE notifications
+(
+    id         uuid PRIMARY KEY,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
+    user_id    uuid                     NOT NULL,
+    title      varchar(255)             NOT NULL,
+    content    varchar(255)             NOT NULL,
+    type       varchar(20)              NOT NULL,
+    target_id  uuid
+);
+
 -- Message.attachments
 CREATE TABLE message_attachments
 (
@@ -75,9 +110,9 @@ CREATE TABLE read_statuses
     user_id      uuid                     NOT NULL,
     channel_id   uuid                     NOT NULL,
     last_read_at timestamp with time zone NOT NULL,
+    notification_enabled boolean,
     UNIQUE (user_id, channel_id)
 );
-
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
@@ -120,4 +155,11 @@ ALTER TABLE read_statuses
     ADD CONSTRAINT fk_read_status_channel
         FOREIGN KEY (channel_id)
             REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+-- Notification (N) -> User (1)
+ALTER TABLE notifications
+    ADD CONSTRAINT fk_notification_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
             ON DELETE CASCADE;
