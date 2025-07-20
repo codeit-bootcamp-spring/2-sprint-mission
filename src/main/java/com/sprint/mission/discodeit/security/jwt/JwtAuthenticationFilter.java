@@ -34,38 +34,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (header == null || !header.startsWith("Bearer ")) {
-            if (isPermitAllPath(request)) {
+        if (header != null && header.startsWith("Bearer ") && !isPermitAllPath(request)) {
+            String token = header.replace("Bearer ", "");
+
+            try {
+                SignedJWT signedJWT = SignedJWT.parse(token);
+                JwtObject jwtObject = JwtObject.toJwtObject(signedJWT);
+
+                if (!jwtService.validateToken(token)) {
+                    jwtService.invalidateJwtSession(token);
+                    handleUnauthorized(response, token, "Invalid JWT");
+                    return;
+                }
+
+                UserDto userDto = jwtObject.userDto();
+                DiscodeitUserDetails userDetails = new DiscodeitUserDetails(userDto, null);
+                UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
                 filterChain.doFilter(request, response);
-                return;
+
+            } catch (Exception e) {
+                handleUnauthorized(response, token, "JWT 처리 실패: " + e.getMessage());
             }
-
-            handleUnauthorized(response, "", "Authorization 헤더가 없거나 형식이 잘못되었습니다.");
-            return;
-        }
-
-        String token = header.replace("Bearer ", "");
-
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            JwtObject jwtObject = JwtObject.toJwtObject(signedJWT);
-
-            if(!jwtService.validateToken(token)) {
-                jwtService.invalidateJwtSession(token);
-                handleUnauthorized(response, token, "Invalid JWT");
-                return;
-            }
-
-            UserDto userDto = jwtObject.userDto();
-            DiscodeitUserDetails userDetails = new DiscodeitUserDetails(userDto, null);
-            UsernamePasswordAuthenticationToken auth =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        } else {
             filterChain.doFilter(request, response);
-
-        } catch (Exception e) {
-            handleUnauthorized(response, token, "JWT 처리 실패: " + e.getMessage());
         }
     }
 
