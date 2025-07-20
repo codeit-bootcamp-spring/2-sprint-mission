@@ -31,6 +31,19 @@ public class AsyncConfig {
         return executor;
     }
 
+    @Bean(name = "eventTaskExecutor")
+    public TaskExecutor eventTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(8);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("NotificationEvent-");
+        executor.setTaskDecorator(new CompositeTaskDecorator(
+            List.of(mdcTaskDecorator(), securityContextTaskDecorator())));
+        executor.initialize();
+        return executor;
+    }
+
     public TaskDecorator mdcTaskDecorator() {
         return runnable -> {
             // 현재 스레드 MDC에서 requestId 꺼냄

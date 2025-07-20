@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -33,6 +36,7 @@ public class BasicAuthService implements AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @Transactional
     @Override
@@ -60,6 +64,14 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> UserNotFoundException.withId(userId));
         user.updateRole(request.newRole());
+
+        notificationEventPublisher.publish(new NotificationEvent(
+            user.getId(),
+            NotificationType.ROLE_CHANGED,
+            user.getId(),
+            "역할 변경",
+            "역할이 '" + request.newRole().name() + "'(으)로 변경되었습니다."
+        ));
 
         jwtService.invalidateJwtSession(user.getId());
         return userMapper.toDto(user);

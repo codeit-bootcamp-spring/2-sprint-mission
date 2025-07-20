@@ -3,7 +3,11 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -28,6 +32,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -37,13 +43,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private final Path root;
     private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     public LocalBinaryContentStorage(
         @Value("${discodeit.storage.local.root-path}") Path root,
-        AsyncTaskFailureRepository asyncTaskFailureRepository
+        AsyncTaskFailureRepository asyncTaskFailureRepository,
+        NotificationEventPublisher notificationEventPublisher
     ) {
         this.root = root;
         this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+        this.notificationEventPublisher = notificationEventPublisher;
     }
 
     @PostConstruct
@@ -95,6 +104,20 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
         AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
         asyncTaskFailureRepository.save(failure);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null
+            && authentication.getPrincipal() instanceof DiscodeitUserDetails principal) {
+            UUID receiverId = principal.getUserDto().id();
+
+            notificationEventPublisher.publish(new NotificationEvent(
+                receiverId,
+                NotificationType.ASYNC_FAILED,
+                null,
+                "비동기 작업 실패",
+                "요청하신 파일 업로드 작업이 실패했습니다."
+            ));
+        }
 
         log.error("파일 업로드 실패 - binaryContentId: {}", binaryContentId, e);
         return CompletableFuture.failedFuture(e);
