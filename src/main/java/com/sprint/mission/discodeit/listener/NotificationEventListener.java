@@ -1,17 +1,13 @@
 package com.sprint.mission.discodeit.listener;
 
-import com.sprint.mission.discodeit.entity.Notification;
-import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
 import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
-import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -26,7 +22,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class NotificationEventListener {
 
-  private final NotificationRepository notificationRepository;
   private final NotificationService notificationService;
   private final ApplicationEventPublisher eventPublisher;
 
