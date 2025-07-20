@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.s3;
+package com.sprint.mission.discodeit.common.s3.impl;
 
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
 

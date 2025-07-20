@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final BinaryContentCore binaryContentService;
+  private final BinaryContentCore binaryContentCore;
   private final UserResultMapper userResultMapper;
   private final PasswordEncoder passwordEncoder;
 
@@ -38,7 +38,7 @@ public class BasicUserService implements UserService {
     validateDuplicateEmail(userRequest.email());
     validateDuplicateUserName(userRequest.username());
 
-    BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
+    BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
@@ -93,10 +93,10 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
     if (user.getBinaryContent() != null) {
-      binaryContentService.delete(user.getBinaryContent().getId());
+      binaryContentCore.delete(user.getBinaryContent().getId());
     }
 
-    BinaryContent binaryContent = binaryContentService.createBinaryContent(binaryContentRequest);
+    BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
         passwordEncoder.encode(userUpdateRequest.newPassword()), binaryContent);
     User updatedUser = userRepository.save(user);

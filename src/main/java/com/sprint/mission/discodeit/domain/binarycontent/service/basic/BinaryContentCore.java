@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Component
@@ -31,24 +33,38 @@ public class BinaryContentCore {
     BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(),
         binaryContentRequest.contentType(), binaryContentRequest.size());
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-    binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+          }
+        }
+    );
 
     return savedBinaryContent;
   }
 
   @Transactional
   public List<BinaryContent> createBinaryContents(
-      List<BinaryContentRequest> binaryContentRequests) {
-    if (binaryContentRequests == null) {
+      List<BinaryContentRequest> binaryContentRequests
+  ) {
+    if (binaryContentRequests == null || binaryContentRequests.isEmpty()) {
       return null;
     }
     // 로직 수정 필요
     List<BinaryContent> binaryContents = new ArrayList<>();
     for (BinaryContentRequest binaryContentRequest : binaryContentRequests) {
-      BinaryContent savedBinaryContent = binaryContentRepository.save(
-          new BinaryContent(binaryContentRequest.fileName(), binaryContentRequest.contentType(),
-              binaryContentRequest.size()));
+      BinaryContent binaryContent = new BinaryContent(
+          binaryContentRequest.fileName(),
+          binaryContentRequest.contentType(),
+          binaryContentRequest.size());
+
+      BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
+
       binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+
       binaryContents.add(savedBinaryContent);
     }
 

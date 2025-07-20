@@ -43,6 +43,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentCore binaryContentCore;
   private final MessageResultMapper messageResultMapper;
 
+  @Transactional
   @Override
   public MessageResult create(
       MessageCreateRequest messageCreateRequest,
@@ -53,7 +54,6 @@ public class BasicMessageService implements MessageService {
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
-    log.info("메세지 서비스 컨텍스트 {}", SecurityContextHolder.getContext().toString());
     List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
