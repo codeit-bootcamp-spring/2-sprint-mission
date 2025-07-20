@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.dto.ErrorResponse;
 import com.sprint.mission.discodeit.exception.channel.ChannelException;
-import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundException;
 import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import com.sprint.mission.discodeit.exception.message.MessageException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistException;
@@ -98,9 +98,9 @@ public class GlobalExceptionHandler {
                 .body(body);
     }
 
-    @ExceptionHandler(FileNotFoundCustomException.class)
+    @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleFileNotFoundCustomException(
-            FileNotFoundCustomException ex) {
+            FileNotFoundException ex) {
         ErrorResponse body = ErrorResponse.of(
                 ex,
                 ex.getErrorCode(),

@@ -29,6 +29,17 @@ public record ErrorResponse(
         );
     }
 
+    public static ErrorResponse of(ErrorCode errorCode) {
+        return new ErrorResponse(
+            Instant.now(),
+            errorCode.getCode(),
+            errorCode.getMessage(),
+            Collections.emptyMap(),
+            errorCode.name(),
+            errorCode.getStatus().value()
+        );
+    }
+
     public static ErrorResponse of(HttpStatus status, Exception e) {
         return new ErrorResponse(
             Instant.now(),
