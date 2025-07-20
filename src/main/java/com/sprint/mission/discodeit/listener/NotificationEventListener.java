@@ -7,9 +7,11 @@ import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
 import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -25,6 +27,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class NotificationEventListener {
 
   private final NotificationRepository notificationRepository;
+  private final NotificationService notificationService;
   private final ApplicationEventPublisher eventPublisher;
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -38,20 +41,15 @@ public class NotificationEventListener {
     log.info("새 메시지 알림 처리 시작: receiverId={}, channelId={}, messageId={}",
         event.receiverId(), event.channelId(), event.messageId());
     try {
-      String title = "새 메시지";
-      String content = String.format("%s님이 새 메시지를 보냈습니다.", event.authorName());
 
-      Notification notification = new Notification(
+      notificationService.createNewMessageNotification(
           event.receiverId(),
-          title,
-          content,
-          NotificationType.NEW_MESSAGE,
-          event.channelId()
+          event.channelId(),
+          event.messageId(),
+          event.authorName()
       );
 
-      notificationRepository.save(notification);
-      log.info("새 메시지 알림 생성 완료: receiverId={}, notificationId={}",
-          event.receiverId(), notification.getId());
+      log.info("새 메시지 알림 생성 완료: receiverId={}", event.receiverId());
 
     } catch (Exception e) {
       log.error("새 메시지 알림 처리 실패: receiverId={}, channelId={}",
@@ -72,21 +70,13 @@ public class NotificationEventListener {
         event.receiverId(), event.oldRole(), event.newRole());
 
     try {
-      String title = "권한 변경";
-      String content = String.format("귀하의 권한이 %s에서 %s로 변경되었습니다.",
-          event.oldRole(), event.newRole());
-
-      Notification notification = new Notification(
+      notificationService.createRoleChangedNotification(
           event.receiverId(),
-          title,
-          content,
-          NotificationType.ROLE_CHANGED,
-          event.receiverId()
+          event.oldRole().toString(),
+          event.newRole().toString()
       );
 
-      notificationRepository.save(notification);
-      log.info("권한 변경 알림 생성 완료: receiverId={}, notificationId={}",
-          event.receiverId(), notification.getId());
+      log.info("권한 변경 알림 처리 완료: receiverId={}", event.receiverId());
 
     } catch (Exception e) {
       log.error("권한 변경 알림 처리 실패: receiverId={}", event.receiverId(), e);
@@ -106,20 +96,13 @@ public class NotificationEventListener {
         event.receiverId(), event.taskName());
 
     try {
-      String title = "비동기 작업 실패";
-      String content = String.format("비동기 작업이 실패했습니다: %s", event.failureReason());
-
-      Notification notification = new Notification(
+      notificationService.createAsyncFailedNotification(
           event.receiverId(),
-          title,
-          content,
-          NotificationType.ASYNC_FAILED,
-          null
+          event.taskName(),
+          event.failureReason()
       );
 
-      notificationRepository.save(notification);
-      log.info("비동기 작업 실패 알림 생성 완료: receiverId={}, notificationId={}",
-          event.receiverId(), notification.getId());
+      log.info("비동기 작업 실패 알림 처리 완료: receiverId={}", event.receiverId());
 
     } catch (Exception e) {
       log.error("비동기 작업 실패 알림 처리 실패: receiverId={}", event.receiverId(), e);
