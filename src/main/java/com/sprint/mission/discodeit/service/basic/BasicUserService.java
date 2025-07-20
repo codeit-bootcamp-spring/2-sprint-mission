@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.async.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.constant.Role;
 import com.sprint.mission.discodeit.dto.auth.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.event.FileUploadEvent;
@@ -10,13 +9,11 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.event.FileUploadEventHandler;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryDataUploadStorageException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryMetadataUploadException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtBlackList;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
@@ -32,8 +29,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +53,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "'all'")
     public UserDto save(UserCreateRequest userCreateRequest, MultipartFile profile) {
         log.info("사용자 생성 진행: username = {}, email = {}", userCreateRequest.username(),
             userCreateRequest.email());
@@ -107,6 +107,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "users", key = "'all'")
     public List<UserDto> findAllUser() {
         Set<UUID> onlineIds = jwtService.findAllActiveJwtSessions().stream()
             .filter(jwtSession -> !jwtBlackList.check(jwtSession.getAccessToken()))
@@ -121,6 +122,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "#userId")
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         MultipartFile profile) {
         log.info("사용자 수정 진행: userId = {}", userId);
@@ -179,6 +181,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "users", key = "'all'")
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> {
@@ -191,6 +194,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
+    @CachePut(value = "users", key = "'all'")
     public UserDto updateRole(RoleUpdateRequest roleUpdateRequest) {
 
         UUID userId = roleUpdateRequest.userId();

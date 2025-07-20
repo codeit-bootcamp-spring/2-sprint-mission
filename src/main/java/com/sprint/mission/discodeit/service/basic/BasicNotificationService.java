@@ -13,8 +13,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notifications", key = "#notificationCreateDto.receiverId()")
     public void createNotification(NotificationCreateDto notificationCreateDto) {
         log.info("알람 서비스 시작: userId = {}", notificationCreateDto.targetId());
         Notification notification = new Notification(
@@ -67,9 +69,8 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationDto> readNotifications() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
+    @Cacheable(value = "notifications", key = "#auth.principal.userId")
+    public List<NotificationDto> readNotifications(Authentication auth) {
         DiscodeitUserDetails userDetails = (DiscodeitUserDetails) auth.getPrincipal();
         UUID userId = userDetails.getUserId();
 
@@ -82,7 +83,12 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "notifications", key = "#receiverId")
     public void deleteNotification(UUID notificationId) {
+        UUID receiverId = notificationRepository.findById(notificationId)
+            .map(Notification::getReceiverId)
+            .orElseThrow(() -> NotificationNotFoundException.forId(notificationId.toString()));
+
         notificationRepository.deleteById(notificationId);
     }
 }
