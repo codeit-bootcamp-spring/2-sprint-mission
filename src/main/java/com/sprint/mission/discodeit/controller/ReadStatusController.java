@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,5 +60,15 @@ public class ReadStatusController implements ReadStatusApi {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(readStatuses);
+  }
+
+  @PatchMapping("/channels/{channelId}/notification-setting")
+  public ResponseEntity<Void> updateNotificationSetting(
+      @PathVariable UUID channelId,
+      @RequestBody ReadStatusUpdateRequest request,
+      @AuthenticationPrincipal DiscodeitUserDetails user
+  ) {
+    readStatusService.updateNotificationSetting(channelId, user.getUserDto().id(), request.notificationEnabled());
+    return ResponseEntity.noContent().build();
   }
 }
