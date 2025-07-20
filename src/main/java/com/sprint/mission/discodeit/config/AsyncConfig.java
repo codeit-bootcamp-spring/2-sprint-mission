@@ -42,4 +42,17 @@ public class AsyncConfig {
         return executor;
     }
 
+    @Bean(name = "kafkaExecutor")
+    public ThreadPoolTaskExecutor KafkaExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(25);
+        executor.setThreadNamePrefix("KafkaExecutor-");
+
+        executor.setTaskDecorator(contextTaskDecorator());
+        executor.initialize();
+        return executor;
+    }
+
 }

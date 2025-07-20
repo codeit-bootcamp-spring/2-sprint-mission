@@ -122,7 +122,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "users", key = "#userId")
+    @CacheEvict(value = "users", key = "'all'")
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         MultipartFile profile) {
         log.info("사용자 수정 진행: userId = {}", userId);
@@ -194,7 +194,7 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    @CachePut(value = "users", key = "'all'")
+    @CacheEvict(value = "users", key = "'all'")
     public UserDto updateRole(RoleUpdateRequest roleUpdateRequest) {
 
         UUID userId = roleUpdateRequest.userId();
