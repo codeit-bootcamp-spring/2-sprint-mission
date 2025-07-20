@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.common.filter;
 
-import static com.sprint.mission.discodeit.common.filter.constant.logConstant.REQUEST_ID;
-import static com.sprint.mission.discodeit.common.filter.constant.logConstant.REQUEST_METHOD;
-import static com.sprint.mission.discodeit.common.filter.constant.logConstant.REQUEST_URL;
+import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
+import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_METHOD;
+import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_URL;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

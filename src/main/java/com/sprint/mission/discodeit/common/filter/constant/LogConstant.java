@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.common.filter.constant;
 
-public class logConstant {
+public class LogConstant {
 
-  private logConstant() {
+  private LogConstant() {
   }
 
   public static final String REQUEST_ID = "requestId";

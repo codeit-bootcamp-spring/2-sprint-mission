@@ -61,6 +61,7 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-gson:${JJWT_VERSION}"
 
     implementation 'org.springframework.retry:spring-retry'
+    testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
 test {

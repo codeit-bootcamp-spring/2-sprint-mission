@@ -32,7 +32,7 @@ public class S3Config {
   }
 
   @Bean
-  public S3Client createS3Client() {
+  public S3Client S3Client() {
     return S3Client.builder()
         .region(Region.of(region))
         .credentialsProvider(credentialsProvider)
@@ -40,7 +40,7 @@ public class S3Config {
   }
 
   @Bean
-  public S3Presigner createS3Presigner() {
+  public S3Presigner S3Presigner() {
     return S3Presigner.builder()
         .region(Region.of(region))
         .credentialsProvider(credentialsProvider)

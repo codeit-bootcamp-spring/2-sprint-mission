@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.common.exception.ErrorCode.ERROR_S3_U
 
 import java.util.Map;
 
-public class S3UploadException extends S3Exception {
+public class S3UploadException extends S3CustomException {
 
   public S3UploadException(Map<String, Object> details) {
     super(ERROR_S3_UPLOAD, details);
