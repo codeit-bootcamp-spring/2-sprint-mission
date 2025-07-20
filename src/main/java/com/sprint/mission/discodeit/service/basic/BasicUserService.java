@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -22,6 +24,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,7 +43,9 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final ApplicationEventPublisher eventPublisher;
 
+  @CacheEvict(value = "users", allEntries = true)
   @Transactional
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
@@ -88,6 +95,7 @@ public class BasicUserService implements UserService {
     return userDto;
   }
 
+  @Cacheable(value = "users")
   @Override
   public List<UserDto> findAll() {
     log.debug("모든 사용자 조회 시작");
@@ -104,6 +112,7 @@ public class BasicUserService implements UserService {
   }
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+  @CacheEvict(value = "users", allEntries = true)
   @Transactional
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
@@ -146,11 +155,20 @@ public class BasicUserService implements UserService {
         .orElse(null);
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
+    eventPublisher.publishEvent(
+        new NotificationEvent(
+            user.getId(),
+            NotificationType.ROLE_CHANGE,
+            null
+        )
+    );
+
     log.info("사용자 수정 완료: id={}", userId);
     return userMapper.toDto(user);
   }
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
+  @CacheEvict(value = "users", allEntries = true)
   @Transactional
   @Override
   public void delete(UUID userId) {
