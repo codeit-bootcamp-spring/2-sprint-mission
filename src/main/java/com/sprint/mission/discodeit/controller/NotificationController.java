@@ -8,7 +8,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,9 +33,10 @@ public class NotificationController {
     @DeleteMapping("/{notificationId}")
     @PreAuthorize("principal.userId == @basicNotificationService.readNotification(#notificationId).receiverId()")
     public ResponseEntity<Void> deleteByNotificationId(
+        @AuthenticationPrincipal DiscodeitUserDetails principal,
         @PathVariable UUID notificationId
     ) {
-        notificationService.deleteNotification(notificationId);
+        notificationService.deleteNotification(principal, notificationId);
         return ResponseEntity.noContent().build();
     }
 

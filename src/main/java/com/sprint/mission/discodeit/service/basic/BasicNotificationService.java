@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,12 +81,11 @@ public class BasicNotificationService implements NotificationService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "notifications", key = "#receiverId")
-    public void deleteNotification(UUID notificationId) {
-        UUID receiverId = notificationRepository.findById(notificationId)
-            .map(Notification::getReceiverId)
-            .orElseThrow(() -> NotificationNotFoundException.forId(notificationId.toString()));
-
+    @CacheEvict(value = "notifications", key = "#principal.getUserId()")
+    public void deleteNotification(
+        DiscodeitUserDetails principal,
+        UUID notificationId
+    ) {
         notificationRepository.deleteById(notificationId);
     }
 }

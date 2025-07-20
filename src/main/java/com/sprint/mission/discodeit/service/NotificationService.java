@@ -18,6 +18,6 @@ public interface NotificationService {
 
     List<NotificationDto> readNotifications(DiscodeitUserDetails principal);
 
-    void deleteNotification(UUID notificationId);
+    void deleteNotification(DiscodeitUserDetails principal, UUID notificationId);
 
 }
