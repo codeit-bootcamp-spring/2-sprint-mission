@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -103,6 +104,7 @@ public class BasicMessageService implements MessageService {
 
   @Transactional(readOnly = true)
   @Override
+  @Cacheable(value = "messages", key = "#messageId")
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
