@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.NotificationService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class BasicNotificationService implements NotificationService {
     }
 
     @Override
+    @CacheEvict(value = "notifications", key = "#notificationId")
     public void deleteNotification(UUID notificationId, UUID receiverId) {
         Notification notification = notificationRepository.findById(notificationId).orElse(null);
 
