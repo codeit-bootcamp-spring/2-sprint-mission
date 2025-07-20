@@ -35,6 +35,9 @@ public class ReadStatus extends BaseUpdatableEntity {
   @Column(name = "last_read_at", nullable = false)
   private Instant lastReadAt;
 
+  @Column(name = "notification_enabled")
+  private boolean notificationEnabled;
+
   public static ReadStatus create(User user, Channel channel, Instant lastReadAt) {
     validate(user, channel);
     return ReadStatus.builder()
@@ -43,13 +46,6 @@ public class ReadStatus extends BaseUpdatableEntity {
         .lastReadAt(lastReadAt != null ? lastReadAt : Instant.now())
         .build();
   }
-
-  public void update(Instant lastReadAt) {
-    if (lastReadAt != null && lastReadAt.isAfter(this.lastReadAt)) {
-      this.lastReadAt = lastReadAt;
-    }
-  }
-
 
   /*******************************
    * Validation check
@@ -60,6 +56,15 @@ public class ReadStatus extends BaseUpdatableEntity {
     }
     if (channel == null) {
       throw new IllegalArgumentException("channel 객체가 없습니다.");
+    }
+  }
+
+  public void update(Instant lastReadAt, boolean notificationEnabled) {
+    if (lastReadAt != null && lastReadAt.isAfter(this.lastReadAt)) {
+      this.lastReadAt = lastReadAt;
+    }
+    if (this.notificationEnabled != notificationEnabled) {
+      this.notificationEnabled = notificationEnabled;
     }
   }
 
