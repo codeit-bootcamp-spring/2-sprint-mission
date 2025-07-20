@@ -123,7 +123,7 @@ public class BasicUserService implements UserService {
     List<UserDto> userDtos = userRepository.findAllWithProfile()
         .stream()
         .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
-        .toList();
+        .collect(Collectors.toList());
     log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
     return userDtos;
   }
