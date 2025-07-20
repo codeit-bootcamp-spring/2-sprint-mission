@@ -2,42 +2,61 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
-@Getter
 @Entity
-@NoArgsConstructor
-@Slf4j
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
 
-    @Column(nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    @Column(nullable = false)
+    @Column(name = "size", nullable = false)
     private Long size;
 
-    @Column(nullable = false)
+    @Column(name = "content_type", length = 100, nullable = false)
     private String contentType;
 
-    @Column(name = "message_id")
-    private UUID messageId;
+    @Column(name = "upload_status")
+    @Enumerated(EnumType.STRING)
+    private BinaryContentUploadStatus uploadStatus;
 
     @Builder
-    public BinaryContent(String fileName, Long size, String contentType, UUID messageId) {
+    private BinaryContent(String fileName, Long size, String contentType) {
         this.fileName = fileName;
         this.size = size;
         this.contentType = contentType;
-        this.messageId = messageId;
+        this.uploadStatus = BinaryContentUploadStatus.WAITING;
     }
 
-    // 프로필 이미지용
-    public BinaryContent(String fileName, Long size, String contentType) {
-        this(fileName, size, contentType, null);
+    public static BinaryContent of(String fileName, Long size, String contentType) {
+        return BinaryContent.builder()
+                .fileName(fileName)
+                .size(size)
+                .contentType(contentType)
+                .build();
+    }
+
+    public void completeUpload() {
+        this.uploadStatus = BinaryContentUploadStatus.SUCCESS;
+    }
+
+    public void failUpload() {
+        this.uploadStatus = BinaryContentUploadStatus.FAILED;
+    }
+
+    public void updateUploadStatus(BinaryContentUploadStatus status) {
+        this.uploadStatus = status;
     }
 }

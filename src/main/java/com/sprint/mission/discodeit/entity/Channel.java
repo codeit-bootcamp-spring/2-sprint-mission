@@ -12,11 +12,18 @@ import jakarta.persistence.Table;
 
 import java.util.Objects;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Table(name = "channels")
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Channel extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
@@ -32,18 +39,6 @@ public class Channel extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
-
-    protected Channel() {
-        super();
-    }
-
-    public Channel(ChannelType type, String name, String description, User owner) {
-        super();
-        this.type = type;
-        this.name = name;
-        this.description = description;
-        this.owner = owner;
-    }
 
     public boolean update(String newName, String newDescription) {
         boolean updated = false;
