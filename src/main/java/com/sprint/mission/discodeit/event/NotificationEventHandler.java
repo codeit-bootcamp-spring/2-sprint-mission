@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.event;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
@@ -16,6 +17,7 @@ public class NotificationEventHandler {
 
     private final NotificationRepository notificationRepository;
 
+    @CacheEvict(value = "userNotifications", key = "#event.receiverId()")
     @Async("eventTaskExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Retryable(
