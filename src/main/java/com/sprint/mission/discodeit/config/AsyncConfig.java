@@ -31,6 +31,20 @@ public class AsyncConfig {
         return executor;
     }
 
+    @Bean(name = "eventTaskExecutor")
+    public Executor eventExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(25);
+        executor.setThreadNamePrefix("event-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setTaskDecorator(new MDCTaskDecorator());
+
+        executor.initialize();
+        return executor;
+    }
+
     public static class MDCTaskDecorator implements TaskDecorator {
 
         @Override
