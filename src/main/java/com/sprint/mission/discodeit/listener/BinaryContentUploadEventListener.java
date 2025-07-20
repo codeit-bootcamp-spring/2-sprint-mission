@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.listener;
 
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentCreateEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadSuccessEvent;
@@ -28,7 +29,6 @@ public class BinaryContentUploadEventListener {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
-  private final AsyncTaskFailureRepository asyncTaskFailureRepository;
   private final ApplicationEventPublisher eventPublisher;
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -102,11 +102,14 @@ public class BinaryContentUploadEventListener {
       binaryContent.markAsFailed();
       binaryContentRepository.save(binaryContent);
 
-      AsyncTaskFailure failure = new AsyncTaskFailure(event.taskName(), event.requestId(),
-          event.failureReason());
-      asyncTaskFailureRepository.save(failure);
+      eventPublisher.publishEvent(
+          new AsyncTaskFailureEvent(
+              event.taskName(),
+              event.requestId(),
+              event.failureReason()
+          )
+      );
 
-      log.info("업로드 실패 상태 업데이트 완료: requestId={}, status=FAILED", event.requestId());
     } catch (Exception e) {
       log.error("업로드 실패 이벤트 처리 중 오류 발생: requestId={}", event.requestId(), e);
     }

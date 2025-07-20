@@ -34,6 +34,22 @@ public class AsyncConfig {
     return new DelegatingSecurityContextAsyncTaskExecutor(executor);
   }
 
+  @Bean
+  public TaskExecutor asyncTaskFailureExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setThreadNamePrefix("failure-log-");
+    executor.setCorePoolSize(2);
+    executor.setMaxPoolSize(5);
+    executor.setQueueCapacity(10);
+    executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    executor.setKeepAliveSeconds((int) Duration.ofSeconds(30).toSeconds());
+
+    executor.setTaskDecorator(new MDCTaskDecorator());
+    executor.initialize();
+
+    return new DelegatingSecurityContextAsyncTaskExecutor(executor);
+  }
+
   public static class MDCTaskDecorator implements TaskDecorator {
 
     @Override
