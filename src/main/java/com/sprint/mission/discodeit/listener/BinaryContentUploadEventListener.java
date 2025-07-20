@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.listener;
 
-import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
@@ -8,9 +7,7 @@ import com.sprint.mission.discodeit.event.BinaryContentCreateEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadSuccessEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
-import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +63,8 @@ public class BinaryContentUploadEventListener {
               event.binaryContentId(),
               requestId,
               "uploadWithRetry",
-              failureReason
+              failureReason,
+              event.userId()
           )
       );
     }
@@ -116,7 +112,7 @@ public class BinaryContentUploadEventListener {
 
       eventPublisher.publishEvent(
           new AsyncFailedNotificationEvent(
-              getCurrentUserId(),
+              event.userId(),
               event.taskName(),
               event.requestId(),
               "파일 업로드 실패"
@@ -126,15 +122,6 @@ public class BinaryContentUploadEventListener {
     } catch (Exception e) {
       log.error("업로드 실패 이벤트 처리 중 오류 발생: requestId={}", event.requestId(), e);
     }
-  }
-
-  private UUID getCurrentUserId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null
-        && authentication.getPrincipal() instanceof DiscodeitUserDetails userDetails) {
-      return userDetails.getUserDto().id();
-    }
-    throw new IllegalStateException("현재 인증된 사용자 정보를 찾을 수 없습니다.");
   }
 
 }

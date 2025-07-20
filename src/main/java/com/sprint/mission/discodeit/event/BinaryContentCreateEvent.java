@@ -7,7 +7,8 @@ public record BinaryContentCreateEvent(
     byte[] bytes,
     String fileName,
     String contentType,
-    String requestId
+    String requestId,
+    UUID userId
 ) {
 
 }

@@ -6,7 +6,8 @@ public record BinaryContentUploadFailureEvent(
     UUID binaryContentId,
     String requestId,
     String taskName,
-    String failureReason
+    String failureReason,
+    UUID userId
 ) {
 
 }
