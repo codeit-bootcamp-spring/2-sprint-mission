@@ -50,6 +50,22 @@ public class AsyncConfig {
     return new DelegatingSecurityContextAsyncTaskExecutor(executor);
   }
 
+  @Bean
+  public TaskExecutor notificationTaskExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setThreadNamePrefix("notification-");
+    executor.setCorePoolSize(3);
+    executor.setMaxPoolSize(8);
+    executor.setQueueCapacity(50);
+    executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    executor.setKeepAliveSeconds((int) Duration.ofSeconds(30).toSeconds());
+
+    executor.setTaskDecorator(new MDCTaskDecorator());
+    executor.initialize();
+
+    return new DelegatingSecurityContextAsyncTaskExecutor(executor);
+  }
+
   public static class MDCTaskDecorator implements TaskDecorator {
 
     @Override
