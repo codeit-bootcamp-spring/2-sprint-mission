@@ -1,104 +1,71 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.4.0'
-	id 'io.spring.dependency-management' version '1.1.6'
-	id 'jacoco'
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'jacoco'
 }
 
 group = 'com.sprint.mission'
-version = '1.2.-M8'
+version = '2.3-M11'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    testCompileOnly {
+        extendsFrom testAnnotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
-}
-
-jacoco {
-	toolVersion = "0.8.8"
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
-	implementation 'software.amazon.awssdk:s3:2.20.56'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'software.amazon.awssdk:s3:2.31.7'
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.6'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.mapstruct:mapstruct:1.6.3'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'org.postgresql:postgresql'
-
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'com.h2database:h2'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
-	finalizedBy jacocoTestReport
+    useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport
 }
 
 jacocoTestReport {
-	dependsOn test
-	reports {
-		xml.required = true
-		html.required = true
-		csv.required = false
-	}
-	// REPORT 단계에서 exception 패키지를 제외
-	afterEvaluate {
-		classDirectories.setFrom(
-				files(classDirectories.files.collect { dir ->
-					fileTree(dir: dir, exclude: [
-							"com/sprint/mission/discodeit/exception/**"
-					])
-				})
-		)
-	}
-}
-
-jacocoTestCoverageVerification {
-	dependsOn jacocoTestReport
-	violationRules {
-		rule {
-			element = 'CLASS'
-			enabled = true
-
-			// 검증 단계에서도 exception 패키지를 제외
-			excludes = [
-					"com.sprint.mission.discodeit.exception.**",
-					"com.sprint.mission.discodeit.dto.**",
-					"com.sprint.mission.discodeit.storage.**",
-					"com.sprint.mission.discodeit.repository.jpa.**"
-			]
-			limit {
-				counter = 'LINE'
-				value   = 'COVEREDRATIO'
-				minimum = 0.0
-			}
-		}
-	}
-}
-
-task testCoverage {
-	group 'verification'
-	description 'Runs unit tests with coverage'
-
-	dependsOn test, jacocoTestReport, jacocoTestCoverageVerification
-
-	jacocoTestReport.mustRunAfter(test)
-	jacocoTestCoverageVerification.mustRunAfter(jacocoTestReport)
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }

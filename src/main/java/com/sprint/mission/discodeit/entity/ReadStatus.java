@@ -1,41 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 @Entity
-@Table(name = "read_statuses", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"}))
-@NoArgsConstructor
+@Table(
+    name = "read_statuses",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    }
+)
 @Getter
-public class ReadStatus extends BaseUpdatableEntity{
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne
-  @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_read_status_user"))
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "user_id", columnDefinition = "uuid")
   private User user;
 
-  @ManyToOne
-  @JoinColumn(name = "channel_id", foreignKey = @ForeignKey(name = "fk_read_status_channel"))
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "channel_id", columnDefinition = "uuid")
   private Channel channel;
 
-  @Column(nullable = false)
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastReadAt;
+
+  @Column(name = "notification_enabled", nullable = false)
+  private boolean notificationEnabled;
 
   public ReadStatus(User user, Channel channel, Instant lastReadAt) {
     this.user = user;
     this.channel = channel;
     this.lastReadAt = lastReadAt;
+    this.notificationEnabled = channel.getType() == ChannelType.PRIVATE;
   }
 
-  public void update(Instant newLastReadAt) {
-    boolean anyValueUpdated = false;
+  public void update(Instant newLastReadAt, boolean newNotificationEnabled) {
     if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = newLastReadAt;
-      anyValueUpdated = true;
     }
+
+    this.notificationEnabled = newNotificationEnabled;
+
   }
 }

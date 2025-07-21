@@ -1,34 +1,25 @@
+server:
+  port: 80
+
 spring:
-  config:
-    activate:
-      on-profile: prod
-
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 30
-      minimum-idle: 10
-      idle-timeout: 30000
-
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
-    hibernate:
-      ddl-auto: none
-    show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-
-  sql:
-    init:
-      mode: never
-
-server:
-  port: ${APP_PORT:80}
+        format_sql: false
 
 logging:
   level:
-    com.sprint.mission.discodeit: INFO
+    com.sprint.mission.discodeit: info
+    org.hibernate.SQL: info
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: false
