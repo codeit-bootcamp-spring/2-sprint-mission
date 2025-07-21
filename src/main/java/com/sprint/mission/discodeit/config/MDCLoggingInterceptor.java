@@ -10,10 +10,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class MDCLoggingInterceptor implements HandlerInterceptor {
 
-  private static final String REQUEST_ID = "requestId";
-  private static final String REQUEST_METHOD = "requestMethod";
-  private static final String REQUEST_URI = "requestUri";
-  private static final String RESPONSE_HEADER_REQUEST_ID = "Discodeit-Request-ID";
+  public static final String REQUEST_ID = "requestId";
+  public static final String REQUEST_METHOD = "requestMethod";
+  public static final String REQUEST_URI = "requestUri";
+  public static final String RESPONSE_HEADER_REQUEST_ID = "Discodeit-Request-ID";
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response,

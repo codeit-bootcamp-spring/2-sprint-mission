@@ -36,12 +36,13 @@ public class S3UploadEventListener {
   // Service 메서드에 @Async를 직접 붙이는 것을 지양 -> EventListener에 붙이는 것이 좋다.
   // 메인 트랜잭션이 정상적으로 커밋된 이후에만 부가(비동기) 작업이 시작되므로, DB 일관성이 완벽하게 보장
   // Service 메서드 직접 @Async 사용시, 비즈니스와 인프라(비동기, 네트워크, 재시도, 예외처리 등) 코드가 뒤섞여 가독성과 테스트, 확장이 어려워짐
-  @Async("asyncExecutor")
+  @Async("binaryContentTaskExecutor")
   @Retryable(
       maxAttempts = 3,
       recover = "createAsyncTaskFailure",
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
+  // 결과값을 Return 해줄게 아니라면 CompletiableFuture 객체를 굳이 사용하지 않아도됨 (Fire and Forget)
   public void handleS3UploadEvent(S3UploadEvent event) {
     // userService, messageService의 메서드와 다른 트랜잭션에서 실행됨 -> binaryContentStorage.put 메서드가 실패해도 메인 트랜잭션에 영향 X
     binaryContentStorage.put(event.id(), event.bytes());

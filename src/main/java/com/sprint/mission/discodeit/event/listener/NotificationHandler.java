@@ -39,7 +39,7 @@ public class NotificationHandler {
   //→ 그 그룹 안의 컨슈머(서버)들에게 메시지를 분배
   //→ 같은 메시지는 그룹 내에서 단 한 번만, 한 인스턴스에서만 처리됨.
   @KafkaListener(topics = "discodeit.notification-create", groupId = "notification-service-group")
-  @Async("asyncExecutor")
+  @Async("eventTaskExecutor")
   @Retryable(
       maxAttempts = 3,
       recover = "createAsyncTaskFailure",
