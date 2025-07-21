@@ -19,6 +19,8 @@ import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public ChannelResult createPublic(PublicChannelCreateRequest channelRegisterRequest) {
@@ -45,6 +48,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(savedChannel);
   }
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
@@ -60,7 +64,6 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(savedChannel);
   }
 
-  @Cacheable(value = CHANNEL_CACHE_NAME, key = "'channel_'+#channelId")
   @Transactional(readOnly = true)
   @Override
   public ChannelResult getById(UUID channelId) {
@@ -70,7 +73,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(channel);
   }
 
-  @Cacheable(value = CHANNEL_CACHE_NAME, key = "'user_'+#userId")
+  @Cacheable(value = CHANNEL_CACHE_NAME, key = "#userId")
   @Transactional(readOnly = true)
   @Override
   public List<ChannelResult> getAllByUserId(UUID userId) {
@@ -89,14 +92,15 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public ChannelResult updatePublic(
-      UUID id,
+      UUID channelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest
   ) {
-    Channel channel = channelRepository.findById(id)
-        .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", id)));
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new ChannelNotFoundException(Map.of()));
 
     channel.update(publicChannelUpdateRequest.newName(),
         publicChannelUpdateRequest.newDescription());
@@ -105,6 +109,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(updatedChannel);
   }
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public void delete(UUID channelId) {

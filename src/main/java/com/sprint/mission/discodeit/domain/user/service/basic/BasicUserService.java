@@ -18,7 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,10 @@ public class BasicUserService implements UserService {
   private final UserResultMapper userResultMapper;
   private final PasswordEncoder passwordEncoder;
 
+  @Caching(
+      put = @CachePut(value = USER_CACHE_NAME, key = "#result.id"),
+      evict = @CacheEvict(value = USER_CACHE_NAME, key = "'all'")
+  )
   @Transactional
   @Override
   public UserResult register(
@@ -90,6 +97,10 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(user);
   }
 
+  @Caching(
+      put = @CachePut(value = USER_CACHE_NAME, key = "#userId"),
+      evict = @CacheEvict(value = USER_CACHE_NAME, key = "'all'")
+  )
   @Transactional
   @Override
   public UserResult update(
@@ -111,6 +122,10 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(updatedUser);
   }
 
+  @Caching(evict = {
+      @CacheEvict(value = USER_CACHE_NAME, key = "#userId"),
+      @CacheEvict(value = USER_CACHE_NAME, key = "'all'")
+  })
   @Transactional
   @Override
   public void delete(UUID userId) {
