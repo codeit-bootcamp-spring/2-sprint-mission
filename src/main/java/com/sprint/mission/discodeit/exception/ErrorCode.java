@@ -36,8 +36,11 @@ public enum ErrorCode {
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "F001", "파일을 찾을 수 없습니다."),
     FILE_PROCESSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "F002", "파일 처리 중 오류가 발생했습니다."),
 
+    // Notification
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "N001", "알림을 찾을 수 없습니다."),
+
     // ReadStatus
-    READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "RS001", "요청한 읽음 상태 정보를 찾을 수 없습니다.");
+    READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "RS001", "읽기 상태를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String code;

@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.common.NotificationEvent;
+import com.sprint.mission.discodeit.entity.NotificationType;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -34,45 +38,80 @@ public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final MessageMapper messageMapper;
     private final PageResponseMapper pageMapper;
     private final BinaryContentService binaryContentService;
     private final ReadStatusRepository readStatusRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public MessageDto create(MessageCreateRequest request, List<MultipartFile> attachments, User user) {
-        Channel channel = channelRepository.findById(request.channelId())
-                .orElseThrow(() -> new ChannelNotFoundException(request.channelId()));
+        Channel channel = getChannel(request);
+        List<BinaryContent> attachmentEntities = processAttachments(attachments);
 
-        List<BinaryContent> attachmentEntities = new ArrayList<>();
-        if (attachments != null && !attachments.isEmpty()) {
-            for (MultipartFile attachment : attachments) {
-                if (!attachment.isEmpty()) {
-                    BinaryContentDto binaryContentDto = binaryContentService.create(attachment);
-                    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentDto.id())
-                            .orElseThrow(FileProcessingCustomException::new);
-                    attachmentEntities.add(binaryContent);
-                }
-            }
+        Message message = saveMessage(request, user, channel, attachmentEntities);
+
+        updateReadStatus(user, channel, message);
+        sendNotifications(user, channel);
+
+        return messageMapper.toDto(message);
+    }
+
+    private List<BinaryContent> processAttachments(List<MultipartFile> attachments) {
+        if (attachments == null || attachments.isEmpty()) {
+            return new ArrayList<>();
         }
 
+        List<BinaryContent> attachmentEntities = new ArrayList<>();
+        for (MultipartFile attachment : attachments) {
+            if (attachment != null && !attachment.isEmpty()) {
+                BinaryContentDto binaryContentDto = binaryContentService.create(attachment);
+                BinaryContent binaryContent = binaryContentRepository.findById(binaryContentDto.id())
+                        .orElseThrow(FileProcessingCustomException::new);
+                attachmentEntities.add(binaryContent);
+            }
+        }
+        return attachmentEntities;
+    }
+
+    private Message saveMessage(MessageCreateRequest request, User user, Channel channel, List<BinaryContent> attachmentEntities) {
         Message message = new Message(
                 request.content(),
                 channel,
                 user,
                 attachmentEntities
         );
+        return messageRepository.save(message);
+    }
 
-        Message savedMessage = messageRepository.save(message);
-
+    private void updateReadStatus(User user, Channel channel, Message message) {
         ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(user.getId(), channel.getId())
-                .orElse(new ReadStatus(user, channel, savedMessage.getCreatedAt()));
-        readStatus.update(savedMessage.getCreatedAt());
+                .orElse(new ReadStatus(user, channel, message.getCreatedAt()));
+        readStatus.update(message.getCreatedAt());
         readStatusRepository.save(readStatus);
+    }
 
-        return messageMapper.toDto(savedMessage);
+    private void sendNotifications(User sender, Channel channel) {
+        List<ReadStatus> notificationEnabledUsers = readStatusRepository
+                .findAllByChannelIdAndNotificationEnabled(channel.getId(), true);
+        notificationEnabledUsers.stream()
+                .filter(readStatus -> !readStatus.getUser().getId().equals(sender.getId()))
+                .forEach(readStatus -> {
+                    NotificationEvent event = new NotificationEvent(
+                            readStatus.getUser().getId(),
+                            NotificationType.NEW_MESSAGE,
+                            channel.getId(),
+                            "메세지 생성"
+                    );
+                    eventPublisher.publishEvent(event);
+                });
+    }
+
+    private Channel getChannel(MessageCreateRequest request) {
+        return channelRepository.findById(request.channelId())
+                .orElseThrow(() -> new ChannelNotFoundException(request.channelId()));
     }
 
     @Override
@@ -109,7 +148,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional(readOnly = true)
-    public Instant lastMessageTime(UUID channelId) {
+    public Instant findLastMessageTimestamp(UUID channelId) {
         return messageRepository.findTopByChannelIdOrderByCreatedAtDesc(channelId)
                 .map(Message::getCreatedAt).orElse(Instant.now());
     }

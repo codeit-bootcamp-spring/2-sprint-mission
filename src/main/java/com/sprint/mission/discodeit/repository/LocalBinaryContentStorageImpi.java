@@ -3,17 +3,22 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.file.FileException;
-import com.sprint.mission.discodeit.exception.file.FileNotFoundCustomException;
+import com.sprint.mission.discodeit.exception.file.FileNotFoundException;
 import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 
 import jakarta.annotation.PostConstruct;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,17 +29,25 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 @Service
-@ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "local")
+@Profile("local")
 public class LocalBinaryContentStorageImpi implements BinaryContentStorage {
 
     private static final Logger log = LoggerFactory.getLogger(LocalBinaryContentStorageImpi.class);
     private final Path rootPath;
+    private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+    private final Executor threadPoolTaskExecutor;
 
     public LocalBinaryContentStorageImpi(
-        @Value("${discodeit.storage.local.root-path}") String rootPathValue) {
+            @Value("${discodeit.storage.local.root-path}") String rootPathValue,
+            AsyncTaskFailureRepository asyncTaskFailureRepository,
+            Executor threadPoolTaskExecutor) {
         this.rootPath = Paths.get(rootPathValue).toAbsolutePath().normalize();
+        this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+        this.threadPoolTaskExecutor = threadPoolTaskExecutor;
     }
 
     @PostConstruct
@@ -55,79 +68,41 @@ public class LocalBinaryContentStorageImpi implements BinaryContentStorage {
         return this.rootPath.resolve(id.toString());
     }
 
-    private Path resolvePath(UUID id, String originalFileName) {
-        if (id == null) {
-            throw new FileException(ErrorCode.FILE_NOT_FOUND);
-        }
-        
-        String fileExtension = "";
-        if (originalFileName != null && originalFileName.contains(".")) {
-            fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-        }
-        
-        return this.rootPath.resolve(id.toString() + fileExtension);
-    }
-
     @Override
-    public void put(UUID id, byte[] bytes) {
-        if (id == null || bytes == null) {
-            log.error("💥 파일 저장 실패 - ID나 bytes가 null: ID={}, bytes length={}", 
-                     id, bytes != null ? bytes.length : "null");
-            throw new FileException(ErrorCode.FILE_NOT_FOUND);
-        }
-        
-        Path destinationPath = resolvePath(id);
-        log.info("💾 파일 저장 시도 시작");
-        log.info("💾 Root Path: {}", rootPath);
-        log.info("💾 Destination Path: {}", destinationPath);
-        log.info("💾 파일 크기: {} bytes", bytes.length);
-        log.info("💾 Root Path 존재?: {}", Files.exists(rootPath));
-        
-        try {
-            // 상위 디렉토리 확인/생성
-            Path parentDir = destinationPath.getParent();
-            log.info("💾 Parent Directory: {}", parentDir);
-            log.info("💾 Parent Directory 존재?: {}", Files.exists(parentDir));
-            
-            if (!Files.exists(parentDir)) {
-                log.info("💾 상위 디렉토리 생성 시도: {}", parentDir);
-                Files.createDirectories(parentDir);
-                log.info("💾 상위 디렉토리 생성 완료: {}", parentDir);
-            }
-            
-            log.info("💾 실제 파일 쓰기 시작...");
-            Files.write(destinationPath, bytes);
-            
-            // 저장 후 검증
-            if (Files.exists(destinationPath)) {
-                long actualSize = Files.size(destinationPath);
-                log.info("✅ 파일 저장 성공!");
-                log.info("✅ 저장된 파일 경로: {}", destinationPath);
-                log.info("✅ 예상 크기: {} bytes, 실제 크기: {} bytes", bytes.length, actualSize);
-                log.info("✅ 크기 일치?: {}", bytes.length == actualSize);
-            } else {
-                log.error("💥 파일 저장 후 파일이 존재하지 않음: {}", destinationPath);
-            }
-            
-        } catch (IOException e) {
-            log.error("💥 파일 저장 실패: {}", destinationPath, e);
-            log.error("💥 IOException 세부사항: {}", e.getMessage());
-            throw new FileProcessingCustomException();
-        }
+    public CompletableFuture<Void> put(UUID id, byte[] bytes) {
+        return CompletableFuture.runAsync(() -> {
+                    if (id == null || bytes == null) {
+                        throw new FileException(ErrorCode.FILE_NOT_FOUND);
+                    }
+
+                    Path destinationPath = resolvePath(id);
+
+                    try {
+                        Path parentDir = destinationPath.getParent();
+
+                        if (!Files.exists(parentDir)) {
+                            Files.createDirectories(parentDir);
+                            log.info("💾 상위 디렉토리 생성 완료: {}", parentDir);
+                        }
+
+                        Files.write(destinationPath, bytes);
+
+                    } catch (IOException e) {
+                        throw new FileProcessingCustomException();
+                    }
+                },
+                threadPoolTaskExecutor);
     }
 
     @Override
     public InputStream get(UUID id) {
         Path filePath = resolvePath(id);
         if (!Files.exists(filePath)) {
-            log.warn("요청한 파일을 찾을 수 없음: {}", filePath);
-            throw new FileNotFoundCustomException();
+            throw new FileNotFoundException();
         }
         try {
-            log.debug("파일 스트림 열기 시도: {}", filePath);
             return Files.newInputStream(filePath);
         } catch (IOException e) {
-            log.error("파일 읽기 실패: {}", filePath, e);
             throw new FileProcessingCustomException();
         }
     }
@@ -136,43 +111,37 @@ public class LocalBinaryContentStorageImpi implements BinaryContentStorage {
     public void delete(UUID id) {
         Path filePath = resolvePath(id);
         if (!Files.exists(filePath)) {
-            throw new FileNotFoundCustomException();
+            throw new FileNotFoundException();
         }
 
         try {
-            log.debug("파일 삭제 시도: {}", filePath);
             Files.delete(filePath);
             log.info("파일 삭제 성공: {}", filePath);
         } catch (IOException e) {
-            log.error("파일 삭제 실패: {}", filePath, e);
             throw new FileProcessingCustomException();
         }
     }
 
     @Override
     public ResponseEntity<Resource> download(BinaryContentDto metaData) {
-        log.info("💾 스토리지 다운로드 시작 - ID: {}, 파일명: {}, 크기: {}, 타입: {}", 
-                 metaData.id(), metaData.fileName(), metaData.size(), metaData.contentType());
-        
-        InputStream inputStream = get(metaData.id());
-        log.info("💾 파일 스트림 생성 완료");
-        
-        Resource resource = new InputStreamResource(inputStream);
-        log.info("💾 리소스 생성 완료");
 
-        ResponseEntity<Resource> response = ResponseEntity
-            .status(HttpStatus.OK)
-            .header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + metaData.fileName() + "\"")
-            .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
-            .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
-            .body(resource);
-            
-        log.info("💾 응답 생성 완료 - 파일명: {}, 타입: {}, 크기: {}", 
-                 metaData.fileName(), metaData.contentType(), metaData.size());
-        
-        return response;
+
+        InputStream inputStream = get(metaData.id());
+
+        Resource resource = new InputStreamResource(inputStream);
+
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + metaData.fileName() + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, metaData.contentType())
+                .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(metaData.size()))
+                .body(resource);
     }
 
 
+    public AsyncTaskFailureRepository getAsyncTaskFailureRepository() {
+        return asyncTaskFailureRepository;
+    }
 }

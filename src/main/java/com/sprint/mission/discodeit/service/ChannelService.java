@@ -5,8 +5,11 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
+
 import java.util.List;
 import java.util.UUID;
+
+import com.sprint.mission.discodeit.dto.request.NotificationUpdateRequest;
 
 public interface ChannelService {
 
@@ -23,4 +26,6 @@ public interface ChannelService {
     List<ChannelDto> findAllByUserId(UUID userId);
 
     List<ChannelDto> findAllPublic();
+
+    void updateNotificationSetting(UUID channelId, User user, NotificationUpdateRequest request);
 }

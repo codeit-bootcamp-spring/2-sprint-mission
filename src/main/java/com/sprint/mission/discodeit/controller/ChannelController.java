@@ -4,11 +4,14 @@ import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.NotificationUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,16 +37,16 @@ public class ChannelController {
 
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> createPublic(
-        @Valid @RequestBody PublicChannelCreateRequest request,
-        @AuthenticationPrincipal User user) {
+            @Valid @RequestBody PublicChannelCreateRequest request,
+            @AuthenticationPrincipal User user) {
         ChannelDto createdChannel = channelService.create(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
 
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> createPrivate(
-        @Valid @RequestBody PrivateChannelCreateRequest request,
-        @AuthenticationPrincipal User user) {
+            @Valid @RequestBody PrivateChannelCreateRequest request,
+            @AuthenticationPrincipal User user) {
         ChannelDto createdChannel = channelService.create(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdChannel);
     }
@@ -69,7 +72,7 @@ public class ChannelController {
 
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> update(@PathVariable("channelId") UUID channelId,
-        @Valid @RequestBody PublicChannelUpdateRequest request) {
+                                             @Valid @RequestBody PublicChannelUpdateRequest request) {
         ChannelDto udpatedChannelDto = channelService.update(channelId, request);
         return ResponseEntity.status(HttpStatus.OK).body(udpatedChannelDto);
     }
@@ -77,6 +80,15 @@ public class ChannelController {
     @DeleteMapping("/{channelId}")
     public ResponseEntity<Void> delete(@PathVariable("channelId") UUID channelId) {
         channelService.delete(channelId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/{channelId}/notifications")
+    public ResponseEntity<Void> updateNotificationSetting(
+            @PathVariable("channelId") UUID channelId,
+            @Valid @RequestBody NotificationUpdateRequest request,
+            @AuthenticationPrincipal User user) {
+        channelService.updateNotificationSetting(channelId, user, request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

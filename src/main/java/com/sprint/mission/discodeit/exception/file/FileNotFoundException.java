@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.exception.file;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.util.UUID;
 
-public class FileNotFoundCustomException extends FileException {
+public class FileNotFoundException extends FileException {
 
-    public FileNotFoundCustomException() {
+    public FileNotFoundException() {
         super(ErrorCode.FILE_NOT_FOUND);
     }
 

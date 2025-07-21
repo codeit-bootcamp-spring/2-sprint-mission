@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 
 
 @Slf4j
@@ -39,14 +41,16 @@ public class MessageController {
 
     private final MessageService messageService;
 
+    @Timed(value = "message.create", description = "Time taken to create a message")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> create(
-        @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
+        @RequestPart("request") @Valid MessageCreateRequest request,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments,
-        @AuthenticationPrincipal User user) {
-
-        MessageDto createdMessage = messageService.create(messageCreateRequest, attachments, user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdMessage);
+        @AuthenticationPrincipal JwtSession jwtSession
+    ) {
+        User user = jwtSession.getUser();
+        MessageDto messageDto = messageService.create(request, attachments, user);
+        return new ResponseEntity<>(messageDto, HttpStatus.CREATED);
     }
 
     @PatchMapping(path = "{messageId}")
@@ -70,6 +74,12 @@ public class MessageController {
         PageResponse<MessageDto> messages = messageService.findAllByChannelId(channelId, cursor,
             pageable.getPageSize());
         return ResponseEntity.status(HttpStatus.OK).body(messages);
+    }
+
+    @GetMapping("/{messageId}")
+    public ResponseEntity<MessageDto> getMessageById(@PathVariable UUID messageId) {
+        MessageDto messageDto = messageService.find(messageId);
+        return ResponseEntity.status(HttpStatus.OK).body(messageDto);
     }
 
 

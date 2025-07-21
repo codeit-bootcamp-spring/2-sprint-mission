@@ -19,7 +19,7 @@ public interface MessageService {
 
     PageResponse<MessageDto> findAllByChannelId(UUID channelId, String cursor, int size);
 
-    Instant lastMessageTime(UUID channelId);
+    Instant findLastMessageTimestamp(UUID channelId);
 
     MessageDto update(UUID messageId, MessageUpdateRequest request);
 
