@@ -19,10 +19,12 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -60,11 +62,8 @@ public class JwtService {
   @Transactional
   public JwtSession refreshSession(String refreshToken) {
     JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
-        .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다."));
-
-    if (isInvalidAccessToken(refreshToken)) {
-      throw new IllegalArgumentException("리프레시 토큰이 만료되었습니다.");
-    }
+        .orElseThrow(() -> new IllegalArgumentException("해당 refresh토큰의 jwt세션이 존재하지 않습니다."));
+    JwtBlacklist.put(jwtSession.getAccessToken(), Instant.now());
 
     User user = jwtSession.getUser();
     UserResult userResult = UserResult.fromEntity(user, true);

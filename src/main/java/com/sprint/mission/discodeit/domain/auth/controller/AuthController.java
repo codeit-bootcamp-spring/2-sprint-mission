@@ -35,9 +35,6 @@ public class AuthController {
   @GetMapping("/me")
   public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
     String refreshToken = extractRefreshTokenFromCookie(request);
-    if (refreshToken == null) {
-      return ResponseEntity.status(401).body("리프레시 토큰이 없습니다.");
-    }
     String accessToken = jwtService.getAccessTokenByRefreshToken(refreshToken);
 
     return ResponseEntity.ok(accessToken);
@@ -45,9 +42,12 @@ public class AuthController {
 
   @PutMapping("/role")
   public ResponseEntity<UserResult> updateRole(
-      @RequestBody RoleUpdateRequest roleUpdateRequest
+      @RequestBody RoleUpdateRequest roleUpdateRequest,
+      HttpServletRequest request
   ) {
     UserResult userResult = authService.updateRole(roleUpdateRequest);
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    jwtService.invalidateSession(refreshToken);
 
     return ResponseEntity.ok(userResult);
   }
@@ -68,7 +68,7 @@ public class AuthController {
 
   private String extractRefreshTokenFromCookie(HttpServletRequest request) {
     if (request.getCookies() == null) {
-      return null;
+      throw new IllegalArgumentException("리프레시 토큰이 없습니다.");
     }
 
     for (Cookie cookie : request.getCookies()) {
@@ -76,7 +76,8 @@ public class AuthController {
         return cookie.getValue();
       }
     }
-    return null;
+
+    throw new IllegalArgumentException("리프레시 토큰이 없습니다.");
   }
 
 }
