@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.domain.binarycontent.storage;
 
 import static org.mockito.ArgumentMatchers.any;
 
-import com.sprint.mission.discodeit.common.failure.AsyncTaskFailure;
-import com.sprint.mission.discodeit.common.failure.AsyncTaskFailureRepository;
+import com.sprint.mission.discodeit.failure.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.common.s3.S3Adapter;
 import com.sprint.mission.discodeit.common.s3.exception.S3UploadException;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestTemplate;
@@ -29,7 +27,6 @@ import org.springframework.web.client.RestTemplate;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import software.amazon.awssdk.core.exception.SdkClientException;
 
 
 public class S3BinaryContentStorageTest extends IntegrationTestSupport {

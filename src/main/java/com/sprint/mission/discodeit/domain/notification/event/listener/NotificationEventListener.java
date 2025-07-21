@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.domain.notification.event.listener;
 
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
 
-import com.sprint.mission.discodeit.common.failure.AsyncTaskFailure;
-import com.sprint.mission.discodeit.common.failure.AsyncTaskFailureRepository;
+import com.sprint.mission.discodeit.failure.AsyncTaskFailure;
+import com.sprint.mission.discodeit.failure.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.domain.notification.entity.Notification;
 import com.sprint.mission.discodeit.domain.notification.event.event.NotificationEvent;
 import com.sprint.mission.discodeit.domain.notification.repository.NotificationRepository;

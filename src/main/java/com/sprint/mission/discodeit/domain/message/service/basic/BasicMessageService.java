@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.domain.notification.event.event.NewMessageNo
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,10 @@ public class BasicMessageService implements MessageService {
 
   private final ApplicationEventPublisher eventPublisher;
 
+  @Timed(
+      value = "file_upload",
+      percentiles = {0.5, 0.95, 0.99}
+  )
   @Transactional
   @Override
   public MessageResult create(
