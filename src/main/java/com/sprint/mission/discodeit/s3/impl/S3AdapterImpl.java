@@ -1,22 +1,24 @@
-package com.sprint.mission.discodeit.common.s3.impl;
+package com.sprint.mission.discodeit.s3.impl;
 
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
 
 import com.sprint.mission.discodeit.failure.AsyncTaskFailure;
 import com.sprint.mission.discodeit.failure.AsyncTaskFailureRepository;
-import com.sprint.mission.discodeit.common.s3.S3Adapter;
-import com.sprint.mission.discodeit.common.s3.exception.S3UploadException;
+import com.sprint.mission.discodeit.s3.S3Adapter;
+import com.sprint.mission.discodeit.s3.exception.S3UploadException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -28,6 +30,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
@@ -50,7 +53,6 @@ public class S3AdapterImpl implements S3Adapter {
       PutObjectRequest putRequest,
       RequestBody request
   ) {
-
     try {
       Thread.sleep(4000);
     } catch (InterruptedException ex) {

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.util;
+package com.sprint.mission.discodeit.util;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.domain.binarycontent.storage;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.sprint.mission.discodeit.failure.AsyncTaskFailureRepository;
-import com.sprint.mission.discodeit.common.s3.S3Adapter;
-import com.sprint.mission.discodeit.common.s3.exception.S3UploadException;
+import com.sprint.mission.discodeit.s3.S3Adapter;
+import com.sprint.mission.discodeit.s3.exception.S3UploadException;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;

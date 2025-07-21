@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.s3.config;
+package com.sprint.mission.discodeit.s3.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

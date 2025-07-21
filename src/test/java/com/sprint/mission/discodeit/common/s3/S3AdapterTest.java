@@ -5,6 +5,7 @@ import static org.mockito.Mockito.atLeastOnce;
 
 import com.sprint.mission.discodeit.failure.AsyncTaskFailure;
 import com.sprint.mission.discodeit.failure.AsyncTaskFailureRepository;
+import com.sprint.mission.discodeit.s3.S3Adapter;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import java.time.Duration;
 import java.util.UUID;

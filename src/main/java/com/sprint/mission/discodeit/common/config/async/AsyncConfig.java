@@ -1,8 +1,11 @@
-package com.sprint.mission.discodeit.common.config;
+package com.sprint.mission.discodeit.common.config.async;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskDecorator;
+import org.springframework.core.task.support.CompositeTaskDecorator;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -11,27 +14,37 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AsyncConfig {
 
   @Bean("uploadExecutor")
-  public Executor S3Executor() {
+  public Executor S3Executor(TaskDecorator taskDecorator) {
+
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
     executor.setMaxPoolSize(3);
     executor.setThreadNamePrefix("S3-Thread-");
-    executor.setTaskDecorator(new ContextTaskDecorator()); // 데코레이터 분리 필요
+    executor.setTaskDecorator(taskDecorator);
     executor.initialize();
 
     return executor;
   }
 
   @Bean("notificationExecutor")
-  public Executor NotificationExecutor() {
+  public Executor NotificationExecutor(TaskDecorator taskDecorator) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
     executor.setMaxPoolSize(3);
     executor.setThreadNamePrefix("Notification-Thread-");
-    executor.setTaskDecorator(new ContextTaskDecorator());
+    executor.setTaskDecorator(taskDecorator);
     executor.initialize();
 
     return executor;
+  }
+
+  @Bean
+  public TaskDecorator taskDecorator() {
+    List<TaskDecorator> decorators = List.of(
+        new MDCContextTaskDecorator(),
+        new SecurityContextTaskDecorator()
+    );
+    return new CompositeTaskDecorator(decorators);
   }
 
 }

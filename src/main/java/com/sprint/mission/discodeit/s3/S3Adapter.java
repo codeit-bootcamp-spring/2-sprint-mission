@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.s3;
+package com.sprint.mission.discodeit.s3;
 
 import java.io.InputStream;
 import java.net.URI;

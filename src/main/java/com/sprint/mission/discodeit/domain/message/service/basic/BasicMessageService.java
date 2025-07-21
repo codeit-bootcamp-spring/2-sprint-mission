@@ -27,14 +27,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -48,7 +51,6 @@ public class BasicMessageService implements MessageService {
 
   private final ApplicationEventPublisher eventPublisher;
 
-  // 메세지 업로드할때, 알림 캐시는 다시 리셋해야합니다.
   @Timed(
       value = "file_upload",
       percentiles = {0.5, 0.95, 0.99}
