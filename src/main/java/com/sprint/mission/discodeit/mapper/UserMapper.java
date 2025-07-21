@@ -10,4 +10,7 @@ public interface UserMapper {
 
   @Mapping(target = "online", ignore = true)
   UserDto toDto(User user);
+
+  @Mapping(target = "online", expression = "java(online)")
+  UserDto toDto(User user, boolean online);
 }

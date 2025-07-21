@@ -142,9 +142,10 @@ class BasicChannelServiceTest {
   @DisplayName("사용자별 채널 목록 조회 성공")
   void findAllByUserId_Success() {
     // given
-    List<ReadStatus> readStatuses = List.of(new ReadStatus(user, channel, Instant.now()));
+    List<ReadStatus> readStatuses = List.of(new ReadStatus(user, channel, Instant.now(), false));
     given(readStatusRepository.findAllByUserId(eq(userId))).willReturn(readStatuses);
-    given(channelRepository.findAllByTypeOrIdIn(eq(ChannelType.PUBLIC), eq(List.of(channel.getId()))))
+    given(
+        channelRepository.findAllByTypeOrIdIn(eq(ChannelType.PUBLIC), eq(List.of(channel.getId()))))
         .willReturn(List.of(channel));
     given(channelMapper.toDto(any(Channel.class))).willReturn(channelDto);
 

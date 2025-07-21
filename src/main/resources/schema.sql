@@ -9,19 +9,20 @@ CREATE TABLE users
     email      varchar(100) UNIQUE      NOT NULL,
     password   varchar(60)              NOT NULL,
     profile_id uuid,
-    role       varchar(30)              NOT NULL
+    role       varchar(20)              NOT NULL
 );
 
 -- BinaryContent
 CREATE TABLE binary_contents
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    file_name    varchar(255)             NOT NULL,
-    size         bigint                   NOT NULL,
-    content_type varchar(100)             NOT NULL
---     ,bytes        bytea        NOT NULL
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(10)              NOT NULL
 );
+
 
 -- Channel
 CREATE TABLE channels
@@ -56,26 +57,29 @@ CREATE TABLE message_attachments
 -- ReadStatus
 CREATE TABLE read_statuses
 (
-    id           uuid PRIMARY KEY,
-    created_at   timestamp with time zone NOT NULL,
-    updated_at   timestamp with time zone,
-    user_id      uuid                     NOT NULL,
-    channel_id   uuid                     NOT NULL,
-    last_read_at timestamp with time zone NOT NULL,
+    id                   uuid PRIMARY KEY,
+    created_at           timestamp with time zone NOT NULL,
+    updated_at           timestamp with time zone,
+    user_id              uuid                     NOT NULL,
+    channel_id           uuid                     NOT NULL,
+    last_read_at         timestamp with time zone NOT NULL,
+    notification_enabled boolean                  NOT NULL,
     UNIQUE (user_id, channel_id)
 );
 
--- JwtSession
-CREATE TABLE jwt_sessions
+-- Notification
+CREATE TABLE notifications
 (
-    id            uuid PRIMARY KEY,
-    user_id       uuid                     NOT NULL,
-    access_token  VARCHAR(500)             NOT NULL UNIQUE,
-    refresh_token VARCHAR(500)             NOT NULL UNIQUE,
-    created_at    timestamp with time zone NOT NULL,
-    expires_at    timestamp with time zone NOT NULL,
-    revoked       boolean                  NOT NULL DEFAULT FALSE
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    updated_at  timestamp with time zone,
+    receiver_id uuid                     NOT NULL,
+    title       varchar(255)             NOT NULL,
+    content     text                     NOT NULL,
+    type        varchar(20)              NOT NULL,
+    target_id   uuid
 );
+
 
 -- 제약 조건
 -- User (1) -> BinaryContent (1)
@@ -120,13 +124,36 @@ ALTER TABLE read_statuses
             REFERENCES channels (id)
             ON DELETE CASCADE;
 
--- JwtSession (N) -> User (1)
-ALTER TABLE jwt_sessions
-    ADD CONSTRAINT fk_jwt_session_user
-        FOREIGN KEY (user_id)
-            REFERENCES users (id)
-            ON DELETE CASCADE;
+CREATE TABLE persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+);
 
+CREATE TABLE jwt_sessions
+(
+    id              uuid PRIMARY KEY,
+    created_at      timestamp with time zone NOT NULL,
+    updated_at      timestamp with time zone,
 
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
+    user_id         uuid                     NOT NULL,
+    access_token    TEXT UNIQUE              NOT NULL,
+    refresh_token   TEXT UNIQUE              NOT NULL,
+    expiration_time timestamp with time zone NOT NULL
+);
+
+CREATE TABLE async_task_failure
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    updated_at     timestamp with time zone,
+
+    task_name      varchar(255)             NOT NULL,
+    request_id     varchar(255)             NOT NULL,
+    failure_reason text                     NOT NULL
+);
+--
+-- DROP SCHEMA public CASCADE;
+-- CREATE SCHEMA public;

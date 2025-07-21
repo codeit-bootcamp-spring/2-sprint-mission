@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -32,42 +30,48 @@ public class AuthController implements AuthApi {
   private final AuthService authService;
   private final JwtService jwtService;
 
-  @GetMapping("/csrf-token")
-  public ResponseEntity<CsrfToken> csrfToken(CsrfToken csrfToken) {
-    log.info("csrf-token - CSRF 토큰 요청");
-    return ResponseEntity.ok(csrfToken);
+  @GetMapping("csrf-token")
+  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+    log.debug("CSRF 토큰 요청");
+    return ResponseEntity.status(HttpStatus.OK).body(csrfToken);
   }
 
-  @GetMapping("/me")
+  @GetMapping("me")
   public ResponseEntity<String> me(
-      @CookieValue(value = "refresh_token", required = false) String refreshToken) {
-    log.info("me - 정보 조회 요청");
-    JwtSession jwtSession = jwtService.findJwtSessionByRefreshToken(refreshToken);
-
-    return ResponseEntity.ok(jwtSession.getAccessToken());
+      @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+    log.info("내 정보 조회 요청");
+    JwtSession jwtSession = jwtService.getJwtSession(refreshToken);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(jwtSession.getAccessToken());
   }
 
-  @PutMapping("/role")
-  public ResponseEntity<UserDto> updateRole(@RequestBody RoleUpdateRequest request) {
-    log.info("role - 권한 수정 요청");
-    UserDto res = authService.updateRole(request);
-    return ResponseEntity.ok(res);
+  @PutMapping("role")
+  public ResponseEntity<UserDto> role(@RequestBody RoleUpdateRequest request) {
+    log.info("권한 수정 요청");
+    UserDto userDto = authService.updateRole(request);
+
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userDto);
   }
 
-  @PostMapping("/refresh")
-  public ResponseEntity<?> refreshToken(@CookieValue("refresh_token") String refreshToken,
-      HttpServletResponse response) {
-    if (refreshToken == null || refreshToken.isBlank() || !jwtService.validateToken(refreshToken)) {
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-          .body(new DiscodeitException(ErrorCode.INVALID_USER_CREDENTIALS));
-    }
+  @PostMapping("refresh")
+  public ResponseEntity<String> refresh(
+      @CookieValue(JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
+      HttpServletResponse response
+  ) {
+    log.info("토큰 재발급 요청");
+    JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
 
-    JwtSession newJwtSession = jwtService.refreshToken(refreshToken);
+    Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME,
+        jwtSession.getRefreshToken());
+    refreshTokenCookie.setHttpOnly(true);
+    response.addCookie(refreshTokenCookie);
 
-    Cookie cookie = new Cookie(JwtService.REFRESH_TOKEN, newJwtSession.getRefreshToken());
-    cookie.setHttpOnly(true);
-    response.addCookie(cookie);
-
-    return ResponseEntity.ok(newJwtSession.getAccessToken());
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(jwtSession.getAccessToken())
+        ;
   }
 }

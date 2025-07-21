@@ -45,7 +45,6 @@ class ReadStatusRepositoryTest {
   private User createTestUser(String username, String email) {
     BinaryContent profile = new BinaryContent("profile.jpg", 1024L, "image/jpeg");
     User user = new User(username, email, "password123!@#", profile);
-
     return userRepository.save(user);
   }
 
@@ -61,7 +60,7 @@ class ReadStatusRepositoryTest {
    * TestFixture: 테스트용 읽음 상태 생성
    */
   private ReadStatus createTestReadStatus(User user, Channel channel, Instant lastReadAt) {
-    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt);
+    ReadStatus readStatus = new ReadStatus(user, channel, lastReadAt, false);
     return readStatusRepository.save(readStatus);
   }
 
@@ -114,7 +113,6 @@ class ReadStatusRepositoryTest {
     // 사용자 정보가 함께 로드되었는지 확인 (FETCH JOIN)
     for (ReadStatus status : readStatuses) {
       assertThat(Hibernate.isInitialized(status.getUser())).isTrue();
-      assertThat(Hibernate.isInitialized(status.getUser().getStatus())).isTrue();
       assertThat(Hibernate.isInitialized(status.getUser().getProfile())).isTrue();
     }
   }
