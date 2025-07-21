@@ -16,6 +16,8 @@ import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
 import com.sprint.mission.discodeit.domain.notification.event.event.NewMessageNotificationEvent;
+import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
@@ -25,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +44,11 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentCore binaryContentCore;
   private final MessageResultMapper messageResultMapper;
+  private final ReadStatusRepository readStatusRepository;
 
   private final ApplicationEventPublisher eventPublisher;
 
+  // 메세지 업로드할때, 알림 캐시는 다시 리셋해야합니다.
   @Timed(
       value = "file_upload",
       percentiles = {0.5, 0.95, 0.99}
@@ -116,9 +119,18 @@ public class BasicMessageService implements MessageService {
   }
 
   private void publishMessageEvent(UUID userId, Channel channel) {
+    if (isNotificationNotEnabled(userId, channel.getId())) {
+      return;
+    }
     NewMessageNotificationEvent newMessageNotificationEvent = new NewMessageNotificationEvent(
         userId, channel.getId(), getChannelName(channel));
     eventPublisher.publishEvent(newMessageNotificationEvent);
+  }
+
+  private boolean isNotificationNotEnabled(UUID userId, UUID channelId) {
+    return !readStatusRepository.findByChannelIdAndUserId(channelId, userId)
+        .map(ReadStatus::getNotificationEnabled)
+        .orElse(false);
   }
 
   private String getChannelName(Channel channel) {

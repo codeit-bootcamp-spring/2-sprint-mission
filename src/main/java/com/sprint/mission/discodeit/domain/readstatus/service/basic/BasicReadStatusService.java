@@ -36,13 +36,17 @@ public class BasicReadStatusService implements ReadStatusService {
         .orElseThrow(() -> new ChannelNotFoundException(Map.of()));
     User user = userRepository.findById(readStatusCreateRequest.userId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
-    if (readStatusRepository.existsByChannelIdAndUserId(channel.getId(), user.getId())) {
-      throw new ReadStatusAlreadyExistsException(Map.of());
-    }
+    validateReadStatusExist(channel, user);
 
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel));
 
     return ReadStatusResult.fromEntity(readStatus);
+  }
+
+  private void validateReadStatusExist(Channel channel, User user) {
+    if (readStatusRepository.existsByChannelIdAndUserId(channel.getId(), user.getId())) {
+      throw new ReadStatusAlreadyExistsException(Map.of());
+    }
   }
 
   @Transactional(readOnly = true)

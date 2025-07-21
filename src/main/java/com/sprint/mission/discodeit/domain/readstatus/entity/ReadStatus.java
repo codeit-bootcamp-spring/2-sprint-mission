@@ -17,11 +17,11 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
 
@@ -35,15 +35,15 @@ public class ReadStatus extends BaseUpdatableEntity {
     this.user = user;
     this.channel = channel;
     this.lastReadTime = ZonedDateTime.now().toInstant();
-    this.notificationEnabled = createNotificationEnabled(channel);
+    this.notificationEnabled = isNotificationEnabled(channel);
   }
 
   public void updateLastReadTime(Instant time) {
     this.lastReadTime = time;
   }
 
-  private boolean createNotificationEnabled(Channel channel) {
-    return channel.isPublic();
+  private boolean isNotificationEnabled(Channel channel) {
+    return channel.isPrivate();
   }
 
 }

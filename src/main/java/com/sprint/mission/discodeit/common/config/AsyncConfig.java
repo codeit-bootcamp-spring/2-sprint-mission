@@ -16,7 +16,7 @@ public class AsyncConfig {
     executor.setCorePoolSize(1);
     executor.setMaxPoolSize(3);
     executor.setThreadNamePrefix("S3-Thread-");
-    executor.setTaskDecorator(new ContextTaskDecorator());
+    executor.setTaskDecorator(new ContextTaskDecorator()); // 데코레이터 분리 필요
     executor.initialize();
 
     return executor;

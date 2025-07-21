@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.domain.notification.event.listener;
 
+import static com.sprint.mission.discodeit.common.config.CacheConfig.NOTIFICATION_CACHE_NAME;
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
 
 import com.sprint.mission.discodeit.failure.AsyncTaskFailure;
@@ -10,6 +11,8 @@ import com.sprint.mission.discodeit.domain.notification.repository.NotificationR
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -25,6 +28,7 @@ public class NotificationEventListener {
   private final NotificationRepository notificationRepository;
   private final AsyncTaskFailureRepository asyncTaskFailureRepository;
 
+  @CacheEvict(value = NOTIFICATION_CACHE_NAME, key = "#event.receiverId")
   @Async("notificationExecutor")
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   @Retryable(
