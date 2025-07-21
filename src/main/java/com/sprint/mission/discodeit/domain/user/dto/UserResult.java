@@ -7,16 +7,18 @@ import com.sprint.mission.discodeit.domain.user.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserResult(UUID id,
-                         Instant createdAt,
-                         Instant updatedAt,
-                         String username,
-                         String email,
-                         BinaryContentResult profile,
-                         Role role,
-                         boolean online) {
+public record UserResult(
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    BinaryContentResult profile,
+    Role role,
+    boolean online
+) {
 
-  public static UserResult fromEntity(User user, boolean isOnline) {
+  public static UserResult from(User user, boolean isOnline) {
     BinaryContentResult binaryContentResult = getBinaryContentResult(user);
 
     return new UserResult(user.getId(),

@@ -23,7 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     User user = userRepository.findByName(username)
         .orElseThrow(UserNotFoundException::new);
 
-    return new CustomUserDetails(UserResult.fromEntity(user, true), user.getPassword());
+    return new CustomUserDetails(UserResult.from(user, true), user.getPassword());
   }
 
 }

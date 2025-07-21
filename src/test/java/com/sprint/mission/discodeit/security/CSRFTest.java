@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
@@ -98,7 +97,7 @@ public class CSRFTest extends IntegrationTestSupport {
         convertJsonRequest(userCreateRequest).getBytes());
 
     User user = new User(name, email, password, null);
-    UserResult stubResult = UserResult.fromEntity(user, true);
+    UserResult stubResult = UserResult.from(user, true);
     BDDMockito.given(userService.register(any(), any())).willReturn(stubResult);
 
     // when

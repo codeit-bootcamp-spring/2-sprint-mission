@@ -66,7 +66,7 @@ public class JwtService {
     JwtBlacklist.put(jwtSession.getAccessToken(), Instant.now());
 
     User user = jwtSession.getUser();
-    UserResult userResult = UserResult.fromEntity(user, true);
+    UserResult userResult = UserResult.from(user, true);
 
     Instant now = Instant.now();
     Instant accessExp = now.plusSeconds(jwtProperties.accessTokenExpiration());

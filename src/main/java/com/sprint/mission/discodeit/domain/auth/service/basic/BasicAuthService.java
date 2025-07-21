@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.domain.auth.service.basic;
 
 import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
-import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
 import com.sprint.mission.discodeit.domain.notification.event.event.RoleChangeNotificationEvent;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
@@ -11,7 +10,6 @@ import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.repository.JwtSessionRepository;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -48,7 +46,7 @@ public class BasicAuthService implements AuthService {
 
     User savedUser = userRepository.save(admin);
 
-    return UserResult.fromEntity(savedUser, false);
+    return UserResult.from(savedUser, false);
   }
 
   @Transactional
@@ -62,7 +60,7 @@ public class BasicAuthService implements AuthService {
     publishRoleChangeEvent(savedUser);
 
     jwtSessionRepository.deleteById(savedUser.getId());
-    return UserResult.fromEntity(savedUser, false);
+    return UserResult.from(savedUser, false);
   }
 
   private void publishRoleChangeEvent(User user) {

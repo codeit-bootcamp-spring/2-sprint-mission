@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain.user.service.basic;
 
+import static com.sprint.mission.discodeit.common.config.CacheConfig.USER_CACHE_NAME;
+
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.service.basic.BinaryContentCore;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +50,7 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(savedUser);
   }
 
+  @Cacheable(value = USER_CACHE_NAME, key = "#userId")
   @Transactional(readOnly = true)
   @Override
   public UserResult getById(UUID userId) {
@@ -56,6 +60,7 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(user);
   }
 
+  @Cacheable(value = USER_CACHE_NAME, key = "#name")
   @Transactional(readOnly = true)
   @Override
   public UserResult getByName(String name) {
@@ -65,6 +70,7 @@ public class BasicUserService implements UserService {
     return userResultMapper.convertToUserResult(user);
   }
 
+  @Cacheable(value = USER_CACHE_NAME, key = "'all'")
   @Transactional(readOnly = true)
   @Override
   public List<UserResult> getAllIn() {
@@ -74,6 +80,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @Cacheable(value = USER_CACHE_NAME, key = "#email")
   @Transactional(readOnly = true)
   @Override
   public UserResult getByEmail(String email) {

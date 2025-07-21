@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain.channel.service.basic;
 
+import static com.sprint.mission.discodeit.common.config.CacheConfig.CHANNEL_CACHE_NAME;
+
 import com.sprint.mission.discodeit.domain.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelUpdateRequest;
@@ -17,6 +19,7 @@ import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +60,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(savedChannel);
   }
 
+  @Cacheable(value = CHANNEL_CACHE_NAME, key = "'channel_'+#channelId")
   @Transactional(readOnly = true)
   @Override
   public ChannelResult getById(UUID channelId) {
@@ -66,6 +70,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(channel);
   }
 
+  @Cacheable(value = CHANNEL_CACHE_NAME, key = "'user_'+#userId")
   @Transactional(readOnly = true)
   @Override
   public List<ChannelResult> getAllByUserId(UUID userId) {

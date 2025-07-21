@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.entity.User;
-import com.sprint.mission.discodeit.domain.user.service.UserService;
 import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -19,9 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.BDDMockito;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class UserControllerTest extends ControllerTestSupport {
 
@@ -34,7 +31,7 @@ class UserControllerTest extends ControllerTestSupport {
     String password = "1111/111";
 
     User user = new User(name, email, password, null);
-    UserResult stubResult = UserResult.fromEntity(user, true);
+    UserResult stubResult = UserResult.from(user, true);
     BDDMockito.given(userService.register(any(), any())).willReturn(stubResult);
     UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password);
     MockMultipartFile multipartFile = new MockMultipartFile("userCreateRequest", null,
@@ -62,7 +59,7 @@ class UserControllerTest extends ControllerTestSupport {
   void register_Validation(String name, String email, String password, String expectedMessage) {
     // given
     User user = new User(name, email, password, null);
-    UserResult stubResult = UserResult.fromEntity(user, true);
+    UserResult stubResult = UserResult.from(user, true);
     BDDMockito.given(userService.register(any(), any())).willReturn(stubResult);
     UserCreateRequest userCreateRequest = new UserCreateRequest(name, email, password);
     MockMultipartFile multipartFile = new MockMultipartFile("userCreateRequest", null,
@@ -108,7 +105,7 @@ class UserControllerTest extends ControllerTestSupport {
     String userId = UUID.randomUUID().toString();
 
     User user = new User(name, email, password, null);
-    UserResult stubResult = UserResult.fromEntity(user, false);
+    UserResult stubResult = UserResult.from(user, false);
     BDDMockito.given(userService.getById(any())).willReturn(stubResult);
 
     // when & then
@@ -129,7 +126,7 @@ class UserControllerTest extends ControllerTestSupport {
     String password = "1111/111";
 
     User user = new User(name, email, password, null);
-    UserResult stubResult = UserResult.fromEntity(user, false);
+    UserResult stubResult = UserResult.from(user, false);
     BDDMockito.given(userService.getById(any())).willReturn(stubResult);
 
     // when & then
