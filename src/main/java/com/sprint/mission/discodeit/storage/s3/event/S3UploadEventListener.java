@@ -37,6 +37,8 @@ public class S3UploadEventListener {
   // 메인 트랜잭션이 정상적으로 커밋된 이후에만 부가(비동기) 작업이 시작되므로, DB 일관성이 완벽하게 보장
   // Service 메서드 직접 @Async 사용시, 비즈니스와 인프라(비동기, 네트워크, 재시도, 예외처리 등) 코드가 뒤섞여 가독성과 테스트, 확장이 어려워짐
   @Async("binaryContentTaskExecutor")
+  // @Order를 추가로 사용하지 않아도 @Retryable이 @Transactional보다 먼저 실행됨 -> Retry마다 새로운 트랜잭션 생성 -> 트랜잭션이 짧고 독립적이기 때문에 훨씬 안전함
+  // 트랜잭션 하나에서 Retry가 계속 동작한다면 롤백 내역 누적 + 락이 계속 지속됨 + 장기 트랜잭션 -> 문제 발생
   @Retryable(
       maxAttempts = 3,
       recover = "createAsyncTaskFailure",
