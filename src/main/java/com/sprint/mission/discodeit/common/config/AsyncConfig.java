@@ -11,11 +11,23 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AsyncConfig {
 
   @Bean("uploadExecutor")
-  public Executor s3Executor() {
+  public Executor S3Executor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
-    executor.setMaxPoolSize(1);
+    executor.setMaxPoolSize(3);
     executor.setThreadNamePrefix("S3-Thread-");
+    executor.setTaskDecorator(new ContextTaskDecorator());
+    executor.initialize();
+
+    return executor;
+  }
+
+  @Bean("notificationExecutor")
+  public Executor NotificationExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(1);
+    executor.setMaxPoolSize(3);
+    executor.setThreadNamePrefix("Notification-Thread-");
     executor.setTaskDecorator(new ContextTaskDecorator());
     executor.initialize();
 

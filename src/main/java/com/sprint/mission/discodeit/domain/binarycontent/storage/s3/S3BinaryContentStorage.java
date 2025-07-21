@@ -4,28 +4,28 @@ import static com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryCon
 
 import com.sprint.mission.discodeit.common.s3.S3Adapter;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.domain.notification.event.event.AsyncFailedNotificationEvent;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Slf4j
 @Component
@@ -37,6 +37,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
   private final S3Adapter s3Adapter;
   private final BinaryContentRepository binaryContentRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Value("${discodeit.storage.s3.presigned-url-expiration}")
   private long presignedUrlExpirationSeconds;
@@ -54,6 +55,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .key(key)
         .contentType(UPLOAD_FILE_TYPE)
         .build();
+
     s3Adapter.put(putRequest, RequestBody.fromBytes(bytes))
         .thenAccept(success -> {
           binaryContent.updateUploadStatus(SUCCESS);
@@ -62,11 +64,22 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .exceptionally(failure -> {
           binaryContent.updateUploadStatus(FAILED);
           binaryContentRepository.save(binaryContent);
+          publishAsyncEvent();
           return null;
         });
-    ;
 
     return binaryContentId;
+  }
+
+  private void publishAsyncEvent() {
+    SecurityContext context = SecurityContextHolder.getContext();
+    UserResult userResult = (UserResult) context.getAuthentication().getPrincipal();
+
+    AsyncFailedNotificationEvent asyncFailedNotificationEvent = new AsyncFailedNotificationEvent(
+        userResult.id(),
+        "S3"
+    );
+    eventPublisher.publishEvent(asyncFailedNotificationEvent);
   }
 
   @Override

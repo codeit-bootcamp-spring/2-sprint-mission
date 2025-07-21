@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
+import com.sprint.mission.discodeit.domain.notification.event.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
@@ -24,11 +25,11 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,8 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentCore binaryContentCore;
   private final MessageResultMapper messageResultMapper;
+
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional
   @Override
@@ -57,6 +60,8 @@ public class BasicMessageService implements MessageService {
     List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
+
+    publishMessageEvent(user.getId(), channel);
 
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
@@ -104,6 +109,19 @@ public class BasicMessageService implements MessageService {
     validateMessageExist(messageId);
 
     messageRepository.deleteById(messageId);
+  }
+
+  private void publishMessageEvent(UUID userId, Channel channel) {
+    NewMessageNotificationEvent newMessageNotificationEvent = new NewMessageNotificationEvent(
+        userId, channel.getId(), getChannelName(channel));
+    eventPublisher.publishEvent(newMessageNotificationEvent);
+  }
+
+  private String getChannelName(Channel channel) {
+    if (channel.getName() == null) {
+      return "프라이빗";
+    }
+    return channel.getName();
   }
 
   private Pageable createPageable(ChannelMessagePageRequest request) {
