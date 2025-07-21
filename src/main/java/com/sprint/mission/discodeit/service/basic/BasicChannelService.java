@@ -23,6 +23,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,8 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
 
     @Override
+    @Transactional
+    @CacheEvict(value = "channels", allEntries = true)
     public ChannelDto createPublicChannel(PublicChannelCreateRequest publicChannelCreateRequest) {
         log.info("공개 채널 생성 진행: channelName = {}", publicChannelCreateRequest.name());
         Channel channel = new Channel(publicChannelCreateRequest.name(),
@@ -49,6 +53,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "channels", allEntries = true)
     public ChannelDto createPrivateChannel(
         PrivateChannelCreateRequest privateChannelCreateRequest) {
         log.info("비공개 채널 생성 진행");
@@ -60,7 +65,7 @@ public class BasicChannelService implements ChannelService {
                     log.error("비공개 채널 생성 중 대상 사용자를 찾을 수 없음:  userId = {}", userId);
                     return UserNotFoundException.forId(userId.toString());
                 });
-            ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
+            ReadStatus readStatus = new ReadStatus(user, channel, Instant.now(), true);
             log.info("비공개 채널 생성 중 읽음 상태 저장 완료: userId = {}, readStatus = {}", userId, readStatus);
             readStatusRepository.save(readStatus);
         });
@@ -70,6 +75,19 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional(readOnly = true)
+    public ChannelDto findById(UUID channelId) {
+        log.info("채널 조회 시작: channelId = {}", channelId);
+        return channelRepository.findById(channelId)
+            .map(channelMapper::toDto)
+            .orElseThrow(() -> {
+                log.error("채널 조회 실패: channelId = {}", channelId);
+                return ChannelNotFoundException.forId(channelId.toString());
+            });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "channels", key = "#userId")
     public List<ChannelDto> findAllByUserId(UUID userId) {
         return channelRepository.findAllByUser(userId).stream()
             .map(channelMapper::toDto)
@@ -78,6 +96,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "channels", allEntries = true)
     public ChannelDto updateChannel(UUID channelId,
         PublicChannelUpdateRequest channelUpdateParamDto) {
         log.info("채널 수정 진행: channelId = {}", channelId);
@@ -102,6 +121,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "channels", allEntries = true)
     public void deleteChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
             .orElseThrow(() -> {

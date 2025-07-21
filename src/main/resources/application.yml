@@ -8,6 +8,21 @@ spring:
             client:
                 instance:
                     name: discodeit
+    kafka:
+        bootstrap-servers: ${KAFKA_HOST:localhost}:9092
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        consumer:
+            group-id: discodeit-group
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    data:
+        redis:
+            host: ${REDIS_HOST:localhost}
+            port: 6379
 
 discodeit:
     storage:
@@ -32,8 +47,6 @@ discodeit:
 
     jwt:
         secret: d9f8e4a2b6c7d5e9f1a3b8c2d7e4f0a1
-        access-token-validity-seconds: 900
-        refresh-token-validity-seconds: 7200
 
 management:
     endpoints:

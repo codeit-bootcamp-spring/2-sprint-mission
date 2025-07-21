@@ -83,7 +83,7 @@ public class SecurityConfig {
             )
             .authenticationProvider(daoAuthenticationProvider)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me", "/api/auth/refresh").permitAll()
+                .requestMatchers("/api/auth/csrf-token", "/api/auth/login", "/api/auth/me", "/api/auth/refresh", "/api/binaryContents/*/download").permitAll()
                 .requestMatchers(POST, "/api/users").permitAll()
                 .requestMatchers(PATCH, "/api/auth/role").hasRole(Role.ADMIN.name())
                 .requestMatchers(POST, "/api/channels/public", "/api/channels/private").hasRole(Role.CHANNEL_MANAGER.name())

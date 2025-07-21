@@ -23,7 +23,7 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
         HttpServletRequest request,
         HttpServletResponse response,
         Authentication authentication
-    ) throws IOException, ServletException {
+    ) throws IOException {
         DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
         jwtService.invalidateJwtSession(principal.getUserDto().id());
         JwtSession jwtSession = jwtService.createJwtSession(principal.getUserDto());

@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,10 +61,15 @@ public class AuthController implements AuthApi {
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refreshToken(
-        @CookieValue(value = "refresh_token") String refreshToken
+        @CookieValue(value = "refresh_token") String refreshToken,
+        HttpServletResponse response
     ) {
         JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
+        Cookie refreshTokenCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
+        response.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(jwtSession.getRefreshToken());
+        return ResponseEntity.
+            status(HttpStatus.OK)
+            .body(jwtSession.getAccessToken());
     }
 }

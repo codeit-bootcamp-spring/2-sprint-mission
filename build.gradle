@@ -10,7 +10,7 @@ ext {
 }
 
 group = 'com.sprint.mission'
-version = '2.2.-M10'
+version = '2.3.-M11'
 
 java {
     toolchain {
@@ -46,6 +46,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.retry:spring-retry'
     implementation 'de.codecentric:spring-boot-admin-starter-client'
 
     implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
@@ -59,6 +63,8 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     implementation 'software.amazon.awssdk:s3:2.31.7'
+
+    implementation 'org.springframework.kafka:spring-kafka'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

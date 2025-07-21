@@ -23,8 +23,7 @@ public class UserMapper {
         user.getUsername(),
         user.getEmail(),
         user.getRole(),
-        user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile(),
-            binaryContentStorage.get(user.getProfile().getId())) : null,
+        user.getProfile() != null ? binaryContentMapper.toDto(user.getProfile()) : null,
         online
     );
   }
