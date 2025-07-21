@@ -82,7 +82,7 @@ class BasicBinaryContentServiceTest {
     given(binaryContentMapper.toDto(any(BinaryContent.class))).willReturn(binaryContentDto);
 
     // when
-    BinaryContentDto result = binaryContentService.create(request);
+    BinaryContent result = binaryContentService.create(request);
 
     // then
     assertThat(result).isEqualTo(binaryContentDto);
