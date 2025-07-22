@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
@@ -8,24 +9,28 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,10 +45,12 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
+  private final ReadStatusRepository readStatusRepository;
   private final MessageMapper messageMapper;
-  private final BinaryContentStorage binaryContentStorage;
-  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentService binaryContentService;
   private final PageResponseMapper pageResponseMapper;
+  private final ApplicationEventPublisher eventPublisher;
+
 
   @Transactional
   @Override
@@ -59,17 +66,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> UserNotFoundException.withId(authorId));
 
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
-        .map(attachmentRequest -> {
-          String fileName = attachmentRequest.fileName();
-          String contentType = attachmentRequest.contentType();
-          byte[] bytes = attachmentRequest.bytes();
-
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType);
-          binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
-          return binaryContent;
-        })
+        .map(binaryContentService::createEntity)
         .toList();
 
     String content = messageCreateRequest.content();
@@ -79,6 +76,8 @@ public class BasicMessageService implements MessageService {
         author,
         attachments
     );
+
+    publishNewMessageNotifications(message, channel, author);
 
     messageRepository.save(message);
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
@@ -134,5 +133,28 @@ public class BasicMessageService implements MessageService {
     }
     messageRepository.deleteById(messageId);
     log.info("메시지 삭제 완료: id={}", messageId);
+  }
+
+  private void publishNewMessageNotifications(Message message, Channel channel, User author) {
+    List<ReadStatus> notificationEnabledStatuses = readStatusRepository
+        .findByChannelIdAndNotificationEnabledTrue(channel.getId());
+
+    String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
+
+    for (ReadStatus readStatus : notificationEnabledStatuses) {
+      if (!readStatus.getUser().getId().equals(author.getId())) {
+        UUID receiverId = readStatus.getUser().getId();
+        NewMessageNotificationEvent event = new NewMessageNotificationEvent(
+            receiverId,
+            channel.getId(),
+            message.getId(),
+            author.getUsername(),
+            requestId
+        );
+        eventPublisher.publishEvent(event);
+        log.debug("새 메시지 알림 이벤트 발행: receiverId={}, channelId={}",
+            readStatus.getUser().getId(), channel.getId());
+      }
+    }
   }
 }
