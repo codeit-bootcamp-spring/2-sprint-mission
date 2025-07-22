@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.security.filter;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.UserActivityService;
 import com.sprint.mission.discodeit.util.AuthUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,7 +17,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class UserActivityFilter extends OncePerRequestFilter {
 
-    private final UserRepository userRepository;
+
+    private final UserActivityService userActivityService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -27,12 +27,8 @@ public class UserActivityFilter extends OncePerRequestFilter {
 
         // 로그인이 되어 있으면 활동시간 갱신
         if (AuthUtils.isLoggedIn()) {
-            User user = AuthUtils.getCurrentUser();
-            Instant now = Instant.now();
-            if (user.getLastActiveAt() == null || Duration.between(user.getLastActiveAt(), now).toMinutes() >= 1) {
-                user.setLastActiveAt(now);
-                userRepository.save(user);
-            }
+            UUID userId = AuthUtils.getCurrentUser().getId();
+            userActivityService.updateLastActiveAt(userId, Instant.now());
         }
 
         filterChain.doFilter(request, response);

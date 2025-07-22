@@ -8,18 +8,42 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
   jpa:
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
     hibernate:
       ddl-auto: update
     open-in-view: false
+
   profiles:
     active:
       - dev # dev | prod
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=5m
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers
+        include: health, info, metrics, loggers, prometheus
   endpoint:
     health:
       show-details: always
@@ -59,6 +83,8 @@ discodeit:
 logging:
   level:
     root: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
 
 jwt:
   secret: "your-local-dev-secret-should-be-long-and-random"

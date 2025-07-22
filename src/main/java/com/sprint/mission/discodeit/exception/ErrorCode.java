@@ -32,7 +32,10 @@ public enum ErrorCode {
     INVALID_REQUEST("잘못된 요청입니다."),
 
     // 인증 관련 에러코드
-    UNAUTHORIZED_USER("허가되지 않은 사용자입니다.");
+    UNAUTHORIZED_USER("허가되지 않은 사용자입니다."),
+
+    // Notification 관련 에러 코드
+    NOTIFICATION_NOT_FOUND("삭제할 알림이 없습니다.");
 
     private final String message;
 

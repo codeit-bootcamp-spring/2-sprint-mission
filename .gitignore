@@ -49,3 +49,6 @@ bin/
 ### env ###
 .env
 discodeit.env
+
+### stroage ###
+/storage/

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.filter.CustomCsrfDebugFilter;
 import com.sprint.mission.discodeit.security.filter.JsonLogoutFilter;
 import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
@@ -11,6 +10,7 @@ import com.sprint.mission.discodeit.security.LoginSuccessHandler;
 import com.sprint.mission.discodeit.security.filter.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.UserActivityFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.service.UserActivityService;
 import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -96,7 +96,7 @@ public class SecurityConfig {
         HttpSecurity http,
         JsonLogoutFilter logoutFilter,
         JsonUsernamePasswordAuthenticationFilter loginFilter,
-        UserRepository userRepository,
+            UserActivityFilter userActivityFilter,
         JwtAuthenticationFilter jwtAuthenticationFilter
 
     ) throws Exception {
@@ -104,7 +104,6 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler handler = new CsrfTokenRequestAttributeHandler();
         handler.setCsrfRequestAttributeName("_csrf");
 
-        UserActivityFilter userActivityFilter = new UserActivityFilter(userRepository);
 
         http
             .securityContext(context -> context
@@ -125,7 +124,8 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/auth/csrf-token",
                     "/api/users",
-                    "/api/auth/logout"
+                    "/api/auth/logout",
+                    "/actuator/**"
                 ).permitAll()
 
                 // 사용자 권한 수정은 ROLE_ADMIN만
@@ -244,6 +244,11 @@ public class SecurityConfig {
             @Value("${jwt.refresh-token-expiry}") long refreshTokenExpiryMillis
     ) {
         return new LoginSuccessHandler(userMapper, csrfTokenRepository, jwtService, objectMapper, refreshTokenExpiryMillis);
+    }
+
+    @Bean
+    public UserActivityFilter userActivityFilter(UserActivityService userActivityService) {
+        return new UserActivityFilter(userActivityService);
     }
 }
 
