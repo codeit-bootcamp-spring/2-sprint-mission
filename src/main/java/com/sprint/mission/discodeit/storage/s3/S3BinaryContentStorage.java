@@ -1,104 +1,203 @@
 package com.sprint.mission.discodeit.storage.s3;
 
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.time.Duration;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
-import software.amazon.awssdk.services.s3.presigner.model.*;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-import java.io.InputStream;
-import java.time.Duration;
-import java.util.UUID;
-
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 @Component
 public class S3BinaryContentStorage implements BinaryContentStorage {
 
-    private final S3Client s3Client;
-    private final S3Presigner presigner;
-    private final String bucket;
-    private final long presignedUrlExpiration;
+  private final String accessKey;
+  private final String secretKey;
+  private final String region;
+  private final String bucket;
 
-    public S3BinaryContentStorage(
-            @Value("${discodeit.storage.s3.access-key}") String accessKey,
-            @Value("${discodeit.storage.s3.secret-key}") String secretKey,
-            @Value("${discodeit.storage.s3.region}") String region,
-            @Value("${discodeit.storage.s3.bucket}") String bucket,
-            @Value("${discodeit.storage.s3.presigned-url-expiration:600}") long presignedUrlExpiration
-    ) {
-        this.bucket = bucket;
-        this.presignedUrlExpiration = presignedUrlExpiration;
+  @Value("${discodeit.storage.s3.presigned-url-expiration:600}") // 기본값 10분
+  private long presignedUrlExpirationSeconds;
 
-        AwsBasicCredentials creds = AwsBasicCredentials.create(accessKey, secretKey);
+  public S3BinaryContentStorage(
+      @Value("${discodeit.storage.s3.access-key}") String accessKey,
+      @Value("${discodeit.storage.s3.secret-key}") String secretKey,
+      @Value("${discodeit.storage.s3.region}") String region,
+      @Value("${discodeit.storage.s3.bucket}") String bucket
+  ) {
+    this.accessKey = accessKey;
+    this.secretKey = secretKey;
+    this.region = region;
+    this.bucket = bucket;
+  }
 
-        this.s3Client = S3Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(creds))
-                .build();
+  @Override
+  public UUID put(UUID binaryContentId, byte[] bytes) {
+    String key = binaryContentId.toString();
 
-        this.presigner = S3Presigner.builder()
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(creds))
-                .build();
+    log.info("S3 파일 업로드 요청: {} ({}bytes)", key, bytes.length);
+
+    uploadToS3Async(binaryContentId, bytes);
+
+    return binaryContentId;
+  }
+
+  @Override
+  public UUID putSync(UUID binaryContentId, byte[] bytes) {
+    String key = binaryContentId.toString();
+    try {
+      S3Client s3Client = getS3Client();
+
+      PutObjectRequest request = PutObjectRequest.builder()
+              .bucket(bucket)
+              .key(key)
+              .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(bytes));
+      log.info("S3에 파일 업로드 성공: {}", key);
+
+      return binaryContentId;
+    } catch (S3Exception e) {
+      log.error("S3에 파일 업로드 실패: {}", e.getMessage());
+      throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
     }
+  }
 
-    @Override
-    public UUID put(UUID uuid, byte[] bytes) {
-        s3Client.putObject(
-                PutObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(uuid.toString())
-                        .build(),
-                RequestBody.fromBytes(bytes)
-        );
-        return uuid;
+  @Async("storageTaskExecutor")
+  @Retryable(
+          retryFor = {S3Exception.class, RuntimeException.class},
+          maxAttempts = 5,
+          backoff = @Backoff(delay = 2000, multiplier = 1.5, maxDelay = 30000)
+  )
+  void uploadToS3Async(UUID binaryContentId, byte[] bytes) {
+
+    String key = binaryContentId.toString();
+
+    try {
+      log.info("S3 파일 업로드 시작: {}", key);
+
+      S3Client s3Client = getS3Client();
+
+      PutObjectRequest request = PutObjectRequest.builder()
+              .bucket(bucket)
+              .key(key)
+              .build();
+
+      s3Client.putObject(request, RequestBody.fromBytes(bytes));
+      log.info("S3 파일 업로드 성공: {}", key);
+
+    } catch (S3Exception e) {
+      log.error("S3 파일 업로드 실패: {}", key, e);
     }
+  }
 
-    @Override
-    public InputStream get(UUID uuid) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(uuid.toString())
-                .build();
-        ResponseInputStream<GetObjectResponse> s3is = s3Client.getObject(getObjectRequest);
-        return s3is;
+  @Recover
+  public void recoverUploadToS3Async(RuntimeException e, UUID binaryContentId, byte[] bytes) {
+    String requestId = MDC.get("requestId");
+    AsyncTaskFailure failure = new AsyncTaskFailure("saveFileAsyncLocal" , requestId , e.getMessage());
+    log.error("비동기 S3 파일 저장 복구 로직 실행: {}", failure, e);
+  }
+
+  @Override
+  public InputStream get(UUID binaryContentId) {
+    String key = binaryContentId.toString();
+    try {
+      S3Client s3Client = getS3Client();
+
+      GetObjectRequest request = GetObjectRequest.builder()
+          .bucket(bucket)
+          .key(key)
+          .build();
+
+      byte[] bytes = s3Client.getObjectAsBytes(request).asByteArray();
+      return new ByteArrayInputStream(bytes);
+    } catch (S3Exception e) {
+      log.error("S3에서 파일 다운로드 실패: {}", e.getMessage());
+      throw new NoSuchElementException("File with key " + key + " does not exist");
     }
+  }
 
-    @Override
-    public ResponseEntity<Void> download(BinaryContentDto metaData) {
-        String presignedUrl = generatePresignedUrl(metaData.id(), metaData.contentType());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(java.net.URI.create(presignedUrl));
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);
+  private S3Client getS3Client() {
+    return S3Client.builder()
+        .region(Region.of(region))
+        .credentialsProvider(
+            StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKey, secretKey)
+            )
+        )
+        .build();
+  }
+
+  @Override
+  public ResponseEntity<Void> download(BinaryContentDto metaData) {
+    try {
+      String key = metaData.id().toString();
+      String presignedUrl = generatePresignedUrl(key, metaData.contentType());
+
+      log.info("생성된 Presigned URL: {}", presignedUrl);
+
+      return ResponseEntity
+          .status(HttpStatus.FOUND)
+          .header(HttpHeaders.LOCATION, presignedUrl)
+          .build();
+    } catch (Exception e) {
+      log.error("Presigned URL 생성 실패: {}", e.getMessage());
+      throw new RuntimeException("Presigned URL 생성 실패", e);
     }
+  }
 
-    public String generatePresignedUrl(UUID binaryCotnentId, String contentType) {
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(binaryCotnentId.toString())
-                .responseContentType(contentType)
-                .build();
+  private String generatePresignedUrl(String key, String contentType) {
+    try (S3Presigner presigner = getS3Presigner()) {
+      GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+          .bucket(bucket)
+          .key(key)
+          .responseContentType(contentType)
+          .build();
 
-        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .getObjectRequest(getObjectRequest)
-                .signatureDuration(Duration.ofSeconds(presignedUrlExpiration))
-                .build();
+      GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+          .signatureDuration(Duration.ofSeconds(presignedUrlExpirationSeconds))
+          .getObjectRequest(getObjectRequest)
+          .build();
 
-        PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
-
-        return presignedRequest.url().toString();
+      PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+      return presignedRequest.url().toString();
     }
-    public S3Client getS3Client() {
-        return s3Client;
-    }
-}
+  }
+
+  private S3Presigner getS3Presigner() {
+    return S3Presigner.builder()
+        .region(Region.of(region))
+        .credentialsProvider(
+            StaticCredentialsProvider.create(
+                AwsBasicCredentials.create(accessKey, secretKey)
+            )
+        )
+        .build();
+  }
+} 

@@ -9,6 +9,8 @@ public interface BinaryContentStorage {
 
   UUID put(UUID binaryContentId, byte[] bytes);
 
+  UUID putSync(UUID binaryContentId, byte[] bytes);
+
   InputStream get(UUID binaryContentId);
 
   ResponseEntity<?> download(BinaryContentDto metaData);

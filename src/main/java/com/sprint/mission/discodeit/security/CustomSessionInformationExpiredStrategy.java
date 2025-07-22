@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.exception.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.security.web.session.SessionInformationExpiredEvent;
 import org.springframework.security.web.session.SessionInformationExpiredStrategy;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 public class CustomSessionInformationExpiredStrategy implements SessionInformationExpiredStrategy {
@@ -29,7 +28,7 @@ public class CustomSessionInformationExpiredStrategy implements SessionInformati
         status
     );
     errorResponse.getDetails().put("sessionId", event.getSessionInformation().getSessionId());
-    
+    response.setCharacterEncoding("UTF-8");
     response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
   }
 }

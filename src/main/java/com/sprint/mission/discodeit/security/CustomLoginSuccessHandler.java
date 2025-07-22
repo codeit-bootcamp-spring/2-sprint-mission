@@ -4,12 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-
-import java.io.IOException;
 
 @RequiredArgsConstructor
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -22,6 +21,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    response.setCharacterEncoding("UTF-8");
     response.getWriter().write(objectMapper.writeValueAsString(principal.getUserDto()));
   }
 }

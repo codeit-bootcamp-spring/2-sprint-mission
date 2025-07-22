@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -25,12 +22,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -67,7 +66,24 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          binaryContentStorage.put(binaryContent.getId(), bytes);
+          TransactionSynchronizationManager.registerSynchronization(
+                  new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                      try{
+                        binaryContentStorage.put(binaryContent.getId(), bytes);
+                        binaryContent.setUploadStatus(BinaryContentUploadStatus.SUCCESS);
+                        binaryContentRepository.save(binaryContent);
+                      } catch (Exception e) {
+
+                        log.error(e.getMessage());
+                        binaryContent.setUploadStatus(BinaryContentUploadStatus.FAILED);
+                        binaryContentRepository.save(binaryContent);
+                        throw new RuntimeException(e);
+                      }
+                    }
+                  }
+          );
           return binaryContent;
         })
         .toList();
@@ -110,6 +126,7 @@ public class BasicMessageService implements MessageService {
 
     return pageResponseMapper.fromSlice(slice, nextCursor);
   }
+
   @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @Transactional
   @Override
@@ -122,6 +139,7 @@ public class BasicMessageService implements MessageService {
     log.info("메시지 수정 완료: id={}, channelId={}", messageId, message.getChannel().getId());
     return messageMapper.toDto(message);
   }
+
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @Transactional
   @Override

@@ -110,7 +110,7 @@ ALTER TABLE read_statuses
             REFERENCES channels (id)
             ON DELETE CASCADE;
 
-create table persistent_logins
+CREATE TABLE persistent_logins
 (
     username  varchar(64) not null,
     series    varchar(64) primary key,
@@ -129,3 +129,4 @@ CREATE TABLE jwt_sessions
     refresh_token   TEXT UNIQUE              NOT NULL,
     expiration_time timestamp with time zone NOT NULL
 );
+
