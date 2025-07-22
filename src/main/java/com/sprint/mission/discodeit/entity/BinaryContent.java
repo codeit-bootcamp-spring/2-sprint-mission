@@ -3,6 +3,11 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,9 +30,22 @@ public class BinaryContent extends BaseEntity implements Serializable {
     @Column(length = 100, nullable = false)
     private String contentType;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BinaryContentUploadStatus uploadStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uploader_id")
+    private User uploader;
+
     public BinaryContent(String fileName, Long size, String contentType) {
         this.fileName = fileName;
         this.size = size;
         this.contentType = contentType;
+        this.uploadStatus = BinaryContentUploadStatus.WAITING;
+    }
+
+    public void setUploadStatus(BinaryContentUploadStatus uploadStatus) {
+        this.uploadStatus = uploadStatus;
     }
 }

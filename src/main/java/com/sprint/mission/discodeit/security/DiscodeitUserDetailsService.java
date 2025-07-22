@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService {
+public class DiscodeitUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -22,6 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException(
                 "User with username" + username + " not found"));
 
-        return new CustomUserDetails(userMapper.toDto(user),user.getPassword());
+        return new DiscodeitUserDetails(userMapper.toDto(user),user.getPassword());
     }
 }

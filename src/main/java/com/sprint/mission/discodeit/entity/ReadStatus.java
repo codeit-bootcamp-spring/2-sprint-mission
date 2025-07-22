@@ -12,32 +12,38 @@ import java.time.Instant;
 @Getter
 @Entity
 @Table(
-        name = "read_statuses",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"})
+    name = "read_statuses",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "channel_id"})
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity implements Serializable {
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", columnDefinition = "UUID")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "channel_id",columnDefinition = "UUID")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "channel_id", columnDefinition = "UUID")
     private Channel channel;
 
-    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE",nullable = false)
+    @Column(columnDefinition = "TIMESTAMP WITH TIME ZONE", nullable = false)
     private Instant lastReadAt;
+
+    private boolean notificationEnabled;
 
     public ReadStatus(User user, Channel channel, Instant lastReadAt) {
         this.user = user;
         this.channel = channel;
         this.lastReadAt = lastReadAt;
+        this.notificationEnabled = channel.getType() == ChannelType.PRIVATE;
     }
 
-    public void updateReadAt(Instant newLastReadAt) {
+    public void update(Instant newLastReadAt, Boolean newNotificationEnabled) {
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
+        }
+        if (newNotificationEnabled != null) {
+            this.notificationEnabled = newNotificationEnabled;
         }
     }
 }

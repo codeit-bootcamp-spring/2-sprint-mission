@@ -15,7 +15,7 @@ public class JsonLoginConfigurer extends
     private final ObjectMapper objectMapper;
 
     public JsonLoginConfigurer(ObjectMapper objectMapper) {
-        super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), "/api/auth/login");
+        super(new JsonUsernamePasswordAuthenticationFilter(objectMapper), SecurityMatchers.LOGIN_URL);
         this.objectMapper = objectMapper;
     }
 
@@ -26,8 +26,6 @@ public class JsonLoginConfigurer extends
 
     @Override
     public void init(HttpSecurity http) throws Exception {
-        loginProcessingUrl("/api/auth/login");
-        successHandler(new JsonLoginSuccessHandler(objectMapper));
-        failureHandler(new JsonLoginFailureHandler(objectMapper));
+        loginProcessingUrl(SecurityMatchers.LOGIN_URL);
     }
 }

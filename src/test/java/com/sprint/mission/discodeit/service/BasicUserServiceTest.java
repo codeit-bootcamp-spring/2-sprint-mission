@@ -108,7 +108,7 @@ public class BasicUserServiceTest {
         given(userMapper.toDto(any(User.class))).willReturn(userDto);
 
         //when
-        UserDto result = userService.searchUser(userId);
+        UserDto result = userService.find(userId);
 
         //then
         assertThat(result).isEqualTo(userDto);
@@ -121,7 +121,7 @@ public class BasicUserServiceTest {
         given(userRepository.findById(eq(userId))).willReturn(Optional.empty());
 
         //when & then
-        assertThatThrownBy(() -> userService.searchUser(userId))
+        assertThatThrownBy(() -> userService.find(userId))
                 .isInstanceOf(UserNotFoundException.class);
     }
 

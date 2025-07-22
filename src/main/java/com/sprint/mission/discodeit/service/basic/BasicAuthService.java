@@ -1,20 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.role.RoleUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NotificationEventPublisher;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.AuthService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final PersistentTokenRepository persistentTokenRepository;
     @Value("${ADMIN_USER_NAME}")
     private String adminUsername;
     @Value("${ADMIN_PASSWORD}")
@@ -33,35 +34,51 @@ public class BasicAuthService implements AuthService {
     private String adminEmail;
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth != null){
-            String username = auth.getName();
-            persistentTokenRepository.removeUserTokens(username);
-        }
-        Cookie cookie = new Cookie("remember-me", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-    }
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @Transactional
-    public void initAdmin() {
+    public UserDto initAdmin() {
         if (userRepository.existsByEmail(adminEmail) || userRepository.existsByUsername(
             adminUsername)) {
             log.warn("이미 admin이 존재합니다.");
-            return;
+            return null;
         }
         String encodePassword = passwordEncoder.encode(adminPassword);
         User admin = new User(adminUsername, adminEmail, encodePassword, null);
-        admin.updateRole(Role.ROLE_ADMIN);
+        admin.updateRole(Role.ADMIN);
 
         userRepository.save(admin);
+
+        UserDto adminDto = userMapper.toDto(admin);
+        log.info("어드민이 초기화 되었습니다. {}", adminDto);
+
+        return adminDto;
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    @Override
+    public UserDto updateRole(RoleUpdateRequest request) {
+        UUID userId = request.userId();
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> UserNotFoundException.withId(userId));
+        user.updateRole(request.newRole());
+
+        jwtService.invalidateJwtSession(user.getId());
+
+        notificationEventPublisher.publish(new NotificationEvent(
+            user.getId(),
+            "권한이 변경되었습니다",
+            "새로운 권한: " + request.newRole().name(),
+            NotificationType.ROLE_CHANGED,
+            user.getId()
+        ));
+
+        return userMapper.toDto(user);
+    }
+
 }
