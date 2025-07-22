@@ -1,18 +1,25 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.dto.data.AsyncTaskFailure;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -51,10 +58,18 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     this.bucket = bucket;
   }
 
+  @Async
+  @Retryable(
+      retryFor = {RuntimeException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, maxDelay = 5000)
+  )
   @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     String key = binaryContentId.toString();
     try {
+      Thread.sleep(2000);
+
       S3Client s3Client = getS3Client();
 
       PutObjectRequest request = PutObjectRequest.builder()
@@ -69,7 +84,25 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     } catch (S3Exception e) {
       log.error("S3에 파일 업로드 실패: {}", e.getMessage());
       throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
+    } catch (InterruptedException e) {
+      log.error("지연 중 인터럽트 발생: {}", e.getMessage());
+      Thread.currentThread().interrupt();
+
+      throw new RuntimeException("지연 처리 실패: " + key + e);
     }
+  }
+
+  @Recover
+  public UUID recoverPut(RuntimeException e, UUID binaryContentId, byte[] bytes) {
+    Throwable cause = e.getCause();
+    String failureReason = (cause instanceof IOException) ? cause.getMessage() : e.getMessage();
+    String requestId = MDC.get("requestId");
+
+    AsyncTaskFailure failure = new AsyncTaskFailure("S3 putMethod", requestId, failureReason);
+
+    log.error("업로드 실패: {}, 컨텐츠 ID: {}", failure, binaryContentId);
+
+    return null;
   }
 
   @Override
