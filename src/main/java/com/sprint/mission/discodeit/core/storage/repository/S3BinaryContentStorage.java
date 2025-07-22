@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.core.storage.BinaryContentException;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.UUID;
@@ -40,7 +39,7 @@ public class S3BinaryContentStorage implements BinaryContentStoragePort {
   private final JpaBinaryContentRepository binaryContentRepository;
 
   @Override
-  public UUID put(UUID id, byte[] bytes) {
+  public void put(UUID id, byte[] bytes) {
     BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
         () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
     );
@@ -53,21 +52,19 @@ public class S3BinaryContentStorage implements BinaryContentStoragePort {
 
     s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
     log.info("[S3BinaryContentStorage] Image uploaded successfully : {}", id);
-
-    return id;
   }
 
-  @Override
-  public InputStream get(UUID id) {
-    BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
-    );
-    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-        .bucket(bucket)
-        .key(binaryContent.getFileName())
-        .build();
-    return s3Client.getObject(getObjectRequest);
-  }
+//  @Override
+//  public InputStream get(UUID id) {
+//    BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
+//        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
+//    );
+//    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+//        .bucket(bucket)
+//        .key(binaryContent.getFileName())
+//        .build();
+//    return s3Client.getObject(getObjectRequest);
+//  }
 
   @Override
   public ResponseEntity<?> download(BinaryContentDto binaryContentDto) {

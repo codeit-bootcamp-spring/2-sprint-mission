@@ -7,16 +7,22 @@ import com.sprint.mission.discodeit.core.message.dto.request.MessageCreateReques
 import com.sprint.mission.discodeit.core.message.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.core.message.entity.Message;
 import com.sprint.mission.discodeit.core.message.repository.JpaMessageRepository;
+import com.sprint.mission.discodeit.core.notification.dto.NotificationEvent;
+import com.sprint.mission.discodeit.core.notification.entity.NotificationTitle;
+import com.sprint.mission.discodeit.core.notification.entity.NotificationType;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.core.storage.service.BinaryContentService;
 import com.sprint.mission.discodeit.core.user.entity.User;
 import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,20 +35,35 @@ public class BasicMessageService implements MessageService {
   private final JpaChannelRepository channelRepository;
   private final JpaMessageRepository messageRepository;
   private final BinaryContentService binaryContentService;
+  private final ApplicationEventPublisher eventPublisher; // 이벤트 발행을 위한 객체
 
   @Override
   @Transactional
   public MessageDto create(MessageCreateRequest request,
       List<BinaryContentCreateRequest> binaryContentCommands) {
-    User user = userRepository.findByUserId(request.authorId());
-    Channel channel = channelRepository.findByChannelId(request.channelId());
+    UUID authorId = request.authorId();
+    UUID channelId = request.channelId();
+    User user = userRepository.findByUserId(authorId);
+    Channel channel = channelRepository.findByChannelId(channelId);
 
     List<BinaryContent> binaryContentIdList = binaryContentCommands.stream()
-        .map(binaryContentService::create).toList();
-
+        .map(command -> {
+          try {
+            return binaryContentService.create(command);
+          } catch (IOException e) {
+            log.error("BinaryContent 생성 중 파일 처리 오류 발생", e);
+            throw new UncheckedIOException(e);
+          }
+        }).toList();
     Message message = Message.create(user, channel, request.content(), binaryContentIdList);
     channel.setLastMessageAt(Instant.now());
     messageRepository.save(message);
+
+    eventPublisher.publishEvent(new NotificationEvent(authorId,
+        NotificationTitle.CREATE.getTitle(),
+        "메시지가 생성되었습니다",
+        NotificationType.NEW_MESSAGE,
+        channelId));
 
     log.info(
         "[MessageService] Message Created: Message Id {}, Channel Id {}, Author Id {}, content {}, attachments {}",

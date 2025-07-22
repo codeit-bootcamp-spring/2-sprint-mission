@@ -8,4 +8,7 @@ public interface JpaUserRepository extends JpaRepository<User, UUID>, CustomUser
 
   boolean existsByNameOrEmail(String name, String email);
 
+  boolean existsByEmail(String email);
+
+  boolean existsByName(String name);
 }

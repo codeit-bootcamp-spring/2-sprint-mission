@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.core.storage.repository;
 
 import com.sprint.mission.discodeit.core.storage.BinaryContentException;
 import com.sprint.mission.discodeit.core.storage.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.core.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import java.io.FileInputStream;
@@ -29,14 +28,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LocalBinaryContentStorage implements BinaryContentStoragePort {
 
-  private final JpaBinaryContentRepository binaryContentRepository;
   private final Path storagePath;
 
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") String storagePath,
       JpaBinaryContentRepository jpaBinaryContentRepository) {
     this.storagePath = Paths.get(storagePath);
-    binaryContentRepository = jpaBinaryContentRepository;
     init();
   }
 
@@ -52,52 +49,34 @@ public class LocalBinaryContentStorage implements BinaryContentStoragePort {
     }
   }
 
-
-  private Path resolvePath(UUID id) {
-    BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
-        () -> new BinaryContentException(ErrorCode.FILE_NOT_FOUND, id)
-    );
-    String extension = binaryContent.getExtension();
-
-    return storagePath.resolve(id.toString() + extension);
-  }
-
   @Override
-  public UUID put(UUID id, byte[] bytes) {
-    Path destination = resolvePath(id);
+  public void put(UUID id, byte[] bytes) throws IOException {
+    Path destination = storagePath.resolve(id.toString() + ".png");
     try (OutputStream outputStream = Files.newOutputStream(destination)) {
       outputStream.write(bytes);
       log.info("[LocalBinaryContentStorage] Image uploaded successfully : {}", id);
     } catch (IOException e) {
-      log.warn("[LocalBinaryContentStorage] To Upload Image is failed : {}", id);
-      throw new RuntimeException();
-    }
-    return id;
-  }
-
-  @Override
-  public InputStream get(UUID id) {
-    Path destination = resolvePath(id);
-    try {
-      return new FileInputStream(destination.toFile());
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
+      throw e;
     }
   }
 
   @Override
   public ResponseEntity<Resource> download(BinaryContentDto binaryContentDto) {
-    InputStream inputStream = get(binaryContentDto.id());
-    InputStreamResource resource = new InputStreamResource(inputStream);
+    try {
+      Path destination = storagePath.resolve(binaryContentDto.id().toString() + ".png");
+      InputStream inputStream = new FileInputStream(destination.toFile());
+      InputStreamResource resource = new InputStreamResource(inputStream);
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.add(HttpHeaders.CONTENT_DISPOSITION,
-        "inline; filename=\"" + binaryContentDto.fileName() + "\"");
-    headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
-    headers.setContentLength(binaryContentDto.size());
-    
-    log.info("[LocalBinaryContentStorage] Image Download successfully");
-    return ResponseEntity.ok().headers(headers).body(resource);
+      HttpHeaders headers = new HttpHeaders();
+      headers.add(HttpHeaders.CONTENT_DISPOSITION,
+          "inline; filename=\"" + binaryContentDto.fileName() + "\"");
+      headers.setContentType(MediaType.parseMediaType(binaryContentDto.contentType()));
+      headers.setContentLength(binaryContentDto.size());
 
+      log.info("[LocalBinaryContentStorage] Image Download successfully");
+      return ResponseEntity.ok().headers(headers).body(resource);
+    } catch (FileNotFoundException e) {
+      throw new BinaryContentException(ErrorCode.INTERNAL_SERVER_ERROR);
+    }
   }
 }

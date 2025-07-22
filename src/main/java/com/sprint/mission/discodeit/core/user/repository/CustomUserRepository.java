@@ -6,9 +6,7 @@ import java.util.UUID;
 
 public interface CustomUserRepository {
 
-  List<User> findALlFromDB();
-
-  List<User> findAllByIdsFromDB(List<UUID> ids);
+  List<User> findAllFromDB();
 
   User findByUserId(UUID id);
 

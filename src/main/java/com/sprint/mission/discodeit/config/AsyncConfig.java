@@ -1,0 +1,46 @@
+package com.sprint.mission.discodeit.config;
+
+import java.util.concurrent.Executor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
+
+@Configuration
+@EnableAsync
+@EnableRetry
+public class AsyncConfig {
+
+  @Bean(name = "AsyncExecutor")
+  public Executor executor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    //i5-14400F
+    //6P + 4E, 16Threads
+    //CPU 집약적 작업: 코어 수 + 1
+    //I/O 집약적 작업: 코어 수 × (1 + 대기시간/처리시간)
+    //멀티 스레드 작업을 위해 4개 스레드만 할당
+    //P코어 할당될 경우, 3스레드로 줄일 예정
+    executor.setCorePoolSize(5); // 기본 스레드 수
+    executor.setMaxPoolSize(10); //최대 스레드 수
+    executor.setQueueCapacity(20);    // 큐 용량
+    executor.setThreadNamePrefix("Async-");
+    executor.setTaskDecorator(new ContextPropagatingTaskDecorator());
+    executor.initialize();
+    return new DelegatingSecurityContextAsyncTaskExecutor(executor);
+  }
+
+  @Bean(name = "notificationExecutor")
+  public Executor notificationExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(5);      // 기본 스레드 수
+    executor.setMaxPoolSize(10);      // 최대 스레드 수
+    executor.setQueueCapacity(20);    // 큐 용량
+    executor.setThreadNamePrefix("Notification-"); // 스레드 이름 접두사
+    executor.setTaskDecorator(new ContextPropagatingTaskDecorator());
+    executor.initialize();
+    return new DelegatingSecurityContextAsyncTaskExecutor(executor);
+  }
+}

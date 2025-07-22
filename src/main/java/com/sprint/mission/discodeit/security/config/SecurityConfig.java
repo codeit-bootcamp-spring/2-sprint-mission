@@ -1,7 +1,13 @@
 package com.sprint.mission.discodeit.security.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
+import com.sprint.mission.discodeit.security.filter.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.filter.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.handler.CustomLoginFailureHandler;
+import com.sprint.mission.discodeit.security.handler.JwtLoginSuccessHandler;
+import com.sprint.mission.discodeit.security.handler.JwtLogoutHandler;
+import com.sprint.mission.discodeit.security.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -20,7 +26,7 @@ import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -34,29 +40,34 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(
       HttpSecurity http,
+      ObjectMapper objectMapper,
       CsrfTokenRepository repository,
       CsrfTokenRequestAttributeHandler requestHandler,
+      JwtService jwtService,
       JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
 
     http
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
+            .anyRequest().authenticated())
         .csrf(csrf -> csrf
-            .ignoringRequestMatchers(SecurityMatchers.LOGIN_URL)
+            .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
             .csrfTokenRepository(repository)
             .csrfTokenRequestHandler(requestHandler))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                SecurityMatchers.FRONT,
-                SecurityMatchers.SIGN_UP,
-                SecurityMatchers.PUBLIC).permitAll()
-            .requestMatchers(SecurityMatchers.GET_CSRF_TOKEN, SecurityMatchers.REFRESH).permitAll()
-            .requestMatchers(SecurityMatchers.LOGIN).permitAll()
-            .requestMatchers(SecurityMatchers.DOWNLOAD).permitAll()
-            .requestMatchers(SecurityMatchers.CACHE).permitAll()
-            .requestMatchers(SecurityMatchers.ACTUATOR).permitAll()
-            .anyRequest().authenticated())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .logout(logout ->
+            logout
+                .logoutRequestMatcher(SecurityMatchers.LOGOUT)
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .addLogoutHandler(new JwtLogoutHandler(jwtService))
+        )
+        .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+            configurer ->
+                configurer
+                    .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
+                    .failureHandler(new CustomLoginFailureHandler(objectMapper)))
         .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .addFilterBefore(jwtAuthenticationFilter, JsonUsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 

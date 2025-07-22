@@ -22,19 +22,11 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
   private final QBinaryContent binaryContent = QBinaryContent.binaryContent;
 
   @Override
-  public List<User> findALlFromDB() {
+  public List<User> findAllFromDB() {
     return jpaQueryFactory
         .selectFrom(user)
         .leftJoin(user.profile, binaryContent)
         .fetchJoin()
-        .fetch();
-  }
-
-  @Override
-  public List<User> findAllByIdsFromDB(List<UUID> ids) {
-    return jpaQueryFactory.selectFrom(user)
-        .leftJoin(user.profile, binaryContent).fetchJoin()
-        .where(user.id.in(ids))
         .fetch();
   }
 
