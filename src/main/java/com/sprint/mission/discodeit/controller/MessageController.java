@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.swagger.MessageApi;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class MessageController implements MessageApi {
 
   @Override
   @PostMapping
+  @Timed(value = "message.create")
   public ResponseEntity<CreateMessageResponseDTO> createMessage(
       @RequestPart("messageCreateRequest") @Valid CreateMessageRequestDTO createMessageRequestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> multipartFileList) {

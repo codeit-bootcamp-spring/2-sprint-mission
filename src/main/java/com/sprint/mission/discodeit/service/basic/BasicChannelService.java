@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -24,7 +25,6 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,7 +126,7 @@ public class BasicChannelService implements ChannelService {
               participants
           );
         })
-        .toList();
+        .collect(Collectors.toList());
   }
 
 
@@ -175,7 +175,7 @@ public class BasicChannelService implements ChannelService {
   private void createReadStatusesForUsers(List<UUID> userIds, UUID channelId) {
     List<CreateReadStatusCommand> createReadStatusParams = userIds.stream()
         .map(userId -> new CreateReadStatusCommand(userId,
-            channelId, Instant.now()))
+            channelId, Instant.now(), true))
         .toList();
     // DTO를 이용해 readStatus 생성
     createReadStatusParams.forEach(readStatusService::create);

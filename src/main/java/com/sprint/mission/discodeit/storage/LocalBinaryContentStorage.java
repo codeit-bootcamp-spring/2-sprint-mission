@@ -45,9 +45,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
-
   @Override
-  public UUID put(UUID binaryContentId, byte[] bytes) {
+  public void put(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
       log.warn("File write failed: duplicate file path (filepath: {})", filePath);
@@ -55,7 +54,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
     try {
       Files.write(filePath, bytes);
-      return binaryContentId;
     } catch (IOException e) {
       log.error("File write failed (binaryContentId: {}, path: {}, size: {})", binaryContentId,
           filePath, bytes.length);

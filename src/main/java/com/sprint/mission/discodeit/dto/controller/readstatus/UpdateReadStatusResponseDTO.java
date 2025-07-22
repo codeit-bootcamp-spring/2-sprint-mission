@@ -5,7 +5,8 @@ import java.util.UUID;
 
 public record UpdateReadStatusResponseDTO(
     UUID id,
-    Instant lastReadAt
+    Instant lastReadAt,
+    boolean notificationEnabled
 ) {
 
 }

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.service.binarycontent.FindBinaryContentR
 import com.sprint.mission.discodeit.exception.s3.S3DeleteException;
 import com.sprint.mission.discodeit.exception.s3.S3DownloadException;
 import com.sprint.mission.discodeit.exception.s3.S3UploadException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.InputStream;
 import java.time.Duration;
@@ -43,7 +44,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   private String bucket;
 
   @Override
-  public UUID put(UUID binaryContentId, byte[] bytes) {
+  public void put(UUID binaryContentId, byte[] bytes) {
     String key = binaryContentId.toString();
     Tika tika = new Tika();
 
@@ -53,18 +54,16 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .contentType(tika.detect(bytes))
         .contentLength((long) bytes.length)
         .build();
-
     try {
       s3Client.putObject(
           putObjectRequest,
-          RequestBody.fromBytes(bytes)
-      );
+          RequestBody.fromBytes(bytes));
     } catch (S3Exception e) {
       log.error("S3 upload failed (key: {})", key);
       throw new S3UploadException(Map.of("key", key));
     }
-    return binaryContentId;
   }
+
 
   @Override
   public InputStream get(UUID binaryContentId) {
@@ -74,7 +73,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .bucket(bucket)
         .key(key)
         .build();
-
     try {
       ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
       return s3Object;

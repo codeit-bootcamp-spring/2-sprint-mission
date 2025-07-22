@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,10 +30,19 @@ public class BinaryContent extends BaseEntity implements Serializable, Identifia
   @Column(name = "content_type", length = 100, nullable = false)
   private String contentType;
 
+  @Column(name = "upload_status")
+  @Enumerated(EnumType.STRING)
+  private BinaryContentUploadStatus uploadStatus;
+
   @Builder
   public BinaryContent(String filename, long size, String contentType) {
     this.filename = filename;
     this.size = size;
     this.contentType = contentType;
+    this.uploadStatus = BinaryContentUploadStatus.WAITING;
+  }
+
+  public void updateStatus(BinaryContentUploadStatus status) {
+    this.uploadStatus = status;
   }
 }

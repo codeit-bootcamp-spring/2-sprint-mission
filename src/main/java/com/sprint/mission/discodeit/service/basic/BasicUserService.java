@@ -18,14 +18,14 @@ import com.sprint.mission.discodeit.security.jwt.JwtSessionRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.storage.s3.event.S3UploadEvent;
 import com.sprint.mission.discodeit.util.MaskingUtil;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,15 +45,17 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentService binaryContentService;
+  private final FindUserService findUserService;
   private final JwtSessionRepository jwtSessionRepository;
   private final UserMapper userMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final ApplicationEventPublisher eventPublisher;
   private final PasswordEncoder passwordEncoder;
 
 
   @Override
   @Transactional
-  @CacheEvict(value = "allUsers", allEntries = true)
+  @CacheEvict(value = "allUsers")
   public CreateUserResult create(CreateUserCommand createUserCommand, MultipartFile multipartFile) {
     checkDuplicateUsername(createUserCommand);
     checkDuplicateEmail(createUserCommand);
@@ -65,8 +67,8 @@ public class BasicUserService implements UserService {
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
-        // 로그를 binaryContentStorage 내부에서 남기기 떄문에 추적이 어려움 - MDC traceId로 해결
-        binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
+        eventPublisher.publishEvent(new S3UploadEvent(createBinaryContentResult.id(),
+            multipartFile.getBytes()));
       } catch (IOException e) {
         log.error("User create failed: multipartFile read failed (filename: {})",
             multipartFile.getOriginalFilename());
@@ -94,15 +96,15 @@ public class BasicUserService implements UserService {
     return userMapper.toFindUserResult(findUser, jwtSessionRepository.existsByUserId(userId));
   }
 
-  @Cacheable("allUsers")
-  public List<User> getCachedUsers() {
-    return userRepository.findAllFetch();
-  }
 
   @Override
   @Transactional(readOnly = true)
+  // findAll()을 캐시해둘 경우, 사용자가 로그아웃을 해도 캐시를 반영하기 떄문에 해당 정보가 반영되지 않음
+  // 너무 자주 발생하는 로그인 / 로그아웃 시 캐시 무효화를 하면 과부화 발생
+  // User 정보만 캐시해두고, 로그인 정보는 findAll() 메서드에서 붙여줌
+  // AOP self-invocation 문제 해결을 위해 User 정보만 캐시하는 메서드는 별도의 서비스로 따로 빼줌
   public List<FindUserResult> findAll() {
-    return getCachedUsers().stream()
+    return findUserService.findAllUserOnly().stream()
         .map(user -> userMapper.toFindUserResult(user,
             jwtSessionRepository.existsByUserId(user.getId())))
         .toList();
@@ -110,8 +112,6 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @CachePut(value = "user", key = "#p0")
-  @CacheEvict(value = "allUsers", allEntries = true)
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   public UpdateUserResult update(@Param("userId") UUID userId, UpdateUserCommand updateUserCommand,
       MultipartFile multipartFile) {
@@ -129,7 +129,8 @@ public class BasicUserService implements UserService {
       CreateBinaryContentResult createBinaryContentResult = binaryContentService.create(
           binaryContent);
       try {
-        binaryContentStorage.put(createBinaryContentResult.id(), multipartFile.getBytes());
+        eventPublisher.publishEvent(
+            new S3UploadEvent(createBinaryContentResult.id(), multipartFile.getBytes()));
       } catch (IOException e) {
         log.error("User update failed: multipartFile read failed (filename: {})",
             multipartFile.getOriginalFilename());
@@ -149,10 +150,6 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  @Caching(evict = {
-      @CacheEvict(value = "user", key = "#p0"),
-      @CacheEvict(value = "allUsers", allEntries = true)
-  })
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   public void delete(@Param("userId") UUID userId) {
     User user = findUserById(userId, "delete");

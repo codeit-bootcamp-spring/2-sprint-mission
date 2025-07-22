@@ -41,6 +41,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     // 하지만 쿠키는 브라우저가 자동으로 전송하기 때문에 CSRF 공격에 취약함
     // -> CSRF 보호를 따로 해줘야함!! CSRF 토큰으로 쿠키의 취약점인 CSRF 공격도 해결 가능
     // 실무에서는 Refresh 토큰을 쿠키에 잘 저장하지 않는 것 같음! 추후 확인해보자.
+    // CSRF 방어 로직을 넣기 힘들고, 모바일 앱에서는 브라우저 환경이 아닐수도 있어 쿠키 사용이 어려울수도 있음 -> AccessToken처럼 응답하고 프론트엔드쪽 저장소에 저장하는 경우가 많다.
     refreshCookie.setHttpOnly(true);
     refreshCookie.setPath("/");
     refreshCookie.setMaxAge(14 * 24 * 60 * 60);
@@ -52,4 +53,5 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     response.getWriter().write(accessToken);
     response.getWriter().flush();
   }
+
 }

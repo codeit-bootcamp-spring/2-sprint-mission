@@ -93,7 +93,8 @@ public class BasicReadStatusService implements ReadStatusService {
   public UpdateReadStatusResult update(UUID id,
       @Param("updateReadStatusCommand") UpdateReadStatusCommand updateReadStatusCommand) {
     ReadStatus readStatus = findReadStatusById(id, "update");
-    readStatus.updateReadStatus(updateReadStatusCommand.newLastReadAt());
+    readStatus.updateReadStatus(updateReadStatusCommand.newLastReadAt(),
+        updateReadStatusCommand.newNotificationEnabled());
     return readStatusMapper.toUpdateReadStatusResult(readStatus);
   }
 
