@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -49,10 +51,20 @@ public class BasicUserService implements UserService {
     validateDuplicateUserName(userRequest.username());
 
     BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
+    log.debug("user를 저장하기 위해서 이동 ");
+    try{
+      Thread.sleep(4000);
+    }catch (Exception ex){
+
+    }
+
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
+    log.debug("에러 발생 직전");
     User savedUser = userRepository.save(user);
+    log.debug("커밋전 binaryConetent의 상태 {}, : id {}", binaryContent.getBinaryContentUploadStatus(),
+        binaryContent.getId());
 
     return userResultMapper.convertToUserResult(savedUser);
   }

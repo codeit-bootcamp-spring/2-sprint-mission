@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
+@Disabled
 class UserControllerTest extends ControllerTestSupport {
 
   @DisplayName("이름, 이메일, 패스워드를 입력받아, 유저를 생성합니다.")

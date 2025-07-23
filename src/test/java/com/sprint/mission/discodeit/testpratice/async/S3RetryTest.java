@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.s3;
+package com.sprint.mission.discodeit.testpratice.async;
 
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
 import static org.mockito.Mockito.atLeastOnce;
@@ -25,7 +25,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-class S3AdapterTest extends IntegrationTestSupport {
+class S3RetryTest extends IntegrationTestSupport {
 
   @Value("${discodeit.storage.s3.presigned-url-expiration}")
   private long presignedUrlExpirationSeconds;
@@ -48,7 +48,7 @@ class S3AdapterTest extends IntegrationTestSupport {
 
   @DisplayName("MaxRetryAttempt를 넘으면, Retry로직이 실행된다.")
   @Test
-  void putTest() throws InterruptedException {
+  void putTest() {
     // given
     String key = UUID.randomUUID().toString();
     PutObjectRequest putRequest = PutObjectRequest.builder()

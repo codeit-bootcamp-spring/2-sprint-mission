@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.testpratice.security;
 
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import org.assertj.core.api.Assertions;

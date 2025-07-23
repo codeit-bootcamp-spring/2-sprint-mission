@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentSt
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -25,23 +26,28 @@ public class BinaryContentCore {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
 
-  @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW) // 이렇게 하면 상관이 없나?
+//  @Transactional // 이렇게 하면 상관이 없나?
   public BinaryContent createBinaryContent(BinaryContentRequest binaryContentRequest) {
     if (binaryContentRequest == null) {
       return null;
     }
     BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(),
         binaryContentRequest.contentType(), binaryContentRequest.size());
+    log.debug("바이너리 스토리지 저장");
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronization() {
-          @Override
-          public void afterCommit() {
-            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
-          }
-        }
-    );
+//    TransactionSynchronizationManager.registerSynchronization(
+//        new TransactionSynchronization() {
+//          @Override
+//          public void afterCommit() {
+//            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+//          }
+//        }
+//    );
+
+    log.debug("바이너리 스토리지 이동전");
+    binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
 
     return savedBinaryContent;
   }
@@ -63,7 +69,15 @@ public class BinaryContentCore {
 
       BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
-      binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+      TransactionSynchronizationManager.registerSynchronization(
+          new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+              log.debug("처음 바이너리 컨텐츠처리 쓰레드 {} ", Thread.currentThread().getName());
+              binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+            }
+          }
+      );
 
       binaryContents.add(savedBinaryContent);
     }

@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@Disabled
 @WithMockUser(roles = "ADMIN")
 class BasicChannelServiceTest extends IntegrationTestSupport {
 

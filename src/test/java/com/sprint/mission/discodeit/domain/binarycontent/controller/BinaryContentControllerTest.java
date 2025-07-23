@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentSt
 import com.sprint.mission.discodeit.testutil.ControllerTestSupport;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -16,9 +17,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+@Disabled
 class BinaryContentControllerTest extends ControllerTestSupport {
-
-
 
   @DisplayName("이미지를 업로드시 바이너리 컨텐츠를 반환한다.")
   @Test

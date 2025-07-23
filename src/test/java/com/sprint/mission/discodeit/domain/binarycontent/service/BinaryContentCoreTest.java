@@ -22,24 +22,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-@Disabled // 추후 수정예정입니다.
+
 class BinaryContentCoreTest extends IntegrationTestSupport {
 
   @Autowired
   private BinaryContentCore binaryContentCore;
   @Autowired
   private BinaryContentRepository binaryContentRepository;
-  @Autowired
-  private BinaryContentStorage binaryContentStorage;
   @MockitoBean
-  private S3Adapter s3Adapter;
+  private BinaryContentStorage binaryContentStorage;
 
   @AfterEach
   void tearDown() {
     binaryContentRepository.deleteAllInBatch();
   }
 
-  @DisplayName("바이너리 컨텐츠를 생성합니다.(아마 s3일떄만 통과)")
+  @DisplayName("바이너리 컨텐츠를 생성합니다.")
   @Test
   void createBinaryContent() {
     // given
@@ -67,7 +65,7 @@ class BinaryContentCoreTest extends IntegrationTestSupport {
     Assertions.assertThat(binaryContent).isNull();
   }
 
-  @DisplayName("여러번 바이너리 컨텐츠를 생성합니다.")
+  @DisplayName("여러개의 바이너리 컨텐츠를 생성합니다.")
   @Test
   void createBinaryContents() {
     // given

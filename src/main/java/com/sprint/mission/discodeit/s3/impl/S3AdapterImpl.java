@@ -53,6 +53,7 @@ public class S3AdapterImpl implements S3Adapter {
       PutObjectRequest putRequest,
       RequestBody request
   ) {
+    log.debug("s3 비동기 요청 처리 쓰레드 {} ", Thread.currentThread().getName());
     try {
       Thread.sleep(4000);
     } catch (InterruptedException ex) {

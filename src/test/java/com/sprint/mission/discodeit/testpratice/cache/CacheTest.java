@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.s3;
+package com.sprint.mission.discodeit.testpratice.cache;
 
 
 import com.sprint.mission.discodeit.domain.user.entity.User;

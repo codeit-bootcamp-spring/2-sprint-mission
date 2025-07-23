@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit.testpratice.security;
 
 import static org.mockito.ArgumentMatchers.any;
 

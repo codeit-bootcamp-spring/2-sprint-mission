@@ -65,7 +65,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new ChannelNotFoundException(Map.of()));
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
-
+    log.debug("메세지 서비스 쓰레드 {} ", Thread.currentThread().getName());
     List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));

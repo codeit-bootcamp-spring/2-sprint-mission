@@ -46,7 +46,7 @@ public class S3BinaryContentStorageTest extends IntegrationTestSupport {
     asyncTaskFailureRepository.deleteAllInBatch();
   }
 
-  @DisplayName("S3업로드시 예외가 발생하면, 업로드 상태를 Failed로 변경합니다.")
+  @DisplayName("S3업로드시 예외가 발생하면, 업로드 상태를 Failed로 변경합니다.") // 성공했을때도 작성 필요
   @Test
   void putUpLoadException() {
     // given

@@ -46,8 +46,8 @@ public class MessageServiceTest extends IntegrationTestSupport {
 
   private static final String MESSAGE_CONTENT = "안녕하세요";
 
-  @MockitoBean
-  private BinaryContentStorage binaryContentStorage;
+//  @MockitoBean
+//  private BinaryContentStorage binaryContentStorage;
 
   @Autowired
   private ChannelRepository channelRepository;

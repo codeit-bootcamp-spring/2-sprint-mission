@@ -23,7 +23,7 @@ import com.sprint.mission.discodeit.security.jwt.accessmanager.MessageDeleteAuth
 import com.sprint.mission.discodeit.security.jwt.accessmanager.MessageOwnerAuthorizationManager;
 import com.sprint.mission.discodeit.security.jwt.accessmanager.ReadStatusSelfAuthorizationManager;
 import com.sprint.mission.discodeit.security.jwt.accessmanager.UserSelfAuthorizationManager;
-import com.sprint.mission.discodeit.security.jwt.service.JwtService;
+import com.sprint.mission.discodeit.security.JwtService;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

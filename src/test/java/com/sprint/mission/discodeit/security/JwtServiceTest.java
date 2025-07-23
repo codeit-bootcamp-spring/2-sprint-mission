@@ -1,49 +1,48 @@
-package com.sprint.mission.discodeit.security.jwt.service;
-
-import static org.junit.jupiter.api.Assertions.*;
+package com.sprint.mission.discodeit.security;
 
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+// 요구사항에 따른 보안 로직 테스트 작성
 class JwtServiceTest extends IntegrationTestSupport {
 
   @DisplayName("UserDTO 정보로, JWT 토큰을 생성합니다. ")
   @Test
-  void createTest(){
-      // given
+  void createTest() {
+    // given
 
-      // when
+    // when
 
-      // then
+    // then
 
   }
 
   @DisplayName("토큰을 열어보면 사용자 정보, 엑세스 토큰, 리프레시 토큰이 있습니다.")
   @Test
-  void test_(){
-      // given
+  void test_() {
+    // given
 
-      // when
+    // when
 
-      // then
+    // then
 
   }
 
   @DisplayName("토큰의 유효성을 검사한 수 있습니다.")
   @Test
-  void validateTokenTest(){
-      // given
+  void validateTokenTest() {
+    // given
 
-      // when
+    // when
 
-      // then
+    // then
 
   }
 
   @DisplayName("리프레시 토큰을 활용해 엑세스 토큰을 재발급할 수 있습니다.")
   @Test
-  void reMakeAccessTokenTest(){
+  void reMakeAccessTokenTest() {
     // given
 
     // when
@@ -54,18 +53,18 @@ class JwtServiceTest extends IntegrationTestSupport {
 
   @DisplayName("리프레시 토큰을 무효화할 수 있습니다.")
   @Test
-  void InvalidateRefreshTokenTest(){
-      // given
+  void InvalidateRefreshTokenTest() {
+    // given
 
-      // when
+    // when
 
-      // then
+    // then
 
   }
 
   @DisplayName("페이로드에는 다음의 정보를 포함합니다.")
   @Test
-  void testPayload(){
+  void testPayload() {
     // given
 
     // when

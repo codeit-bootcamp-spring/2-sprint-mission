@@ -48,6 +48,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   public UUID put(UUID binaryContentId, byte[] bytes) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new BinaryContentNotFoundException(Map.of()));
+    log.debug("저장을 하러 들어옴 {}", binaryContent.getFileName());
 
     String key = binaryContentId.toString();
     PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -58,20 +59,28 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
 
     s3Adapter.put(putRequest, RequestBody.fromBytes(bytes))
         .thenAccept(success -> {
+          log.debug("S3 요청 이후 처리 쓰레드 {} ", Thread.currentThread().getName());
           binaryContent.updateUploadStatus(SUCCESS);
-          binaryContentRepository.save(binaryContent);
+          log.debug("이미지 상태 변경 {}", binaryContent.getFileName());
+          try{
+            BinaryContent save = binaryContentRepository.save(binaryContent);
+            log.debug("이미지 저장완료 {}", save.getBinaryContentUploadStatus());
+          }catch (Exception e){
+            log.debug("이미지 저장 시 에러 : {}", e.getMessage());
+          }
+
         })
         .exceptionally(failure -> {
           binaryContent.updateUploadStatus(FAILED);
           binaryContentRepository.save(binaryContent);
-          publishAsyncEvent();
+          publishAsyncFailedEvent();
           return null;
         });
 
     return binaryContentId;
   }
 
-  private void publishAsyncEvent() {
+  private void publishAsyncFailedEvent() {
     SecurityContext context = SecurityContextHolder.getContext();
     UserResult userResult = (UserResult) context.getAuthentication().getPrincipal();
 
