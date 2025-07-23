@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +53,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @Transactional
   @Override
@@ -117,6 +119,11 @@ public class BasicMessageService implements MessageService {
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
 
     MessageDto messageDto = messageMapper.toDto(message);
+
+    String destination = "/sub/channels/" + messageDto.channelId() + "/message";
+    messagingTemplate.convertAndSend(destination, messageDto);
+    log.info("웹소켓 메시지 발행 완료: destination={}", destination);
+
     eventPublisher.publishEvent(new NewMessageEvent(messageDto));
     return messageDto;
   }
