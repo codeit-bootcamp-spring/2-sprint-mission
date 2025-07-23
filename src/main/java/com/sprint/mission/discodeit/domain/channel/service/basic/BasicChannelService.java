@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain.channel.service.basic;
 
+import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.CHANNEL_CACHE_NAME;
+
 import com.sprint.mission.discodeit.domain.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelUpdateRequest;
@@ -16,7 +18,8 @@ import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepos
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,20 +35,24 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public ChannelResult createPublic(PublicChannelCreateRequest channelRegisterRequest) {
-    Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.name(),
-        channelRegisterRequest.description());
+    Channel channel = Channel.createPublic(
+        channelRegisterRequest.name(),
+        channelRegisterRequest.description()
+    );
     Channel savedChannel = channelRepository.save(channel);
 
     return channelMapper.convertToChannelResult(savedChannel);
   }
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
-    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    Channel channel = Channel.createPrivate();
     Channel savedChannel = channelRepository.save(channel);
 
     List<User> members = userRepository.findAllById(privateChannelCreateRequest.participantIds());
@@ -66,6 +73,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(channel);
   }
 
+  @Cacheable(value = CHANNEL_CACHE_NAME, key = "#userId")
   @Transactional(readOnly = true)
   @Override
   public List<ChannelResult> getAllByUserId(UUID userId) {
@@ -84,14 +92,15 @@ public class BasicChannelService implements ChannelService {
         .toList();
   }
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public ChannelResult updatePublic(
-      UUID id,
+      UUID channelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest
   ) {
-    Channel channel = channelRepository.findById(id)
-        .orElseThrow(() -> new ChannelNotFoundException(Map.of("channelId", id)));
+    Channel channel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new ChannelNotFoundException(Map.of()));
 
     channel.update(publicChannelUpdateRequest.newName(),
         publicChannelUpdateRequest.newDescription());
@@ -100,6 +109,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.convertToChannelResult(updatedChannel);
   }
 
+  @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
   @Override
   public void delete(UUID channelId) {

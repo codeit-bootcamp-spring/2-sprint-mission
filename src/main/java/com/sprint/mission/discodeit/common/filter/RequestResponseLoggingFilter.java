@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.common.filter;
 
+import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
+import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_METHOD;
+import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_URL;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,9 +52,9 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
 
     try {
       // === MDC 설정 ===
-      MDC.put("requestId", UUID.randomUUID().toString());
-      MDC.put("requestMethod", requestWrapper.getMethod());
-      MDC.put("requestUrl", requestWrapper.getRequestURI());
+      MDC.put(REQUEST_ID, UUID.randomUUID().toString());
+      MDC.put(REQUEST_METHOD, requestWrapper.getMethod());
+      MDC.put(REQUEST_URL, requestWrapper.getRequestURI());
 
       // 필터 체인 호출
       chain.doFilter(requestWrapper, responseWrapper);

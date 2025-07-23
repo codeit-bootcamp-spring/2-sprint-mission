@@ -20,4 +20,5 @@ public interface MessageService {
     MessageResult updateContext(UUID id, String context);
 
     void delete(UUID id);
+
 }

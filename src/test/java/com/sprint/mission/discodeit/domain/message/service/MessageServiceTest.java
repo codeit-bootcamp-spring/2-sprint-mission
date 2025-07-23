@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.domain.message.service;
 
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
-import com.sprint.mission.discodeit.testutil.AuthSupport;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
@@ -47,8 +46,8 @@ public class MessageServiceTest extends IntegrationTestSupport {
 
   private static final String MESSAGE_CONTENT = "안녕하세요";
 
-  @MockitoBean
-  private BinaryContentStorage binaryContentStorage;
+//  @MockitoBean
+//  private BinaryContentStorage binaryContentStorage;
 
   @Autowired
   private ChannelRepository channelRepository;
@@ -73,7 +72,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void createTest_NullAttachments() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), savedUser.getId());
@@ -97,7 +96,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void createTest_HaveAttachments() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), savedUser.getId());
@@ -143,7 +142,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void createTest_UserNotExisting() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), UUID.randomUUID());
 
@@ -156,7 +155,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void getByIdTest() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message savedMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -190,7 +189,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @MethodSource("provideSortAndCursorCase")
   void getAllByChannelId(Instant cursor, Sort sort, List<String> expectedMessages) {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message firstMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -234,7 +233,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void getAllByChannelIdDesc_NextCursor() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message firstMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -273,11 +272,10 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void updateContextTest() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message savedMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     MessageResult updatedMessage = messageService.updateContext(savedMessage.getId(), "updated");
@@ -298,7 +296,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void deleteTest() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), savedUser.getId());
@@ -311,7 +309,6 @@ public class MessageServiceTest extends IntegrationTestSupport {
         .stream()
         .map(BinaryContentResult::id)
         .toList();
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     messageService.delete(savedMessage.id());

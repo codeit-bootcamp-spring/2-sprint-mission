@@ -2,18 +2,17 @@ package com.sprint.mission.discodeit.domain.auth.service.basic;
 
 import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
+import com.sprint.mission.discodeit.common.event.event.RoleChangeNotificationEvent;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.repository.JwtSessionRepository;
-import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.session.SessionInformation;
-import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +25,7 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtSessionRepository jwtSessionRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   private final String adminUsername = "adminUsername";
   private final String adminPassword = "adminPassword";
@@ -46,7 +46,7 @@ public class BasicAuthService implements AuthService {
 
     User savedUser = userRepository.save(admin);
 
-    return UserResult.fromEntity(savedUser, false);
+    return UserResult.from(savedUser, false);
   }
 
   @Transactional
@@ -55,9 +55,19 @@ public class BasicAuthService implements AuthService {
     User user = userRepository.findById(roleUpdateRequest.userId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
     user.updateRole(roleUpdateRequest.newRole());
-    User savedUser = userRepository.save(user);
+    User updatedUser = userRepository.save(user);
 
-    return UserResult.fromEntity(savedUser, false);
+    publishRoleChangeEvent(user, updatedUser);
+
+    jwtSessionRepository.deleteById(updatedUser.getId());
+    return UserResult.from(updatedUser, false);
+  }
+
+  private void publishRoleChangeEvent(User notUpdatedUser, User updatedUser) {
+    RoleChangeNotificationEvent roleChangeNotificationEvent = new RoleChangeNotificationEvent(
+        notUpdatedUser, updatedUser
+    );
+    eventPublisher.publishEvent(roleChangeNotificationEvent);
   }
 
 }

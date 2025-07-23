@@ -2,15 +2,13 @@ package com.sprint.mission.discodeit.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
-import com.sprint.mission.discodeit.security.jwt.service.JwtService;
+import com.sprint.mission.discodeit.security.JwtService;
 import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;

@@ -7,7 +7,7 @@ import static com.sprint.mission.discodeit.security.config.SecurityMatchers.NON_
 import static com.sprint.mission.discodeit.security.config.SecurityMatchers.SIGN_UP;
 
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
-import com.sprint.mission.discodeit.security.jwt.service.JwtService;
+import com.sprint.mission.discodeit.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

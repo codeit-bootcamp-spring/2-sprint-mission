@@ -1,0 +1,150 @@
+package com.sprint.mission.discodeit.security;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.security.jwt.config.JwtProperties;
+import com.sprint.mission.discodeit.security.jwt.repository.JwtSessionRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.crypto.SecretKey;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class JwtService {
+
+  private static final Map<String, Instant> JwtBlacklist = new ConcurrentHashMap<>();
+
+  private final SecretKey secretKey;
+  private final JwtProperties jwtProperties;
+  private final JwtSessionRepository jwtSessionRepository;
+  private final UserRepository userRepository;
+  private final ObjectMapper objectMapper;
+
+  @Transactional
+  public JwtSession generateSession(UserResult userResult) {
+    Optional<JwtSession> jwtSession = jwtSessionRepository.findById(userResult.id());
+    if (jwtSession.isPresent()) {
+      jwtSessionRepository.delete(jwtSession.get());
+      JwtBlacklist.put(jwtSession.get().getAccessToken(), Instant.now());
+    }
+
+    Instant now = Instant.now();
+    Instant accessExp = now.plusSeconds(jwtProperties.accessTokenExpiration());
+    Instant refreshExp = now.plusSeconds(jwtProperties.refreshTokenExpiration());
+
+    String accessToken = createToken(userResult, now, accessExp);
+    String refreshToken = createToken(userResult, now, refreshExp);
+
+    User user = userRepository.findById(userResult.id())
+        .orElseThrow(() -> new UserNotFoundException(Map.of()));
+    JwtSession session = new JwtSession(accessToken, refreshToken, user);
+
+    return jwtSessionRepository.save(session);
+  }
+
+  @Transactional
+  public JwtSession refreshSession(String refreshToken) {
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new IllegalArgumentException("해당 refresh토큰의 jwt세션이 존재하지 않습니다."));
+    JwtBlacklist.put(jwtSession.getAccessToken(), Instant.now());
+
+    User user = jwtSession.getUser();
+    UserResult userResult = UserResult.from(user, true);
+
+    Instant now = Instant.now();
+    Instant accessExp = now.plusSeconds(jwtProperties.accessTokenExpiration());
+    Instant refreshExp = now.plusSeconds(jwtProperties.refreshTokenExpiration());
+
+    String newAccessToken = createToken(userResult, now, accessExp);
+    String newRefreshToken = createToken(userResult, now, refreshExp);
+    jwtSession.update(newAccessToken, newRefreshToken);
+
+    return jwtSessionRepository.save(jwtSession);
+  }
+
+  @Transactional
+  public void invalidateSession(String refreshToken) {
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new IllegalArgumentException("해당 jwt 세션이 없습니다."));
+
+    jwtSessionRepository.delete(jwtSession);
+    JwtBlacklist.put(jwtSession.getAccessToken(), Instant.now());
+  }
+
+  @Transactional(readOnly = true)
+  public String getAccessTokenByRefreshToken(String refreshToken) {
+    JwtSession jwtSession = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new IllegalArgumentException("해당 jwt 세션이 없습니다."));
+
+    return jwtSession.getAccessToken();
+  }
+
+  public boolean isInvalidAccessToken(String accessToken) {
+    if (JwtBlacklist.containsKey(accessToken)) {
+      return true;
+    }
+
+    try {
+      Jwts.parser()
+          .verifyWith(secretKey)
+          .requireIssuer(jwtProperties.issuer())
+          .build()
+          .parseSignedClaims(accessToken);
+      return false;
+    } catch (JwtException e) {
+      return true;
+    }
+  }
+
+  public UserResult parseUser(String token) {
+    Claims claims = Jwts.parser()
+        .verifyWith(secretKey)
+        .requireIssuer(jwtProperties.issuer())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    Map<String, Object> userMap = claims.get("userDto", Map.class);
+    return objectMapper.convertValue(userMap, UserResult.class);
+  }
+
+  @Scheduled(fixedRate = 1800000)
+  void cleanExpiredBlacklistTokens() {
+    Instant now = Instant.now();
+    JwtBlacklist.entrySet().removeIf(entry -> entry.getValue().isBefore(now));
+  }
+
+  private String createToken(UserResult userResult, Instant now, Instant expiresAt) {
+    Map<String, Object> userMap = objectMapper.convertValue(userResult, new TypeReference<>() {
+    });
+
+    return Jwts.builder()
+        .subject(userResult.username())
+        .issuedAt(Date.from(now))
+        .issuer(jwtProperties.issuer())
+        .expiration(Date.from(expiresAt))
+        .claim("userDto", userMap)
+        .claim("iat", now.getEpochSecond())
+        .claim("exp", expiresAt.getEpochSecond())
+        .signWith(secretKey)
+        .compact();
+  }
+
+}

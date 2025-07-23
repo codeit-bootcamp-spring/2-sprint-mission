@@ -23,7 +23,7 @@ import com.sprint.mission.discodeit.security.jwt.accessmanager.MessageDeleteAuth
 import com.sprint.mission.discodeit.security.jwt.accessmanager.MessageOwnerAuthorizationManager;
 import com.sprint.mission.discodeit.security.jwt.accessmanager.ReadStatusSelfAuthorizationManager;
 import com.sprint.mission.discodeit.security.jwt.accessmanager.UserSelfAuthorizationManager;
-import com.sprint.mission.discodeit.security.jwt.service.JwtService;
+import com.sprint.mission.discodeit.security.JwtService;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -55,7 +55,6 @@ public class SecurityConfig {
       HttpSecurity httpSecurity,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      PersistentTokenBasedRememberMeServices rememberMeServices,
       JwtService jwtService,
       JwtAuthenticationFilter jwtAuthenticationFilter,
       UserSelfAuthorizationManager userSelfAuthorizationManager,
@@ -84,14 +83,12 @@ public class SecurityConfig {
             .logoutRequestMatcher(LOGOUT)
             .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
             .addLogoutHandler(new TokenLogoutHandler(jwtService))
-            .addLogoutHandler(rememberMeServices)
         )
         .csrf(csrf -> csrf
             .ignoringRequestMatchers(LOGOUT)
             .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
         )
-        .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices))
         .addFilterBefore(jwtAuthenticationFilter, JsonUsernamePasswordAuthenticationFilter.class);
 
     return httpSecurity.build();
@@ -121,23 +118,6 @@ public class SecurityConfig {
         .role(Role.CHANNEL_MANAGER.name())
         .implies(Role.USER.name())
         .build();
-  }
-
-  @Bean
-  public PersistentTokenBasedRememberMeServices rememberMeServices(
-      @Value("${security.remember-me.key}") String key,
-      @Value("${security.remember-me.token-validity-seconds}") int tokenValiditySeconds,
-      UserDetailsService userDetailsService,
-      DataSource dataSource
-  ) {
-    JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-    tokenRepository.setDataSource(dataSource);
-
-    PersistentTokenBasedRememberMeServices rememberMeServices = new PersistentTokenBasedRememberMeServices(
-        key, userDetailsService, tokenRepository);
-    rememberMeServices.setTokenValiditySeconds(tokenValiditySeconds);
-
-    return rememberMeServices;
   }
 
 }

@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.domain.message.service.basic;
 
+import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
+
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
@@ -15,14 +16,21 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
+import com.sprint.mission.discodeit.common.event.event.NewMessageNotificationEvent;
+import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,6 +38,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -37,9 +46,18 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
-  private final BinaryContentCore binaryContentCore;
+  private final MessageBinaryContentService messageBinaryContentService;
   private final MessageResultMapper messageResultMapper;
+  private final ReadStatusRepository readStatusRepository;
 
+  private final ApplicationEventPublisher eventPublisher;
+
+  @CacheEvict(value = NOTIFICATION_CACHE_NAME, key = "#messageCreateRequest.authorId")
+  @Timed(
+      value = "file_upload",
+      percentiles = {0.5, 0.95, 0.99}
+  )
+  @Transactional
   @Override
   public MessageResult create(
       MessageCreateRequest messageCreateRequest,
@@ -50,9 +68,11 @@ public class BasicMessageService implements MessageService {
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
-    List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
+    List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
+
+    publishMessageEvent(savedMessage);
 
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
@@ -100,6 +120,24 @@ public class BasicMessageService implements MessageService {
     validateMessageExist(messageId);
 
     messageRepository.deleteById(messageId);
+  }
+
+  private void publishMessageEvent(Message message) { // 매개변수는 이벤트 대상을 추천, 내부에서 메세지 형태 만들기 좋게
+    if (isNotificationNotEnabled(message)) {
+      return;
+    }
+    NewMessageNotificationEvent newMessageNotificationEvent = new NewMessageNotificationEvent(
+        message);
+    eventPublisher.publishEvent(newMessageNotificationEvent);
+  }
+
+  private boolean isNotificationNotEnabled(Message message) {
+    return !readStatusRepository.findByChannelIdAndUserId(
+            message.getChannel().getId(),
+            message.getUser().getId()
+        )
+        .map(ReadStatus::getNotificationEnabled)
+        .orElse(false);
   }
 
   private Pageable createPageable(ChannelMessagePageRequest request) {

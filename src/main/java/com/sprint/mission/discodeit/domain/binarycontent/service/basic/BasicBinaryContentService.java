@@ -6,27 +6,37 @@ import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentService;
+import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-  private final BinaryContentCore binaryContentCore;
+  private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
 
   @Transactional
   @Override
   public BinaryContentResult createBinaryContent(BinaryContentRequest binaryContentRequest) {
-    BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
+    if (binaryContentRequest == null) {
+      return null;
+    }
+    BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(),
+        binaryContentRequest.contentType(), binaryContentRequest.size());
+    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
-    return BinaryContentResult.fromEntity(binaryContent);
+    binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+
+    return BinaryContentResult.fromEntity(savedBinaryContent);
   }
 
   @Transactional(readOnly = true)
@@ -49,7 +59,16 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public void delete(UUID id) {
-    binaryContentCore.delete(id);
+    validateBinaryContentExist(id);
+
+    binaryContentRepository.deleteById(id);
+  }
+
+  private void validateBinaryContentExist(UUID id) {
+    if (binaryContentRepository.existsById(id)) {
+      return;
+    }
+    throw new BinaryContentNotFoundException(Map.of());
   }
 
 }

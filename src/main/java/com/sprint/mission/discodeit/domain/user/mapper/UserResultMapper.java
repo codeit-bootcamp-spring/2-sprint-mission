@@ -15,7 +15,7 @@ public class UserResultMapper {
   private final JwtSessionRepository jwtSessionRepository;
 
   public UserResult convertToUserResult(User user) {
-    return UserResult.fromEntity(user, isOnline(user));
+    return UserResult.from(user, isOnline(user));
   }
 
   private boolean isOnline(User user) {

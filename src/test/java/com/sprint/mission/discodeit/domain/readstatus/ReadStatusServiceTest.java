@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.domain.readstatus;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import com.sprint.mission.discodeit.domain.user.entity.Role;
-import com.sprint.mission.discodeit.testutil.AuthSupport;
-import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.domain.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusNotFoundException;
@@ -19,11 +18,12 @@ import com.sprint.mission.discodeit.domain.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +40,8 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   @Autowired
   private ReadStatusService readStatusService;
 
-  @AfterEach
-  void tearDown() {
+  @BeforeEach
+  void setUp() {
     readStatusRepository.deleteAllInBatch();
     channelRepository.deleteAllInBatch();
     userRepository.deleteAllInBatch();
@@ -53,10 +53,9 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void create() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(savedUser.getId(),
         savedChannel.getId());
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     ReadStatusResult readStatusResult = readStatusService.create(readStatusCreateRequest);
@@ -88,7 +87,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   @Test
   void create_NoUser_Exception() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(UUID.randomUUID(),
         savedChannel.getId());
 
@@ -102,7 +101,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void create_AlreadyReadStatus_Exception() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(savedUser.getId(),
         savedChannel.getId());
@@ -117,8 +116,8 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void getAllByUserId() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel firstChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
-    Channel secondChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel firstChannel = channelRepository.save(Channel.createPrivate());
+    Channel secondChannel = channelRepository.save(Channel.createPrivate());
     readStatusRepository.save(new ReadStatus(savedUser, firstChannel));
     readStatusRepository.save(new ReadStatus(savedUser, secondChannel));
 
@@ -149,17 +148,20 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void updateLastReadTime() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
     Instant instant = Instant.parse("2025-05-17T14:00:00Z");
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
+    boolean notificationEnabled = false;
+    ReadStatusUpdateRequest request = new ReadStatusUpdateRequest(instant, notificationEnabled);
 
     // when
-    ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatus.getId(),
-        instant);
+    ReadStatusResult readStatusResult = readStatusService.update(readStatus.getId(),
+        request);
 
     // then
-    Assertions.assertThat(readStatusResult.lastReadAt()).isEqualTo(instant);
+    Assertions.assertThat(readStatusResult)
+        .extracting(ReadStatusResult::lastReadAt, ReadStatusResult::notificationEnabled)
+        .containsExactlyInAnyOrder(instant, notificationEnabled);
   }
 
   @DisplayName("읽기 상태 업데이트 시도시, 없는 읽기상태면 예외를 반환합니다.")
@@ -167,10 +169,12 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void updateLastReadTime_Exception() {
     // given
     Instant instant = Instant.parse("2025-05-17T14:00:00Z");
+    boolean notificationEnabled = false;
+    ReadStatusUpdateRequest request = new ReadStatusUpdateRequest(instant, notificationEnabled);
 
     // when & then
     Assertions.assertThatThrownBy(
-            () -> readStatusService.updateLastReadTime(UUID.randomUUID(), instant))
+            () -> readStatusService.update(UUID.randomUUID(), request))
         .isInstanceOf(ReadStatusNotFoundException.class);
   }
 
@@ -179,9 +183,8 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void delete() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
-    AuthSupport.setTestAuthentication(savedUser, Role.USER);
 
     // when
     readStatusService.delete(readStatus.getId());

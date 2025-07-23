@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.security.filter;
 
-import com.sprint.mission.discodeit.security.jwt.service.JwtService;
+import com.sprint.mission.discodeit.security.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
