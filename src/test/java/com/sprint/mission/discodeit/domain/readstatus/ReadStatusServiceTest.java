@@ -23,8 +23,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.groups.Tuple;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -157,7 +155,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
     ReadStatusUpdateRequest request = new ReadStatusUpdateRequest(instant, notificationEnabled);
 
     // when
-    ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatus.getId(),
+    ReadStatusResult readStatusResult = readStatusService.update(readStatus.getId(),
         request);
 
     // then
@@ -176,7 +174,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
 
     // when & then
     Assertions.assertThatThrownBy(
-            () -> readStatusService.updateLastReadTime(UUID.randomUUID(), request))
+            () -> readStatusService.update(UUID.randomUUID(), request))
         .isInstanceOf(ReadStatusNotFoundException.class);
   }
 

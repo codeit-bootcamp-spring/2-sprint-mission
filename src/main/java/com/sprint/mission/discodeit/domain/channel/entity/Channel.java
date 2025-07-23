@@ -24,10 +24,18 @@ public class Channel extends BaseUpdatableEntity {
   @Enumerated(EnumType.STRING)
   private ChannelType type;
 
-  public Channel(ChannelType channelType, String name, String description) {
+  private Channel(ChannelType channelType, String name, String description) {
     this.name = name;
     this.description = description;
     this.type = channelType;
+  }
+
+  public static Channel createPublic(String name, String description) {
+    return new Channel(ChannelType.PUBLIC, name, description);
+  }
+
+  public static Channel createPrivate() {
+    return new Channel(ChannelType.PRIVATE, null, null);
   }
 
   public void update(String name, String description) {

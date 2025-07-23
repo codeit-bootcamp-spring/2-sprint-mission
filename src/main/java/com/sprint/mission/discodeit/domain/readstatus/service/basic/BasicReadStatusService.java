@@ -59,7 +59,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Transactional
   @Override
-  public ReadStatusResult updateLastReadTime(UUID readStatusId, ReadStatusUpdateRequest request) {
+  public ReadStatusResult update(UUID readStatusId, ReadStatusUpdateRequest request) {
     ReadStatus readStatus = readStatusRepository.findFetchUserById(readStatusId)
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of()));
 

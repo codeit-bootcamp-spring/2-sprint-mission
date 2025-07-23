@@ -36,8 +36,10 @@ public class NotificationEventListener {
   )
   public void handleNotificationEvent(NotificationEvent event) {
     try {
+      log.info("알림 메세지 전송");
       createNotification(event);
     } catch (Exception ex) {
+      log.error("알림 메세지 전송실패 {}", ex.getMessage());
       throw ex;
     }
   }

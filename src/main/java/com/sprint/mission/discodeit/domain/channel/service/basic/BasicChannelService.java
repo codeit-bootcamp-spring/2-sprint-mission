@@ -39,8 +39,10 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelResult createPublic(PublicChannelCreateRequest channelRegisterRequest) {
-    Channel channel = new Channel(ChannelType.PUBLIC, channelRegisterRequest.name(),
-        channelRegisterRequest.description());
+    Channel channel = Channel.createPublic(
+        channelRegisterRequest.name(),
+        channelRegisterRequest.description()
+    );
     Channel savedChannel = channelRepository.save(channel);
 
     return channelMapper.convertToChannelResult(savedChannel);
@@ -50,7 +52,7 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelResult createPrivate(PrivateChannelCreateRequest privateChannelCreateRequest) {
-    Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+    Channel channel = Channel.createPrivate();
     Channel savedChannel = channelRepository.save(channel);
 
     List<User> members = userRepository.findAllById(privateChannelCreateRequest.participantIds());

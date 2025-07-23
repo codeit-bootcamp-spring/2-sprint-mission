@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.domain.binarycontent.storage.s3;
 import static com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus.FAILED;
 import static com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus.SUCCESS;
 
+import com.sprint.mission.discodeit.common.event.event.S3AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
@@ -48,7 +49,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-        .orElseThrow(() -> new BinaryContentNotFoundException(Map.of()));
+        .orElseThrow(() -> new BinaryContentNotFoundException(Map.of())); // TODO: 7/23/25 S3에서 알 필요가 없다
 
     String key = binaryContentId.toString();
     PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -71,22 +72,21 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .exceptionally(failure -> {
           binaryContent.updateUploadStatus(FAILED);
           binaryContentRepository.save(binaryContent);
-          publishAsyncFailedEvent();
+          publishAsyncFailedEvent(binaryContent);
           return null;
         });
 
     return binaryContentId;
   }
 
-  private void publishAsyncFailedEvent() {
+  private void publishAsyncFailedEvent(BinaryContent binaryContent) {
     SecurityContext context = SecurityContextHolder.getContext();
-    UserResult userResult = (UserResult) context.getAuthentication().getPrincipal();
+    UserResult userResult = (UserResult) context.getAuthentication()
+        .getPrincipal(); // TODO: 7/23/25 캐스팅에러 처리필요
 
-    AsyncFailedNotificationEvent asyncFailedNotificationEvent = new AsyncFailedNotificationEvent(
-        userResult.id(),
-        "S3"
-    );
-    eventPublisher.publishEvent(asyncFailedNotificationEvent);
+    S3AsyncFailedNotificationEvent s3AsyncFailedNotificationEvent = new S3AsyncFailedNotificationEvent(
+        userResult.id(), binaryContent);
+    eventPublisher.publishEvent(s3AsyncFailedNotificationEvent);
   }
 
   @Override

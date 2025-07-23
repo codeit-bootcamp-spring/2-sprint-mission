@@ -1,18 +1,24 @@
 package com.sprint.mission.discodeit.common.event.event;
 
 import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
-import java.util.UUID;
+import com.sprint.mission.discodeit.domain.user.entity.User;
 
 public class RoleChangeNotificationEvent extends NotificationEvent {
 
-  public RoleChangeNotificationEvent(UUID receiverId, String contentKeyword) {
+  public RoleChangeNotificationEvent(User notUpdatedUser, User updatedUser) {
     super(
-        receiverId,
+        updatedUser.getId(),
         NotificationType.ROLE_CHANGED,
-        receiverId,
+        updatedUser.getId(),
         NotificationType.ROLE_CHANGED.getTitle(),
-        NotificationType.ROLE_CHANGED.formatContent(contentKeyword)
+        createContent(notUpdatedUser, updatedUser)
     );
+  }
+
+  private static String createContent(User notUpdatedUser, User updatedUser) {
+    String rawContent = String.format("%s에서 %s", notUpdatedUser.getRole().name(),
+        updatedUser.getRole().name());
+    return NotificationType.ROLE_CHANGED.formatContent(rawContent);
   }
 
 }

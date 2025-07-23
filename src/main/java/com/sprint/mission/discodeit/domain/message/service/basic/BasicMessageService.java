@@ -72,7 +72,7 @@ public class BasicMessageService implements MessageService {
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
 
-    publishMessageEvent(user.getId(), channel);
+    publishMessageEvent(savedMessage);
 
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
@@ -122,26 +122,22 @@ public class BasicMessageService implements MessageService {
     messageRepository.deleteById(messageId);
   }
 
-  private void publishMessageEvent(UUID userId, Channel channel) {
-    if (isNotificationNotEnabled(userId, channel.getId())) {
+  private void publishMessageEvent(Message message) { // 매개변수는 이벤트 대상을 추천, 내부에서 메세지 형태 만들기 좋게
+    if (isNotificationNotEnabled(message)) {
       return;
     }
     NewMessageNotificationEvent newMessageNotificationEvent = new NewMessageNotificationEvent(
-        userId, channel.getId(), getChannelName(channel));
+        message);
     eventPublisher.publishEvent(newMessageNotificationEvent);
   }
 
-  private boolean isNotificationNotEnabled(UUID userId, UUID channelId) {
-    return !readStatusRepository.findByChannelIdAndUserId(channelId, userId)
+  private boolean isNotificationNotEnabled(Message message) {
+    return !readStatusRepository.findByChannelIdAndUserId(
+            message.getChannel().getId(),
+            message.getUser().getId()
+        )
         .map(ReadStatus::getNotificationEnabled)
         .orElse(false);
-  }
-
-  private String getChannelName(Channel channel) {
-    if (channel.getName() == null) {
-      return "프라이빗";
-    }
-    return channel.getName();
   }
 
   private Pageable createPageable(ChannelMessagePageRequest request) {

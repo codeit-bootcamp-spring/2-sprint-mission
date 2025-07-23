@@ -1,15 +1,19 @@
 package com.sprint.mission.discodeit.domain.readstatus.entity;
 
-import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.user.entity.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.time.ZonedDateTime;
 
 @Getter
 @Entity
@@ -38,14 +42,14 @@ public class ReadStatus extends BaseUpdatableEntity {
     this.notificationEnabled = isNotificationEnabled(channel);
   }
 
-  public void update(Instant time, boolean newNotificationEnabled) {
-    if (time != null) {
+  public void update(Instant time, Boolean newNotificationEnabled) {
+    if (time != null && !this.lastReadTime.equals(time)) {
       this.lastReadTime = time;
     }
-    if (this.notificationEnabled.equals(newNotificationEnabled)) {
-      return;
+    if (newNotificationEnabled != null &&
+        !this.notificationEnabled.equals(newNotificationEnabled)) {
+      this.notificationEnabled = newNotificationEnabled;
     }
-    this.notificationEnabled = newNotificationEnabled;
   }
 
   private boolean isNotificationEnabled(Channel channel) {

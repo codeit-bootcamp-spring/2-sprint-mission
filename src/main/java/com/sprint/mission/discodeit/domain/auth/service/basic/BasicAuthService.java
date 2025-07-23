@@ -55,18 +55,17 @@ public class BasicAuthService implements AuthService {
     User user = userRepository.findById(roleUpdateRequest.userId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
     user.updateRole(roleUpdateRequest.newRole());
-    User savedUser = userRepository.save(user);
+    User updatedUser = userRepository.save(user);
 
-    publishRoleChangeEvent(savedUser);
+    publishRoleChangeEvent(user, updatedUser);
 
-    jwtSessionRepository.deleteById(savedUser.getId());
-    return UserResult.from(savedUser, false);
+    jwtSessionRepository.deleteById(updatedUser.getId());
+    return UserResult.from(updatedUser, false);
   }
 
-  private void publishRoleChangeEvent(User user) {
+  private void publishRoleChangeEvent(User notUpdatedUser, User updatedUser) {
     RoleChangeNotificationEvent roleChangeNotificationEvent = new RoleChangeNotificationEvent(
-        user.getId(),
-        user.getName()
+        notUpdatedUser, updatedUser
     );
     eventPublisher.publishEvent(roleChangeNotificationEvent);
   }

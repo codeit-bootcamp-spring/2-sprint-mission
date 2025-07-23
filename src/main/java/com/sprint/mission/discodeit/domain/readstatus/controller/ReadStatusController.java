@@ -6,13 +6,9 @@ import com.sprint.mission.discodeit.domain.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusCreateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +32,7 @@ public class ReadStatusController {
       @PathVariable UUID readStatusId,
       @RequestBody @Valid ReadStatusUpdateRequest request
   ) {
-    ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatusId,
+    ReadStatusResult readStatusResult = readStatusService.update(readStatusId,
         request);
 
     return ResponseEntity.ok(readStatusResult);
