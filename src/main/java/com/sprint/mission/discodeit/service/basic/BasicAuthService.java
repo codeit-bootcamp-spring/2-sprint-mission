@@ -2,7 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.NotificationEvent;
+import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -24,6 +27,7 @@ public class BasicAuthService implements AuthService {
     private final SessionInvalidateManager sessionInvalidateManager;
     private UserMapper userMapper;
     private final JwtSessionRepository jwtSessionRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @Transactional
     @Override
@@ -34,6 +38,14 @@ public class BasicAuthService implements AuthService {
         user.setRole(request.newRole());
 
         userRepository.save(user);
+
+        notificationEventPublisher.publish(new NotificationEvent(
+                user.getId(),
+                "권한이 변경되었습니다",
+                "사용자 권한이 " + request.newRole().name() + "으로 변경되었습니다.",
+                NotificationType.ROLE_CHANGED,
+                user.getId()
+        ));
 
         // 세션 무효화
         sessionInvalidateManager.invalidateIfPresent(user.getId());
