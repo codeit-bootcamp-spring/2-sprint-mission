@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.domain.binarycontent.storage.s3;
 
-import static com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus.*;
+import static com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus.FAILED;
+import static com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus.SUCCESS;
 
-import com.sprint.mission.discodeit.s3.S3Adapter;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.notification.event.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.s3.S3Adapter;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
@@ -62,7 +63,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
           binaryContent.updateUploadStatus(SUCCESS);
           try {
             binaryContentRepository.save(binaryContent);
-            log.debug("S3서비스에서 데이터 베이스에 저장");
           } catch (Exception e) {
             log.debug("바이너리 컨텐츠 저장 시 에러 : {}", e.getMessage());
           }

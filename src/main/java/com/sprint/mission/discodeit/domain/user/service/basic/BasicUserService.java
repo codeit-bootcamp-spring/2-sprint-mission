@@ -51,17 +51,10 @@ public class BasicUserService implements UserService {
     validateDuplicateUserName(userRequest.username());
 
     BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
-    log.debug("user를 저장하기 위해서 이동 ");
-    try{
-      Thread.sleep(4000);
-    }catch (Exception ex){
-
-    }
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
     User savedUser = userRepository.save(user);
-    log.debug("유저서비스에서 데이터 베이스에 저장");
 
     return userResultMapper.convertToUserResult(savedUser);
   }

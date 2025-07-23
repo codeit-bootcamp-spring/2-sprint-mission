@@ -26,28 +26,23 @@ public class BinaryContentCore {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
 
-//  @Transactional(propagation = Propagation.REQUIRES_NEW) // 이렇게 하면 상관이 없나?
-  @Transactional // 이렇게 하면 상관이 없나?
+  @Transactional
   public BinaryContent createBinaryContent(BinaryContentRequest binaryContentRequest) {
     if (binaryContentRequest == null) {
       return null;
     }
     BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(),
         binaryContentRequest.contentType(), binaryContentRequest.size());
-    log.debug("바이너리 스토리지 저장"); // 아 이건 시점 문제가 없긴하지
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
-//    TransactionSynchronizationManager.registerSynchronization(
-//        new TransactionSynchronization() {
-//          @Override
-//          public void afterCommit() {
-//            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
-//          }
-//        }
-//    );
-
-    log.debug("바이너리 스토리지 이동전");
-    binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
+          }
+        }
+    );
 
     return savedBinaryContent;
   }
@@ -73,7 +68,6 @@ public class BinaryContentCore {
           new TransactionSynchronization() {
             @Override
             public void afterCommit() {
-              log.debug("처음 바이너리 컨텐츠처리 쓰레드 {} ", Thread.currentThread().getName());
               binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
             }
           }
