@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,6 +32,7 @@ public class BasicNotificationService implements NotificationService {
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @PreAuthorize("principal.userDto.id == #receiverId")
   @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
@@ -76,6 +78,10 @@ public class BasicNotificationService implements NotificationService {
         targetId
     );
     notificationRepository.save(notification);
+
+    // "notifications" 라는 이름으로 Dto 데이터를 SSE로 전송
+    sseService.send(receiverId, "notifications", notificationMapper.toDto(notification));
+
     log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
         notification.getId(), receiverId, targetId);
   }
