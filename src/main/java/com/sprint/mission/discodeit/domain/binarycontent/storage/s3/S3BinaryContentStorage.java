@@ -63,6 +63,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
           binaryContent.updateUploadStatus(SUCCESS);
           try {
             binaryContentRepository.save(binaryContent);
+            log.debug("바이너리 컨텐츠 저장 완료");
           } catch (Exception e) {
             log.debug("바이너리 컨텐츠 저장 시 에러 : {}", e.getMessage());
           }

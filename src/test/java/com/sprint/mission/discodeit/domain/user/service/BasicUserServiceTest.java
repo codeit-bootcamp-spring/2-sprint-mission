@@ -1,22 +1,36 @@
 package com.sprint.mission.discodeit.domain.user.service;
 
-import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
+import static org.mockito.ArgumentMatchers.any;
+
+import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
+import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
+import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
+import org.assertj.core.groups.Tuple;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 class BasicUserServiceTest extends IntegrationTestSupport {
 
@@ -26,14 +40,21 @@ class BasicUserServiceTest extends IntegrationTestSupport {
 
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
 
   @Autowired
   private UserService userService;
+//  @MockitoBean
+//  private S3Adapter s3Adapter; // 로컬 스택으로 개선 예정 // 어댑터를 모킹하면 오히려 작동을 안하는데
 
-  @AfterEach
-  void tearDown() {
+  @MockitoBean
+  private S3Client s3Client;
+
+  @BeforeEach
+  void beforeEach() {
     userRepository.deleteAllInBatch();
-    SecurityContextHolder.clearContext();
+    binaryContentRepository.deleteAllInBatch();
   }
 
   @DisplayName("유저 등록을 요청하면, 유저와 유저의 상태를 저장한다")
@@ -50,6 +71,43 @@ class BasicUserServiceTest extends IntegrationTestSupport {
         .extracting(UserResult::id)
         .isEqualTo(user.id());
   }
+
+  @Disabled("s3Adapter를 모킹하면 SUCCESS가 아니라 Waiting이 나옵니다. 비동기 처리시 모킹 주의")
+  @DisplayName("프로필 사진과 함께 유저 등록을 요청하면, 프로필 사진을 저장합니다.")
+  @Test
+  void register_WithProfileImage() {
+    // given
+    UserCreateRequest userRequest = new UserCreateRequest(USER_NAME, USER_EMAIL, USER_PASSWORD);
+    String fileName = UUID.randomUUID().toString();
+    BinaryContentRequest binaryContentRequest = new BinaryContentRequest(fileName, "", 0,
+        "hello".getBytes());
+    PutObjectResponse mockResponse = PutObjectResponse.builder()
+        .eTag("mock-etag")
+        .build();
+//    BDDMockito.given(s3Adapter.put(any(PutObjectRequest.class), any(RequestBody.class)))
+//        .willReturn(CompletableFuture.completedFuture(mockResponse));
+    BDDMockito.given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+        .willReturn(mockResponse);
+
+    // when
+    UserResult user = userService.register(userRequest, binaryContentRequest);
+
+    // then
+    Assertions.assertThat(user)
+        .extracting(UserResult::id)
+        .isEqualTo(user.id());
+
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(12))
+        .pollInterval(Duration.ofMillis(1000))
+        .untilAsserted(() -> {
+          Assertions.assertThat(binaryContentRepository.findAll())
+              .hasSize(1)
+              .extracting(BinaryContent::getFileName, BinaryContent::getBinaryContentUploadStatus)
+              .containsExactlyInAnyOrder(Tuple.tuple(fileName, BinaryContentUploadStatus.SUCCESS));
+        });
+  }
+
 
   @DisplayName("이미 등록된 유저 이름으로 등록 시도시, 예외를 반환한다")
   @Test

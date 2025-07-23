@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.domain.message.service.basic;
 
 import static com.sprint.mission.discodeit.common.config.CacheConfig.NOTIFICATION_CACHE_NAME;
+
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
@@ -46,7 +46,7 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
-  private final BinaryContentCore binaryContentCore;
+  private final MessageBinaryContentService messageBinaryContentService;
   private final MessageResultMapper messageResultMapper;
   private final ReadStatusRepository readStatusRepository;
 
@@ -68,7 +68,7 @@ public class BasicMessageService implements MessageService {
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
-    List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
+    List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
 

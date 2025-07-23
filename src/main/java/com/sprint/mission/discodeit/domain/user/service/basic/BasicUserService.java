@@ -4,7 +4,6 @@ import static com.sprint.mission.discodeit.common.config.CacheConfig.USER_CACHE_
 
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.binarycontent.service.basic.BinaryContentCore;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
@@ -33,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final BinaryContentCore binaryContentCore;
+  private final UserBinaryContentService userBinaryContentService;
   private final UserResultMapper userResultMapper;
   private final PasswordEncoder passwordEncoder;
 
@@ -50,11 +49,12 @@ public class BasicUserService implements UserService {
     validateDuplicateEmail(userRequest.email());
     validateDuplicateUserName(userRequest.username());
 
-    BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
+    BinaryContent binaryContent = userBinaryContentService.createBinaryContent(binaryContentRequest);
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
     User savedUser = userRepository.save(user);
+    log.debug("유저 레포지토리에 저장 {}", savedUser.getBinaryContent().getBinaryContentUploadStatus());
 
     return userResultMapper.convertToUserResult(savedUser);
   }
@@ -112,11 +112,9 @@ public class BasicUserService implements UserService {
   ) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
-    if (user.getBinaryContent() != null) {
-      binaryContentCore.delete(user.getBinaryContent().getId());
-    }
+    userBinaryContentService.delete(user.getBinaryContent());
 
-    BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
+    BinaryContent binaryContent = userBinaryContentService.createBinaryContent(binaryContentRequest);
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
         passwordEncoder.encode(userUpdateRequest.newPassword()), binaryContent);
     User updatedUser = userRepository.save(user);

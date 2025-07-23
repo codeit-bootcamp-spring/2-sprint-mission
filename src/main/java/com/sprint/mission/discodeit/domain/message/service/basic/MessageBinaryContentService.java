@@ -1,51 +1,27 @@
-package com.sprint.mission.discodeit.domain.binarycontent.service.basic;
+package com.sprint.mission.discodeit.domain.message.service.basic;
 
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-@Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
-public class BinaryContentCore {
+public class MessageBinaryContentService {
+
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
-
-  @Transactional
-  public BinaryContent createBinaryContent(BinaryContentRequest binaryContentRequest) {
-    if (binaryContentRequest == null) {
-      return null;
-    }
-    BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(),
-        binaryContentRequest.contentType(), binaryContentRequest.size());
-    BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
-
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronization() {
-          @Override
-          public void afterCommit() {
-            binaryContentStorage.put(savedBinaryContent.getId(), binaryContentRequest.bytes());
-          }
-        }
-    );
-
-    return savedBinaryContent;
-  }
 
   @Transactional
   public List<BinaryContent> createBinaryContents(
@@ -91,5 +67,6 @@ public class BinaryContentCore {
     }
     throw new BinaryContentNotFoundException(Map.of());
   }
+
 
 }
