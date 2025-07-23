@@ -21,6 +21,4 @@ public interface UserService {
       Optional<BinaryContentCreateRequest> profileCreateRequest);
 
   void delete(UUID userId);
-
-  UUID transId(String receiverName);
 }
