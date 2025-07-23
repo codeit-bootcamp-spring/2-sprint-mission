@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentReques
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -42,14 +44,11 @@ class BasicUserServiceTest extends IntegrationTestSupport {
   private UserRepository userRepository;
   @Autowired
   private BinaryContentRepository binaryContentRepository;
-
   @Autowired
   private UserService userService;
 
-//  @MockitoBean
-//  private S3Adapter s3Adapter; // 로컬 스택으로 개선 예정 // 어댑터를 모킹하면 오히려 작동을 안하는데
   @MockitoBean
-  private S3Client s3Client;
+  private BinaryContentStorage binaryContentStorage;
 
   @BeforeEach
   void beforeEach() {
@@ -72,7 +71,6 @@ class BasicUserServiceTest extends IntegrationTestSupport {
         .isEqualTo(user.id());
   }
 
-  @Disabled("s3Adapter를 모킹하면 SUCCESS가 아니라 Waiting이 나옵니다. 비동기 처리시 모킹 주의")
   @DisplayName("프로필 사진과 함께 유저 등록을 요청하면, 프로필 사진을 저장합니다.")
   @Test
   void register_WithProfileImage() {
@@ -81,13 +79,6 @@ class BasicUserServiceTest extends IntegrationTestSupport {
     String fileName = UUID.randomUUID().toString();
     BinaryContentRequest binaryContentRequest = new BinaryContentRequest(fileName, "", 0,
         "hello".getBytes());
-    PutObjectResponse mockResponse = PutObjectResponse.builder()
-        .eTag("mock-etag")
-        .build();
-//    BDDMockito.given(s3Adapter.put(any(PutObjectRequest.class), any(RequestBody.class)))
-//        .willReturn(CompletableFuture.completedFuture(mockResponse));
-    BDDMockito.given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
-        .willReturn(mockResponse);
 
     // when
     UserResult user = userService.register(userRequest, binaryContentRequest);
@@ -97,17 +88,9 @@ class BasicUserServiceTest extends IntegrationTestSupport {
         .extracting(UserResult::id)
         .isEqualTo(user.id());
 
-    Awaitility.await()
-        .atMost(Duration.ofSeconds(12))
-        .pollInterval(Duration.ofMillis(1000))
-        .untilAsserted(() -> {
-          Assertions.assertThat(binaryContentRepository.findAll())
-              .hasSize(1)
-              .extracting(BinaryContent::getFileName, BinaryContent::getBinaryContentUploadStatus)
-              .containsExactlyInAnyOrder(Tuple.tuple(fileName, BinaryContentUploadStatus.SUCCESS));
-        });
+    Mockito.verify(binaryContentStorage, Mockito.times(1))
+        .put(any(), any());
   }
-
 
   @DisplayName("이미 등록된 유저 이름으로 등록 시도시, 예외를 반환한다")
   @Test

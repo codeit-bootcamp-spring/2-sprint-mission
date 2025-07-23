@@ -53,7 +53,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void create() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(savedUser.getId(),
         savedChannel.getId());
 
@@ -87,7 +87,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   @Test
   void create_NoUser_Exception() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(UUID.randomUUID(),
         savedChannel.getId());
 
@@ -101,7 +101,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void create_AlreadyReadStatus_Exception() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
     ReadStatusCreateRequest readStatusCreateRequest = new ReadStatusCreateRequest(savedUser.getId(),
         savedChannel.getId());
@@ -116,8 +116,8 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void getAllByUserId() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel firstChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
-    Channel secondChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel firstChannel = channelRepository.save(Channel.createPrivate());
+    Channel secondChannel = channelRepository.save(Channel.createPrivate());
     readStatusRepository.save(new ReadStatus(savedUser, firstChannel));
     readStatusRepository.save(new ReadStatus(savedUser, secondChannel));
 
@@ -148,7 +148,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void updateLastReadTime() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
     Instant instant = Instant.parse("2025-05-17T14:00:00Z");
     boolean notificationEnabled = false;
@@ -183,7 +183,7 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void delete() {
     // given
     User savedUser = userRepository.save(new User("", "", "", null));
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPrivate());
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
 
     // when

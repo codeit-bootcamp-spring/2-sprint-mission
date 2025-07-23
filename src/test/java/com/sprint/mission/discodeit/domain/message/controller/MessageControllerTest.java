@@ -32,7 +32,7 @@ class MessageControllerTest extends ControllerTestSupport {
   void create() {
     // given
     String uniqueContent = UUID.randomUUID().toString();
-    Channel channel = new Channel(ChannelType.PUBLIC, "", "");
+    Channel channel = Channel.createPublic("", "");
     ReflectionTestUtils.setField(channel, "id", UUID.randomUUID());
 
     Message message = new Message(channel, null, uniqueContent, List.of());

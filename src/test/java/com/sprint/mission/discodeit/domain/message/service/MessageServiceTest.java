@@ -72,7 +72,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void createTest_NullAttachments() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), savedUser.getId());
@@ -96,7 +96,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void createTest_HaveAttachments() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), savedUser.getId());
@@ -142,7 +142,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void createTest_UserNotExisting() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), UUID.randomUUID());
 
@@ -155,7 +155,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void getByIdTest() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message savedMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -189,7 +189,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @MethodSource("provideSortAndCursorCase")
   void getAllByChannelId(Instant cursor, Sort sort, List<String> expectedMessages) {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message firstMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -233,7 +233,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void getAllByChannelIdDesc_NextCursor() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message firstMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -272,7 +272,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void updateContextTest() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     Message savedMessage = messageRepository.save(
         new Message(savedChannel, savedUser, "", List.of()));
@@ -296,7 +296,7 @@ public class MessageServiceTest extends IntegrationTestSupport {
   @Test
   void deleteTest() {
     // given
-    Channel savedChannel = channelRepository.save(new Channel(ChannelType.PUBLIC, "", ""));
+    Channel savedChannel = channelRepository.save(Channel.createPublic("", ""));
     User savedUser = userRepository.save(new User("", "", "", null));
     MessageCreateRequest messageCreateRequest = new MessageCreateRequest(MESSAGE_CONTENT,
         savedChannel.getId(), savedUser.getId());
