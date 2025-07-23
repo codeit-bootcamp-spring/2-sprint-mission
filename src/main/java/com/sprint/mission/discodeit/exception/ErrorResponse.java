@@ -1,40 +1,29 @@
 package com.sprint.mission.discodeit.exception;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
-import lombok.Builder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value.Str;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Builder
-public record ErrorResponse(
-    Instant timestamp, int status, String code, String message, String exceptionType,
-    Map<String, String> details
-) {
+@Getter
+@RequiredArgsConstructor
+public class ErrorResponse {
 
-  public static ErrorResponse from(DiscodeitException ex, String message) {
-    ErrorCode errorCode = ex.getErrorCode();
-    return ErrorResponse.builder()
-        .timestamp(ex.getTimestamp())
-        .status(errorCode.getHttpStatus())
-        .code(errorCode.getCode())
-        .message(message)
-        .exceptionType(ex.getClass().getSimpleName())
-        .details(ex.getDetails())
-        .build();
+  private final Instant timestamp;
+  private final String code;
+  private final String message;
+  private final Map<String, Object> details;
+  private final String exceptionType;
+  private final int status;
+
+  public ErrorResponse(DiscodeitException exception, int status) {
+    this(Instant.now(), exception.getErrorCode().name(), exception.getMessage(),
+        exception.getDetails(), exception.getClass().getSimpleName(), status);
   }
 
-  public static ErrorResponse from(MethodArgumentNotValidException ex, ErrorCode errorCode,
-      String message) {
-    return ErrorResponse.builder()
-        .timestamp(Instant.now())
-        .status(errorCode.getHttpStatus())
-        .code(errorCode.getCode())
-        .message(message)
-        .exceptionType(ex.getClass().getSimpleName())
-        .details(Map.of())
-        .build();
+  public ErrorResponse(Exception exception, int status) {
+    this(Instant.now(), exception.getClass().getSimpleName(), exception.getMessage(),
+        new HashMap<>(), exception.getClass().getSimpleName(), status);
   }
-
-
-}
+} 

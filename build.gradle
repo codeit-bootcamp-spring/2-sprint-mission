@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.3'
+    id 'org.springframework.boot' version '3.4.0'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'jacoco'
 
@@ -46,13 +46,16 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+    implementation 'com.nimbusds:nimbus-jose-jwt:10.3'
 
     //캐시
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     //캐시 가시화
-    implementation 'io.micrometer:micrometer-registry-prometheus'
+//    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     //AWS SDK 설치
     implementation 'software.amazon.awssdk:s3:2.31.7'

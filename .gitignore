@@ -4,7 +4,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 *.env
-
+.discodeit/storage
 ### STS ###
 .apt_generated
 .classpath

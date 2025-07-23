@@ -1,131 +1,189 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.core.user.dto.UserDto;
-import com.sprint.mission.discodeit.core.user.entity.User;
-import com.sprint.mission.discodeit.core.user.repository.JpaUserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ClaimsBuilder;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import java.nio.charset.StandardCharsets;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import com.sprint.mission.discodeit.domain.user.UserNotFoundException;
+import com.sprint.mission.discodeit.domain.user.dto.UserDto;
+import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import java.text.ParseException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Optional;
-import javax.crypto.SecretKey;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JwtService {
 
+  public static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
+
+  @Value("${security.jwt.secret}")
+  private String secret;
+  @Value("${security.jwt.access-token-validity-seconds}")
+  private long accessTokenValiditySeconds;
+  @Value("${security.jwt.refresh-token-validity-seconds}")
+  private long refreshTokenValiditySeconds;
+
   private final JwtSessionRepository jwtSessionRepository;
-  private final JpaUserRepository userRepository;
+  private final UserRepository userRepository;
+  private final ObjectMapper objectMapper;
   private final JwtBlacklist jwtBlacklist;
 
-  @Value("${jwt.secret}")
-  private String secretString;
-
-  @Value("${jwt.access-token-expiration}")
-  private long accessTokenExpiration;
-
-  @Value("${jwt.refresh-token-expiration}")
-  private long refreshTokenExpiration;
-
-  private SecretKey secretKey;
-
-  @PostConstruct
-  public void init() {
-    this.secretKey = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
-  }
-
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
-  public JwtSession generateTokens(UserDto userDto) {
-    Instant now = Instant.now();
-    String accessToken = createToken(now, userDto, accessTokenExpiration);
-    String refreshToken = createToken(now, null, refreshTokenExpiration);
+  public JwtSession registerJwtSession(UserDto userDto) {
+    JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
+    JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
-    JwtSession session = JwtSession.builder()
-        .userId(userDto.id())
-        .username(userDto.username())
-        .accessToken(accessToken)
-        .refreshToken(refreshToken)
-        .build();
+    JwtSession jwtSession = new JwtSession(userDto.id(), accessJwtObject.token(),
+        refreshJwtObject.token(), accessJwtObject.expirationTime());
+    jwtSessionRepository.save(jwtSession);
 
-    jwtSessionRepository.findByUserId(userDto.id())
-        .ifPresent(existingSession -> session.setId(existingSession.getId()));
-
-    return jwtSessionRepository.save(session);
+    return jwtSession;
   }
 
-  public Jws<Claims> validateToken(String token) {
-    if (jwtBlacklist.isBlacklisted(token)) {
-      return null;
-    }
+  public boolean validate(String token) {
+    boolean verified;
 
     try {
-      return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-    } catch (Exception e) {
-      return null;
+      JWSVerifier verifier = new MACVerifier(secret);
+      JWSObject jwsObject = JWSObject.parse(token);
+      verified = jwsObject.verify(verifier);
+
+      if (verified) {
+        JwtObject jwtObject = parse(token);
+        verified = !jwtObject.isExpired();
+      }
+
+      if (verified) {
+        verified = !jwtBlacklist.contains(token);
+      }
+
+    } catch (JOSEException | ParseException e) {
+      log.error(e.getMessage());
+      verified = false;
     }
+
+    return verified;
   }
 
-  public Claims getClaims(String token) {
-    Jws<Claims> jws = validateToken(token);
-    if (jws != null) {
-      return jws.getPayload();
-    } else {
-      return null;
+  public JwtObject parse(String token) {
+    try {
+      JWSObject jwsObject = JWSObject.parse(token);
+      Payload payload = jwsObject.getPayload();
+      Map<String, Object> jsonObject = payload.toJSONObject();
+      return new JwtObject(
+          objectMapper.convertValue(jsonObject.get("iat"), Instant.class),
+          objectMapper.convertValue(jsonObject.get("exp"), Instant.class),
+          objectMapper.convertValue(jsonObject.get("userDto"), UserDto.class),
+          token
+      );
+    } catch (ParseException e) {
+      log.error(e.getMessage());
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("token", token), e);
     }
+
   }
 
   @Transactional
-  public Optional<JwtSession> refreshAccessToken(String oldRefreshToken) {
-    if (validateToken(oldRefreshToken) == null) {
-      return Optional.empty();
+  public JwtSession refreshJwtSession(String refreshToken) {
+    if (!validate(refreshToken)) {
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN, Map.of("refreshToken", refreshToken));
     }
-    return jwtSessionRepository.findByRefreshToken(oldRefreshToken).map(session -> {
-          String oldAccessToken = session.getAccessToken();
-          jwtBlacklist.addBlacklist(oldAccessToken);
+    JwtSession session = jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+            Map.of("refreshToken", refreshToken)));
 
-          User user = userRepository.findByUserId(session.getUserId());
-          Instant now = Instant.now();
-          UserDto userDto = UserDto.from(user);
+    UUID userId = parse(refreshToken).userDto().id();
+    UserDto userDto = userRepository.findById(userId)
+        .map(UserDto::from)
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
+    JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
+    JwtObject refreshJwtObject = generateJwtObject(userDto, refreshTokenValiditySeconds);
 
-          String newAccessToken = createToken(now, userDto, accessTokenExpiration);
-          String newRefreshToken = createToken(now, null, refreshTokenExpiration);
-
-          session.updateTokens(newAccessToken, newRefreshToken);
-          return jwtSessionRepository.save(session);
-        }
+    session.update(
+        accessJwtObject.token(),
+        refreshJwtObject.token(),
+        accessJwtObject.expirationTime()
     );
+
+    return session;
   }
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
-  public void invalidateRefreshToken(String refreshToken) {
-    jwtSessionRepository.deleteByRefreshToken(refreshToken);
+  public void invalidateJwtSession(String refreshToken) {
+    jwtSessionRepository.findByRefreshToken(refreshToken)
+        .ifPresent(this::invalidate);
   }
 
-  private String createToken(Instant now, UserDto userDto, long expirationInSeconds) {
-    Date issuedAt = Date.from(now);
-    Date expiration = Date.from(now.plusSeconds(expirationInSeconds));
+  @CacheEvict(value = "users", key = "'all'")
+  @Transactional
+  public void invalidateJwtSession(UUID userId) {
+    jwtSessionRepository.findByUserId(userId)
+        .ifPresent(this::invalidate);
+  }
 
-    ClaimsBuilder claimsBuilder = Jwts.claims()
-        .issuer("discodeit")
-        .issuedAt(issuedAt)
-        .expiration(expiration);
+  public JwtSession getJwtSession(String refreshToken) {
+    return jwtSessionRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.TOKEN_NOT_FOUND,
+            Map.of("refreshToken", refreshToken)));
+  }
 
-    if (userDto != null) {
-      claimsBuilder.add("userDto", userDto);
+  public List<JwtSession> getActiveJwtSessions() {
+    return jwtSessionRepository.findAllByExpirationTimeAfter(Instant.now());
+  }
+
+  private JwtObject generateJwtObject(UserDto userDto, long tokenValiditySeconds) {
+    Instant issueTime = Instant.now();
+    Instant expirationTime = issueTime.plus(Duration.ofSeconds(tokenValiditySeconds));
+
+    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        .subject(userDto.username())
+        .claim("userDto", userDto)
+        .issueTime(new Date(issueTime.toEpochMilli()))
+        .expirationTime(new Date(expirationTime.toEpochMilli()))
+        .build();
+
+    JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
+    SignedJWT signedJWT = new SignedJWT(header, claimsSet);
+
+    try {
+      signedJWT.sign(new MACSigner(secret));
+    } catch (JOSEException e) {
+      log.error(e.getMessage());
+      throw new DiscodeitException(ErrorCode.INVALID_TOKEN_SECRET, e);
     }
 
-    return Jwts.builder()
-        .claims(claimsBuilder.build())
-        .signWith(secretKey)
-        .compact();
+    String token = signedJWT.serialize();
+
+    return new JwtObject(issueTime, expirationTime, userDto, token);
+  }
+
+  private void invalidate(JwtSession session) {
+    jwtSessionRepository.delete(session);
+    if (!session.isExpired()) {
+      jwtBlacklist.put(session.getAccessToken(), session.getExpirationTime());
+    }
   }
 }
