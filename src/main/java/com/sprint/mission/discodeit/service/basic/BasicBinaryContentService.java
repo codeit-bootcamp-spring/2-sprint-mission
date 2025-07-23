@@ -8,13 +8,13 @@ import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoun
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UploadStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -27,6 +27,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final UploadStatusService uploadStatusService;
 
   @Transactional
   @Override
@@ -50,12 +51,12 @@ public class BasicBinaryContentService implements BinaryContentService {
           @Override
           public void afterCommit() {
             binaryContentStorage.putAsync(binaryContentId, bytes)
-                .thenAccept(res -> {
-                  updateUploadStatus(binaryContentId,
-                      BinaryContentUploadStatus.SUCCESS);
-                })
+                .thenAccept(res ->
+                    uploadStatusService.updateUploadStatus(binaryContentId,
+                        BinaryContentUploadStatus.SUCCESS)
+                )
                 .exceptionally(throwable -> {
-                  updateUploadStatus(binaryContentId,
+                  uploadStatusService.updateUploadStatus(binaryContentId,
                       BinaryContentUploadStatus.FAILED);
                   return null;
                 });
@@ -97,13 +98,6 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
     binaryContentRepository.deleteById(binaryContentId);
     log.info("바이너리 컨텐츠 삭제 완료: id={}", binaryContentId);
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  @Override
-  public void updateUploadStatus(UUID binaryContentId, BinaryContentUploadStatus status) {
-    log.debug("저장소에 파일 업로드 : {}", binaryContentId);
-    binaryContentRepository.updateUploadStatus(binaryContentId, status);
   }
 
 }

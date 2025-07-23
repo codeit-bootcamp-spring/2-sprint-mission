@@ -20,8 +20,8 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UploadStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.HashMap;
@@ -52,8 +52,8 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
-  private final BinaryContentService binaryContentService;
   private final ApplicationEventPublisher eventPublisher;
+  private final UploadStatusService updateUploadStatus;
 
   @Transactional
   @Override
@@ -99,18 +99,18 @@ public class BasicMessageService implements MessageService {
         new TransactionSynchronization() {
           @Override
           public void afterCommit() {
-            files.forEach((id, bytes) -> {
-              binaryContentStorage.putAsync(id, bytes)
-                  .thenAccept(res -> {
-                    binaryContentService.updateUploadStatus(id,
-                        BinaryContentUploadStatus.SUCCESS);
-                  })
-                  .exceptionally(throwable -> {
-                    binaryContentService.updateUploadStatus(id,
-                        BinaryContentUploadStatus.FAILED);
-                    return null;
-                  });
-            });
+            files.forEach((id, bytes) ->
+                binaryContentStorage.putAsync(id, bytes)
+                    .thenAccept(res ->
+                        updateUploadStatus.updateUploadStatus(id,
+                            BinaryContentUploadStatus.SUCCESS)
+                    )
+                    .exceptionally(throwable -> {
+                      updateUploadStatus.updateUploadStatus(id,
+                          BinaryContentUploadStatus.FAILED);
+                      return null;
+                    })
+            );
           }
         });
 

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.event;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
@@ -32,6 +33,7 @@ public class NotificationEventListener {
   private final ReadStatusRepository readStatusRepository;
   private final ChannelService channelService;
   private final NotificationService notificationService;
+  private final ObjectMapper objectMapper;
 
   @Async
   @Retryable(
@@ -40,8 +42,9 @@ public class NotificationEventListener {
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
   @KafkaListener(topics = "new-message")
-  public void handleCreateMessageEvent(NewMessageEvent event) {
+  public void handleCreateMessageEvent(String kafkaEvent) {
     try {
+      NewMessageEvent event = objectMapper.readValue(kafkaEvent, NewMessageEvent.class);
       MessageDto messageDto = event.messageDto();
       ChannelDto channel = channelService.find(messageDto.channelId());
 
@@ -74,8 +77,9 @@ public class NotificationEventListener {
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
   @KafkaListener(topics = "role-changed")
-  public void handleUpdateRoleEvent(RoleChangedEvent event) {
+  public void handleUpdateRoleEvent(String kafkaEvent) {
     try {
+      RoleChangedEvent event = objectMapper.readValue(kafkaEvent, RoleChangedEvent.class);
       UserDto userDto = event.userDto();
       UUID receiver = userDto.id();
 
@@ -97,8 +101,9 @@ public class NotificationEventListener {
       backoff = @Backoff(delay = 1000, multiplier = 2)
   )
   @KafkaListener(topics = "async-failure")
-  public void handleAsyncFailureEvent(AsyncFailureEvent event) {
+  public void handleAsyncFailureEvent(String kafkaEvent) {
     try {
+      AsyncFailureEvent event = objectMapper.readValue(kafkaEvent, AsyncFailureEvent.class);
       AsyncTaskFailure asyncTaskFailure = event.failure();
       DiscodeitUserDetails userDetails = (DiscodeitUserDetails) SecurityContextHolder.getContext()
           .getAuthentication().getDetails();
