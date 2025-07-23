@@ -58,6 +58,7 @@ public class BasicBinaryContentAsyncService implements BinaryContentAsyncService
     }
 
     // 재시도 모두 실패 시 실행되는 복구 메서드 (@Recover)
+    @Transactional
     @Recover
     public void recover(RuntimeException e, UUID binaryContentId, byte[] bytes) {
 
