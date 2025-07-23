@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.domain.message.service.basic;
 
+import static com.sprint.mission.discodeit.common.config.CacheConfig.NOTIFICATION_CACHE_NAME;
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
@@ -28,12 +29,12 @@ import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,7 @@ public class BasicMessageService implements MessageService {
 
   private final ApplicationEventPublisher eventPublisher;
 
+  @CacheEvict(value = NOTIFICATION_CACHE_NAME, key = "#messageCreateRequest.authorId")
   @Timed(
       value = "file_upload",
       percentiles = {0.5, 0.95, 0.99}
@@ -65,7 +67,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new ChannelNotFoundException(Map.of()));
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
-    log.debug("메세지 서비스 쓰레드 {} ", Thread.currentThread().getName());
+
     List<BinaryContent> attachments = binaryContentCore.createBinaryContents(files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
