@@ -52,11 +52,11 @@ public class BasicUserService implements UserService {
 
     BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
     log.debug("user를 저장하기 위해서 이동 ");
-    try{
-      Thread.sleep(4000);
-    }catch (Exception ex){
-
-    }
+//    try{
+//      Thread.sleep(4000);
+//    }catch (Exception ex){
+//
+//    }
 
 
     User user = new User(userRequest.username(), userRequest.email(),
