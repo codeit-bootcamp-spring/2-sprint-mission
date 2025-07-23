@@ -72,6 +72,9 @@ dependencies {
 
     // Instant 타입 직렬화를 위한 의존성
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // 웹소켓
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 tasks.named('test') {
