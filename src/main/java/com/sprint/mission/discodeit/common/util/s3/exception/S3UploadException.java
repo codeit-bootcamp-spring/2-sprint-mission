@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.s3.exception;
+package com.sprint.mission.discodeit.common.util.s3.exception;
 
 import static com.sprint.mission.discodeit.common.exception.ErrorCode.ERROR_S3_UPLOAD;
 

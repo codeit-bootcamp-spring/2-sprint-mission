@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.failure;
+package com.sprint.mission.discodeit.common.failure;
 
 import com.sprint.mission.discodeit.common.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;

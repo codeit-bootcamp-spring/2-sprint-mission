@@ -38,6 +38,19 @@ public class AsyncConfig {
     return executor;
   }
 
+  @Bean("kafkaExecutor")
+  public Executor kafkaExecutor(TaskDecorator taskDecorator) {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+    executor.setCorePoolSize(3);
+    executor.setMaxPoolSize(5);
+    executor.setQueueCapacity(50);
+    executor.setThreadNamePrefix("kafka-relay-");
+    executor.setTaskDecorator(taskDecorator);
+    executor.initialize();
+
+    return executor;
+  }
+
   @Bean
   public TaskDecorator taskDecorator() {
     List<TaskDecorator> decorators = List.of(

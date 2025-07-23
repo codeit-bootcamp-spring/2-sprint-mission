@@ -7,9 +7,9 @@ import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.domain.notification.event.event.AsyncFailedNotificationEvent;
+import com.sprint.mission.discodeit.common.event.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
-import com.sprint.mission.discodeit.s3.S3Adapter;
+import com.sprint.mission.discodeit.common.util.s3.S3Adapter;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .build();
 
     s3Adapter.put(putRequest, RequestBody.fromBytes(bytes))
-        .thenAccept(success -> {
+        .thenRun(() -> {
           log.debug("S3 요청 이후 처리 쓰레드 {} ", Thread.currentThread().getName());
           binaryContent.updateUploadStatus(SUCCESS);
           try {
@@ -67,7 +67,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
           } catch (Exception e) {
             log.debug("바이너리 컨텐츠 저장 시 에러 : {}", e.getMessage());
           }
-
         })
         .exceptionally(failure -> {
           binaryContent.updateUploadStatus(FAILED);

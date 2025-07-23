@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.failure;
+package com.sprint.mission.discodeit.common.failure;
 
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -45,9 +45,9 @@ class BasicUserServiceTest extends IntegrationTestSupport {
 
   @Autowired
   private UserService userService;
+
 //  @MockitoBean
 //  private S3Adapter s3Adapter; // 로컬 스택으로 개선 예정 // 어댑터를 모킹하면 오히려 작동을 안하는데
-
   @MockitoBean
   private S3Client s3Client;
 

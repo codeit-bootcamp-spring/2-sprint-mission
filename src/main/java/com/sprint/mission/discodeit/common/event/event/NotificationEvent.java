@@ -1,11 +1,11 @@
-package com.sprint.mission.discodeit.domain.notification.event.event;
+package com.sprint.mission.discodeit.common.event.event;
 
 import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
 import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public abstract class NotificationEvent {
+public class NotificationEvent {
 
   private final UUID receiverId;
   private final NotificationType type;

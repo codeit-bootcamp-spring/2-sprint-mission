@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.domain.binarycontent.dto;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.sprint.mission.discodeit.util.FileUtils.getBytesFromMultiPartFile;
+import static com.sprint.mission.discodeit.common.util.FileUtils.getBytesFromMultiPartFile;
 
 public record BinaryContentRequest(
         @NotBlank String fileName,

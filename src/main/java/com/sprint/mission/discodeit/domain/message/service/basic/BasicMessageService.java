@@ -16,7 +16,7 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
-import com.sprint.mission.discodeit.domain.notification.event.event.NewMessageNotificationEvent;
+import com.sprint.mission.discodeit.common.event.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;

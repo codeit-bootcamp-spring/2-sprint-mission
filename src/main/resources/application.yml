@@ -24,15 +24,16 @@ spring:
   sql:
     init:
       mode: never
-  session:
-    store-type: jdbc
-    jdbc:
-      initialize-schema: always
-
-security:
-  remember-me:
-    key: ${REMEMBER_ME_KEY}
-    token-validity-seconds: ${REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: discodeit-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 logging:
   level:
@@ -62,3 +63,5 @@ management:
     web:
       exposure:
         include: health, metrics
+
+
