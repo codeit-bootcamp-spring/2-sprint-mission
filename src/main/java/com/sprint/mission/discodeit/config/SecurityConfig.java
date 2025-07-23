@@ -2,11 +2,14 @@ package com.sprint.mission.discodeit.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
+import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
+import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import java.util.List;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -14,8 +17,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyAuthoritiesMapper;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +30,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
@@ -42,54 +48,40 @@ public class SecurityConfig {
         JwtService jwtService
     )
         throws Exception {
-        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repository.setCookieName("XSRF-TOKEN");
-        repository.setHeaderName("X-XSRF-TOKEN");
-
-        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-        requestHandler.setCsrfRequestAttributeName("_csrf");
-
         http
             .authenticationProvider(daoAuthenticationProvider)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(
-                    SecurityMatchers.NON_API,
-                    SecurityMatchers.GET_CSRF_TOKEN,
-                    SecurityMatchers.SIGN_UP,
-                    SecurityMatchers.LOGIN,
-                    SecurityMatchers.LOGOUT,
-                    SecurityMatchers.ME,
-                    SecurityMatchers.REFRESH,
-                    SecurityMatchers.DOWNLOAD
-                ).permitAll()
+                .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
                 .anyRequest().hasRole(Role.USER.name())
             )
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(repository) // HttpOnly 속성 -> false
-                .csrfTokenRequestHandler(requestHandler)
-                .ignoringRequestMatchers(
-                    SecurityMatchers.LOGIN,
-                    SecurityMatchers.LOGOUT,
-                    SecurityMatchers.REFRESH
-                )
+            .csrf(csrf ->
+                csrf
+                    .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                    .sessionAuthenticationStrategy(new NullAuthenticatedSessionStrategy())
             )
             .logout(logout ->
                 logout
                     .logoutRequestMatcher(SecurityMatchers.LOGOUT)
                     .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                    .addLogoutHandler(new JwtLogoutHandler(jwtService)) // JWT 기반 로그아웃 처리로 교체
+                    .addLogoutHandler(new JwtLogoutHandler(jwtService))
             )
-            .with(new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper, jwtService),
-                Customizer.withDefaults())
+            .with(
+                new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+                configurer ->
+                    configurer
+                        .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
+                        .failureHandler(new CustomLoginFailureHandler(objectMapper))
+            )
             .sessionManagement(session ->
                 session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+            )
+            .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
+                JsonUsernamePasswordAuthenticationFilter.class)
+        ;
 
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService,
-            objectMapper);
-        http.addFilterBefore(jwtAuthenticationFilter,
-            JsonUsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -120,6 +112,12 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder);
         provider.setAuthoritiesMapper(new RoleHierarchyAuthoritiesMapper(roleHierarchy));
         return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(
+        List<AuthenticationProvider> authenticationProviders) {
+        return new ProviderManager(authenticationProviders);
     }
 
     @Bean

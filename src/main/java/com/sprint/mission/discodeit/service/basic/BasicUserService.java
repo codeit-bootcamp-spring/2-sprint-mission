@@ -5,14 +5,15 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -22,11 +23,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,6 +44,7 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    @CacheEvict(value = "userList", allEntries = true)
     @Transactional
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
@@ -64,7 +69,33 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            // 비동기 업로드 실행 (트랜잭션 커밋 이후)
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                // 성공시 상태 변경 -> SUCCESS 로
+                                .thenAccept(result -> {
+                                    binaryContentRepository.findById(result)
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.SUCCESS);
+                                            binaryContentRepository.save(content);
+                                        });
+                                })
+                                // 실패시 상태 변경 -> FAILED 로
+                                .exceptionally(e -> {
+                                    binaryContentRepository.findById(binaryContent.getId())
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.FAILED);
+                                            binaryContentRepository.save(content);
+                                        });
+                                    return null;
+                                });
+                        }
+                    });
                 return binaryContent;
             })
             .orElse(null);
@@ -89,22 +120,23 @@ public class BasicUserService implements UserService {
         return userDto;
     }
 
+    @Cacheable(value = "userList")
     @Override
     public List<UserDto> findAll() {
         log.debug("모든 사용자 조회 시작");
         Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
-            .map(session -> session.getUser().getId())
+            .map(JwtSession::getUserId)
             .collect(Collectors.toSet());
 
         List<UserDto> userDtos = userRepository.findAllWithProfile()
             .stream()
             .map(user -> userMapper.toDto(user, onlineUserIds.contains(user.getId())))
             .toList();
-        
         log.info("모든 사용자 조회 완료: 총 {}명", userDtos.size());
         return userDtos;
     }
 
+    @CacheEvict(value = "userList", allEntries = true)
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
     @Override
@@ -138,7 +170,33 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            // 비동기로 업로드 수행
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                // 성공시 상태 변경 -> SUCCESS 로
+                                .thenAccept(result -> {
+                                    binaryContentRepository.findById(result)
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.SUCCESS);
+                                            binaryContentRepository.save(content);
+                                        });
+                                })
+                                // 실패시 상태 변경 -> FAILED 로
+                                .exceptionally(e -> {
+                                    binaryContentRepository.findById(binaryContent.getId())
+                                        .ifPresent(content -> {
+                                            content.updateUploadStatus(
+                                                BinaryContentUploadStatus.FAILED);
+                                            binaryContentRepository.save(content);
+                                        });
+                                    return null;
+                                });
+                        }
+                    });
                 return binaryContent;
             })
             .orElse(null);
@@ -152,6 +210,7 @@ public class BasicUserService implements UserService {
         return userMapper.toDto(user);
     }
 
+    @CacheEvict(value = "userList", allEntries = true)
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
     @Override

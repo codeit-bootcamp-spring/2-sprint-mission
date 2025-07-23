@@ -23,6 +23,7 @@ public class CustomLoginFailureHandler implements AuthenticationFailureHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ErrorResponse errorResponse = new ErrorResponse(exception,
             HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

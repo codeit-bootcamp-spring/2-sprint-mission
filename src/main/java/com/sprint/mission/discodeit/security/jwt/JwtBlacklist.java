@@ -9,25 +9,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtBlacklist {
 
-    private final Map<String, Instant> blacklist = new ConcurrentHashMap<>();
+  private final Map<String, Instant> blacklist = new ConcurrentHashMap<>();
 
-    public void add(String accessToken, Instant expirationTime) {
-        blacklist.put(accessToken, expirationTime);
-    }
+  public void put(String accessToken, Instant expirationTime) {
+    blacklist.putIfAbsent(accessToken, expirationTime);
+  }
 
-    public boolean contains(String accessToken) {
-        Instant expirationTime = blacklist.get(accessToken);
+  public boolean contains(String accessToken) {
+    return blacklist.containsKey(accessToken);
+  }
 
-        return expirationTime != null && expirationTime.isAfter(Instant.now());
-    }
-
-    public void removeExpiredTokens() {
-        blacklist.entrySet().removeIf(
-            entry -> entry.getValue().isBefore(Instant.now()));
-    }
-
-    @Scheduled(fixedDelay = 1_800_000) // 30분 간격
-    public void scheduleCleanup() {
-        removeExpiredTokens();
-    }
+  // 1시간마다 정리
+  @Scheduled(fixedDelay = 60 * 60 * 1000)
+  public void cleanUp() {
+    blacklist.values().removeIf(expirationTime -> expirationTime.isBefore(Instant.now()));
+  }
 }

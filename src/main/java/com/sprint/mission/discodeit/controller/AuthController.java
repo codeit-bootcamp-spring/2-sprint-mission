@@ -3,19 +3,15 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.controller.api.AuthApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.RoleUpdateRequest;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,8 +38,8 @@ public class AuthController implements AuthApi {
 
     @GetMapping("me")
     public ResponseEntity<String> me(
-        @CookieValue(value = "refresh_token") String refreshToken
-    ) {
+        @CookieValue(value = JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken) {
+        log.info("내 정보 조회 요청");
         JwtSession jwtSession = jwtService.getJwtSession(refreshToken);
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -62,16 +58,20 @@ public class AuthController implements AuthApi {
 
     @PostMapping("refresh")
     public ResponseEntity<String> refresh(
-        @CookieValue(value = "refresh_token") String refreshToken,
+        @CookieValue(JwtService.REFRESH_TOKEN_COOKIE_NAME) String refreshToken,
         HttpServletResponse response
     ) {
-        log.info("엑세스 토큰 재발급 요청");
+        log.info("토큰 재발급 요청");
         JwtSession jwtSession = jwtService.refreshJwtSession(refreshToken);
 
-        Cookie newRefreshTokenCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
-        newRefreshTokenCookie.setHttpOnly(true);
-        response.addCookie(newRefreshTokenCookie);
+        Cookie refreshTokenCookie = new Cookie(JwtService.REFRESH_TOKEN_COOKIE_NAME,
+            jwtSession.getRefreshToken());
+        refreshTokenCookie.setHttpOnly(true);
+        response.addCookie(refreshTokenCookie);
 
-        return ResponseEntity.ok(jwtSession.getAccessToken());
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(jwtSession.getAccessToken())
+            ;
     }
 }
