@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -28,77 +29,82 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class BasicNotificationService implements NotificationService {
 
-  private final NotificationRepository notificationRepository;
-  private final NotificationMapper notificationMapper;
-  private final ApplicationEventPublisher eventPublisher;
+    private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final SseService sseService;
 
-  @PreAuthorize("principal.userDto.id == #receiverId")
-  @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
-  @Override
-  public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
-    log.debug("알림 목록 조회 시작: receiverId={}", receiverId);
-    List<NotificationDto> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(
-            receiverId)
-        .stream()
-        .map(notificationMapper::toDto)
-        .toList();
-    log.info("알림 목록 조회 완료: receiverId={}, 조회된 항목 수={}", receiverId, notifications.size());
-    return notifications;
-  }
+    @PreAuthorize("principal.userDto.id == #receiverId")
+    @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
+    @Override
+    public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
+        log.debug("알림 목록 조회 시작: receiverId={}", receiverId);
+        List<NotificationDto> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(
+                receiverId)
+            .stream()
+            .map(notificationMapper::toDto)
+            .toList();
+        log.info("알림 목록 조회 완료: receiverId={}, 조회된 항목 수={}", receiverId, notifications.size());
 
-  @PreAuthorize("principal.userDto.id == #receiverId")
-  @Transactional
-  @CacheEvict(value = "notificationsByUser", key = "#receiverId")
-  @Override
-  public void delete(UUID notificationId, UUID receiverId) {
-    log.debug("알림 삭제 시작: id={}, receiverId={}", notificationId, receiverId);
-    try {
-      notificationRepository.deleteByIdAndReceiverId(notificationId, receiverId);
-      log.info("알림 삭제 완료: id={}, receiverId={}", notificationId, receiverId);
-    } catch (Exception e) {
-      log.error("알림 삭제 실패: id={}, receiverId={}", notificationId, receiverId, e);
-      throw NotificationNotFoundException.withId(notificationId);
+        return notifications;
     }
-  }
 
-  @Transactional
-  @CacheEvict(value = "notificationsByUser", key = "#receiverId")
-  @Override
-  public void create(UUID receiverId, String title, String content,
-      NotificationType notificationType, UUID targetId) {
-    log.debug("새 알림 생성 시작: receiverId={}, channelId={}", receiverId);
+    @PreAuthorize("principal.userDto.id == #receiverId")
+    @Transactional
+    @CacheEvict(value = "notificationsByUser", key = "#receiverId")
+    @Override
+    public void delete(UUID notificationId, UUID receiverId) {
+        log.debug("알림 삭제 시작: id={}, receiverId={}", notificationId, receiverId);
+        try {
+            notificationRepository.deleteByIdAndReceiverId(notificationId, receiverId);
+            log.info("알림 삭제 완료: id={}, receiverId={}", notificationId, receiverId);
+        } catch (Exception e) {
+            log.error("알림 삭제 실패: id={}, receiverId={}", notificationId, receiverId, e);
+            throw NotificationNotFoundException.withId(notificationId);
+        }
+    }
 
-    Notification notification = new Notification(
-        receiverId,
-        title,
-        content,
-        notificationType,
-        targetId
-    );
-    notificationRepository.save(notification);
-    log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
-        notification.getId(), receiverId, targetId);
-  }
+    @Transactional
+    @CacheEvict(value = "notificationsByUser", key = "#receiverId")
+    @Override
+    public void create(UUID receiverId, String title, String content,
+        NotificationType notificationType, UUID targetId) {
+        log.debug("새 알림 생성 시작: receiverId={}, channelId={}", receiverId);
 
-  @Transactional
-  @Override
-  public void createAll(Set<UUID> receiverIds, String title, String content,
-      NotificationType notificationType, UUID targetId) {
-    log.debug("새 알림 생성 시작: receiverIds={}, targetId={}", receiverIds, targetId);
-    List<Notification> notifications = receiverIds.stream()
-        .map(receiverId -> new Notification(
+        Notification notification = new Notification(
             receiverId,
             title,
             content,
             notificationType,
             targetId
-        )).toList();
-    notificationRepository.saveAll(notifications);
+        );
+        notificationRepository.save(notification);
+        sseService.notifyNewNotification(receiverId.toString(),
+            notificationMapper.toDto(notification));
 
-    // 이벤트 발행
-    eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));
+        log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
+            notification.getId(), receiverId, targetId);
+    }
 
-    log.info("새 알림 생성 완료: receiverIds={}, targetId={}",
-        receiverIds, targetId);
-  }
+    @Transactional
+    @Override
+    public void createAll(Set<UUID> receiverIds, String title, String content,
+        NotificationType notificationType, UUID targetId) {
+        log.debug("새 알림 생성 시작: receiverIds={}, targetId={}", receiverIds, targetId);
+        List<Notification> notifications = receiverIds.stream()
+            .map(receiverId -> new Notification(
+                receiverId,
+                title,
+                content,
+                notificationType,
+                targetId
+            )).toList();
+        notificationRepository.saveAll(notifications);
+
+        // 이벤트 발행
+        eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));
+
+        log.info("새 알림 생성 완료: receiverIds={}, targetId={}",
+            receiverIds, targetId);
+    }
 } 
