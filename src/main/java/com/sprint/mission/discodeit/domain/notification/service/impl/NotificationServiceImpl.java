@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.notification.service.impl;
 
-import static com.sprint.mission.discodeit.common.config.CacheConfig.NOTIFICATION_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
 
 import com.sprint.mission.discodeit.domain.notification.dto.NotificationResult;
 import com.sprint.mission.discodeit.domain.notification.entity.Notification;

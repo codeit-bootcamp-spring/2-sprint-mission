@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.channel.service.basic;
 
-import static com.sprint.mission.discodeit.common.config.CacheConfig.CHANNEL_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.CHANNEL_CACHE_NAME;
 
 import com.sprint.mission.discodeit.domain.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelCreateRequest;
@@ -18,9 +18,7 @@ import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepos
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

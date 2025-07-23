@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.message.service.basic;
 
-import static com.sprint.mission.discodeit.common.config.CacheConfig.NOTIFICATION_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
 
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;

@@ -24,4 +24,4 @@
 
 ## 심화 요구사항(Kafka, Redis) 사용해보기
 - [x] Kafka 사용해보기
-- [ ] Redis 사용해보기
+- [x] Redis 사용해보기

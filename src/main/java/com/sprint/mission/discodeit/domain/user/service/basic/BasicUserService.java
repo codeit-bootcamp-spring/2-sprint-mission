@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.user.service.basic;
 
-import static com.sprint.mission.discodeit.common.config.CacheConfig.USER_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.USER_CACHE_NAME;
 
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
