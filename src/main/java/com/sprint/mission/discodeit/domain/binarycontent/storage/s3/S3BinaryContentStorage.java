@@ -61,8 +61,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
           log.debug("S3 요청 이후 처리 쓰레드 {} ", Thread.currentThread().getName());
           binaryContent.updateUploadStatus(SUCCESS);
           try {
-            log.debug("S3서비스에서 데이터 베이스에 저장");
             binaryContentRepository.save(binaryContent);
+            log.debug("S3서비스에서 데이터 베이스에 저장");
           } catch (Exception e) {
             log.debug("바이너리 컨텐츠 저장 시 에러 : {}", e.getMessage());
           }

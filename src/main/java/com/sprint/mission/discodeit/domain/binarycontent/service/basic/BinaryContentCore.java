@@ -26,8 +26,8 @@ public class BinaryContentCore {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW) // 이렇게 하면 상관이 없나?
-//  @Transactional // 이렇게 하면 상관이 없나?
+//  @Transactional(propagation = Propagation.REQUIRES_NEW) // 이렇게 하면 상관이 없나?
+  @Transactional // 이렇게 하면 상관이 없나?
   public BinaryContent createBinaryContent(BinaryContentRequest binaryContentRequest) {
     if (binaryContentRequest == null) {
       return null;

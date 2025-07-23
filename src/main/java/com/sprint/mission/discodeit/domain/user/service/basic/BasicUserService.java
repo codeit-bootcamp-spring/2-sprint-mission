@@ -60,8 +60,8 @@ public class BasicUserService implements UserService {
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
-    log.debug("유저서비스에서 데이터 베이스에 저장");
     User savedUser = userRepository.save(user);
+    log.debug("유저서비스에서 데이터 베이스에 저장");
 
     return userResultMapper.convertToUserResult(savedUser);
   }
