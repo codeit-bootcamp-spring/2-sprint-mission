@@ -1,46 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import jakarta.persistence.Table;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "notifications")
 @Getter
-@RequiredArgsConstructor
-public class Notification {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Notification extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+    @Column(name = "receiver_id", columnDefinition = "uuid", nullable = false)
+    private UUID receiverId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User receiver; // 알림 수신자
-
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private NotificationType type;
 
-    private UUID targetId; // 선택적 대상 ID (댓글, 게시글 등)
+    @Column(name = "target_id", columnDefinition = "uuid")
+    private UUID targetId;
 
-    private LocalDateTime createdAt;
-
-    public Notification(User receiver, String name, String content,
-        NotificationType notificationType, UUID channelId, LocalDateTime now) {
-        this.receiver = receiver;
-        this.title = name;
+    public Notification(UUID receiverId, String title, String content, NotificationType type) {
+        this.receiverId = receiverId;
+        this.title = title;
         this.content = content;
-        this.type = notificationType;
-        this.targetId = channelId;
-        this.createdAt = now;
+        this.type = type;
     }
-}
+
+    public Notification(UUID receiverId, String title, String content, NotificationType type, UUID targetId) {
+        this(receiverId, title, content, type);
+        this.targetId = targetId;
+    }
+} 

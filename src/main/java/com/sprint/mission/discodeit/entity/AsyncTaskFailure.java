@@ -1,40 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
-import jakarta.persistence.*;
-import java.util.UUID;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "async_task_failure")
+@Table(name = "async_task_failures")
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AsyncTaskFailure extends BaseEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private UUID id;
+    @Column(nullable = false)
+    private String taskName;
 
-  // 실패한 작업 이름 (예: "FileUpload")
-  @Column(nullable = false)
-  private String taskName;
+    @Column(nullable = false)
+    private String requestId;
 
-  // MDC에서 가져온 Request ID
-  @Column(nullable = false, length = 100)
-  private String requestId;
+    @Column(nullable = false, columnDefinition = "text")
+    private String failureReason;
 
-  // 실패 원인 메시지
-  @Column(nullable = false, length = 1000)
-  private String failureReason;
-
-  public AsyncTaskFailure(String fileName, String requestId, String message) {
-    this.taskName = fileName;
-    this.requestId = requestId;
-    this.failureReason = message;
-  }
-}
-
+    public AsyncTaskFailure(String taskName, String requestId, String failureReason) {
+        this.taskName = taskName;
+        this.requestId = requestId;
+        this.failureReason = failureReason;
+    }
+} 

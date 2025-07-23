@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,6 +27,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +51,7 @@ public class JwtService {
   private final ObjectMapper objectMapper;
   private final JwtBlacklist jwtBlacklist;
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
   public JwtSession registerJwtSession(UserDto userDto) {
     JwtObject accessJwtObject = generateJwtObject(userDto, accessTokenValiditySeconds);
@@ -67,7 +68,7 @@ public class JwtService {
     boolean verified;
 
     try {
-      JWSVerifier verifier = new MACVerifier(secret.getBytes(StandardCharsets.UTF_8));
+      JWSVerifier verifier = new MACVerifier(secret);
       JWSObject jwsObject = JWSObject.parse(token);
       verified = jwsObject.verify(verifier);
 
@@ -131,12 +132,14 @@ public class JwtService {
     return session;
   }
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
   public void invalidateJwtSession(String refreshToken) {
     jwtSessionRepository.findByRefreshToken(refreshToken)
         .ifPresent(this::invalidate);
   }
 
+  @CacheEvict(value = "users", key = "'all'")
   @Transactional
   public void invalidateJwtSession(UUID userId) {
     jwtSessionRepository.findByUserId(userId)
@@ -168,7 +171,7 @@ public class JwtService {
     SignedJWT signedJWT = new SignedJWT(header, claimsSet);
 
     try {
-      signedJWT.sign(new MACSigner(secret.getBytes(StandardCharsets.UTF_8)));
+      signedJWT.sign(new MACSigner(secret));
     } catch (JOSEException e) {
       log.error(e.getMessage());
       throw new DiscodeitException(ErrorCode.INVALID_TOKEN_SECRET, e);
