@@ -1,43 +1,44 @@
 package com.sprint.mission.discodeit.security.jwt;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
-@Table(name = "jwt_sessions")
 @Getter
-@Setter
-@NoArgsConstructor
-public class JwtSession extends BaseEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "jwt_sessions")
+@Entity
+public class JwtSession extends BaseUpdatableEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private UUID id;
-
-  @Column(length = 500)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+  private UUID userId;
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String accessToken;
-
-  @Column(length = 500)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String refreshToken;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant expirationTime;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", insertable = false, updatable = false)
-  private User user; // 선택
+  public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
+    this.userId = userId;
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
+  }
+
+  public boolean isExpired() {
+    return this.expirationTime.isBefore(Instant.now());
+  }
+
+  public void update(String accessToken, String refreshToken, Instant expirationTime) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
+  }
 }
-
