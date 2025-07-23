@@ -71,6 +71,6 @@ security:
     key: ${SECURITY_REMEMBER_ME_KEY}
     token-validity-seconds: ${SECURITY_REMEMBER_ME_TOKEN_VALIDITY_SECONDS}
   jwt:
-    secret-key: ${SECURITY_JWT_SECRET_KEY}
-    expiration: ${SECURITY_JWT_EXPIRATION}
-    issuer: ${SECURITY_JWT_ISSUER}
+    secret: ${SECURITY_JWT_SECRET}
+    access-token-validity-seconds: ${SECURITY_JWT_ACCESS_TOKEN_VALIDITY_SECONDS}
+    refresh-token-validity-seconds: ${SECURITY_JWT_REFRESH_TOKEN_VALIDITY_SECONDS}

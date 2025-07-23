@@ -48,6 +48,7 @@ class UserControllerTest {
   @MockitoBean
   private UserService userService;
 
+
   @Test
   @DisplayName("사용자 생성 성공 테스트")
   void createUser_Success() throws Exception {
