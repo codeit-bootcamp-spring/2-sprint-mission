@@ -1,0 +1,120 @@
+### 환경 변수 설정
+@baseUrl = http://localhost:8080
+
+### =============================================
+### 파일 업로드 포함 API 호출 (메트릭 데이터 생성용)
+### =============================================
+
+### 1. 사용자 생성 API 호출 (프로필 이미지 포함)
+POST {{baseUrl}}/api/users
+Content-Type: multipart/form-data; boundary=boundary123
+Authorization: Bearer your-jwt-token-here
+
+--boundary123
+Content-Disposition: form-data; name="user"
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@example.com",
+  "password": "password123"
+}
+--boundary123
+Content-Disposition: form-data; name="profile"; filename="profile.jpg"
+Content-Type: image/jpeg
+
+< /path/to/your/test-image.jpg
+--boundary123--
+
+### 2. 메시지 생성 API 호출 (첨부파일 포함)
+POST {{baseUrl}}/api/messages
+Content-Type: multipart/form-data; boundary=boundary456
+Authorization: Bearer your-jwt-token-here
+
+--boundary456
+Content-Disposition: form-data; name="message"
+Content-Type: application/json
+
+{
+  "channelId": "123e4567-e89b-12d3-a456-556642440000",
+  "authorId": "123e4567-e89b-12d3-a456-556642440001",
+  "content": "Test message with attachment"
+}
+--boundary456
+Content-Disposition: form-data; name="attachments"; filename="document.pdf"
+Content-Type: application/pdf
+
+< /path/to/your/test-document.pdf
+--boundary456
+Content-Disposition: form-data; name="attachments"; filename="image.png"
+Content-Type: image/png
+
+< /path/to/your/test-image.png
+--boundary456--
+
+### =============================================
+### 간단한 방법 (IntelliJ 내장 지원)
+### =============================================
+
+### 3. 사용자 생성 - 간단한 multipart 방식
+POST {{baseUrl}}/api/users
+Content-Type: multipart/form-data
+Authorization: Bearer your-jwt-token-here
+
+--WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="user"
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "email": "test2@example.com",
+  "password": "password123"
+}
+--WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="profile"; filename="profile.jpg"
+Content-Type: image/jpeg
+
+< ./profile.jpg
+--WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 4. 메시지 생성 - 간단한 multipart 방식 (여러 파일)
+POST {{baseUrl}}/api/messages
+Content-Type: multipart/form-data
+Authorization: Bearer your-jwt-token-here
+
+--WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="message"
+Content-Type: application/json
+
+{
+  "channelId": "123e4567-e89b-12d3-a456-556642440000",
+  "authorId": "123e4567-e89b-12d3-a456-556642440001",
+  "content": "Test message with multiple attachments"
+}
+--WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="attachments"; filename="file1.pdf"
+Content-Type: application/pdf
+
+< ./test-files/document.pdf
+--WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="attachments"; filename="file2.jpg"
+Content-Type: image/jpeg
+
+< ./test-files/image.jpg
+--WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### =============================================
+### 메트릭 확인 (파일 업로드 후)
+### =============================================
+
+### 5. User Create Time 메트릭 확인
+GET {{baseUrl}}/actuator/metrics/user.create.time
+Accept: application/json
+
+### 6. Message Create Time 메트릭 확인
+GET {{baseUrl}}/actuator/metrics/message.create.time
+Accept: application/json
+
+### 7. BinaryContent Upload Time 메트릭 확인
+GET {{baseUrl}}/actuator/metrics/binaryContent.upload.time
+Accept: application/json
