@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.testpratice.async;
+package com.sprint.mission.discodeit.testpratice.retry;
 
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
 import static org.mockito.Mockito.atLeastOnce;
