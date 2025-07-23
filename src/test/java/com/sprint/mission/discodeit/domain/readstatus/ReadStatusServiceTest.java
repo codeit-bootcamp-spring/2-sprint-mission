@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.domain.readstatus;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
@@ -8,6 +9,7 @@ import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundExce
 import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.domain.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusNotFoundException;
@@ -21,7 +23,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +42,8 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   @Autowired
   private ReadStatusService readStatusService;
 
-  @AfterEach
-  void tearDown() {
+  @BeforeEach
+  void setUp() {
     readStatusRepository.deleteAllInBatch();
     channelRepository.deleteAllInBatch();
     userRepository.deleteAllInBatch();
@@ -149,13 +153,17 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
     Channel savedChannel = channelRepository.save(new Channel(ChannelType.PRIVATE, "", ""));
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(savedUser, savedChannel));
     Instant instant = Instant.parse("2025-05-17T14:00:00Z");
+    boolean notificationEnabled = false;
+    ReadStatusUpdateRequest request = new ReadStatusUpdateRequest(instant, notificationEnabled);
 
     // when
     ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatus.getId(),
-        instant);
+        request);
 
     // then
-    Assertions.assertThat(readStatusResult.lastReadAt()).isEqualTo(instant);
+    Assertions.assertThat(readStatusResult)
+        .extracting(ReadStatusResult::lastReadAt, ReadStatusResult::notificationEnabled)
+        .containsExactlyInAnyOrder(instant, notificationEnabled);
   }
 
   @DisplayName("읽기 상태 업데이트 시도시, 없는 읽기상태면 예외를 반환합니다.")
@@ -163,10 +171,12 @@ class ReadStatusServiceTest extends IntegrationTestSupport {
   void updateLastReadTime_Exception() {
     // given
     Instant instant = Instant.parse("2025-05-17T14:00:00Z");
+    boolean notificationEnabled = false;
+    ReadStatusUpdateRequest request = new ReadStatusUpdateRequest(instant, notificationEnabled);
 
     // when & then
     Assertions.assertThatThrownBy(
-            () -> readStatusService.updateLastReadTime(UUID.randomUUID(), instant))
+            () -> readStatusService.updateLastReadTime(UUID.randomUUID(), request))
         .isInstanceOf(ReadStatusNotFoundException.class);
   }
 

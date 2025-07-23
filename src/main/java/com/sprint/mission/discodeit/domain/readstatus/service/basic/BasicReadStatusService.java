@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundExce
 import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.domain.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.readstatus.exception.ReadStatusNotFoundException;
@@ -13,7 +14,6 @@ import com.sprint.mission.discodeit.domain.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -40,7 +40,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     ReadStatus readStatus = readStatusRepository.save(new ReadStatus(user, channel));
 
-    return ReadStatusResult.fromEntity(readStatus);
+    return ReadStatusResult.from(readStatus);
   }
 
   private void validateReadStatusExist(Channel channel, User user) {
@@ -54,19 +54,19 @@ public class BasicReadStatusService implements ReadStatusService {
   public List<ReadStatusResult> getAllByUserId(UUID userId) {
     List<ReadStatus> readStatuses = readStatusRepository.findByUserId(userId);
 
-    return ReadStatusResult.fromEntity(readStatuses);
+    return ReadStatusResult.from(readStatuses);
   }
 
   @Transactional
   @Override
-  public ReadStatusResult updateLastReadTime(UUID readStatusId, Instant time) {
+  public ReadStatusResult updateLastReadTime(UUID readStatusId, ReadStatusUpdateRequest request) {
     ReadStatus readStatus = readStatusRepository.findFetchUserById(readStatusId)
         .orElseThrow(() -> new ReadStatusNotFoundException(Map.of()));
 
-    readStatus.updateLastReadTime(time);
+    readStatus.update(request.newLastReadAt(), request.newNotificationEnabled());
     readStatusRepository.save(readStatus);
 
-    return ReadStatusResult.fromEntity(readStatus);
+    return ReadStatusResult.from(readStatus);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.domain.readstatus.controller;
 
+import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.domain.readstatus.service.ReadStatusService;
 import com.sprint.mission.discodeit.domain.readstatus.dto.ReadStatusResult;
 import com.sprint.mission.discodeit.domain.readstatus.dto.request.ReadStatusCreateRequest;
@@ -20,34 +21,39 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReadStatusController {
 
-    private final ReadStatusService readStatusService;
+  private final ReadStatusService readStatusService;
 
-    @PostMapping
-    public ResponseEntity<ReadStatusResult> create(@Valid @RequestBody ReadStatusCreateRequest request) {
-        ReadStatusResult readStatusResult = readStatusService.create(request);
+  @PostMapping
+  public ResponseEntity<ReadStatusResult> create(
+      @Valid @RequestBody ReadStatusCreateRequest request) {
+    ReadStatusResult readStatusResult = readStatusService.create(request);
 
-        return ResponseEntity.ok(readStatusResult);
-    }
+    return ResponseEntity.ok(readStatusResult);
+  }
 
-    @PatchMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatusResult> update(@PathVariable UUID readStatusId) {
-        ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatusId, Instant.now());
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatusResult> update(
+      @PathVariable UUID readStatusId,
+      @RequestBody @Valid ReadStatusUpdateRequest request
+  ) {
+    ReadStatusResult readStatusResult = readStatusService.updateLastReadTime(readStatusId,
+        request);
 
-        return ResponseEntity.ok(readStatusResult);
-    }
+    return ResponseEntity.ok(readStatusResult);
+  }
 
-    @GetMapping
-    public ResponseEntity<List<ReadStatusResult>> getAllByUserId(@RequestParam UUID userId) {
-        List<ReadStatusResult> readStatusResults = readStatusService.getAllByUserId(userId);
+  @GetMapping
+  public ResponseEntity<List<ReadStatusResult>> getAllByUserId(@RequestParam UUID userId) {
+    List<ReadStatusResult> readStatusResults = readStatusService.getAllByUserId(userId);
 
-        return ResponseEntity.ok(readStatusResults);
-    }
+    return ResponseEntity.ok(readStatusResults);
+  }
 
-    @DeleteMapping("/{readStatusId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID readStatusId) {
-        readStatusService.delete(readStatusId);
+  @DeleteMapping("/{readStatusId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID readStatusId) {
+    readStatusService.delete(readStatusId);
 
-        return ResponseEntity.noContent().build();
-    }
+    return ResponseEntity.noContent().build();
+  }
 
 }

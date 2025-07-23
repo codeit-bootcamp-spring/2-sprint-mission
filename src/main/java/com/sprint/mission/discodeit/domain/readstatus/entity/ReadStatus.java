@@ -38,8 +38,14 @@ public class ReadStatus extends BaseUpdatableEntity {
     this.notificationEnabled = isNotificationEnabled(channel);
   }
 
-  public void updateLastReadTime(Instant time) {
-    this.lastReadTime = time;
+  public void update(Instant time, boolean newNotificationEnabled) {
+    if (time != null) {
+      this.lastReadTime = time;
+    }
+    if (this.notificationEnabled.equals(newNotificationEnabled)) {
+      return;
+    }
+    this.notificationEnabled = newNotificationEnabled;
   }
 
   private boolean isNotificationEnabled(Channel channel) {
