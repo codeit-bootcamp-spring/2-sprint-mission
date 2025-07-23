@@ -3,11 +3,8 @@ package com.sprint.mission.discodeit.storage.local;
 import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
-import com.sprint.mission.discodeit.entity.NotificationType;
-import com.sprint.mission.discodeit.event.NotificationEvent;
-import com.sprint.mission.discodeit.event.NotificationEventPublisher;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
-import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -23,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +30,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -43,16 +39,16 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     private final Path root;
     private final AsyncTaskFailureRepository asyncTaskFailureRepository;
-    private final NotificationEventPublisher notificationEventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     public LocalBinaryContentStorage(
         @Value("${discodeit.storage.local.root-path}") Path root,
         AsyncTaskFailureRepository asyncTaskFailureRepository,
-        NotificationEventPublisher notificationEventPublisher
+        ApplicationEventPublisher eventPublisher
     ) {
         this.root = root;
         this.asyncTaskFailureRepository = asyncTaskFailureRepository;
-        this.notificationEventPublisher = notificationEventPublisher;
+        this.eventPublisher = eventPublisher;
     }
 
     @PostConstruct
@@ -81,46 +77,34 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         return binaryContentId;
     }
 
-    @Override
+    @Async("binaryContentTaskExecutor")
     @Retryable(
         value = {IOException.class, RuntimeException.class},
         maxAttempts = 3,
-        backoff = @Backoff(delay = 1000)
+        backoff = @Backoff(delay = 1000, multiplier = 2)
     )
-    @Async("binaryContentTaskExecutor")
     public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+        log.info("파일 업로드 시도: {}", binaryContentId);
         return CompletableFuture.completedFuture(put(binaryContentId, bytes));
     }
 
     @Recover
-    public CompletableFuture<UUID> recover(Exception e, UUID binaryContentId, byte[] bytes) {
-        String taskName = "putAsync";
+    public CompletableFuture<UUID> recoverPutAsync(Exception e, UUID binaryContentId,
+        byte[] bytes) {
+        String taskName = getClass().getSimpleName() + "#" + "putAsync";
+        String failureReason = String.format("파일 업로드 실패 (binaryContentId: %s): %s",
+            binaryContentId, e.getMessage());
         String requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID))
-            .orElse("UNKNOWN");
-        String failureReason = String.format(
-            "파일 업로드 실패 - binaryContentId: %s - %s",
-            binaryContentId,
-            e.getMessage());
+            .map(Object::toString)
+            .orElse("unknown");
 
         AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
         asyncTaskFailureRepository.save(failure);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null
-            && authentication.getPrincipal() instanceof DiscodeitUserDetails principal) {
-            UUID receiverId = principal.getUserDto().id();
+        eventPublisher.publishEvent(new AsyncTaskFailedEvent(failure));
 
-            notificationEventPublisher.publish(new NotificationEvent(
-                receiverId,
-                NotificationType.ASYNC_FAILED,
-                null,
-                "비동기 작업 실패",
-                "요청하신 파일 업로드 작업이 실패했습니다."
-            ));
-        }
-
-        log.error("파일 업로드 실패 - binaryContentId: {}", binaryContentId, e);
-        return CompletableFuture.failedFuture(e);
+        log.error("파일 업로드 최종 실패 (실패 정보 기록됨): {}", binaryContentId, e);
+        throw new RuntimeException("파일 업로드 최종 실패: " + binaryContentId, e);
     }
 
     public InputStream get(UUID binaryContentId) {
