@@ -23,6 +23,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -97,6 +100,7 @@ public class BasicUserService implements UserService {
 
   @Transactional(readOnly = true)
   @Override
+  @Cacheable(value = "users", key = "#userId")
   public UserDto find(UUID userId) {
     log.debug("사용자 조회 시작: id={}", userId);
     UserDto userDto = userRepository.findById(userId)
@@ -124,6 +128,7 @@ public class BasicUserService implements UserService {
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
   @Override
+  @CachePut(value = "users", key = "#userId")
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
@@ -171,6 +176,7 @@ public class BasicUserService implements UserService {
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
   @Override
+  @CacheEvict(value = "users", key = "#userId")
   public void delete(UUID userId) {
     log.debug("사용자 삭제 시작: id={}", userId);
 

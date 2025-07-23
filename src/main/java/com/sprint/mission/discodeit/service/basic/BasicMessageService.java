@@ -23,6 +23,9 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -103,6 +106,7 @@ public class BasicMessageService implements MessageService {
 
   @Transactional(readOnly = true)
   @Override
+  @Cacheable(value = "messages", key = "#messageId")
   public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
         .map(messageMapper::toDto)
@@ -130,6 +134,7 @@ public class BasicMessageService implements MessageService {
   @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @Transactional
   @Override
+  @CachePut(value = "messages", key = "#messageId")
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     log.debug("메시지 수정 시작: id={}, request={}", messageId, request);
     Message message = messageRepository.findById(messageId)
@@ -143,6 +148,7 @@ public class BasicMessageService implements MessageService {
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
   @Transactional
   @Override
+  @CacheEvict(value = "messages", key = "#messageId")
   public void delete(UUID messageId) {
     log.debug("메시지 삭제 시작: id={}", messageId);
     if (!messageRepository.existsById(messageId)) {
