@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.FileUtil;
+import com.sprint.mission.discodeit.util.FileUtils;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class UserController implements UserApi {
   ) {
     log.info("사용자 생성 요청: {}", request);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(FileUtil::toBinaryRequest);
+        .flatMap(FileUtils::toBinaryRequest);
     UserDto createdUser = userService.createUser(request, profileRequest);
 
     log.debug("사용자 생성 응답: {}", createdUser);
@@ -58,7 +58,7 @@ public class UserController implements UserApi {
   ) {
     log.info("사용자 수정 요청: id={}, request={}", userId, request);
     Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
-        .flatMap(FileUtil::toBinaryRequest);
+        .flatMap(FileUtils::toBinaryRequest);
     UserDto updatedUser = userService.updateUser(userId, request, profileRequest);
 
     log.debug("사용자 수정 응답: {}", updatedUser);

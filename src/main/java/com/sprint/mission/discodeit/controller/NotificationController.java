@@ -1,0 +1,40 @@
+package com.sprint.mission.discodeit.controller;
+
+import com.sprint.mission.discodeit.dto.NotificationDto;
+import com.sprint.mission.discodeit.service.NotificationService;
+import java.util.List;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Slf4j
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/notifications")
+public class NotificationController {
+
+  private final NotificationService notificationService;
+
+  @GetMapping
+  public ResponseEntity<List<NotificationDto>> getAll() {
+    log.info("알람 목록 조회 요청");
+    List<NotificationDto> notifications = notificationService.findAll();
+    log.debug("알람 목록 조회 응답: count={}", notifications.size());
+    return ResponseEntity.ok(notifications);
+  }
+
+  @DeleteMapping("/{notificationId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID notificationId) {
+    log.info("알림 삭제(확인) 요청: id={}", notificationId);
+    notificationService.deleteNotification(notificationId);
+    log.debug("알림 삭제(확인) 완료");
+    return ResponseEntity.noContent().build();
+  }
+
+}

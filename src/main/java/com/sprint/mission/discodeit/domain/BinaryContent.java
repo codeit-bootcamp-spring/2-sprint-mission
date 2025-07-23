@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.domain;
 import com.sprint.mission.discodeit.domain.base.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,15 +27,19 @@ public class BinaryContent extends BaseEntity {
   @Column(name = "content_type", nullable = false, length = 100)
   private String contentType;
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private BinaryContentUploadStatus uploadStatus;
+
   public static BinaryContent create(String fileName, Long size, String contentType) {
     validate(fileName, size, contentType);
     return BinaryContent.builder()
         .fileName(fileName)
         .size(size)
         .contentType(contentType)
+        .uploadStatus(BinaryContentUploadStatus.WAITING)
         .build();
   }
-
 
   /*******************************
    * Validation check
@@ -54,6 +60,10 @@ public class BinaryContent extends BaseEntity {
     if (size <= 0) {
       throw new IllegalArgumentException("파일 크기가 유효하지 않습니다.");
     }
+  }
+
+  public void updateUploadStatus(BinaryContentUploadStatus status) {
+    this.uploadStatus = status;
   }
 
 }

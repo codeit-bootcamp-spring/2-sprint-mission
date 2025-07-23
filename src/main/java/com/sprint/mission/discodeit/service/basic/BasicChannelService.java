@@ -17,11 +17,16 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@CacheConfig(cacheNames = "channelsByUser")
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
@@ -32,6 +37,7 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
   private final ChannelMapper channelMapper;
 
+  @CacheEvict(allEntries = true)
   @Transactional
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Override
@@ -41,6 +47,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(createdChannel);
   }
 
+  @CacheEvict(allEntries = true)
   @Transactional
   @Override
   public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
@@ -63,18 +70,23 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(() -> ChannelNotFoundException.byId(channelId));
   }
 
+  @Cacheable(key = "#userId")
   @Transactional(readOnly = true)
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatus::getChannel)
         .map(Channel::getId)
-        .toList();
+        .collect(Collectors.toList());
 
     return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
         .stream()
         .map(channelMapper::toDto)
-        .toList();
+        .collect(Collectors.toList());
+
+    // List<ChannelDto>가 캐시에 저장될 때, Spring Cache + Redis + GenericJackson2JsonRedisSerializer는 리스트 내부 객체의 정확한 타입 정보가 필요
+    // toList()가 리턴하는 리스트는 내부적으로 ImmutableCollections.ListN 같은 비표준 컬렉션 타입
+    // -> GenericJackson2JsonRedisSerializer가 직렬화할 때 타입 정보를 못 읽음
   }
 
   @Transactional
@@ -94,6 +106,7 @@ public class BasicChannelService implements ChannelService {
     return channelMapper.toDto(channel);
   }
 
+  @CacheEvict(key = "#channelId")
   @Transactional
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Override

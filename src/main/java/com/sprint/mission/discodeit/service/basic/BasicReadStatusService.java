@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.Channel;
+import com.sprint.mission.discodeit.domain.ChannelType;
 import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
@@ -82,7 +83,11 @@ public class BasicReadStatusService implements ReadStatusService {
     checkUserExists(readStatus.getUser().getId());
     checkChannelExists(readStatus.getChannel().getId());
 
-    readStatus.update(updateDto.newLastReadAt());
+    ChannelType channelType = readStatus.getChannel().getType();
+    boolean newNotificationEnabled = updateDto.newNotificationEnabled();
+    newNotificationEnabled = channelType == ChannelType.PRIVATE;
+
+    readStatus.update(updateDto.newLastReadAt(), newNotificationEnabled);
     return readStatusMapper.toDto(readStatus);
   }
 

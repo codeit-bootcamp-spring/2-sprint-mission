@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.util.FileUtil;
+import com.sprint.mission.discodeit.util.FileUtils;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class MessageController implements MessageApi {
         request, attachments != null ? attachments.size() : 0);
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
         .map(files -> files.stream()
-            .map(FileUtil::toBinaryRequest)
+            .map(FileUtils::toBinaryRequest)
             .flatMap(Optional::stream)
             .toList()
         )

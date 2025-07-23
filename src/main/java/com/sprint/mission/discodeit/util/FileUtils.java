@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @Component
-public class FileUtil {
+public class FileUtils {
 
   public static Optional<BinaryContentCreateRequest> toBinaryRequest(MultipartFile file) {
     if (file == null || file.isEmpty()) {
