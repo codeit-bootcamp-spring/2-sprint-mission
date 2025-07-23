@@ -48,7 +48,6 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   public UUID put(UUID binaryContentId, byte[] bytes) {
     BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new BinaryContentNotFoundException(Map.of()));
-    log.debug("저장을 하러 들어옴 {}", binaryContent.getFileName());
 
     String key = binaryContentId.toString();
     PutObjectRequest putRequest = PutObjectRequest.builder()
@@ -61,12 +60,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         .thenAccept(success -> {
           log.debug("S3 요청 이후 처리 쓰레드 {} ", Thread.currentThread().getName());
           binaryContent.updateUploadStatus(SUCCESS);
-          log.debug("이미지 상태 변경 {}", binaryContent.getFileName());
-          try{
-            BinaryContent save = binaryContentRepository.save(binaryContent);
-            log.debug("이미지 저장완료 {}", save.getBinaryContentUploadStatus());
-          }catch (Exception e){
-            log.debug("이미지 저장 시 에러 : {}", e.getMessage());
+          try {
+            log.debug("S3서비스에서 데이터 베이스에 저장");
+            binaryContentRepository.save(binaryContent);
+          } catch (Exception e) {
+            log.debug("바이너리 컨텐츠 저장 시 에러 : {}", e.getMessage());
           }
 
         })

@@ -52,19 +52,16 @@ public class BasicUserService implements UserService {
 
     BinaryContent binaryContent = binaryContentCore.createBinaryContent(binaryContentRequest);
     log.debug("user를 저장하기 위해서 이동 ");
-//    try{
-//      Thread.sleep(4000);
-//    }catch (Exception ex){
-//
-//    }
+    try{
+      Thread.sleep(4000);
+    }catch (Exception ex){
 
+    }
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
-    log.debug("에러 발생 직전");
+    log.debug("유저서비스에서 데이터 베이스에 저장");
     User savedUser = userRepository.save(user);
-    log.debug("커밋전 binaryConetent의 상태 {}, : id {}", binaryContent.getBinaryContentUploadStatus(),
-        binaryContent.getId());
 
     return userResultMapper.convertToUserResult(savedUser);
   }

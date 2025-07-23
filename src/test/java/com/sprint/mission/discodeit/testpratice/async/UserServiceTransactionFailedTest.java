@@ -55,11 +55,7 @@ public class UserServiceTransactionFailedTest extends IntegrationTestSupport {
     userRepository.deleteAllInBatch();
   }
 
-
-  // 통제하기가 힘들다 이런 말만 남겨 놓자. computableFuture 내부에서는 다른 쓰레드여서 그런가 저장이 안되더라
-  // 다른 쓰레드가 작업 중이면 안되는건가?
-  // 그럼 aftercommit하면 되나?
-  @DisplayName("커밋 후 이미지 업로드 설정을 하지 않는다면, 트랜잭션이 실패해도 바이너리 컨텐츠는 저장됩니다.")
+  @DisplayName("커밋 후 이미지 업로드 설정을 하지 않는다면, 비슷한 시점에서 save로직이 있다면 에러가 발생합니다.")
   @Test
   void test_TransactionSynchronizationManager() {
     // given

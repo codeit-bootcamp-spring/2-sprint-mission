@@ -26,15 +26,15 @@ public class BinaryContentCore {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
 
-//    @Transactional(propagation = Propagation.REQUIRES_NEW) // 이렇게 하면 상관이 없나?
-  @Transactional // 이렇게 하면 상관이 없나?
+  @Transactional(propagation = Propagation.REQUIRES_NEW) // 이렇게 하면 상관이 없나?
+//  @Transactional // 이렇게 하면 상관이 없나?
   public BinaryContent createBinaryContent(BinaryContentRequest binaryContentRequest) {
     if (binaryContentRequest == null) {
       return null;
     }
     BinaryContent binaryContent = new BinaryContent(binaryContentRequest.fileName(),
         binaryContentRequest.contentType(), binaryContentRequest.size());
-    log.debug("바이너리 스토리지 저장");
+    log.debug("바이너리 스토리지 저장"); // 아 이건 시점 문제가 없긴하지
     BinaryContent savedBinaryContent = binaryContentRepository.save(binaryContent);
 
 //    TransactionSynchronizationManager.registerSynchronization(
