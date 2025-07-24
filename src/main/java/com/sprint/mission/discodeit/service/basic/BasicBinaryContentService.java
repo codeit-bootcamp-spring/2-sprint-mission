@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.event.BinaryContentCreateEvent;
+import com.sprint.mission.discodeit.event.BinaryContentUploadFailureEvent;
+import com.sprint.mission.discodeit.event.BinaryContentUploadSuccessEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -55,16 +57,36 @@ public class BasicBinaryContentService implements BinaryContentService {
     DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authentication.getPrincipal();
     UUID currentUserId = userDetails.getUserDto().id();
 
-    eventPublisher.publishEvent(
-        new BinaryContentCreateEvent(
-            binaryContent.getId(),
-            request.bytes(),
-            request.fileName(),
-            request.contentType(),
-            requestId,
-            currentUserId
-        )
+    CompletableFuture<UUID> uploadFuture = binaryContentStorage.put(
+        binaryContent.getId(),
+        bytes
     );
+
+    uploadFuture.whenComplete((result, ex) -> {
+      if (ex == null) {
+        log.info("업로드 성공: binaryContentId={}", result);
+        eventPublisher.publishEvent(
+            new BinaryContentUploadSuccessEvent(result, requestId)
+        );
+      } else {
+        log.error("업로드 실패: binaryContentId={}", binaryContent.getId(), ex);
+        String failureReason = String.format(
+            "파일 업로드 실패 - binaryContentId: %s, fileName: %s, error: %s",
+            binaryContent.getId(),
+            fileName,
+            ex.getMessage()
+        );
+        eventPublisher.publishEvent(
+            new BinaryContentUploadFailureEvent(
+                binaryContent.getId(),
+                requestId,
+                "BinaryContentStorage.put",
+                failureReason,
+                currentUserId
+            )
+        );
+      }
+    });
 
     log.info("바이너리 컨텐츠 생성 및 업로드 이벤트 발행: id={}, fileName={}",
         binaryContent.getId(), fileName);

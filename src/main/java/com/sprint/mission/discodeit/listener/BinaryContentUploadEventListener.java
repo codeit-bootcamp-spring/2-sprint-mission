@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
@@ -13,13 +15,10 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Component
@@ -29,50 +28,13 @@ public class BinaryContentUploadEventListener {
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
   private final ApplicationEventPublisher eventPublisher;
+  private final ObjectMapper objectMapper;
 
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  @Async("binaryContentTaskExecutor")
-  public void handleBinaryContentCreated(BinaryContentCreateEvent event) {
-    String requestId = event.requestId();
-
-    try {
-      log.info("비동기 업로드 시작: binaryContentId={}, fileName={}, size={}",
-          event.binaryContentId(), event.fileName(), event.bytes().length);
-
-      UUID result = binaryContentStorage.put(event.binaryContentId(), event.bytes())
-          .get();
-
-      eventPublisher.publishEvent(
-          new BinaryContentUploadSuccessEvent(event.binaryContentId(), requestId)
-      );
-
-      log.info("업로드 성공: binaryContentId={}", event.binaryContentId());
-
-    } catch (Exception e) {
-      log.error("업로드 실패: binaryContentId={}", event.binaryContentId(), e);
-
-      String failureReason = String.format(
-          "파일 업로드 실패 - binaryContentId: %s, fileName: %s, error: %s",
-          event.binaryContentId(),
-          event.fileName(),
-          e.getMessage()
-      );
-
-      eventPublisher.publishEvent(
-          new BinaryContentUploadFailureEvent(
-              event.binaryContentId(),
-              requestId,
-              "uploadWithRetry",
-              failureReason,
-              event.userId()
-          )
-      );
-    }
-  }
-
-  @EventListener
+  @KafkaListener(topics = "binary-content.upload-success", groupId = "binary-content-group")
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void handleUploadSuccess(BinaryContentUploadSuccessEvent event) {
+  public void handleUploadSuccess(String kafkaEvent) throws JsonProcessingException {
+    BinaryContentUploadSuccessEvent event = objectMapper.readValue(kafkaEvent,
+        BinaryContentUploadSuccessEvent.class);
     log.info("업로드 성공 이벤트 처리 시작: binaryContentId={}, requestId={}",
         event.binaryContentId(), event.requestId());
 
@@ -89,9 +51,11 @@ public class BinaryContentUploadEventListener {
     }
   }
 
-  @EventListener
+  @KafkaListener(topics = "binary-content.upload-failure", groupId = "binary-content-group")
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void handleUploadFailure(BinaryContentUploadFailureEvent event) {
+  public void handleUploadFailure(String kafkaEvent) throws JsonProcessingException {
+    BinaryContentUploadFailureEvent event = objectMapper.readValue(kafkaEvent,
+        BinaryContentUploadFailureEvent.class);
     log.info("업로드 실패 이벤트 처리 시작: binaryContentId={}, requestId={}",
         event.binaryContentId(), event.requestId());
 

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
@@ -9,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AsyncTaskFailureEventListener {
 
   private final AsyncTaskFailureRepository asyncTaskFailureRepository;
-  private final ApplicationEventPublisher eventPublisher;
+  private final ObjectMapper objectMapper;
 
-  @EventListener
+  @KafkaListener(topics = "async-task.failure", groupId = "async-task-failure-group")
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  @Async("asyncTaskFailureExecutor")
-  public void handleAsyncFailure(AsyncTaskFailureEvent event) {
+  public void handleAsyncFailure(String kafkaEvent) throws JsonProcessingException {
+    AsyncTaskFailureEvent event = objectMapper.readValue(kafkaEvent, AsyncTaskFailureEvent.class);
     log.info("비동기 작업 실패 로그 기록 시작: requestId={}", event.requestId());
     try {
       String failureReason = Objects.toString(event.failureReason(), "");
