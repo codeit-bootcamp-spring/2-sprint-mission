@@ -74,6 +74,9 @@ dependencies {
     //websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+    //인가 처리
+    implementation 'org.springframework.security:spring-security-messaging'
+
 }
 
 tasks.named('test') {
