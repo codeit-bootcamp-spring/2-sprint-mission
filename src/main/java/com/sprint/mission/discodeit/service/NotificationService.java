@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
+import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -13,5 +14,5 @@ public interface NotificationService {
 
     void deleteNotification(UUID notificationId, UUID userId);
 
-    void sendNotification(User receiver, String title, String content, NotificationType type, UUID targetId);
+    Notification sendNotification(User receiver, String title, String content, NotificationType type, UUID targetId);
 }

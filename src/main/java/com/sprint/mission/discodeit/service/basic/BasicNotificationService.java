@@ -47,8 +47,10 @@ public class BasicNotificationService implements NotificationService {
     // 알림 발행
     @Transactional
     @CacheEvict(value = "userNotifications", key = "#receiver.getId()")
-    public void sendNotification(User receiver, String title, String content, NotificationType type, UUID targetId) {
+    public Notification sendNotification(User receiver, String title, String content, NotificationType type, UUID targetId) {
         Notification notification = new Notification(receiver, title, content, type, targetId);
         notificationRepository.save(notification);
+
+        return notification;
     }
 }
