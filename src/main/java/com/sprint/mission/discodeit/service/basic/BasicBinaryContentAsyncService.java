@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.BinaryContentEventPublisher;
 import com.sprint.mission.discodeit.event.NotificationEvent;
 import com.sprint.mission.discodeit.event.NotificationEventPublisher;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentAsyncService;
@@ -33,6 +35,8 @@ public class BasicBinaryContentAsyncService implements BinaryContentAsyncService
     private final BinaryContentStorage binaryContentStorage;
     private final AsyncTaskFailureRepository asyncTaskFailureRepository;
     private final NotificationEventPublisher notificationEventPublisher;
+    private final BinaryContentEventPublisher binaryContentEventPublisher;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     @Async("contextAwareTaskExecutor")
@@ -46,13 +50,17 @@ public class BasicBinaryContentAsyncService implements BinaryContentAsyncService
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new DiscodeitException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
 
+        UUID userId = binaryContent.getUploader().getId();
+
         try {
             // 업로드 시도
             binaryContentStorage.put(binaryContentId, bytes);
             binaryContent.setUploadStatus(BinaryContentUploadStatus.SUCCESS);
+            binaryContentEventPublisher.publishStatusChanged(userId.toString(), binaryContentMapper.toDto(binaryContent));
         } catch (Exception e) {
             // 재시도를 위해 예외 던지고 WAITING
             binaryContent.setUploadStatus(BinaryContentUploadStatus.WAITING);
+            binaryContentEventPublisher.publishStatusChanged(userId.toString(), binaryContentMapper.toDto(binaryContent));
             throw e;
         }
     }
@@ -65,10 +73,11 @@ public class BasicBinaryContentAsyncService implements BinaryContentAsyncService
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
                 .orElse(null);
 
+        UUID userId = binaryContent.getUploader().getId();
+
         if (binaryContent != null) {
             binaryContent.setUploadStatus(BinaryContentUploadStatus.FAILED);
-
-            UUID userId = binaryContent.getUploader().getId();
+            binaryContentEventPublisher.publishStatusChanged(userId.toString(), binaryContentMapper.toDto(binaryContent));
 
             notificationEventPublisher.publish(new NotificationEvent(
                     userId,
