@@ -14,10 +14,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class AsyncConfig {
 
   @Bean("uploadExecutor")
-  public Executor S3Executor(TaskDecorator taskDecorator) {
-
+  public Executor s3Executor(TaskDecorator taskDecorator) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(1);
+    executor.setCorePoolSize(2);
     executor.setMaxPoolSize(3);
     executor.setThreadNamePrefix("S3-Thread-");
     executor.setTaskDecorator(taskDecorator);
@@ -27,7 +26,7 @@ public class AsyncConfig {
   }
 
   @Bean("notificationExecutor")
-  public Executor NotificationExecutor(TaskDecorator taskDecorator) {
+  public Executor notificationExecutor(TaskDecorator taskDecorator) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
     executor.setCorePoolSize(1);
     executor.setMaxPoolSize(3);

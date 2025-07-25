@@ -54,7 +54,6 @@ public class BasicUserService implements UserService {
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
     User savedUser = userRepository.save(user);
-    log.debug("유저 레포지토리에 저장 {}", savedUser.getBinaryContent().getBinaryContentUploadStatus());
 
     return userResultMapper.convertToUserResult(savedUser);
   }

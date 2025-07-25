@@ -20,7 +20,7 @@ public enum ErrorCode {
   ERROR_BINARY_CONTENT_NOT_FOUND("해당 BinaryContent가 존재하지 않습니다."),
   ERROR_AUTH_PASSWORD_NOT_MATCH("비밀번호가 일치하지 않습니다."),
 
-  ERROR_S3_UPLOAD("S3 업로드 중 에러가 발생했습니다.");
+  ERROR_S3_UPLOAD_INVALID_ARGUMENT("S3 업로드 요청 중 유효하지 않은 매개변수가 들어왔습니다.");
 
   private static final String ERROR = "[ERROR]";
   private final String message;

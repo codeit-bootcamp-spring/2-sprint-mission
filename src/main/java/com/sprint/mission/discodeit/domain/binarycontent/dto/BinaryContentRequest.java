@@ -6,18 +6,19 @@ import org.springframework.web.multipart.MultipartFile;
 import static com.sprint.mission.discodeit.common.util.FileUtils.getBytesFromMultiPartFile;
 
 public record BinaryContentRequest(
-        @NotBlank String fileName,
-        @NotBlank String contentType,
-        @NotBlank long size,
-        byte[] bytes) {
+    @NotBlank String fileName,
+    @NotBlank String contentType,
+    @NotBlank long size,
+    @NotBlank byte[] bytes
+) {
 
-    public static BinaryContentRequest fromMultipartFile(MultipartFile multipartFile) {
-        return new BinaryContentRequest(
-                multipartFile.getName(),
-                multipartFile.getContentType(),
-                multipartFile.getSize(),
-                getBytesFromMultiPartFile(multipartFile)
-        );
-    }
+  public static BinaryContentRequest fromMultipartFile(MultipartFile multipartFile) {
+    return new BinaryContentRequest(
+        multipartFile.getName(),
+        multipartFile.getContentType(),
+        multipartFile.getSize(),
+        getBytesFromMultiPartFile(multipartFile)
+    );
+  }
 
 }

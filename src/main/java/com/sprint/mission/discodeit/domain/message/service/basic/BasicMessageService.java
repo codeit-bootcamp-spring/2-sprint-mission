@@ -37,6 +37,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -68,10 +70,11 @@ public class BasicMessageService implements MessageService {
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
-    List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(files);
+    List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(
+        files);
+
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
-
     publishMessageEvent(savedMessage);
 
     return messageResultMapper.convertToMessageResult(savedMessage);
@@ -122,7 +125,7 @@ public class BasicMessageService implements MessageService {
     messageRepository.deleteById(messageId);
   }
 
-  private void publishMessageEvent(Message message) { // 매개변수는 이벤트 대상을 추천, 내부에서 메세지 형태 만들기 좋게
+  private void publishMessageEvent(Message message) {
     if (isNotificationNotEnabled(message)) {
       return;
     }
@@ -131,6 +134,7 @@ public class BasicMessageService implements MessageService {
     eventPublisher.publishEvent(newMessageNotificationEvent);
   }
 
+  // 그럼 이 로직도 여기 있으면 안됨, 알림 쓸지 안쓸지 모르잖아
   private boolean isNotificationNotEnabled(Message message) {
     return !readStatusRepository.findByChannelIdAndUserId(
             message.getChannel().getId(),

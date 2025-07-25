@@ -1,83 +1,71 @@
 package com.sprint.mission.discodeit.testpratice.retry;
 
 import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.REQUEST_ID;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
 
 import com.sprint.mission.discodeit.common.failure.AsyncTaskFailure;
 import com.sprint.mission.discodeit.common.failure.AsyncTaskFailureRepository;
-import com.sprint.mission.discodeit.common.util.s3.S3Adapter;
+import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
-import java.time.Duration;
 import java.util.UUID;
-import org.assertj.core.api.Assertions;
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.AfterEach;
+import java.util.concurrent.ExecutionException;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+@TestPropertySource(properties = {
+    "discodeit.storage.type=s3"
+})
 class S3RetryTest extends IntegrationTestSupport {
-
-  @Value("${discodeit.storage.s3.presigned-url-expiration}")
-  private long presignedUrlExpirationSeconds;
-  @Value("${discodeit.storage.s3.bucket}")
-  private String bucket;
-  private static final String UPLOAD_FILE_TYPE = "image/jpeg";
 
   @MockitoBean
   private S3Client s3Client;
   @Autowired
-  private AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private BinaryContentStorage binaryContentStorage;
   @Autowired
-  private S3Adapter s3Adapter;
+  private AsyncTaskFailureRepository asyncTaskFailureRepository;
 
-  @AfterEach
-  void tearDown() {
+  @BeforeEach
+  void setUp() {
     asyncTaskFailureRepository.deleteAllInBatch();
     MDC.clear();
   }
 
-  @DisplayName("MaxRetryAttempt를 넘으면, Retry로직이 실행된다.")
+  @DisplayName("S3에 업로드시 재시도 필요한 예외가 발생하면, 비동기 작업실패로 기록합니다.")
   @Test
-  void putTest() {
+  void putExceptionAndRecovery() {
     // given
-    String key = UUID.randomUUID().toString();
-    PutObjectRequest putRequest = PutObjectRequest.builder()
-        .bucket(bucket)
-        .key(key)
-        .contentType(UPLOAD_FILE_TYPE)
-        .build();
-    byte[] bytes = "Hello".getBytes();
-    String requestId = UUID.randomUUID().toString();
-    MDC.put(REQUEST_ID, requestId);
-    BDDMockito.given(
-            s3Client.putObject(Mockito.any(PutObjectRequest.class), Mockito.any(RequestBody.class)))
-        .willThrow(SdkClientException.class);
+    MDC.put(REQUEST_ID, "1");
+    UUID id = UUID.randomUUID();
+    String fileContent = "test-data";
+    BDDMockito.given(s3Client.putObject(any(PutObjectRequest.class), any(RequestBody.class)))
+        .willThrow(SdkClientException.builder().build());
 
-    // when
-    s3Adapter.put(putRequest, RequestBody.fromBytes(bytes));
+    // when & then
+    SoftAssertions.assertSoftly(softly -> {
+      softly.assertThatThrownBy(() -> binaryContentStorage.put(id, fileContent.getBytes()).get())
+          .isInstanceOf(ExecutionException.class)
+          .hasCauseInstanceOf(SdkClientException.class);
+      softly.assertThat(asyncTaskFailureRepository.findAll())
+          .hasSize(1)
+          .extracting(AsyncTaskFailure::getRequestId)
+          .containsExactly(MDC.get(REQUEST_ID));
+    });
 
-    // then
-    Awaitility.await()
-        .atMost(Duration.ofSeconds(5))
-        .pollInterval(Duration.ofMillis(1000))
-        .untilAsserted(() -> {
-          Assertions.assertThat(asyncTaskFailureRepository.findAll())
-              .extracting(AsyncTaskFailure::getRequestId)
-              .containsExactly(requestId);
-        });
-
-    Mockito.verify(s3Client, atLeastOnce())
-        .putObject(Mockito.any(PutObjectRequest.class), Mockito.any(RequestBody.class));
+    Mockito.verify(s3Client, atLeast(2))
+        .putObject(any(PutObjectRequest.class), any(RequestBody.class));
   }
 
 }

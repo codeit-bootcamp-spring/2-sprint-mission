@@ -27,10 +27,9 @@
 - [x] Redis 사용해보기
 
 # 청산 목록 
-- [x] readStatus 업데이트로 API 추가 및 수정 
-- [x] 각각의 NotificationEvent에 추가 정보를 담을 수 있도록 고도화
-- [ ] localstack으로 S3 테스트 코드 변경 
-- [ ] s3Adatper 삭제하고 기존 로직 통합해보기 
+- [x] localstack으로 S3 테스트 코드 변경 
+- [x] s3Adatper 삭제하고 기존 로직 통합해보기
+- [ ] 이벤트 부분 피드백 반영 및 바이너리 컨텐츠 -> s3도 이벤트로 수정하기
 - [ ] 시큐리티 요구사항 반영 
   - [ ] 버그수정 401 에러
   - [ ] 인가로직 수정하기(Manager access로 들어오는 로직들)
