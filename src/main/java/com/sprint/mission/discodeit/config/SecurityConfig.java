@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.security.CustomLoginFailureHandler;
 import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter;
+import com.sprint.mission.discodeit.security.JsonUsernamePasswordAuthenticationFilter.Configurer;
 import com.sprint.mission.discodeit.security.SecurityMatchers;
 import com.sprint.mission.discodeit.security.jwt.JwtAuthenticationFilter;
 import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
@@ -33,6 +34,8 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfigurationSource;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Slf4j
 @Configuration
@@ -43,15 +46,18 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(
       HttpSecurity http,
+      CorsConfigurationSource corsConfigurationSource,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
       JwtService jwtService
   )
       throws Exception {
     http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource))
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
+            .requestMatchers("/api/sse").hasRole("USER")
             .anyRequest().hasRole(Role.USER.name())
         )
         .csrf(csrf ->
@@ -68,7 +74,7 @@ public class SecurityConfig {
                 .addLogoutHandler(new JwtLogoutHandler(jwtService))
         )
         .with(
-            new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
+            new Configurer(objectMapper),
             configurer ->
                 configurer
                     .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))

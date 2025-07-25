@@ -33,4 +33,12 @@ public class BinaryContent extends BaseEntity {
     this.size = size;
     this.contentType = contentType;
   }
+
+  public void changeStatusToSuccess() {
+    this.uploadStatus = BinaryContentUploadStatus.SUCCESS;
+  }
+
+  public void changeStatusToFailed() {
+    this.uploadStatus = BinaryContentUploadStatus.FAILED;
+  }
 }
