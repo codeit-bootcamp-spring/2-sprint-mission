@@ -119,13 +119,5 @@ public class MessageController implements MessageApi {
             .body(messages);
     }
 
-    @MessageMapping("/messages") // /pub/messages
-    public void sendMessage(MessageCreateRequest request) {
-        MessageDto dto = messageService.find(request.authorId()); // 채널별 메시지 구성
-        messagingTemplate.convertAndSend(
-            "/sub/channels." + request.channelId() + ".messages",
-            dto
-        );
-    }
 
 }

@@ -40,6 +40,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 
+
 management:
   endpoints:
     web:

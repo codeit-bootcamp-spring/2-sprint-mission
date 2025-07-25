@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.event.listener;
+package com.sprint.mission.discodeit.event.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
