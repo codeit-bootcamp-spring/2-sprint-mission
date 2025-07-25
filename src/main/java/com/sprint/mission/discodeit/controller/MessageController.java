@@ -22,7 +22,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,15 +43,6 @@ public class MessageController implements MessageApi {
 
   private final MessageService messageService;
   private final SimpMessagingTemplate simpMessagingTemplate;
-
-  @MessageMapping("/messages")
-  public void send(MessageCreateRequest request) {
-    log.debug("웹소켓 메시지 수신 : {}", request);
-    MessageDto createdMessage = messageService.create(request, new ArrayList<>());
-    String destination = String.format("/sub/channels/%s/messages", createdMessage.channelId());
-    simpMessagingTemplate.convertAndSend(destination, createdMessage);
-    log.debug("웹소켓 메시지 발신[{}] :  {}", destination, createdMessage);
-  }
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<MessageDto> create(
