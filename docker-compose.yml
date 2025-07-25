@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"  # 외부 접근 포트
     volumes:
-      - ./nginx/conf/default.conf:/etc/nginx/conf/default.conf:ro
+      - ./nginx/conf/nginx.conf:/etc/nginx/conf/nginx.conf:ro
       - ./frontend/build:/usr/share/nginx/html:ro  # 정적 리소스 경로
     depends_on:
       - backend
