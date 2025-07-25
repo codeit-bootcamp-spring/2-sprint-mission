@@ -22,6 +22,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageController implements MessageApi {
 
     private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Timed("message.create.async")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -69,6 +71,10 @@ public class MessageController implements MessageApi {
             .orElse(new ArrayList<>());
         MessageDto createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
         log.debug("메시지 생성 응답: {}", createdMessage);
+
+        messagingTemplate.convertAndSend(
+            "/sub/channels." + createdMessage.channelId() + ".messages", createdMessage);
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(createdMessage);
