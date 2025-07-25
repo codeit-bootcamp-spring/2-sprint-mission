@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -58,15 +59,13 @@ public class SecurityConfig {
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonLoginFilter(
         ObjectMapper objectMapper,
-        UserMapper userMapper,
         AuthenticationManager authenticationManager,
-        CsrfTokenRepository csrfTokenRepository,
-        JwtService jwtService,
-        LoginSuccessHandler loginSuccessHandler
+        LoginSuccessHandler loginSuccessHandler,
+        CacheManager cacheManager
     ) {
         // 로그인 요청 파싱해서 커스텀 필터 객체 생성
         JsonUsernamePasswordAuthenticationFilter loginFilter =
-            new JsonUsernamePasswordAuthenticationFilter(objectMapper);
+            new JsonUsernamePasswordAuthenticationFilter(objectMapper, cacheManager);
         // 인증을 위임할 매니저 생성
         loginFilter.setAuthenticationManager(authenticationManager);
         // 인증 성공시 SecurityContext를 저장할 장소 지정
