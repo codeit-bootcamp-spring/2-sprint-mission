@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentCreateEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadSuccessEvent;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,14 @@ public class KafkaHandler {
         event.receiverId());
     sendToKafka("notification.async-failed", event, "비동기 실패 알림");
   }
-  
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @Async("kafkaTaskExecutor") //
+  public void handleMessageCreated(MessageCreatedEvent event) {
+    log.info("Spring Event -> Kafka: MessageCreatedEvent, channelId={}", event.channelId());
+    sendToKafka("message.new-message", event, "새 메시지 브로드캐스트");
+  }
+
   @EventListener
   @Async("kafkaTaskExecutor")
   public void handleBinaryContentUploadSuccess(BinaryContentUploadSuccessEvent event) {

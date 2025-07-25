@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -33,6 +34,7 @@ import org.slf4j.MDC;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +52,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentService binaryContentService;
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SimpMessagingTemplate messagingTemplate;
 
 
   @Transactional
@@ -80,8 +83,18 @@ public class BasicMessageService implements MessageService {
     publishNewMessageNotifications(message, channel, author);
 
     messageRepository.save(message);
+    MessageDto messageDto = messageMapper.toDto(message);
+
+    eventPublisher.publishEvent(
+        new MessageCreatedEvent(
+            messageCreateRequest.channelId(),
+            messageDto,
+            MDC.get(MDCLoggingInterceptor.REQUEST_ID)
+        )
+    );
+
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
-    return messageMapper.toDto(message);
+    return messageDto;
   }
 
   @Transactional(readOnly = true)
