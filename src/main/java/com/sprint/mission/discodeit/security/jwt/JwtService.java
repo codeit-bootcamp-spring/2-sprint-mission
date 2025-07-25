@@ -53,7 +53,7 @@ public class JwtService {
         String accessToken = Jwts.builder()
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusMillis(accessTokenExpiryMillis)))
-                .claim("userId", userDto.id())
+                .claim("userId", userDto.getId())
                 .claim("userDto", userDto)
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
@@ -61,12 +61,12 @@ public class JwtService {
         String refreshToken = Jwts.builder()
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plusMillis(refreshTokenExpiryMillis)))
-                .claim("userId", userDto.id())
+                .claim("userId", userDto.getId())
                 .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .compact();
 
         JwtSession jwtSession = JwtSession.builder()
-                .userId(userDto.id())
+                .userId(userDto.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .issuedAt(LocalDateTime.ofInstant(now, ZoneId.systemDefault()))
