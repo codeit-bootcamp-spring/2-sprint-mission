@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.data.NotificationMessage;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -36,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,7 +58,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
     private final ApplicationEventPublisher eventPublisher;
-    private final SseService sseService;
+    private final KafkaTemplate kafkaTemplate;
     private final BinaryContentMapper binaryContentMapper;
 
     @Transactional
@@ -105,8 +107,12 @@ public class BasicMessageService implements MessageService {
                                     .orElseThrow(() -> BinaryContentNotFoundException.withId(
                                         binaryContentId));
 
-                                sseService.notifyBinaryContentStatus(binaryContentId.toString(),
-                                    binaryContentMapper.toDto(binaryContent_));
+                                NotificationMessage message = new NotificationMessage(
+                                    "binaryContents.status", binaryContentId.toString(),
+                                    Map.of("binaryContent",
+                                        binaryContentMapper.toDto(binaryContent_)));
+                                kafkaTemplate.send("sse-events", binaryContentId.toString(),
+                                    message);
                             })
                             .exceptionally(ex -> {
                                 log.error("메시지에 포함된 첨부파일 업로드 실패: {}", binaryContentId, ex);
@@ -117,8 +123,11 @@ public class BasicMessageService implements MessageService {
                                         binaryContentId)
                                     .orElseThrow(() -> BinaryContentNotFoundException.withId(
                                         binaryContentId));
-                                sseService.notifyBinaryContentStatus(binaryContentId.toString(),
-                                    binaryContentMapper.toDto(binaryContent_));
+                                NotificationMessage message = new NotificationMessage(
+                                    "binaryContents.status", binaryContentId.toString(),
+                                    Map.of("binaryContent", binaryContent_));
+                                kafkaTemplate.send("sse-events", binaryContentId.toString(),
+                                    message);
                                 return null;
                             })
                         ;

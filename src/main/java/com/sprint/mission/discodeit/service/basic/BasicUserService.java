@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.NotificationMessage;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -20,12 +21,14 @@ import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,7 +49,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final SseService sseService;
+    private final KafkaTemplate kafkaTemplate;
     private final BinaryContentMapper binaryContentMapper;
 
     @Transactional
@@ -89,9 +92,13 @@ public class BasicUserService implements UserService {
                                             binaryContent.getId())
                                         .orElseThrow(() -> BinaryContentNotFoundException.withId(
                                             binaryContent.getId()));
-                                    sseService.notifyBinaryContentStatus(
-                                        binaryContent.getId().toString(),
-                                        binaryContentMapper.toDto(binaryContent_));
+
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
                                 })
                                 .exceptionally(throwable -> {
                                     log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
@@ -103,9 +110,12 @@ public class BasicUserService implements UserService {
                                             binaryContent.getId())
                                         .orElseThrow(() -> BinaryContentNotFoundException.withId(
                                             binaryContent.getId()));
-                                    sseService.notifyBinaryContentStatus(
-                                        binaryContent.getId().toString(),
-                                        binaryContentMapper.toDto(binaryContent_));
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
                                     return null;
                                 })
                             ;
@@ -199,9 +209,12 @@ public class BasicUserService implements UserService {
                                             binaryContent.getId())
                                         .orElseThrow(() -> BinaryContentNotFoundException.withId(
                                             binaryContent.getId()));
-                                    sseService.notifyBinaryContentStatus(
-                                        binaryContent.getId().toString(),
-                                        binaryContentMapper.toDto(binaryContent_));
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
                                 })
                                 .exceptionally(throwable -> {
                                     log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
@@ -212,9 +225,12 @@ public class BasicUserService implements UserService {
                                             binaryContent.getId())
                                         .orElseThrow(() -> BinaryContentNotFoundException.withId(
                                             binaryContent.getId()));
-                                    sseService.notifyBinaryContentStatus(
-                                        binaryContent.getId().toString(),
-                                        binaryContentMapper.toDto(binaryContent_));
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
                                     return null;
                                 })
                             ;
@@ -231,7 +247,14 @@ public class BasicUserService implements UserService {
         user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
         log.info("사용자 수정 완료: id={}", userId);
-        sseService.notifyUserRefresh(UUID.randomUUID().toString(), userId.toString());
+
+        NotificationMessage message = new NotificationMessage(
+            "users.refresh", UUID.randomUUID().toString(),
+            Map.of("userId",
+                userId));
+        kafkaTemplate.send("sse-events",
+            UUID.randomUUID().toString(), message);
+
         return userMapper.toDto(user);
     }
 

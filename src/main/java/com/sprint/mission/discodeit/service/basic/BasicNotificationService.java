@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.NotificationMessage;
 import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
 import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +35,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
     private final ApplicationEventPublisher eventPublisher;
-    private final SseService sseService;
+    private final KafkaTemplate kafkaTemplate;
 
     @PreAuthorize("principal.userDto.id == #receiverId")
     @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
@@ -79,7 +82,9 @@ public class BasicNotificationService implements NotificationService {
             targetId
         );
         notificationRepository.save(notification);
-        sseService.notifyNewNotification(receiverId.toString(),
+        NotificationMessage message = new NotificationMessage("notifications",
+            receiverId.toString(), Map.of("notification", notificationMapper.toDto(notification)));
+        kafkaTemplate.send("sse-events", receiverId.toString(),
             notificationMapper.toDto(notification));
 
         log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
