@@ -8,15 +8,14 @@ import com.sprint.mission.discodeit.entity.Notification;
 public class NotificationMapper {
 
     public NotificationDto toDto(Notification entity) {
-        return new NotificationDto(
-                entity.getId(),
-                entity.getCreatedAt(),
-                entity.getReceiver().getId(),
-                entity.getTitle(),
-                entity.getContent(),
-                entity.getType(),
-                entity.getTargetId()
-        );
+        NotificationDto dto = new NotificationDto();
+        dto.setId(entity.getId());
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setReceiverId(entity.getReceiver().getId());
+        dto.setTitle(entity.getTitle());
+        dto.setContent(entity.getContent());
+        dto.setType(entity.getType());
+        dto.setTargetId(entity.getTargetId());
+        return dto;
     }
-
 }
