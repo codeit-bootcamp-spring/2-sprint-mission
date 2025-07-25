@@ -115,7 +115,8 @@ public class SecurityConfig {
                     "/api/auth/login",
                     "/api/users", // 회원가입
                     "/api/auth/csrf-token",
-                    "/api/auth/logout"
+                    "/api/auth/logout",
+                    "/ws/**"
                 )
             )
             .authorizeHttpRequests(auth -> auth
@@ -124,7 +125,8 @@ public class SecurityConfig {
                     "/api/auth/csrf-token",
                     "/api/users",
                     "/api/auth/logout",
-                    "/actuator/**"
+                    "/actuator/**",
+                    "/ws/**"
                 ).permitAll()
 
                 // 사용자 권한 수정은 ROLE_ADMIN만
@@ -249,6 +251,8 @@ public class SecurityConfig {
     public UserActivityFilter userActivityFilter(UserActivityService userActivityService) {
         return new UserActivityFilter(userActivityService);
     }
+
+
 }
 
 
