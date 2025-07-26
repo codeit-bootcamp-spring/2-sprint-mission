@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.domain.user.service;
 
 import com.sprint.mission.discodeit.domain.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.domain.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.domain.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.storage.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.storage.repository.BinaryContentRepository;
@@ -14,7 +15,9 @@ import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.sse.SseEmitterService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -40,6 +43,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final SseEmitterService sseEmitterService;
 
   @Transactional
   @CacheEvict(value = "users", key = "'all'")
@@ -57,6 +61,10 @@ public class BasicUserService implements UserService {
     if (userRepository.existsByUsername(username)) {
       throw UserAlreadyExistsException.withUsername(username);
     }
+    String password = userCreateRequest.password();
+
+    String hashedPassword = passwordEncoder.encode(password);
+    User user = new User(username, email, hashedPassword, null);
 
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
@@ -75,11 +83,19 @@ public class BasicUserService implements UserService {
                         log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
                         binaryContentRepository.updateUploadStatus(binaryContent.getId(),
                             BinaryContentUploadStatus.SUCCESS);
+                        sseEmitterService.broadcast(
+                            "binaryContents.status",
+                            BinaryContentDto.from(binaryContent)
+                        );
                       })
                       .exceptionally(throwable -> {
                         log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
                         binaryContentRepository.updateUploadStatus(binaryContent.getId(),
                             BinaryContentUploadStatus.FAILED);
+                        sseEmitterService.broadcast(
+                            "binaryContents.status",
+                            BinaryContentDto.from(binaryContent)
+                        );
                         return null;
                       })
                   ;
@@ -89,13 +105,12 @@ public class BasicUserService implements UserService {
           return binaryContent;
         })
         .orElse(null);
-    String password = userCreateRequest.password();
-
-    String hashedPassword = passwordEncoder.encode(password);
-    User user = new User(username, email, hashedPassword, nullableProfile);
-
-    userRepository.save(user);
+    user.update(null, null, null, nullableProfile);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+    userRepository.save(user);
+
+    sseEmitterService.broadcast("users.refresh", Map.of("userId", user.getId()));
+
     return UserDto.from(user);
   }
 
@@ -168,11 +183,19 @@ public class BasicUserService implements UserService {
                         log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
                         binaryContentRepository.updateUploadStatus(binaryContent.getId(),
                             BinaryContentUploadStatus.SUCCESS);
+                        sseEmitterService.broadcast(
+                            "binaryContents.status",
+                            BinaryContentDto.from(binaryContent)
+                        );
                       })
                       .exceptionally(throwable -> {
                         log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
                         binaryContentRepository.updateUploadStatus(binaryContent.getId(),
                             BinaryContentUploadStatus.FAILED);
+                        sseEmitterService.broadcast(
+                            "binaryContents.status",
+                            BinaryContentDto.from(binaryContent)
+                        );
                         return null;
                       })
                   ;
@@ -187,6 +210,8 @@ public class BasicUserService implements UserService {
     String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
         .orElse(null);
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
+
+    sseEmitterService.broadcast("users.refresh", Map.of("userId", user.getId()));
 
     log.info("사용자 수정 완료: id={}", userId);
     return UserDto.from(user);
@@ -204,6 +229,9 @@ public class BasicUserService implements UserService {
     }
 
     userRepository.deleteById(userId);
+
+    sseEmitterService.broadcast("users.refresh", Map.of("userId", userId));
+
     log.info("사용자 삭제 완료: id={}", userId);
   }
 }
