@@ -21,6 +21,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UploadStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
@@ -54,6 +55,7 @@ public class BasicMessageService implements MessageService {
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
   private final UploadStatusService updateUploadStatus;
+  private final SseService sseService;
 
   @Transactional
   @Override
@@ -68,7 +70,7 @@ public class BasicMessageService implements MessageService {
     User author = userRepository.findById(authorId)
         .orElseThrow(() -> UserNotFoundException.withId(authorId));
 
-    Map<UUID, byte[]> files = new HashMap<>();
+    Map<BinaryContent, byte[]> files = new HashMap<>();
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();
@@ -78,7 +80,7 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          files.put(binaryContent.getId(), bytes);
+          files.put(binaryContent, bytes);
 
           return binaryContent;
         })
@@ -99,15 +101,17 @@ public class BasicMessageService implements MessageService {
         new TransactionSynchronization() {
           @Override
           public void afterCommit() {
-            files.forEach((id, bytes) ->
-                binaryContentStorage.putAsync(id, bytes)
-                    .thenAccept(res ->
-                        updateUploadStatus.updateUploadStatus(id,
-                            BinaryContentUploadStatus.SUCCESS)
-                    )
+            files.forEach((binaryContent, bytes) ->
+                binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                    .thenAccept(res -> {
+                      updateUploadStatus.updateUploadStatus(binaryContent.getId(),
+                          BinaryContentUploadStatus.SUCCESS);
+                      sseService.sendBinaryContent(authorId, binaryContent);
+                    })
                     .exceptionally(throwable -> {
-                      updateUploadStatus.updateUploadStatus(id,
+                      updateUploadStatus.updateUploadStatus(binaryContent.getId(),
                           BinaryContentUploadStatus.FAILED);
+                      sseService.sendBinaryContent(authorId, binaryContent);
                       return null;
                     })
             );

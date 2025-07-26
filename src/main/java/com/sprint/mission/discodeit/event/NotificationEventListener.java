@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.event;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -13,6 +15,8 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseService;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,6 +38,7 @@ public class NotificationEventListener {
   private final ChannelService channelService;
   private final NotificationService notificationService;
   private final ObjectMapper objectMapper;
+  private final SseService sseService;
 
   @Async
   @Retryable(
@@ -63,8 +68,14 @@ public class NotificationEventListener {
           : String.format("[비공개] %s", author);
       String content = messageDto.content();
 
-      notificationService.createAll(receivers, title, content, NotificationType.NEW_MESSAGE,
+      List<Notification> notifications = notificationService.createAll(receivers, title, content,
+          NotificationType.NEW_MESSAGE,
           channel.id());
+
+      for (Notification notification : notifications) {
+        NotificationDto notificationDto = NotificationDto.from(notification);
+        sseService.sendNotification(notification.getReceiverId(), notificationDto);
+      }
     } catch (Exception e) {
       log.error("메시지 생성 알림 이벤트 처리 중 오류 발생 :", e);
     }
@@ -88,7 +99,10 @@ public class NotificationEventListener {
       String title = String.format("[권한 변경] %s", userDto.username());
       String content = String.format("%s -> %s", event.previousRole(), userDto.role());
 
-      notificationService.create(receiver, title, content, NotificationType.ROLE_CHANGED, receiver);
+      NotificationDto notificationDto = notificationService.create(receiver, title, content,
+          NotificationType.ROLE_CHANGED, receiver);
+
+      sseService.sendNotification(receiver, notificationDto);
     } catch (Exception e) {
       log.error("사용자 권한 변경 알림 이벤트 처리 중 오류 발생 :", e);
     }
@@ -108,14 +122,18 @@ public class NotificationEventListener {
       DiscodeitUserDetails userDetails = (DiscodeitUserDetails) SecurityContextHolder.getContext()
           .getAuthentication().getDetails();
       UserDto userDto = userDetails.getUserDto();
+      UUID userId = userDto.id();
 
       log.debug("비동기 작업 실패 알림 이벤트 시작 - taskName : {}, userId : {}", asyncTaskFailure.getTaskName(),
-          userDto.id());
+          userId);
 
       String title = String.format("[비동기 작업 실패] %s", asyncTaskFailure.getTaskName());
       String content = String.format("failure reason: %s", asyncTaskFailure.getFailureReason());
 
-      notificationService.create(userDto.id(), title, content, NotificationType.ASYNC_FAILED, null);
+      NotificationDto notificationDto = notificationService.create(userId, title, content,
+          NotificationType.ASYNC_FAILED, null);
+
+      sseService.sendNotification(userId, notificationDto);
     } catch (Exception e) {
       log.error("비동기 작업 실패 알림 이벤트 처리 중 오류 발생 :", e);
     }

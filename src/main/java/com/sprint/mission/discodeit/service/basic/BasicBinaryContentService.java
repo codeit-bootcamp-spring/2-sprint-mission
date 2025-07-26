@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoun
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UploadStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -28,6 +29,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
   private final UploadStatusService uploadStatusService;
+  private final SseService sseService;
 
   @Transactional
   @Override
@@ -51,13 +53,15 @@ public class BasicBinaryContentService implements BinaryContentService {
           @Override
           public void afterCommit() {
             binaryContentStorage.putAsync(binaryContentId, bytes)
-                .thenAccept(res ->
-                    uploadStatusService.updateUploadStatus(binaryContentId,
-                        BinaryContentUploadStatus.SUCCESS)
-                )
+                .thenAccept(res -> {
+                  uploadStatusService.updateUploadStatus(binaryContentId,
+                      BinaryContentUploadStatus.SUCCESS);
+                  sseService.sendBinaryContent(binaryContent);
+                })
                 .exceptionally(throwable -> {
                   uploadStatusService.updateUploadStatus(binaryContentId,
                       BinaryContentUploadStatus.FAILED);
+                  sseService.sendBinaryContent(binaryContent);
                   return null;
                 });
           }
