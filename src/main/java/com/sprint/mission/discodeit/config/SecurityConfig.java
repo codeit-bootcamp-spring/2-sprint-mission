@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.security.jwt.JwtLoginSuccessHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtLogoutHandler;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.List;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -84,17 +83,6 @@ public class SecurityConfig {
     ;
 
     return http.build();
-  }
-
-  @Bean
-  public String debugFilterChain(SecurityFilterChain chain) {
-    log.debug("Debug Filter Chain...");
-    int filterSize = chain.getFilters().size();
-    IntStream.range(0, filterSize)
-        .forEach(idx -> {
-          log.debug("[{}/{}] {}", idx + 1, filterSize, chain.getFilters().get(idx));
-        });
-    return "debugFilterChain";
   }
 
   @Bean
