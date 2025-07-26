@@ -17,7 +17,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: discodeit-backend
+    deploy:
+      replicas: 3
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/discodeit
