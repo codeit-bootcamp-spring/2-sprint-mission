@@ -32,6 +32,7 @@ public class BasicNotificationService implements NotificationService {
                 .toList();
     }
 
+    @CacheEvict(value = "userNotifications", key = "#userId")
     @Transactional
     public void deleteNotification(UUID notificationId, UUID userId) {
         Notification notification = notificationRepository.findById(notificationId)
