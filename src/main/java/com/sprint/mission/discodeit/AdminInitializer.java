@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.security;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +17,6 @@ public class AdminInitializer implements ApplicationRunner {
   @Override
   public void run(ApplicationArguments args) {
     authService.initAdmin();
+    authService.testUser();
   }
 }

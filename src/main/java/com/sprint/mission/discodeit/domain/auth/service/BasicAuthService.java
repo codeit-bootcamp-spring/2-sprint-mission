@@ -52,6 +52,26 @@ public class BasicAuthService implements AuthService {
     return adminDto;
   }
 
+  @Transactional
+  @Override
+  public UserDto testUser() {
+    if (userRepository.existsByEmail("test123@test.com") || userRepository.existsByUsername(
+        "test")) {
+      log.warn("이미 유저가 존재합니다.");
+      return null;
+    }
+
+    String encodedPassword = passwordEncoder.encode("test");
+    User user = new User("test", "test123@test.com", encodedPassword, null);
+    user.updateRole(Role.USER);
+    userRepository.save(user);
+
+    UserDto userDto = UserDto.from(user);
+    log.info("유저가 초기화되었습니다. {}", userDto);
+    return userDto;
+
+  }
+
   @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   @Override

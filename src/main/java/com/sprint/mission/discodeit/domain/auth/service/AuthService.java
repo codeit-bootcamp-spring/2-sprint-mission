@@ -7,5 +7,7 @@ public interface AuthService {
 
   UserDto initAdmin();
 
+  UserDto testUser();
+
   UserDto updateRole(RoleUpdateRequest request);
 }
