@@ -66,6 +66,17 @@ public class SseEmitterService {
     });
   }
 
+  public void broadcast(String eventName, Object data) {
+    String eventId = "broadcast_" + eventName + "_" + System.currentTimeMillis();
+    log.info("SSE 브로드캐스트 시작: eventName={}", eventName);
+
+    emitters.values().stream()
+        .flatMap(List::stream) // 모든 Emitter 리스트를 하나의 스트림으로 평탄화
+        .forEach(emitter -> sendToEmitter(emitter, eventId, eventName, data));
+
+    log.info("SSE 브로드캐스트 완료: eventName={}", eventName);
+  }
+
   //15초마다 실행
   @Scheduled(fixedRate = 15000)
   public void sendPing() {
