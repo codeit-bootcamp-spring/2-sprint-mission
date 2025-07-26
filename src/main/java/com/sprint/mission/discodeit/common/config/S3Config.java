@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.util.s3.config;
+package com.sprint.mission.discodeit.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,7 +32,7 @@ public class S3Config {
   }
 
   @Bean
-  public S3Client S3Client() {
+  public S3Client s3Client() {
     return S3Client.builder()
         .region(Region.of(region))
         .credentialsProvider(credentialsProvider)
@@ -40,7 +40,7 @@ public class S3Config {
   }
 
   @Bean
-  public S3Presigner S3Presigner() {
+  public S3Presigner s3Presigner() {
     return S3Presigner.builder()
         .region(Region.of(region))
         .credentialsProvider(credentialsProvider)

@@ -4,11 +4,11 @@ import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
 import java.util.UUID;
 
-public class S3AsyncFailedNotificationEvent extends NotificationEvent {
+public class S3AsyncFailedEvent extends NotificationEvent {
 
   private static final String S3_ASYNC = "S3";
 
-  public S3AsyncFailedNotificationEvent(UUID receiverId, BinaryContent binaryContent) {
+  public S3AsyncFailedEvent(UUID receiverId, BinaryContent binaryContent) {
     super(
         receiverId,
         NotificationType.ASYNC_FAILED, null,

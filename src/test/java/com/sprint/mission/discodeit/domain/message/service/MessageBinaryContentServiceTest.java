@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.message.service.basic;
+package com.sprint.mission.discodeit.domain.message.service;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -7,19 +7,17 @@ import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.domain.message.service.basic.MessageBinaryContentService;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class MessageBinaryContentServiceTest extends IntegrationTestSupport {
@@ -30,8 +28,6 @@ class MessageBinaryContentServiceTest extends IntegrationTestSupport {
   private MessageBinaryContentService messageBinaryContentService;
 
   @MockitoBean
-  private ApplicationEventPublisher eventPublisher;
-  @MockitoBean
   private BinaryContentStorage binaryContentStorage;
 
   @BeforeEach
@@ -39,7 +35,7 @@ class MessageBinaryContentServiceTest extends IntegrationTestSupport {
     binaryContentRepository.deleteAllInBatch();
   }
 
-  @DisplayName("첨부파일들을 올리면 바이너리 스토리지에 저장합니다.")
+  @DisplayName("첨부파일들을 바이너리 스토리지에 업로드합니다.")
   @Test
   void createBinaryContents() {
     // given

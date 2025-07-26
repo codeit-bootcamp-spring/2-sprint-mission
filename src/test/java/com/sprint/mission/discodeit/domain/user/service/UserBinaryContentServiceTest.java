@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.user.service.basic;
+package com.sprint.mission.discodeit.domain.user.service;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
+import com.sprint.mission.discodeit.domain.user.service.basic.UserBinaryContentService;
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,7 @@ class UserBinaryContentServiceTest extends IntegrationTestSupport {
     binaryContentRepository.deleteAllInBatch();
   }
 
-  @DisplayName("바이너리 컨텐츠를 업로드하는데 성공하면 상태를 성공")
+  @DisplayName("바이너리 컨텐츠를 업로드하는데 성공하면, 컨텐츠 상태를 성공으로 기록합니다.")
   @Test
   void createBinaryContent_Success() {
     // given
@@ -52,7 +53,7 @@ class UserBinaryContentServiceTest extends IntegrationTestSupport {
         .isEqualTo(BinaryContentUploadStatus.SUCCESS);
   }
 
-  @DisplayName("바이너리 컨텐츠를 업로드하는데 실패하면 실패")
+  @DisplayName("바이너리 컨텐츠를 업로드하는데 실패하면, 컨텐츠 상태를 실패로 기록합니다.")
   @Test
   void createBinaryContent_Failed() {
     // given
