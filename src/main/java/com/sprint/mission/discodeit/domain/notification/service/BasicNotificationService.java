@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.domain.notification.entity.Notification;
 import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
 import com.sprint.mission.discodeit.domain.notification.event.MultipleNotificationCreatedEvent;
 import com.sprint.mission.discodeit.domain.notification.repository.NotificationRepository;
+import com.sprint.mission.discodeit.sse.SseEmitterService;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,6 +26,8 @@ public class BasicNotificationService implements NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final ApplicationEventPublisher eventPublisher;
+
+  private final SseEmitterService sseEmitterService;
 
   @PreAuthorize("principal.userDto.id == #receiverId")
   @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
@@ -72,6 +75,8 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.save(notification);
     log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
         notification.getId(), receiverId, targetId);
+
+    sseEmitterService.sendNotification(receiverId, NotificationDto.from(notification));
   }
 
   @Transactional
@@ -91,6 +96,11 @@ public class BasicNotificationService implements NotificationService {
 
     // 이벤트 발행
     eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));
+
+    notifications.forEach(notification -> {
+      sseEmitterService.sendNotification(notification.getReceiverId(),
+          NotificationDto.from(notification));
+    });
 
     log.info("새 알림 생성 완료: receiverIds={}, targetId={}",
         receiverIds, targetId);

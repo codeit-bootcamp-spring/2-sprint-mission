@@ -51,6 +51,7 @@ public class SecurityConfig {
     http
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/api/auth/**", "/error").permitAll()
             .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
             .anyRequest().hasRole(Role.USER.name())
         )
