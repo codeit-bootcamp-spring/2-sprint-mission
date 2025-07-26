@@ -25,7 +25,7 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationMapper notificationMapper;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "userChannels", key = "#userId")
+    @Cacheable(value = "userNotifications", key = "#userId")
     public List<NotificationDto> getNotificationsForUser(UUID userId){
         return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(userId).stream()
                 .map(notificationMapper::toDto)
