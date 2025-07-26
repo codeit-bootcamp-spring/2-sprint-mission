@@ -16,8 +16,7 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
-import com.sprint.mission.discodeit.common.event.event.NewMessageNotificationEvent;
-import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.message.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
@@ -37,8 +36,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -50,8 +47,6 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final MessageBinaryContentService messageBinaryContentService;
   private final MessageResultMapper messageResultMapper;
-  private final ReadStatusRepository readStatusRepository;
-
   private final ApplicationEventPublisher eventPublisher;
 
   @CacheEvict(value = NOTIFICATION_CACHE_NAME, key = "#messageCreateRequest.authorId")
@@ -72,10 +67,10 @@ public class BasicMessageService implements MessageService {
 
     List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(
         files);
-
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
-    publishMessageEvent(savedMessage);
+
+    eventPublisher.publishEvent(MessageCreatedEvent.from(savedMessage));
 
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
@@ -125,28 +120,8 @@ public class BasicMessageService implements MessageService {
     messageRepository.deleteById(messageId);
   }
 
-  private void publishMessageEvent(Message message) {
-    if (isNotificationNotEnabled(message)) {
-      return;
-    }
-    NewMessageNotificationEvent newMessageNotificationEvent = new NewMessageNotificationEvent(
-        message);
-    eventPublisher.publishEvent(newMessageNotificationEvent);
-  }
-
-  // 그럼 이 로직도 여기 있으면 안됨, 알림 쓸지 안쓸지 모르잖아
-  private boolean isNotificationNotEnabled(Message message) {
-    return !readStatusRepository.findByChannelIdAndUserId(
-            message.getChannel().getId(),
-            message.getUser().getId()
-        )
-        .map(ReadStatus::getNotificationEnabled)
-        .orElse(false);
-  }
-
   private Pageable createPageable(ChannelMessagePageRequest request) {
     Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-
     return PageRequest.of(request.pageNumber(), request.pageSize(), sort);
   }
 

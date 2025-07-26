@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.domain.binarycontent.event.handler;
 
-import com.sprint.mission.discodeit.common.event.event.S3AsyncFailedEvent;
+import com.sprint.mission.discodeit.common.failure.event.AsyncJobFailedEvent;
+import com.sprint.mission.discodeit.common.failure.event.AsyncJobType;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.event.BinaryContentCreatedEvent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,11 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.PayloadApplicationEvent;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
-
 
 @Slf4j
 @Component
@@ -39,8 +36,7 @@ public class BinaryContentEventHandler {
       PayloadApplicationEvent<List<BinaryContentCreatedEvent>> binaryContentsCreatedEvent
   ) {
     Map<UUID, BinaryContent> binaryContents = getBinaryContents(
-        binaryContentsCreatedEvent.getPayload()
-    );
+        binaryContentsCreatedEvent.getPayload());
 
     List<CompletableFuture<UUID>> uploadResults = new ArrayList<>();
     for (BinaryContentCreatedEvent binaryContentCreatedEvent : binaryContentsCreatedEvent.getPayload()) {
@@ -70,19 +66,18 @@ public class BinaryContentEventHandler {
     uploadResult.thenRun(() -> binaryContentRepository.save(binaryContent));
   }
 
-  private CompletableFuture<UUID> getBinaryStorageUploadResult(UUID binaryContent,
-      BinaryContentCreatedEvent binaryContentCreatedEvent, BinaryContent binaryContent1
+  private CompletableFuture<UUID> getBinaryStorageUploadResult(UUID binaryContentId,
+      BinaryContentCreatedEvent binaryContentCreatedEvent, BinaryContent binaryContent
   ) {
-    return binaryContentStorage.put(binaryContent,
-            binaryContentCreatedEvent.bytes())
-        .whenComplete((result, exception) -> {
-          if (exception != null) {
-            binaryContent1.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+    return binaryContentStorage.put(binaryContentId, binaryContentCreatedEvent.bytes())
+        .whenComplete((result, throwable) -> {
+          if (throwable != null) {
+            binaryContent.updateUploadStatus(BinaryContentUploadStatus.FAILED);
+            eventPublisher.publishEvent(
+                AsyncJobFailedEvent.of(AsyncJobType.S3_ASYNC_FAILED, throwable));
+            return;
           }
-          if (exception == null) {
-            binaryContent1.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
-          }
-          publishS3UploadEvent(binaryContent1);
+          binaryContent.updateUploadStatus(BinaryContentUploadStatus.SUCCESS);
         });
   }
 
@@ -92,21 +87,13 @@ public class BinaryContentEventHandler {
     List<UUID> binaryContentIds = binaryContentsCreatedEvent.stream()
         .map(BinaryContentCreatedEvent::binaryContentId)
         .toList();
+
     return binaryContentRepository.findAllById(binaryContentIds)
         .stream()
         .collect(Collectors.toMap(
             BinaryContent::getId,
             Function.identity()
         ));
-  }
-
-  private void publishS3UploadEvent(BinaryContent binaryContent) {
-    SecurityContext context = SecurityContextHolder.getContext();
-    UserResult userResult = (UserResult) context.getAuthentication()
-        .getPrincipal();
-
-    S3AsyncFailedEvent s3AsyncFailedEvent = new S3AsyncFailedEvent(userResult.id(), binaryContent);
-    eventPublisher.publishEvent(s3AsyncFailedEvent);
   }
 
 }

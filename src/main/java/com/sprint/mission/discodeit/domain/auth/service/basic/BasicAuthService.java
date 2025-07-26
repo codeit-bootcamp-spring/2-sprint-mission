@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.domain.auth.service.basic;
 
 import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
 import com.sprint.mission.discodeit.domain.auth.service.AuthService;
-import com.sprint.mission.discodeit.common.event.event.RoleChangeNotificationEvent;
+import com.sprint.mission.discodeit.domain.auth.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
@@ -54,20 +54,15 @@ public class BasicAuthService implements AuthService {
   public UserResult updateRole(RoleUpdateRequest roleUpdateRequest) {
     User user = userRepository.findById(roleUpdateRequest.userId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
+    Role previousRole = user.getRole();
+
     user.updateRole(roleUpdateRequest.newRole());
     User updatedUser = userRepository.save(user);
 
-    publishRoleChangeEvent(user, updatedUser);
-
     jwtSessionRepository.deleteById(updatedUser.getId());
-    return UserResult.from(updatedUser, false);
-  }
+    eventPublisher.publishEvent(UserRoleChangedEvent.of(previousRole, updatedUser));
 
-  private void publishRoleChangeEvent(User notUpdatedUser, User updatedUser) {
-    RoleChangeNotificationEvent roleChangeNotificationEvent = new RoleChangeNotificationEvent(
-        notUpdatedUser, updatedUser
-    );
-    eventPublisher.publishEvent(roleChangeNotificationEvent);
+    return UserResult.from(updatedUser, false);
   }
 
 }
