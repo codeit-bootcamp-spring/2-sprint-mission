@@ -15,9 +15,11 @@ import com.sprint.mission.discodeit.domain.read.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.read.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.dto.UserDto;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.sse.SseEmitterService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,8 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ApplicationEventPublisher eventPublisher;
+
+  private final SseEmitterService sseEmitterService;
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
@@ -95,8 +99,11 @@ public class BasicChannelService implements ChannelService {
 
     return channelRepository.findAllByTypeOrIdIn(ChannelType.PUBLIC, mySubscribedChannelIds)
         .stream()
-        .map(channel -> ChannelDto.of(channel, resolveLastMessageAt(channel),
-            resolveParticipants(channel)))
+        .map(channel -> {
+          sseEmitterService.broadcast("channels.refresh", Map.of("channelId", channel.getId()));
+          return ChannelDto.of(channel, resolveLastMessageAt(channel),
+              resolveParticipants(channel));
+        })
         .toList();
   }
 
@@ -115,6 +122,7 @@ public class BasicChannelService implements ChannelService {
     }
     channel.update(newName, newDescription);
     log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
+
     return ChannelDto.of(channel, resolveLastMessageAt(channel), resolveParticipants(channel));
   }
 
