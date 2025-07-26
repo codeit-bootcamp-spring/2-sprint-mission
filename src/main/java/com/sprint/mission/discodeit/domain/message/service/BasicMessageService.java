@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.domain.message.entity.Message;
 import com.sprint.mission.discodeit.domain.message.event.NewMessageEvent;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.storage.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.domain.storage.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.domain.storage.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.storage.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.storage.repository.BinaryContentRepository;
@@ -19,6 +20,7 @@ import com.sprint.mission.discodeit.domain.storage.repository.BinaryContentStora
 import com.sprint.mission.discodeit.domain.user.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
+import com.sprint.mission.discodeit.sse.SseEmitterService;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +49,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseEmitterService sseEmitterService;
 
   @Transactional
   @Override
@@ -88,6 +91,8 @@ public class BasicMessageService implements MessageService {
                     log.debug("메시지에 포함된 첨부파일 업로드 성공: {}", binaryContentId);
                     binaryContentRepository.updateUploadStatus(binaryContentId,
                         BinaryContentUploadStatus.SUCCESS);
+                    sseEmitterService.broadcast("binaryContents.status",
+                        BinaryContentDto.from(binaryContent));
                   })
                   .exceptionally(ex -> {
                     log.error("메시지에 포함된 첨부파일 업로드 실패: {}", binaryContentId, ex);
