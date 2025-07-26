@@ -70,6 +70,9 @@ dependencies {
     //JPA 설치
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+    //웹 소캣
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     //querl dsl
     implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
     annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
