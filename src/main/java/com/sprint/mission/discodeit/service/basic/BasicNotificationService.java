@@ -1,18 +1,22 @@
-// 1. BasicNotificationService.java (최종 버전)
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.sse.SseNotificationEvent;
 import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.exception.notification.NotificationOwnershipException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,7 @@ public class BasicNotificationService implements NotificationService {
 
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Transactional(readOnly = true)
   @Cacheable(value = "notifications", key = "#receiverId")
@@ -82,6 +87,15 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.save(notification);
     log.info("새 메시지 알림 생성 완료: receiverId={}, notificationId={} (캐시 무효화)",
         receiverId, notification.getId());
+
+    NotificationDto notificationDto = notificationMapper.toDto(notification);
+    String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
+    eventPublisher.publishEvent(new SseNotificationEvent(
+        receiverId,
+        notificationDto,
+        Instant.now(),
+        requestId != null ? requestId : UUID.randomUUID().toString()
+    ));
   }
 
   @Transactional
@@ -104,6 +118,15 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.save(notification);
     log.info("권한 변경 알림 생성 완료: receiverId={}, notificationId={} (캐시 무효화)",
         receiverId, notification.getId());
+
+    NotificationDto notificationDto = notificationMapper.toDto(notification);
+    String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
+    eventPublisher.publishEvent(new SseNotificationEvent(
+        receiverId,
+        notificationDto,
+        Instant.now(),
+        requestId != null ? requestId : UUID.randomUUID().toString()
+    ));
   }
 
   @Transactional
@@ -126,5 +149,14 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.save(notification);
     log.info("비동기 작업 실패 알림 생성 완료: receiverId={}, notificationId={} (캐시 무효화)",
         receiverId, notification.getId());
+
+    NotificationDto notificationDto = notificationMapper.toDto(notification);
+    String requestId = MDC.get(MDCLoggingInterceptor.REQUEST_ID);
+    eventPublisher.publishEvent(new SseNotificationEvent(
+        receiverId,
+        notificationDto,
+        Instant.now(),
+        requestId != null ? requestId : UUID.randomUUID().toString()
+    ));
   }
 }

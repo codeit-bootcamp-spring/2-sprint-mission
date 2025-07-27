@@ -69,7 +69,7 @@ public class BasicBinaryContentService implements BinaryContentService {
           if (ex == null) {
             log.info("업로드 성공: binaryContentId={}", result);
             eventPublisher.publishEvent(
-                new BinaryContentUploadSuccessEvent(result, requestId)
+                new BinaryContentUploadSuccessEvent(result, requestId, currentUserId)
             );
           } else {
             log.error("업로드 실패: binaryContentId={}", binaryContent.getId(), ex);

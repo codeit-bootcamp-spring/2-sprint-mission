@@ -2,15 +2,19 @@ package com.sprint.mission.discodeit.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.event.AsyncFailedNotificationEvent;
 import com.sprint.mission.discodeit.event.AsyncTaskFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentCreateEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadFailureEvent;
 import com.sprint.mission.discodeit.event.BinaryContentUploadSuccessEvent;
+import com.sprint.mission.discodeit.event.sse.SseBinaryContentStatusEvent;
 import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +31,7 @@ public class BinaryContentUploadEventListener {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
   private final ApplicationEventPublisher eventPublisher;
   private final ObjectMapper objectMapper;
 
@@ -44,6 +49,13 @@ public class BinaryContentUploadEventListener {
 
       binaryContent.markAsSuccess();
       binaryContentRepository.save(binaryContent);
+
+      BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
+      eventPublisher.publishEvent(new SseBinaryContentStatusEvent(
+          event.userId(),
+          binaryContentDto,
+          Instant.now()
+      ));
 
       log.info("업로드 성공 상태 업데이트 완료: binaryContentId={}, status=SUCCESS", event.binaryContentId());
     } catch (Exception e) {
@@ -65,6 +77,13 @@ public class BinaryContentUploadEventListener {
 
       binaryContent.markAsFailed();
       binaryContentRepository.save(binaryContent);
+
+      BinaryContentDto binaryContentDto = binaryContentMapper.toDto(binaryContent);
+      eventPublisher.publishEvent(new SseBinaryContentStatusEvent(
+          event.userId(),
+          binaryContentDto,
+          Instant.now()
+      ));
 
       eventPublisher.publishEvent(
           new AsyncTaskFailureEvent(

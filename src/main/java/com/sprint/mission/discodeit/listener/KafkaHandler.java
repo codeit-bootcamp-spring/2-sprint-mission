@@ -9,6 +9,10 @@ import com.sprint.mission.discodeit.event.BinaryContentUploadSuccessEvent;
 import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.event.NewMessageNotificationEvent;
 import com.sprint.mission.discodeit.event.RoleChangedNotificationEvent;
+import com.sprint.mission.discodeit.event.sse.SseBinaryContentStatusEvent;
+import com.sprint.mission.discodeit.event.sse.SseChannelRefreshEvent;
+import com.sprint.mission.discodeit.event.sse.SseNotificationEvent;
+import com.sprint.mission.discodeit.event.sse.SseUserRefreshEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -81,6 +85,36 @@ public class KafkaHandler {
     sendToKafka("async-task.failure", event, "비동기 작업 실패");
   }
 
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @Async("kafkaTaskExecutor")
+  public void handleSseNotification(SseNotificationEvent event) {
+    log.info("Spring Event -> Kafka: SseNotificationEvent, receiverId={}", event.receiverId());
+    sendToKafka("sse.notification", event, "SSE 알림");
+  }
+
+  @EventListener
+  @Async("kafkaTaskExecutor")
+  public void handleSseBinaryContentStatus(SseBinaryContentStatusEvent event) {
+    log.info("Spring Event -> Kafka: SseBinaryContentStatusEvent, receiverId={}",
+        event.receiverId());
+    sendToKafka("sse.binary-content-status", event, "SSE 파일 상태");
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  @Async("kafkaTaskExecutor")
+  public void handleSseChannelRefresh(SseChannelRefreshEvent event) {
+    log.info("Spring Event -> Kafka: SseChannelRefreshEvent, receiverId={}, channelId={}",
+        event.receiverId(), event.channelId());
+    sendToKafka("sse.channel-refresh", event, "SSE 채널 갱신");
+  }
+
+  @EventListener
+  @Async("kafkaTaskExecutor")
+  public void handleSseUserRefresh(SseUserRefreshEvent event) {
+    log.info("Spring Event -> Kafka: SseUserRefreshEvent, receiverId={}, targetUserId={}",
+        event.receiverId(), event.targetUserId());
+    sendToKafka("sse.user-refresh", event, "SSE 사용자 갱신");
+  }
 
   private void sendToKafka(String topic, Object event, String eventType) {
     try {

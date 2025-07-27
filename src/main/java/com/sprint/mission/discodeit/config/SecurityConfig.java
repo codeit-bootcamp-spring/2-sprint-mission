@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtService;
 import java.util.List;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -45,7 +46,8 @@ public class SecurityConfig {
       HttpSecurity http,
       ObjectMapper objectMapper,
       DaoAuthenticationProvider daoAuthenticationProvider,
-      JwtService jwtService
+      JwtService jwtService,
+      ApplicationEventPublisher eventPublisher
   )
       throws Exception {
     http
@@ -65,13 +67,14 @@ public class SecurityConfig {
             logout
                 .logoutRequestMatcher(SecurityMatchers.LOGOUT)
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .addLogoutHandler(new JwtLogoutHandler(jwtService))
+                .addLogoutHandler(new JwtLogoutHandler(jwtService, eventPublisher))
         )
         .with(
             new JsonUsernamePasswordAuthenticationFilter.Configurer(objectMapper),
             configurer ->
                 configurer
-                    .successHandler(new JwtLoginSuccessHandler(objectMapper, jwtService))
+                    .successHandler(
+                        new JwtLoginSuccessHandler(objectMapper, jwtService, eventPublisher))
                     .failureHandler(new CustomLoginFailureHandler(objectMapper))
         )
         .sessionManagement(session ->

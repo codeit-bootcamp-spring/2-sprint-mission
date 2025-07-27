@@ -4,7 +4,8 @@ import java.util.UUID;
 
 public record BinaryContentUploadSuccessEvent(
     UUID binaryContentId,
-    String requestId
+    String requestId,
+    UUID userId
 ) {
 
 }
