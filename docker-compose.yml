@@ -1,14 +1,29 @@
 version: '3.8'
 
 services:
-  app:
+  # Reverse Proxy (Nginx)
+  reverse-proxy:
+    image: nginx:1.25-alpine
+    container_name: reverse-proxy
+    ports:
+      - "3000:80"  # 외부에서는 3000번 포트로만 접근
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # 프론트엔드 빌드 결과물이 위치한 경로를 마운트하세요.
+      # 예: ./frontend/build:/usr/share/nginx/html:ro
+      - ./frontend/build:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+    networks:
+      - discodeit-network
+
+  # Backend (Spring Boot)
+  backend:
     image: discodeit:local
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: discodeit
-    ports:
-      - "8081:80"
+    container_name: backend
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/discodeit
@@ -34,34 +49,36 @@ services:
       - REDIS_PORT=${REDIS_PORT}
     depends_on:
       - db
+      - broker
+      - redis
     volumes:
       - binary-content-storage:/app/.discodeit/storage
     networks:
       - discodeit-network
+
+  # DB (PostgreSQL)
   db:
     image: postgres:16-alpine
-    container_name: discodeit-db
+    container_name: db
     environment:
       - POSTGRES_DB=discodeit
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
     networks:
       - discodeit-network
+
+  # Message Broker (Kafka)
   broker:
     image: apache/kafka:4.0.0
     hostname: broker
     container_name: broker
-    ports:
-      - 9092:9092
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
@@ -69,23 +86,24 @@ services:
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_NODE_ID: 1
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker:29093
-      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_LISTENERS: PLAINTEXT://broker:29092,CONTROLLER://broker:29093
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
     networks:
       - discodeit-network
+
+  # Memory DB (Redis)
   redis:
     image: redis:7.2-alpine
     container_name: redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
     networks:
       - discodeit-network
+
 volumes:
   postgres-data:
   binary-content-storage:
@@ -94,3 +112,4 @@ volumes:
 networks:
   discodeit-network:
     driver: bridge
+

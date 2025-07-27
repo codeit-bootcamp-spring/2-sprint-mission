@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +54,9 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SimpMessagingTemplate messagingTemplate;
+  private final SseService sseService;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Transactional
   @Override
@@ -93,11 +98,23 @@ public class BasicMessageService implements MessageService {
                     log.debug("메시지에 포함된 첨부파일 업로드 성공: {}", binaryContentId);
                     binaryContentRepository.updateUploadStatus(binaryContentId,
                         BinaryContentUploadStatus.SUCCESS);
+
+                    // 업로드 성공 SSE 이벤트 전송
+                    binaryContentRepository.findById(binaryContentId).ifPresent(content ->
+                        sseService.sendEventToUser(authorId, "binaryContents.status",
+                            binaryContentMapper.toDto(content))
+                    );
                   })
                   .exceptionally(ex -> {
                     log.error("메시지에 포함된 첨부파일 업로드 실패: {}", binaryContentId, ex);
                     binaryContentRepository.updateUploadStatus(binaryContentId,
                         BinaryContentUploadStatus.FAILED);
+
+                    // 업로드 실패 SSE 이벤트 전송
+                    binaryContentRepository.findById(binaryContentId).ifPresent(content ->
+                        sseService.sendEventToUser(authorId, "binaryContents.status",
+                            binaryContentMapper.toDto(content))
+                    );
                     return null;
                   })
               ;
@@ -170,5 +187,13 @@ public class BasicMessageService implements MessageService {
     }
     messageRepository.deleteById(messageId);
     log.info("메시지 삭제 완료: id={}", messageId);
+  }
+
+  @Transactional
+  @Override
+  public void broadcastMessage(MessageDto createdMessage, UUID channelId) {
+    String destination = "/sub/channels." + channelId + ".messages";
+    messagingTemplate.convertAndSend(destination, createdMessage);
+    log.info("메시지 브로드캐스트: destination={}, messageId={}", destination, createdMessage.id());
   }
 }

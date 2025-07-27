@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -43,6 +44,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final SseService sseService;
 
   @Transactional
   @CacheEvict(value = "users", key = "'all'")
@@ -99,6 +101,10 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+
+    // 모든 사용자에게 사용자 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("users.refresh", Map.of("userId", user.getId()));
+
     return userMapper.toDto(user);
   }
 
@@ -190,8 +196,10 @@ public class BasicUserService implements UserService {
     String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
         .orElse(null);
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
-
     log.info("사용자 수정 완료: id={}", userId);
+
+    sseService.broadcastEvent("users.refresh", Map.of("userId", userId));
+
     return userMapper.toDto(user);
   }
 
@@ -208,5 +216,7 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+
+    sseService.broadcastEvent("users.refresh", Map.of("usersId", userId));
   }
 }

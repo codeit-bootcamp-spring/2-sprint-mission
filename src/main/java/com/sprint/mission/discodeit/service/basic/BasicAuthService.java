@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,7 @@ public class BasicAuthService implements AuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @Transactional
   @Override
@@ -65,14 +67,17 @@ public class BasicAuthService implements AuthService {
     UUID userId = request.userId();
     User user = userRepository.findById(userId)
         .orElseThrow(() -> UserNotFoundException.withId(userId));
-    
+
     Role oldRole = user.getRole();
     user.updateRole(request.newRole());
-    
+
     // 권한이 변경된 경우에만 알림 발행
     if (!oldRole.equals(request.newRole())) {
       eventPublisher.publishEvent(new RoleChangedEvent(userId, oldRole, request.newRole()));
     }
+
+    // 모든 사용자에게 사용자 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("users.fresh", Map.of("userId", userId));
 
     jwtService.invalidateJwtSession(user.getId());
     return userMapper.toDto(user);

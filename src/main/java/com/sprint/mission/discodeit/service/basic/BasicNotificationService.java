@@ -1,27 +1,27 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.ApplicationEventPublisher;
-
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.entity.Notification;
 import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
 import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
-
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,6 +31,7 @@ public class BasicNotificationService implements NotificationService {
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @PreAuthorize("principal.userDto.id == #receiverId")
   @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
@@ -66,7 +67,7 @@ public class BasicNotificationService implements NotificationService {
   @Override
   public void create(UUID receiverId, String title, String content,
       NotificationType notificationType, UUID targetId) {
-    log.debug("새 알림 생성 시작: receiverId={}, channelId={}", receiverId);
+    log.debug("새 알림 생성 시작: receiverId={}", receiverId);
 
     Notification notification = new Notification(
         receiverId,
@@ -78,6 +79,9 @@ public class BasicNotificationService implements NotificationService {
     notificationRepository.save(notification);
     log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
         notification.getId(), receiverId, targetId);
+
+    // notification 저장 후 사용자에게 실시간 SSE 알림 전송
+    sseService.sendEventToUser(receiverId, "notifications", notificationMapper.toDto(notification));
   }
 
   @Transactional
@@ -94,6 +98,12 @@ public class BasicNotificationService implements NotificationService {
             targetId
         )).toList();
     notificationRepository.saveAll(notifications);
+
+    // 저장된 각 알림을 해당 사용자에게 SSE로 전송
+    notifications.forEach(notification -> {
+      sseService.sendEventToUser(notification.getReceiverId(), "notifications",
+          notificationMapper.toDto(notification));
+    });
 
     // 이벤트 발행
     eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));

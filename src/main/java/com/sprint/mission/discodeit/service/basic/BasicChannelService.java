@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
@@ -52,6 +54,10 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.save(channel);
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+
+    // 모든 사용자에게 채널 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("channels.refresh", Map.of("channelId", channel.getId()));
+
     return channelMapper.toDto(channel);
   }
 
@@ -66,10 +72,16 @@ public class BasicChannelService implements ChannelService {
         .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
     readStatusRepository.saveAll(readStatuses);
-
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+
+    request.participantIds().forEach(participantId ->
+        sseService.sendEventToUser(participantId, "channels.refresh",
+            Map.of("channelId", channel.getId()))
+    );
+
     ChannelDto channelDto = channelMapper.toDto(channel);
-    eventPublisher.publishEvent(new PrivateChannelCreatedEvent(channelDto, request.participantIds()));
+    eventPublisher.publishEvent(
+        new PrivateChannelCreatedEvent(channelDto, request.participantIds()));
     return channelDto;
   }
 
@@ -111,6 +123,10 @@ public class BasicChannelService implements ChannelService {
     }
     channel.update(newName, newDescription);
     log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
+
+    // 모든 사용자에게 채널 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("channels.refresh", Map.of("channelId", channelId));
+
     return channelMapper.toDto(channel);
   }
 
@@ -129,5 +145,8 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.deleteById(channelId);
     log.info("채널 삭제 완료: id={}", channelId);
+
+    // 모든 사용자에게 채널 목록 갱신 입엔트 전송
+    sseService.broadcastEvent("channels.refresh", Map.of("channelId", channelId));
   }
 }
