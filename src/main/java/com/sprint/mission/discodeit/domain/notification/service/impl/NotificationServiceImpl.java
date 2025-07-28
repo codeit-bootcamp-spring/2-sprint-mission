@@ -26,12 +26,6 @@ public class NotificationServiceImpl implements NotificationService {
   @Transactional(readOnly = true)
   @Override
   public List<NotificationResult> getAllByUserId(UUID userId) {
-    try {
-      Thread.sleep(3000);
-    } catch (InterruptedException ex) {
-
-    }
-
     List<Notification> notifications = notificationRepository.findAllByReceiverId(userId);
     return NotificationResult.from(notifications);
   }
