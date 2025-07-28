@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.security.filter;
 
+import static com.sprint.mission.discodeit.security.config.SecurityConstant.REFRESH_TOKEN;
+
 import com.sprint.mission.discodeit.security.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @RequiredArgsConstructor
-public class TokenLogoutHandler implements LogoutHandler {
+public class JwtTokenLogoutHandler implements LogoutHandler {
 
   private final JwtService jwtService;
 
@@ -29,7 +31,7 @@ public class TokenLogoutHandler implements LogoutHandler {
     }
 
     for (Cookie cookie : request.getCookies()) {
-      if ("refresh_token".equals(cookie.getName())) {
+      if (REFRESH_TOKEN.equals(cookie.getName())) {
         return cookie.getValue();
       }
     }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.auth.event;
+package com.sprint.mission.discodeit.security.auth.event;
 
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;

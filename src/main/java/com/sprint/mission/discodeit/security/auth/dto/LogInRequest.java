@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.auth.dto;
+package com.sprint.mission.discodeit.security.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.testpratice.security;
 
 import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
-import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
-import com.sprint.mission.discodeit.domain.auth.service.AuthService;
+import com.sprint.mission.discodeit.security.auth.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.security.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.entity.Role;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;

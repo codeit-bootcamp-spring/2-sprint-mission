@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.auth.exception;
+package com.sprint.mission.discodeit.security.auth.exception;
 
 import com.sprint.mission.discodeit.common.exception.DiscodeitException;
 import com.sprint.mission.discodeit.common.exception.ErrorCode;

@@ -28,8 +28,8 @@ public class AsyncConfig {
   @Bean("notificationExecutor")
   public Executor notificationExecutor(TaskDecorator taskDecorator) {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(1);
-    executor.setMaxPoolSize(3);
+    executor.setCorePoolSize(3);
+    executor.setMaxPoolSize(5);
     executor.setThreadNamePrefix("Notification-Thread-");
     executor.setTaskDecorator(taskDecorator);
     executor.initialize();

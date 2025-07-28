@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.channel.service.basic;
 
-import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.CHANNEL_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.cache.CaffeineCacheConfig.CHANNEL_CACHE_NAME;
 
 import com.sprint.mission.discodeit.domain.channel.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelCreateRequest;

@@ -52,7 +52,7 @@ public class BinaryContentController {
     return ResponseEntity.ok().body(binaryContentResult);
   }
 
-  @GetMapping("{binaryContentId}/download")
+  @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable(value = "binaryContentId") UUID binaryContentId) {
     return binaryContentStorage.download(binaryContentId);
   }

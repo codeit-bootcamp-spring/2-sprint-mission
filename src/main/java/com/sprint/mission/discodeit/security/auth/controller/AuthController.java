@@ -1,7 +1,9 @@
-package com.sprint.mission.discodeit.domain.auth.controller;
+package com.sprint.mission.discodeit.security.auth.controller;
 
-import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
-import com.sprint.mission.discodeit.domain.auth.service.AuthService;
+import static com.sprint.mission.discodeit.security.config.SecurityConstant.REFRESH_TOKEN;
+
+import com.sprint.mission.discodeit.security.auth.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.security.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.JwtService;
@@ -59,7 +61,7 @@ public class AuthController {
     String refreshToken = extractRefreshTokenFromCookie(request);
     JwtSession jwtSession = jwtService.refreshSession(refreshToken);
 
-    Cookie newRefreshCookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
+    Cookie newRefreshCookie = new Cookie(REFRESH_TOKEN, jwtSession.getRefreshToken());
     response.addCookie(newRefreshCookie);
 
     return ResponseEntity.ok(jwtSession.getAccessToken());
@@ -71,7 +73,7 @@ public class AuthController {
     }
 
     for (Cookie cookie : request.getCookies()) {
-      if ("refresh_token".equals(cookie.getName())) {
+      if (REFRESH_TOKEN.equals(cookie.getName())) {
         return cookie.getValue();
       }
     }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.config;
+package com.sprint.mission.discodeit.common.config.cache;
 
 import java.util.List;
 import org.springframework.cache.CacheManager;

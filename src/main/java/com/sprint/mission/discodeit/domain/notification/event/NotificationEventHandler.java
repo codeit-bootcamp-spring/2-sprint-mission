@@ -5,29 +5,20 @@ import static com.sprint.mission.discodeit.common.filter.constant.LogConstant.RE
 import com.sprint.mission.discodeit.common.failure.AsyncTaskFailure;
 import com.sprint.mission.discodeit.common.failure.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.common.failure.event.AsyncJobFailedEvent;
-import com.sprint.mission.discodeit.domain.auth.event.UserRoleChangedEvent;
-import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.channel.entity.Channel;
+import com.sprint.mission.discodeit.security.auth.event.UserRoleChangedEvent;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.domain.message.entity.Message;
 import com.sprint.mission.discodeit.domain.message.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.domain.notification.entity.Notification;
 import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
 import com.sprint.mission.discodeit.domain.notification.repository.NotificationRepository;
-import com.sprint.mission.discodeit.domain.user.entity.Role;
-import com.sprint.mission.discodeit.domain.user.entity.User;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.springframework.context.event.EventListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 // TODO: 7/26/25 로직, 전략패턴으로 리펙터링 필요, 카프카에선 어떻게 적용할지 생각해야함

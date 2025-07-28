@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.auth.service.basic;
+package com.sprint.mission.discodeit.domain.auth;
 
 import static org.junit.jupiter.api.Assertions.*;
 

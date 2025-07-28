@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.message.service.basic;
 
-import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.cache.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
 
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
@@ -17,7 +17,6 @@ import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
 import com.sprint.mission.discodeit.domain.message.event.MessageCreatedEvent;
-import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;

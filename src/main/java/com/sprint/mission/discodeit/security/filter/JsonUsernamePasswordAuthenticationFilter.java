@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGI
 import static com.sprint.mission.discodeit.security.config.SecurityMatchers.LOGIN_URL;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sprint.mission.discodeit.domain.auth.dto.LogInRequest;
+import com.sprint.mission.discodeit.security.auth.dto.LogInRequest;
 import com.sprint.mission.discodeit.security.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.security.config;
 
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
@@ -37,5 +39,18 @@ public final class SecurityMatchers {
       "/api/readStatuses", HttpMethod.POST.name());
   public static final RequestMatcher READ_STATUS_UPDATE = new AntPathRequestMatcher(
       "/api/readStatuses/{readStatusId}", HttpMethod.PATCH.name());
+
+  public static final RequestMatcher ME = new AntPathRequestMatcher("/api/auth/me",
+      HttpMethod.GET.name());
+  public static final RequestMatcher REFRESH = new AntPathRequestMatcher("/api/auth/refresh",
+      HttpMethod.POST.name());
+
+  public static final RequestMatcher DOWNLOAD = new AntPathRequestMatcher(
+      "/api/binaryContents/{binaryContentId}/download",
+      HttpMethod.GET.name());
+
+  public static final RequestMatcher[] PUBLIC_MATCHERS = new RequestMatcher[]{
+      NON_API, GET_CSRF_TOKEN, SIGN_UP, LOGOUT, LOGIN, ME, REFRESH, DOWNLOAD
+  };
 
 }

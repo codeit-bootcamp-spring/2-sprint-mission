@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.domain.notification;
 
 import com.sprint.mission.discodeit.common.failure.AsyncTaskFailureRepository;
-import com.sprint.mission.discodeit.domain.auth.dto.RoleUpdateRequest;
-import com.sprint.mission.discodeit.domain.auth.service.AuthService;
+import com.sprint.mission.discodeit.security.auth.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.security.auth.service.AuthService;
 import com.sprint.mission.discodeit.domain.notification.entity.Notification;
 import com.sprint.mission.discodeit.domain.notification.entity.NotificationType;
 import com.sprint.mission.discodeit.domain.notification.repository.NotificationRepository;
