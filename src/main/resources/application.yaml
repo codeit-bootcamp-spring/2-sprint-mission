@@ -24,7 +24,7 @@ spring:
       spec: maximumSize=1000,expireAfterWrite=5m
 
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: broker:29092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -36,7 +36,7 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
 
 management:

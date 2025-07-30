@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper;
+    private final CacheManager cacheManager;
 
     @PostConstruct
     public void init() {
@@ -59,6 +62,13 @@ public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAu
         FilterChain chain,
         Authentication authResult) throws IOException, ServletException {
         log.info("[LOGIN] successfulAuthentication 시작");
+
+        // 캐시 제거
+        Cache cache = cacheManager.getCache("findAllUsers");
+        if (cache != null) {
+            cache.clear(); // 전체 삭제
+            log.info("로그인 성공 - 사용자 캐시 제거 완료");
+        }
 
         // 성공 핸들러 실행
         this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.UserEventPublisher;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -42,6 +43,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final BinaryContentAsyncService binaryContentAsyncService;
+  private final UserEventPublisher userEventPublisher;
 
   @Transactional
   @Override
@@ -89,6 +91,7 @@ public class BasicUserService implements UserService {
     Instant now = Instant.now();
 
     userRepository.save(user);
+    userEventPublisher.publishUsersRefresh(user.getId());
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
     return userMapper.toDto(user);
   }
@@ -160,6 +163,7 @@ public class BasicUserService implements UserService {
     }
 
     user.update(newUsername, newEmail, newPassword, nullableProfile);
+    userEventPublisher.publishUsersRefresh(userId);
 
     log.info("사용자 수정 완료: id={}", userId);
     return userMapper.toDto(user);
@@ -175,6 +179,7 @@ public class BasicUserService implements UserService {
     }
 
     userRepository.deleteById(userId);
+    userEventPublisher.publishUsersRefresh(userId);
     log.info("사용자 삭제 완료: id={}", userId);
   }
 

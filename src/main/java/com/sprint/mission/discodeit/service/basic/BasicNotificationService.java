@@ -25,13 +25,14 @@ public class BasicNotificationService implements NotificationService {
     private final NotificationMapper notificationMapper;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "userChannels", key = "#userId")
+    @Cacheable(value = "userNotifications", key = "#userId")
     public List<NotificationDto> getNotificationsForUser(UUID userId){
         return notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(userId).stream()
                 .map(notificationMapper::toDto)
                 .toList();
     }
 
+    @CacheEvict(value = "userNotifications", key = "#userId")
     @Transactional
     public void deleteNotification(UUID notificationId, UUID userId) {
         Notification notification = notificationRepository.findById(notificationId)
@@ -47,8 +48,10 @@ public class BasicNotificationService implements NotificationService {
     // 알림 발행
     @Transactional
     @CacheEvict(value = "userNotifications", key = "#receiver.getId()")
-    public void sendNotification(User receiver, String title, String content, NotificationType type, UUID targetId) {
+    public Notification sendNotification(User receiver, String title, String content, NotificationType type, UUID targetId) {
         Notification notification = new Notification(receiver, title, content, type, targetId);
         notificationRepository.save(notification);
+
+        return notification;
     }
 }
