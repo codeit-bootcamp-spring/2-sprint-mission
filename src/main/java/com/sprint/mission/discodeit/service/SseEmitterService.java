@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.storage.SseEventStorage;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,6 @@ public class SseEmitterService {
     // 사용자별 여러 emitter 관리
     private final Map<UUID, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
     private final SseEventStorage sseEventStorage;
-
 
     public SseEmitter connect(UUID userId, String lastEventId) {
         SseEmitter emitter = new SseEmitter(60 * 60 * 1000L); // 1시간 타임아웃
@@ -81,6 +81,24 @@ public class SseEmitterService {
                 }
             }
         }
+    }
 
+    public void sendNotification(UUID userId, NotificationDto dto) {
+        String eventId = UUID.randomUUID().toString(); // 고유 이벤트 ID 생성
+
+        // 1. 이벤트 복원 저장소에 이벤트 저장
+        sseEventStorage.saveEvent(userId, eventId, dto);
+
+        // 2. 등록된 emitter 에게 전송
+        for (SseEmitter emitter : getEmitters(userId)) {
+            try {
+                emitter.send(SseEmitter.event()
+                    .id(eventId)
+                    .name("notification")
+                    .data(dto));
+            } catch (Exception e) {
+                removeEmitter(userId, emitter);
+            }
+        }
     }
 }

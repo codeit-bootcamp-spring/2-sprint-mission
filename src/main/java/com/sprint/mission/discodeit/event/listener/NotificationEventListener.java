@@ -13,16 +13,21 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.Role;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.AuthenticatedAsyncTaskFailedEvent;
+import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
 import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.event.RoleChangedEvent;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseEmitterService;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -38,6 +43,9 @@ public class NotificationEventListener {
     private final ReadStatusRepository readStatusRepository;
     private final ChannelService channelService;
     private final ObjectMapper objectMapper;
+    private final SseEmitterService sseEmitterService;
+    private final NotificationRepository notificationRepository;
+    private final NotificationMapper notificationMapper;
 
     @Async("eventTaskExecutor")
     @KafkaListener(topics = "discodeit.new_message")
@@ -146,6 +154,17 @@ public class NotificationEventListener {
         } catch (Exception e) {
             log.error("비동기 작업 실패 알림 이벤트 처리 실패: error={}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    @EventListener
+    public void handleMultipleNotificationCreated(MultipleNotificationCreatedEvent event) {
+        for (UUID userId : event.receiverIds()) {
+            // 가장 최근 알림 1개 가져오기
+            notificationRepository.findTopByReceiverIdOrderByCreatedAtDesc(userId)
+                .map(notificationMapper::toDto)
+                .ifPresent(dto ->
+                    sseEmitterService.sendNotification(userId, dto));
         }
     }
 } 
