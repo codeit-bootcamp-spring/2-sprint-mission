@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.domain.notification.entity.Notification;
 import com.sprint.mission.discodeit.domain.notification.repository.NotificationRepository;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -81,15 +83,17 @@ public class SseEmitterService {
   @Scheduled(fixedRate = 15000)
   public void sendPing() {
     emitters.forEach((userId, userEmitters) -> {
+      List<SseEmitter> deadEmitters = new ArrayList<>();
       userEmitters.forEach(emitter -> {
         try {
           emitter.send(SseEmitter.event().comment("ping"));
           log.info("Ping 전송 성공: userId={}", userId);
         } catch (IOException e) {
           log.warn("Ping 전송 실패, Emitter 제거: userId={}, error={}", userId, e.getMessage());
-          removeEmitter(userId, emitter, "ping failed");
+          deadEmitters.add(emitter);
         }
       });
+      deadEmitters.forEach(emitter -> removeEmitter(userId, emitter, "ping failed"));
     });
   }
 
@@ -129,12 +133,11 @@ public class SseEmitterService {
       emitter.send(SseEmitter.event()
           .id(eventId)
           .name(eventName)
-          .data(data));
+          .data(data, MediaType.APPLICATION_JSON));
       log.info("SSE 이벤트 전송완료...");
     } catch (IOException e) {
       log.error("SSE 이벤트 전송 실패: eventId={}, eventName={}, error={}", eventId, eventName,
           e.getMessage());
-      emitter.complete();
     }
   }
 

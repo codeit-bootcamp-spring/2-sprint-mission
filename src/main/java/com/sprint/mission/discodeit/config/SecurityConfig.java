@@ -50,12 +50,15 @@ public class SecurityConfig {
     http
         .authenticationProvider(daoAuthenticationProvider)
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/auth/**", "/error").permitAll()
-            .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
-            .anyRequest().hasRole(Role.USER.name())
+                .requestMatchers("/api/auth/**", "/error").permitAll()
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers(SecurityMatchers.PUBLIC_MATCHERS).permitAll()
+                .anyRequest().hasRole(Role.USER.name())
+//                .anyRequest().permitAll()
         )
         .csrf(csrf ->
             csrf
+                .ignoringRequestMatchers(SecurityMatchers.WS)
                 .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
@@ -78,7 +81,7 @@ public class SecurityConfig {
             session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
-        .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper),
+        .addFilterBefore(new JwtAuthenticationFilter(jwtService, objectMapper, List.of("/ws/**")),
             JsonUsernamePasswordAuthenticationFilter.class)
     ;
 

@@ -34,6 +34,7 @@ public class Message extends BaseUpdatableEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", columnDefinition = "uuid")
   private User author;
+
   @BatchSize(size = 100)
   @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
   @JoinTable(

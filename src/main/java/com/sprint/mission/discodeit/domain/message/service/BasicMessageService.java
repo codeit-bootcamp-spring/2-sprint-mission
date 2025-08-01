@@ -147,7 +147,7 @@ public class BasicMessageService implements MessageService {
     return PageResponse.of(slice, nextCursor);
   }
 
-  @PreAuthorize("principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @PreAuthorize("principal.userDto.id.toString() == @messageRepository.findById(#messageId).orElse(null)?.author.id.toString()")
   @Transactional
   @Override
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
@@ -160,7 +160,7 @@ public class BasicMessageService implements MessageService {
     return MessageDto.from(message);
   }
 
-  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == @basicMessageService.find(#messageId).author.id")
+  @PreAuthorize("hasRole('ADMIN') or principal.userDto.id.toString() == @messageRepository.findById(#messageId).orElse(null)?.author.id.toString()")
   @Transactional
   @Override
   public void delete(UUID messageId) {

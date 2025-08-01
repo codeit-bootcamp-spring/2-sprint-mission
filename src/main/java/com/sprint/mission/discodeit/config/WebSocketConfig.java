@@ -1,7 +1,16 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.websocket.AuthChannelInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.messaging.access.intercept.AuthorizationChannelInterceptor;
+import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
+import org.springframework.security.messaging.context.SecurityContextChannelInterceptor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -10,17 +19,50 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-  @Override
-  public void registerStompEndpoints(StompEndpointRegistry config) {
-    config.addEndpoint("/ws").withSockJS();
+  private final AuthChannelInterceptor authChannelInterceptor;
+
+  public WebSocketConfig(AuthChannelInterceptor authChannelInterceptor) {
+    this.authChannelInterceptor = authChannelInterceptor;
   }
 
   @Override
-  //메시지를 어디로 어떻게 보낼지 결정하는 부분
-  public void configureMessageBroker(MessageBrokerRegistry config) {
-    //어떻게 보낼 지 결정
-    config.enableSimpleBroker("/sub");
-    //어디로 오는 지 감시
-    config.setApplicationDestinationPrefixes("/pub");
+  public void configureClientInboundChannel(ChannelRegistration registration) {
+    registration
+        .interceptors(authChannelInterceptor)
+        .interceptors(new SecurityContextChannelInterceptor());
+  }
+
+  // STOMP 엔드포인트 설정 (SockJS 지원 포함)
+  @Override
+  public void registerStompEndpoints(StompEndpointRegistry registry) {
+    registry.addEndpoint("/ws")          // STOMP 연결 엔드포인트
+        .setAllowedOriginPatterns("*") // 모든 origin 허용 (필요 시 제한 가능)
+        .withSockJS();                // SockJS fallback 활성화
+  }
+
+  // 메시지 브로커 설정
+  @Override
+  public void configureMessageBroker(MessageBrokerRegistry registry) {
+    registry.enableSimpleBroker("/topic", "/queue", "/sub"); // 메모리 기반 SimpleBroker
+    registry.setApplicationDestinationPrefixes("/pub"); // 클라이언트가 서버로 보낼 prefix
+  }
+
+
+  @Bean
+  public ChannelInterceptor authorizationChannelInterceptor() {
+    MessageMatcherDelegatingAuthorizationManager.Builder builder =
+        new MessageMatcherDelegatingAuthorizationManager.Builder();
+
+    builder
+        .simpDestMatchers("/pub/admin/**")
+        .hasRole("ADMIN")
+        .simpDestMatchers("/pub/**")
+        .authenticated()
+        .simpSubscribeDestMatchers("/sub/**")
+        .authenticated();
+
+    AuthorizationManager<Message<?>> manager = builder.build();
+
+    return new AuthorizationChannelInterceptor(manager);
   }
 }

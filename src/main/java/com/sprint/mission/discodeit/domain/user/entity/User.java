@@ -27,9 +27,11 @@ public class User extends BaseUpdatableEntity {
   private String email;
   @Column(length = 60, nullable = false)
   private String password;
+
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
   @JoinColumn(name = "profile_id", columnDefinition = "uuid")
   private BinaryContent profile;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private Role role;
