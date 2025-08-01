@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.websocket.AuthChannelInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -29,7 +30,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void configureClientInboundChannel(ChannelRegistration registration) {
     registration
         .interceptors(authChannelInterceptor)
-        .interceptors(new SecurityContextChannelInterceptor());
+        .interceptors(new SecurityContextChannelInterceptor())
+        .interceptors(authorizationChannelInterceptor());
   }
 
   // STOMP 엔드포인트 설정 (SockJS 지원 포함)
@@ -54,15 +56,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         new MessageMatcherDelegatingAuthorizationManager.Builder();
 
     builder
-        .simpDestMatchers("/pub/admin/**")
-        .hasRole("ADMIN")
-        .simpDestMatchers("/pub/**")
-        .authenticated()
-        .simpSubscribeDestMatchers("/sub/**")
-        .authenticated();
+        .simpTypeMatchers(SimpMessageType.CONNECT, SimpMessageType.HEARTBEAT,
+            SimpMessageType.UNSUBSCRIBE, SimpMessageType.DISCONNECT).authenticated()
+        .simpDestMatchers("/pub/admin/**").hasRole("ADMIN")
+        .simpDestMatchers("/pub/**").authenticated()
+        .simpSubscribeDestMatchers("/sub/**").authenticated()
+        .anyMessage().denyAll();
 
     AuthorizationManager<Message<?>> manager = builder.build();
-
     return new AuthorizationChannelInterceptor(manager);
   }
 }

@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +21,15 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
   private final JwtService jwtService;
   private final UserDetailsService userDetailsService;
+  private final RoleHierarchy roleHierarchy; // 권한 계층을 주입받습니다.
 
-  public AuthChannelInterceptor(JwtService jwtService, UserDetailsService userDetailsService) {
+  public AuthChannelInterceptor(JwtService jwtService, UserDetailsService userDetailsService,
+      RoleHierarchy roleHierarchy) {
     this.jwtService = jwtService;
     this.userDetailsService = userDetailsService;
+    this.roleHierarchy = roleHierarchy;
   }
+
 
   @Override
   public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -40,8 +45,11 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         if (jwtService.validate(token)) {
           String username = jwtService.parse(token).userDto().username();
           UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+          Authentication tempAuth = new UsernamePasswordAuthenticationToken(userDetails, null,
+              userDetails.getAuthorities());
           Authentication authentication = new UsernamePasswordAuthenticationToken(
-              userDetails, null, userDetails.getAuthorities()
+              userDetails, null,
+              roleHierarchy.getReachableGrantedAuthorities(tempAuth.getAuthorities())
           );
 
           accessor.setUser(authentication); // WebSocket 세션에 사용자 설정
