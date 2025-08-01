@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -21,6 +22,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.SseEmitterService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.HashMap;
@@ -52,6 +54,8 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
     private final PageResponseMapper pageResponseMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final BinaryContentMapper binaryContentMapper;
+    private final SseEmitterService sseEmitterService;
 
     @Transactional
     @Override
@@ -92,13 +96,32 @@ public class BasicMessageService implements MessageService {
                                 bytesMap.get(binaryContentId))
                             .thenAccept(result -> {
                                 log.debug("메시지에 포함된 첨부파일 업로드 성공: {}", binaryContentId);
+
+                                // 1. 상태 업데이트
                                 binaryContentRepository.updateUploadStatus(binaryContentId,
                                     BinaryContentUploadStatus.SUCCESS);
+
+                                // 2. 업로드 상태 변경된 BinaryContent 다시 조회
+                                binaryContentRepository.findById(binaryContentId)
+                                    .map(binaryContentMapper::toDto)
+                                    .ifPresent(dto -> {
+                                        // 3. 해당 authorId 에게 상태 변경 SSE 알림 전송
+                                        sseEmitterService.sendBinaryContentStatus(authorId, dto);
+                                    });
+
                             })
                             .exceptionally(ex -> {
                                 log.error("메시지에 포함된 첨부파일 업로드 실패: {}", binaryContentId, ex);
                                 binaryContentRepository.updateUploadStatus(binaryContentId,
                                     BinaryContentUploadStatus.FAILED);
+
+                                binaryContentRepository.findById(binaryContentId)
+                                    .map(binaryContentMapper::toDto)
+                                    .ifPresent(dto -> {
+                                        // 실패 상태도 전송
+                                        sseEmitterService.sendBinaryContentStatus(authorId, dto);
+                                    });
+
                                 return null;
                             })
                         ;

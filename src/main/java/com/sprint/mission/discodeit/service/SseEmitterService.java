@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.data.NotificationDto;
 import com.sprint.mission.discodeit.storage.SseEventStorage;
 import java.util.ArrayList;
@@ -96,6 +97,24 @@ public class SseEmitterService {
                     .id(eventId)
                     .name("notification")
                     .data(dto));
+            } catch (Exception e) {
+                removeEmitter(userId, emitter);
+            }
+        }
+    }
+
+    public void sendBinaryContentStatus(UUID userId, BinaryContentDto dto) {
+        String eventId = UUID.randomUUID().toString();
+
+        sseEventStorage.saveEvent(userId, eventId, dto);
+
+        for (SseEmitter emitter : getEmitters(userId)) {
+            try {
+                emitter.send(SseEmitter.event()
+                    .id(eventId)
+                    .name("binaryContents.status")
+                    .data(dto)
+                );
             } catch (Exception e) {
                 removeEmitter(userId, emitter);
             }
