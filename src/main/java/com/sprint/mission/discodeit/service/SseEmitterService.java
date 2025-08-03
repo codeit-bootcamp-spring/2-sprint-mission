@@ -84,6 +84,7 @@ public class SseEmitterService {
         }
     }
 
+    // 새로운 알림 이벤트 전송
     public void sendNotification(UUID userId, NotificationDto dto) {
         String eventId = UUID.randomUUID().toString(); // 고유 이벤트 ID 생성
 
@@ -103,6 +104,7 @@ public class SseEmitterService {
         }
     }
 
+    // 파일 업로드 상태 변경 이벤트 전송
     public void sendBinaryContentStatus(UUID userId, BinaryContentDto dto) {
         String eventId = UUID.randomUUID().toString();
 
@@ -115,6 +117,25 @@ public class SseEmitterService {
                     .name("binaryContents.status")
                     .data(dto)
                 );
+            } catch (Exception e) {
+                removeEmitter(userId, emitter);
+            }
+        }
+    }
+
+    // 채널 목록 갱신 이벤트 전송
+    public void sendChannelRefresh(UUID userId, UUID channelId) {
+        String eventId = UUID.randomUUID().toString();
+        Map<String, String> data = Map.of("channelId", channelId.toString());
+
+        sseEventStorage.saveEvent(userId, eventId, data);
+
+        for (SseEmitter emitter : getEmitters(userId)) {
+            try {
+                emitter.send(SseEmitter.event()
+                    .id(eventId)
+                    .name("channels.refresh")
+                    .data(data));
             } catch (Exception e) {
                 removeEmitter(userId, emitter);
             }

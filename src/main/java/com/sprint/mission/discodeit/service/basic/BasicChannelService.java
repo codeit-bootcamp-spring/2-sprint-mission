@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.SseEmitterService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final SseEmitterService sseEmitterService;
 
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
@@ -70,6 +72,11 @@ public class BasicChannelService implements ChannelService {
 
         log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
         ChannelDto channelDto = channelMapper.toDto(channel);
+
+        // 채널 사용자에게 SSE 전송
+        request.participantIds().forEach(userId ->
+            sseEmitterService.sendChannelRefresh(userId, channel.getId()));
+
         eventPublisher.publishEvent(
             new PrivateChannelCreatedEvent(channelDto, request.participantIds()));
         return channelDto;
