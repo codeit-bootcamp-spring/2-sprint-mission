@@ -4,7 +4,7 @@ services:
   app:
     image: discodeit:local
     build:
-      context: ../../../Downloads/Sprint+Mission+S12+Base+(1)/0-sprint-mission-s12-base
+      context: .
       dockerfile: Dockerfile
     container_name: discodeit
     ports:
@@ -34,6 +34,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
     depends_on:
       - db
+      - broker
     volumes:
       - binary-content-storage:/app/.discodeit/storage
     networks:
