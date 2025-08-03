@@ -50,6 +50,7 @@ public class SecurityConfig {
             .anyRequest().hasRole(Role.USER.name())
         )
         .csrf(csrf -> csrf
+            .ignoringRequestMatchers("/ws/**")
             .csrfTokenRepository(cookieCsrfTokenRepository())
             .ignoringRequestMatchers(SecurityMatchers.LOGOUT)
             .csrfTokenRequestHandler(
