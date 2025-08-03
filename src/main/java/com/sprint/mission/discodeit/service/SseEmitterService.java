@@ -141,4 +141,26 @@ public class SseEmitterService {
             }
         }
     }
+
+    // 사용자 목록 갱신 이벤트 전송
+    public void sendUserRefresh(UUID updatedUserId) {
+        String eventId = UUID.randomUUID().toString();
+        Map<String, String> data = Map.of("userId", updatedUserId.toString());
+
+        emitters.keySet().forEach(clientUserId -> {
+            sseEventStorage.saveEvent(clientUserId, eventId, data);
+
+            for (SseEmitter emitter : getEmitters(clientUserId)) {
+                try {
+                    emitter.send(SseEmitter.event()
+                        .id(eventId)
+                        .name("users.refresh")
+                        .data(data));
+                } catch (Exception e) {
+                    removeEmitter(clientUserId, emitter);
+                }
+            }
+        });
+    }
+
 }

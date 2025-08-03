@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.service.SseEmitterService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -43,6 +44,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final SseEmitterService sseEmitterService;
 
     @Transactional
     @CacheEvict(value = "users", key = "'all'")
@@ -196,6 +198,8 @@ public class BasicUserService implements UserService {
         user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
         log.info("사용자 수정 완료: id={}", userId);
+        sseEmitterService.sendUserRefresh(userId);
+
         return userMapper.toDto(user);
     }
 
