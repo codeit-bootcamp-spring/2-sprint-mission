@@ -38,7 +38,7 @@ public class S3BinaryContentStorageTest extends IntegrationTestSupport {
   private AsyncTaskFailureRepository asyncTaskFailureRepository;
 
   @Value("${discodeit.storage.s3.bucket}")
-  String bucket;
+  private String bucket;
 
   @BeforeEach
   void setUp() {

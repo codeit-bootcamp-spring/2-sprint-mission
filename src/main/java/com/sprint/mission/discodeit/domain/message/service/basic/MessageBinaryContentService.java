@@ -38,11 +38,17 @@ public class MessageBinaryContentService {
 
     Map<BinaryContent, BinaryContentRequest> binaryContents = saveBinaryContents(contentRequests);
 
-    log.debug("바이너리 스토리지 이벤트 보냄");
     publishBinaryContentsCreatedEvent(binaryContents);
     return binaryContents.keySet()
         .stream()
         .toList();
+  }
+
+  @Transactional
+  public void delete(UUID id) {
+    validateBinaryContentExist(id);
+
+    binaryContentRepository.deleteById(id);
   }
 
   private void publishBinaryContentsCreatedEvent(
@@ -51,6 +57,13 @@ public class MessageBinaryContentService {
     List<BinaryContentCreatedEvent> binaryContentsCreatedEvent = BinaryContentCreatedEvent.createBinaryContentsCreatedEvent(
         binaryContents);
     eventPublisher.publishEvent(binaryContentsCreatedEvent);
+  }
+
+  private void validateBinaryContentExist(UUID id) {
+    if (binaryContentRepository.existsById(id)) {
+      return;
+    }
+    throw new BinaryContentNotFoundException(Map.of());
   }
 
   private Map<BinaryContent, BinaryContentRequest> saveBinaryContents(
@@ -66,19 +79,6 @@ public class MessageBinaryContentService {
     }
     binaryContentRepository.saveAll(binaryContents.keySet());
     return binaryContents;
-  }
-
-  public void delete(UUID id) {
-    validateBinaryContentExist(id);
-
-    binaryContentRepository.deleteById(id);
-  }
-
-  private void validateBinaryContentExist(UUID id) {
-    if (binaryContentRepository.existsById(id)) {
-      return;
-    }
-    throw new BinaryContentNotFoundException(Map.of());
   }
 
 }

@@ -12,6 +12,7 @@ import static com.sprint.mission.discodeit.security.config.SecurityMatchers.SIGN
 
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.security.JwtService;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -39,6 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private final JwtService jwtService;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  private final UserDetailsService userDetailsService;
 
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -68,8 +72,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     UserResult userResult = jwtService.parseUser(token);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(userResult.username());
     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-        userResult, null, List.of(new SimpleGrantedAuthority("ROLE_" + userResult.role())));
+        userDetails, null, List.of(new SimpleGrantedAuthority("ROLE_" + userResult.role())));
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     filterChain.doFilter(request, response);

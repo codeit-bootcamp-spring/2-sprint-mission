@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.exception.controller;
+package com.sprint.mission.discodeit.common.controller;
 
 import com.sprint.mission.discodeit.common.exception.DiscodeitException;
 import org.springframework.http.HttpStatus;

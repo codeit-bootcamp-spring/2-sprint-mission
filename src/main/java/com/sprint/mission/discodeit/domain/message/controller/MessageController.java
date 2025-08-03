@@ -82,7 +82,7 @@ public class MessageController {
       return List.of();
     }
     return attachments.stream()
-        .map(BinaryContentRequest::fromMultipartFile)
+        .map(BinaryContentRequest::from)
         .toList();
   }
 

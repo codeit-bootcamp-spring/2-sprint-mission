@@ -17,7 +17,6 @@ public class MDCContextTaskDecorator implements TaskDecorator {
         if (mdcContext != null) {
           MDC.setContextMap(mdcContext);
         }
-
         runnable.run();
       } finally {
         MDC.clear();

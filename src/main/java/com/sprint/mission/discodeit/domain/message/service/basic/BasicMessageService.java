@@ -95,8 +95,11 @@ public class BasicMessageService implements MessageService {
     Slice<Message> messages = messageRepository.findAllByChannelIdWithAuthorDesc(channelId,
         cursorCreatedAt, pageable);
 
-    return PageResponse.of(messages, messageResultMapper::convertToMessageResult,
-        getNextCursor(messages));
+    return PageResponse.of(
+        messages,
+        messageResultMapper::convertToMessageResult,
+        getNextCursor(messages)
+    );
   }
 
   @Transactional

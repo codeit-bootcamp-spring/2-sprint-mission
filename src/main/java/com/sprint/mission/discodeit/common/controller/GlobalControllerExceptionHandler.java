@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.exception.controller;
+package com.sprint.mission.discodeit.common.controller;
 
 import com.sprint.mission.discodeit.common.exception.DiscodeitException;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class GlobalControllerExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnExpectedException(Exception unexpectedException) {
+    public ResponseEntity<ErrorResponse> handleUnexpectedException(Exception unexpectedException) {
         log.error("Not SpecificException: {}", unexpectedException.getMessage());
 
         return ResponseEntity.internalServerError()

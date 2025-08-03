@@ -73,12 +73,15 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     testImplementation 'org.testcontainers:localstack'
-    testImplementation 'org.mockito:mockito-inline:5.2.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 }
 
 test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
+
+    jvmArgs '-XX:+EnableDynamicAgentLoading'
 }
 
 jacocoTestReport {

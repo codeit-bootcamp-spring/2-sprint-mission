@@ -12,7 +12,7 @@ public record BinaryContentRequest(
     @NotBlank byte[] bytes
 ) {
 
-  public static BinaryContentRequest fromMultipartFile(MultipartFile multipartFile) {
+  public static BinaryContentRequest from(MultipartFile multipartFile) {
     return new BinaryContentRequest(
         multipartFile.getName(),
         multipartFile.getContentType(),
