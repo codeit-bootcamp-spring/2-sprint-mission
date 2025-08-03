@@ -32,6 +32,11 @@ public class AsyncConfig implements AsyncConfigurer {
     }
 
     @Override
+    public Executor getAsyncExecutor() {
+        return threadPoolTaskExecutor();
+    }
+
+    @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return asyncExceptionHandler;
     }
