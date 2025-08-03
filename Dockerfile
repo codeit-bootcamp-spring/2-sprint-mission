@@ -26,7 +26,7 @@ ENV PROJECT_VERSION=1.2.-M8
 ENV JVM_OPTS=""
 
 # 포트 노출
-EXPOSE 80
+EXPOSE 8080
 
 # jar 파일만 app.jar로 복사
 COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
