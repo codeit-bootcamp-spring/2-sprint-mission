@@ -1,7 +1,19 @@
 version: '3.8'
 
 services:
-  app:
+  nginx:
+    image: nginx:latest
+    container_name: discodeit-proxy
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./frontend/build:/usr/share/nginx/html
+    networks:
+      - discodeit-network
+    depends_on:
+      - backend
+  backend:
     image: discodeit:local
     build:
       context: .
@@ -35,6 +47,7 @@ services:
     depends_on:
       - db
       - broker
+      - redis
     volumes:
       - binary-content-storage:/app/.discodeit/storage
     networks:
