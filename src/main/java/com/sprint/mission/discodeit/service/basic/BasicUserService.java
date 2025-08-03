@@ -26,6 +26,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ public class BasicUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ApplicationEventPublisher eventPublisher;
+    private final EventPublisher sseEventPublisher;
 
     @Transactional
     @Override
@@ -241,6 +243,9 @@ public class BasicUserService implements UserService {
         User updatedUser = userRepository.save(user);
 
         boolean isOnline = isUserOnline(updatedUser);
+        
+        // 사용자 정보 갱신 SSE 알림
+        sseEventPublisher.publishUserRefresh(updatedUser.getId());
 
         return userMapper.toDto(updatedUser, isOnline);
     }
@@ -281,6 +286,9 @@ public class BasicUserService implements UserService {
 
         userRepository.delete(user);
         log.info("사용자 삭제 완료");
+        
+        // 사용자 삭제 SSE 알림
+        sseEventPublisher.publishUserRefresh(userId);
     }
 
     private void validateUserDoesNotExist(String username, String email) {

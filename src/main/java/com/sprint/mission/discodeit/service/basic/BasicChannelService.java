@@ -19,13 +19,17 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.event.ChannelEvent;
+import com.sprint.mission.discodeit.event.EventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +45,8 @@ public class BasicChannelService implements ChannelService {
     private final ChannelMapper channelMapper;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final EventPublisher eventPublisher;
 
     @PreAuthorize("hasAuthority('ROLE_CHANNEL_MANAGER')")
     @Transactional
@@ -67,6 +73,10 @@ public class BasicChannelService implements ChannelService {
         );
 
         Channel savedChannel = channelRepository.save(channel);
+
+        // 채널 생성 이벤트 발행
+        publishChannelCreatedEvent(savedChannel);
+
         return channelMapper.toDto(savedChannel);
     }
 
@@ -108,6 +118,9 @@ public class BasicChannelService implements ChannelService {
                 .map(p -> new ReadStatus(p, savedChannel, savedChannel.getCreatedAt()))
                 .collect(Collectors.toList());
         readStatusRepository.saveAll(readStatuses);
+
+        // 채널 생성 이벤트 발행
+        publishChannelCreatedEvent(savedChannel);
 
         return channelMapper.toDto(savedChannel);
     }
@@ -171,6 +184,9 @@ public class BasicChannelService implements ChannelService {
 
         if (updated) {
             Channel updatedChannel = channelRepository.save(channel);
+
+            publishChannelUpdatedEvent(updatedChannel);
+
             return channelMapper.toDto(updatedChannel);
         } else {
             return channelMapper.toDto(channel);
@@ -188,6 +204,9 @@ public class BasicChannelService implements ChannelService {
         messageRepository.deleteAllByChannelId(channelId);
         readStatusRepository.deleteAllByChannelId(channelId);
         channelRepository.deleteById(channelId);
+
+        // 채널 삭제 이벤트 발행
+        publishChannelDeletedEvent(channelId);
     }
 
 
@@ -238,5 +257,26 @@ public class BasicChannelService implements ChannelService {
         if (readStatus.updateNotificationEnabled(request.notificationEnabled())) {
             readStatusRepository.save(readStatus);
         }
+    }
+
+    // 채널 관련 이벤트 발행 메서드들 (통합)
+    private void publishChannelCreatedEvent(Channel channel) {
+        applicationEventPublisher.publishEvent(new ChannelEvent(ChannelEvent.ChannelEventType.CREATED, channel));
+        
+        // 채널 생성 시 채널 새로고침 이벤트 발행
+        eventPublisher.publishChannelRefresh(channel.getId());
+    }
+    
+    private void notifyChannelParticipants(Channel channel) {
+        // 채널 새로고침으로 통합 - 더 효율적
+        eventPublisher.publishChannelRefresh(channel.getId());
+    }
+
+    private void publishChannelUpdatedEvent(Channel channel) {
+        applicationEventPublisher.publishEvent(new ChannelEvent(ChannelEvent.ChannelEventType.UPDATED, channel));
+    }
+
+    private void publishChannelDeletedEvent(UUID channelId) {
+        applicationEventPublisher.publishEvent(new ChannelEvent(ChannelEvent.ChannelEventType.DELETED, channelId));
     }
 }

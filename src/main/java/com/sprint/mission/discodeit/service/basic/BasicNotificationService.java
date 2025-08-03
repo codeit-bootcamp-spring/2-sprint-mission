@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundE
 import com.sprint.mission.discodeit.exception.user.UserOperationRestrictedException;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.service.SseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -22,12 +23,14 @@ import java.util.stream.Collectors;
 public class BasicNotificationService implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final SseService sseService;
 
     @Override
     @Cacheable(value = "notifications", key = "#user.id")
     @Transactional(readOnly = true)
     public List<NotificationDto> findNotificationsByUser(User user) {
         List<Notification> notifications = notificationRepository.findByReceiverIdOrderByCreatedAtDesc(user.getId());
+
         return notifications.stream()
                 .map(NotificationDto::from)
                 .collect(Collectors.toList());

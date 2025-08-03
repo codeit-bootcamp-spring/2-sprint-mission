@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.data.PageResponse;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.event.EventPublisher;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.file.FileProcessingCustomException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,8 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.sprint.mission.discodeit.common.NotificationEvent;
-import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.event.MessageCreatedEvent;
 
 @RequiredArgsConstructor
 @Service
@@ -43,7 +44,8 @@ public class BasicMessageService implements MessageService {
     private final PageResponseMapper pageMapper;
     private final BinaryContentService binaryContentService;
     private final ReadStatusRepository readStatusRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final EventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -54,7 +56,10 @@ public class BasicMessageService implements MessageService {
         Message message = saveMessage(request, user, channel, attachmentEntities);
 
         updateReadStatus(user, channel, message);
-        sendNotifications(user, channel);
+        publishMessageCreatedEvent(message);
+        
+        // 채널의 다른 참여자들에게 새 메시지 알림 전송
+        notifyChannelParticipants(channel, user, message);
 
         return messageMapper.toDto(message);
     }
@@ -93,20 +98,9 @@ public class BasicMessageService implements MessageService {
         readStatusRepository.save(readStatus);
     }
 
-    private void sendNotifications(User sender, Channel channel) {
-        List<ReadStatus> notificationEnabledUsers = readStatusRepository
-                .findAllByChannelIdAndNotificationEnabled(channel.getId(), true);
-        notificationEnabledUsers.stream()
-                .filter(readStatus -> !readStatus.getUser().getId().equals(sender.getId()))
-                .forEach(readStatus -> {
-                    NotificationEvent event = new NotificationEvent(
-                            readStatus.getUser().getId(),
-                            NotificationType.NEW_MESSAGE,
-                            channel.getId(),
-                            "메세지 생성"
-                    );
-                    eventPublisher.publishEvent(event);
-                });
+    //생성됐다는 것만 이벤트로 날림
+    private void publishMessageCreatedEvent(Message message) {
+        applicationEventPublisher.publishEvent(new MessageCreatedEvent(message));
     }
 
     private Channel getChannel(MessageCreateRequest request) {
@@ -190,4 +184,23 @@ public class BasicMessageService implements MessageService {
         messageRepository.deleteById(messageId);
     }
 
+    private void notifyChannelParticipants(Channel channel, User sender, Message message) {
+        // 채널의 모든 참여자를 ReadStatus를 통해 조회
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channel.getId());
+        
+        for (ReadStatus readStatus : readStatuses) {
+            User participant = readStatus.getUser();
+            // 메시지 작성자가 아닌 참여자들에게만 알림 전송
+            if (!participant.getId().equals(sender.getId())) {
+                String notificationMessage = String.format("%s님이 #%s에 새 메시지를 보냈습니다: %s", 
+                    sender.getUsername(), 
+                    channel.getName(),
+                    message.getContent().length() > 50 ? 
+                        message.getContent().substring(0, 50) + "..." : 
+                        message.getContent()
+                );
+                eventPublisher.publishNotification(participant.getId(), notificationMessage);
+            }
+        }
+    }
 }
