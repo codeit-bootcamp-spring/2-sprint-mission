@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -21,6 +22,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import java.util.HashMap;
@@ -50,8 +52,10 @@ public class BasicMessageService implements MessageService {
   private final MessageMapper messageMapper;
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentMapper binaryContentMapper;
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @Transactional
   @Override
@@ -93,6 +97,7 @@ public class BasicMessageService implements MessageService {
                     log.debug("메시지에 포함된 첨부파일 업로드 성공: {}", binaryContentId);
                     binaryContentRepository.updateUploadStatus(binaryContentId,
                         BinaryContentUploadStatus.SUCCESS);
+                    sseService.sendBinaryContentStatus(authorId, binaryContentMapper.toDto(binaryContent));
                   })
                   .exceptionally(ex -> {
                     log.error("메시지에 포함된 첨부파일 업로드 실패: {}", binaryContentId, ex);

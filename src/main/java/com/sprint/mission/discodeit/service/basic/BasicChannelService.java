@@ -16,7 +16,9 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,7 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
@@ -51,6 +54,9 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
     channelRepository.save(channel);
+
+    sseService.broadcast("channels.refresh", Map.of("channelsId:", channel.getId()));
+
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
     return channelMapper.toDto(channel);
   }
@@ -110,6 +116,9 @@ public class BasicChannelService implements ChannelService {
       throw PrivateChannelUpdateException.forChannel(channelId);
     }
     channel.update(newName, newDescription);
+
+    sseService.broadcast("channels.refresh", Map.of("channelsId:", channel.getId()));
+
     log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
     return channelMapper.toDto(channel);
   }

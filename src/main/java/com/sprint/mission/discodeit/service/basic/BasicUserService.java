@@ -9,14 +9,17 @@ import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -41,8 +44,10 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final SseService sseService;
 
   @Transactional
   @CacheEvict(value = "users", key = "'all'")
@@ -98,6 +103,8 @@ public class BasicUserService implements UserService {
     User user = new User(username, email, hashedPassword, nullableProfile);
 
     userRepository.save(user);
+
+    sseService.broadcast("users.refresh", Map.of("userId:", user.getId()));
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
     return userMapper.toDto(user);
   }
@@ -171,6 +178,7 @@ public class BasicUserService implements UserService {
                         log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
                         binaryContentRepository.updateUploadStatus(binaryContent.getId(),
                             BinaryContentUploadStatus.SUCCESS);
+                        sseService.sendBinaryContentStatus(userId, binaryContentMapper.toDto(binaryContent));
                       })
                       .exceptionally(throwable -> {
                         log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
@@ -190,6 +198,8 @@ public class BasicUserService implements UserService {
     String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
         .orElse(null);
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
+
+    sseService.broadcast("users.refresh", Map.of("userId:", user.getId()));
 
     log.info("사용자 수정 완료: id={}", userId);
     return userMapper.toDto(user);
