@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.sse.SseEvent;
+import com.sprint.mission.discodeit.sse.service.SseLocalService;
 import com.sprint.mission.discodeit.util.SecurityUtils;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ public class BasicNotificationService implements NotificationService {
   private final NotificationRepository notificationRepository;
   private final NotificationMapper notificationMapper;
   private final UserRepository userRepository;
+  private final SseLocalService sseLocalService;
 
   @CacheEvict(allEntries = true)
   @Transactional
@@ -53,7 +56,17 @@ public class BasicNotificationService implements NotificationService {
     );
 
     notificationRepository.save(notification);
-    return notificationMapper.toDto(notification);
+
+    NotificationDto notificationDto = notificationMapper.toDto(notification);
+
+    UUID eventId = UUID.randomUUID();
+    Map<String, Object> eventData = Map.of(
+        "NotificationDto", notificationDto
+    );
+    SseEvent sseEvent = new SseEvent(eventId, "notifications", eventData);
+    sseLocalService.sendEventToUser(receiverId, sseEvent);
+
+    return notificationDto;
   }
 
   @Cacheable(key = "T(com.sprint.mission.discodeit.util.SecurityUtils).getCurrentUserId()")
