@@ -12,7 +12,6 @@ import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(
@@ -22,7 +21,6 @@ import lombok.Setter;
     }
 )
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReadStatus extends BaseUpdatableEntity {
 
@@ -34,6 +32,7 @@ public class ReadStatus extends BaseUpdatableEntity {
   private Channel channel;
   @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastReadAt;
+
   @Column(nullable = false)
   private boolean notificationEnabled;
 
@@ -41,12 +40,15 @@ public class ReadStatus extends BaseUpdatableEntity {
     this.user = user;
     this.channel = channel;
     this.lastReadAt = lastReadAt;
+    this.notificationEnabled = channel.getType().equals(ChannelType.PRIVATE);
   }
 
-  public void update(Instant newLastReadAt, boolean newNotificationEnable) {
+  public void update(Instant newLastReadAt, Boolean notificationEnabled) {
     if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
       this.lastReadAt = newLastReadAt;
-      this.notificationEnabled = newNotificationEnable;
+    }
+    if (notificationEnabled != null) {
+      this.notificationEnabled = notificationEnabled;
     }
   }
 }

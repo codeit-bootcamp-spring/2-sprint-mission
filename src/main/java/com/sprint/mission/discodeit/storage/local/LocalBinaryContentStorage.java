@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.storage.local;
 
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
 import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.NotificationService;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
+import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import io.micrometer.core.annotation.Timed;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +13,14 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
-
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -38,17 +38,17 @@ import org.springframework.stereotype.Component;
 public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   private final Path root;
-  private final UserRepository userRepository;
-  private final NotificationService notificationService;
+  private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   public LocalBinaryContentStorage(
       @Value("${discodeit.storage.local.root-path}") Path root,
-      UserRepository userRepository,
-      NotificationService notificationService
+      AsyncTaskFailureRepository asyncTaskFailureRepository,
+      ApplicationEventPublisher eventPublisher
   ) {
     this.root = root;
-    this.userRepository = userRepository;
-    this.notificationService = notificationService;
+    this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+    this.eventPublisher = eventPublisher;
   }
 
   @PostConstruct
@@ -63,26 +63,10 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     }
   }
 
-  @Timed
-  @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
-    log.info("로컬 파일 저장 요청: {} ({}bytes)", binaryContentId, bytes.length);
-      saveFileAsync(binaryContentId, bytes);
-
-    return binaryContentId;
-  }
-
-  @Timed
-  @Override
-  public UUID putSync(UUID binaryContentId, byte[] bytes) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.exists(filePath)) {
       throw new IllegalArgumentException("File with key " + binaryContentId + " already exists");
-    }
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
     }
     try (OutputStream outputStream = Files.newOutputStream(filePath)) {
       outputStream.write(bytes);
@@ -92,53 +76,35 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     return binaryContentId;
   }
 
-  @Async("storageTaskExecutor")
+  @Async("binaryContentTaskExecutor")
   @Retryable(
-          retryFor = {IOException.class, RuntimeException.class},
-          maxAttempts = 3,
-          backoff = @Backoff(delay = 1000, multiplier = 2.0)
+      value = {IOException.class, RuntimeException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
   )
-  void saveFileAsync(UUID binaryContentId, byte[] bytes) {
-    try {
-      Path filePath = resolvePath(binaryContentId);
-
-      if (Files.exists(filePath)) {
-        log.warn("파일이 이미 존재합니다: {}", binaryContentId);
-        return;
-      }
-
-      log.info("로컬 파일 저장 시작: {}", binaryContentId);
-
-      try {
-        Thread.sleep(10000);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-
-      try (OutputStream outputStream = Files.newOutputStream(filePath)) {
-        outputStream.write(bytes);
-        log.info("로컬 파일 저장 성공: {}", binaryContentId);
-      }
-
-    } catch (IOException e) {
-
-      log.error("로컬 파일 저장 실패: {}", binaryContentId, e);
-    }
+  public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+    log.info("파일 업로드 시도: {}", binaryContentId);
+    return CompletableFuture.completedFuture(put(binaryContentId, bytes));
   }
 
   @Recover
-  public void recoverSaveFileAsync(RuntimeException e, UUID binaryContentId, byte[] bytes) {
-    String requestId = MDC.get("requestId");
-    AsyncTaskFailure failure = new AsyncTaskFailure("saveFileAsyncLocal" , requestId , e.getMessage());
-    log.error("비동기 로컬 파일 저장 복구 로직 실행: {}", failure, e);
+  public CompletableFuture<UUID> recoverPutAsync(Exception e, UUID binaryContentId, byte[] bytes) {
+    String taskName = getClass().getSimpleName() + "#" + "putAsync";
+    String failureReason = String.format("파일 업로드 실패 (binaryContentId: %s): %s",
+        binaryContentId, e.getMessage());
+    String requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID))
+        .map(Object::toString)
+        .orElse("unknown");
 
-    User user = userRepository.findByProfile_Id(binaryContentId)
-            .orElseThrow(UserNotFoundException::new);
-    UUID userId = user.getId();
-    notificationService.createNotificationAsyncFailed(userId);
+    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
+    asyncTaskFailureRepository.save(failure);
+
+    eventPublisher.publishEvent(new AsyncTaskFailedEvent(failure));
+
+    log.error("파일 업로드 최종 실패 (실패 정보 기록됨): {}", binaryContentId, e);
+    throw new RuntimeException("파일 업로드 최종 실패: " + binaryContentId, e);
   }
 
-  @Override
   public InputStream get(UUID binaryContentId) {
     Path filePath = resolvePath(binaryContentId);
     if (Files.notExists(filePath)) {
