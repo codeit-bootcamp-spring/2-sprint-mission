@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -22,6 +23,12 @@ public class Notification extends BaseEntity {
     @Column(name = "receiver_id", columnDefinition = "uuid", nullable = false)
     private UUID receiverId;
 
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String content;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationType type;
@@ -29,18 +36,15 @@ public class Notification extends BaseEntity {
     @Column(name = "target_id", columnDefinition = "uuid")
     private UUID targetId;
 
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false, columnDefinition = "text")
-    private String content;
-
-    public Notification(UUID receiverId, NotificationType type, UUID targetId, String title,
-        String content) {
+    public Notification(UUID receiverId, String title, String content, NotificationType type) {
         this.receiverId = receiverId;
-        this.type = type;
-        this.targetId = targetId;
         this.title = title;
         this.content = content;
+        this.type = type;
     }
-}
+
+    public Notification(UUID receiverId, String title, String content, NotificationType type, UUID targetId) {
+        this(receiverId, title, content, type);
+        this.targetId = targetId;
+    }
+} 

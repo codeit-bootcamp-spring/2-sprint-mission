@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.config;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.MDC;
+import org.jboss.logging.MDC;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
@@ -14,17 +14,18 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+
 @Configuration
 @EnableAsync
 public class AsyncConfig {
 
-    @Bean(name = "binaryContentTaskExecutor")
+    @Bean("binaryContentTaskExecutor")
     public TaskExecutor binaryContentTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
         executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("BinaryContent-");
+        executor.setThreadNamePrefix("binary-content-");
         executor.setTaskDecorator(new CompositeTaskDecorator(
             List.of(mdcTaskDecorator(), securityContextTaskDecorator())));
         executor.initialize();
@@ -32,12 +33,12 @@ public class AsyncConfig {
     }
 
     @Bean(name = "eventTaskExecutor")
-    public TaskExecutor eventTaskExecutor() {
+    public TaskExecutor eventExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(8);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
         executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("NotificationEvent-");
+        executor.setThreadNamePrefix("event-task-");
         executor.setTaskDecorator(new CompositeTaskDecorator(
             List.of(mdcTaskDecorator(), securityContextTaskDecorator())));
         executor.initialize();
@@ -46,17 +47,13 @@ public class AsyncConfig {
 
     public TaskDecorator mdcTaskDecorator() {
         return runnable -> {
-            // 현재 스레드 MDC에서 requestId 꺼냄
             Optional<String> requestId = Optional.ofNullable(
-                MDC.get(MDCLoggingInterceptor.REQUEST_ID));
+                MDC.get(MDCLoggingInterceptor.REQUEST_ID)).map(String.class::cast);
             return () -> {
-                // 비동기 스레드에 requestId 설정
                 requestId.ifPresent(id -> MDC.put(MDCLoggingInterceptor.REQUEST_ID, id));
                 try {
-                    // 비동기 작업 실행
                     runnable.run();
                 } finally {
-                    // 작업 끝나면 clean-up
                     requestId.ifPresent(id -> MDC.remove(MDCLoggingInterceptor.REQUEST_ID));
                 }
             };
@@ -76,5 +73,4 @@ public class AsyncConfig {
             };
         };
     }
-
 }

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.event.PrivateChannelCreatedEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -15,15 +16,17 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.SseEmitterService;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -31,14 +34,17 @@ import lombok.extern.slf4j.Slf4j;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
+    //
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelMapper channelMapper;
+    private final ApplicationEventPublisher eventPublisher;
+    private final SseEmitterService sseEmitterService;
 
-    @CacheEvict(value = "userChannels", allEntries = true)
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(value = "channelsByUser", allEntries = true)
     @Override
     public ChannelDto create(PublicChannelCreateRequest request) {
         log.debug("채널 생성 시작: {}", request);
@@ -65,7 +71,15 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.saveAll(readStatuses);
 
         log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
-        return channelMapper.toDto(channel);
+        ChannelDto channelDto = channelMapper.toDto(channel);
+
+        // 채널 사용자에게 SSE 전송
+        request.participantIds().forEach(userId ->
+            sseEmitterService.sendChannelRefresh(userId, channel.getId()));
+
+        eventPublisher.publishEvent(
+            new PrivateChannelCreatedEvent(channelDto, request.participantIds()));
+        return channelDto;
     }
 
     @Transactional(readOnly = true)
@@ -76,8 +90,8 @@ public class BasicChannelService implements ChannelService {
             .orElseThrow(() -> ChannelNotFoundException.withId(channelId));
     }
 
-    @Cacheable(value = "userChannels", key = "#userId")
     @Transactional(readOnly = true)
+    @Cacheable(value = "channelsByUser", key = "#userId", unless = "#result.isEmpty()")
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
         List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
@@ -91,9 +105,9 @@ public class BasicChannelService implements ChannelService {
             .toList();
     }
 
-    @CacheEvict(value = "userChannels", allEntries = true)
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(value = "channelsByUser", allEntries = true)
     @Override
     public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
         log.debug("채널 수정 시작: id={}, request={}", channelId, request);
@@ -109,9 +123,9 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(channel);
     }
 
-    @CacheEvict(value = "userChannels", allEntries = true)
     @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     @Transactional
+    @CacheEvict(value = "channelsByUser", allEntries = true)
     @Override
     public void delete(UUID channelId) {
         log.debug("채널 삭제 시작: id={}", channelId);
