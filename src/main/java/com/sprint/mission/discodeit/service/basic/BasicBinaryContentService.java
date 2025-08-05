@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
     private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentUpdater binaryContentUpdater;
     private static final Logger log = LoggerFactory.getLogger(BasicBinaryContentService.class);
 
     @Transactional
@@ -50,7 +52,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 try {
                     uploadFileAfterCommit(dto, file);
                 } catch (IOException e) {
-                    log.error("Exception thrown while initiating async file upload for {}", dto.id(), e);
+                    log.error("exception occurred while uploading file", e);
                 }
             }
         });
@@ -67,20 +69,12 @@ public class BasicBinaryContentService implements BinaryContentService {
     public void uploadFileAfterCommit(BinaryContentDto binaryContentDto, MultipartFile file) throws IOException {
         byte[] bytes = file.getBytes();
         binaryContentStorage.put(binaryContentDto.id(), bytes).join();
-        updateUploadStatus(binaryContentDto.id(), BinaryContentUploadStatus.SUCCESS);
+        binaryContentUpdater.updateUploadStatus(binaryContentDto.id(), BinaryContentUploadStatus.SUCCESS);
     }
 
     @Recover
     public void recoverUploadFailure(Throwable ex, BinaryContentDto binaryContentDto, MultipartFile file) {
-        updateUploadStatus(binaryContentDto.id(), BinaryContentUploadStatus.FAILED);
-    }
-
-    @Transactional
-    public void updateUploadStatus(UUID contentId, BinaryContentUploadStatus status) {
-        binaryContentRepository.findById(contentId).ifPresent(content -> {
-            content.updateUploadStatus(status);
-            binaryContentRepository.save(content);
-        });
+        binaryContentUpdater.updateUploadStatus(binaryContentDto.id(), BinaryContentUploadStatus.FAILED);
     }
 
     @Override
@@ -139,11 +133,14 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     private BinaryContent saveMetadata(MultipartFile file) {
-        BinaryContent meta = BinaryContent.of(
-                file.getOriginalFilename(),
-                file.getSize(),
-                file.getContentType()
-        );
+        BinaryContent meta = BinaryContent.builder()
+                .fileName(file.getOriginalFilename())
+                .size(file.getSize())
+                .contentType(file.getContentType())
+                .uploadStatus(BinaryContentUploadStatus.WAITING)
+                .build();
         return binaryContentRepository.save(meta);
     }
+
+
 }
