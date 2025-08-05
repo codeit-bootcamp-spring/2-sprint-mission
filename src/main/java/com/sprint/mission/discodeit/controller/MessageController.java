@@ -22,6 +22,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,9 +44,10 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageController implements MessageApi {
 
     private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
+    @Timed("message.create.async")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Timed(value = "upload.time", description = "Time taken to upload a file")
     public ResponseEntity<MessageDto> create(
         @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
         @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
@@ -115,4 +118,6 @@ public class MessageController implements MessageApi {
             .status(HttpStatus.OK)
             .body(messages);
     }
+
+
 }

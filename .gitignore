@@ -52,4 +52,4 @@ bin/
 discodeit.env
 /.logs/
 /.logs/application.log
-
+/nginx

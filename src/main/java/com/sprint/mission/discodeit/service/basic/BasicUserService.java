@@ -1,33 +1,42 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.NotificationMessage;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.service.SseService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,8 +49,11 @@ public class BasicUserService implements UserService {
     private final BinaryContentStorage binaryContentStorage;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final KafkaTemplate kafkaTemplate;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Transactional
+    @CacheEvict(value = "users", key = "'all'")
     @Override
     public UserDto create(UserCreateRequest userCreateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -65,7 +77,51 @@ public class BasicUserService implements UserService {
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                .thenAccept(result -> {
+                                    log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
+                                    binaryContentRepository.updateUploadStatus(
+                                        binaryContent.getId(),
+                                        BinaryContentUploadStatus.SUCCESS);
+
+                                    BinaryContent binaryContent_ = binaryContentRepository.findById(
+                                            binaryContent.getId())
+                                        .orElseThrow(() -> BinaryContentNotFoundException.withId(
+                                            binaryContent.getId()));
+
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
+                                })
+                                .exceptionally(throwable -> {
+                                    log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
+                                    binaryContentRepository.updateUploadStatus(
+                                        binaryContent.getId(),
+                                        BinaryContentUploadStatus.FAILED);
+
+                                    BinaryContent binaryContent_ = binaryContentRepository.findById(
+                                            binaryContent.getId())
+                                        .orElseThrow(() -> BinaryContentNotFoundException.withId(
+                                            binaryContent.getId()));
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
+                                    return null;
+                                })
+                            ;
+                        }
+                    });
+
                 return binaryContent;
             })
             .orElse(null);
@@ -90,8 +146,8 @@ public class BasicUserService implements UserService {
         return userDto;
     }
 
+    @Cacheable(value = "users", key = "'all'", unless = "#result.isEmpty()")
     @Override
-    @Cacheable(cacheNames = "users", key = "'all'")
     public List<UserDto> findAll() {
         log.debug("모든 사용자 조회 시작");
         Set<UUID> onlineUserIds = jwtService.getActiveJwtSessions().stream()
@@ -108,7 +164,7 @@ public class BasicUserService implements UserService {
 
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
-    @CacheEvict(cacheNames = "users", key = "'all'")
+    @CacheEvict(value = "users", key = "'all'")
     @Override
     public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
         Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -133,14 +189,54 @@ public class BasicUserService implements UserService {
 
         BinaryContent nullableProfile = optionalProfileCreateRequest
             .map(profileRequest -> {
-
                 String fileName = profileRequest.fileName();
                 String contentType = profileRequest.contentType();
                 byte[] bytes = profileRequest.bytes();
                 BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
                     contentType);
                 binaryContentRepository.save(binaryContent);
-                binaryContentStorage.put(binaryContent.getId(), bytes);
+                TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                                .thenAccept(result -> {
+                                    log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
+                                    binaryContentRepository.updateUploadStatus(
+                                        binaryContent.getId(),
+                                        BinaryContentUploadStatus.SUCCESS);
+                                    BinaryContent binaryContent_ = binaryContentRepository.findById(
+                                            binaryContent.getId())
+                                        .orElseThrow(() -> BinaryContentNotFoundException.withId(
+                                            binaryContent.getId()));
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
+                                })
+                                .exceptionally(throwable -> {
+                                    log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
+                                    binaryContentRepository.updateUploadStatus(
+                                        binaryContent.getId(),
+                                        BinaryContentUploadStatus.FAILED);
+                                    BinaryContent binaryContent_ = binaryContentRepository.findById(
+                                            binaryContent.getId())
+                                        .orElseThrow(() -> BinaryContentNotFoundException.withId(
+                                            binaryContent.getId()));
+                                    NotificationMessage message = new NotificationMessage(
+                                        "binaryContents.status", binaryContent.getId().toString(),
+                                        Map.of("binaryContent",
+                                            binaryContentMapper.toDto(binaryContent_)));
+                                    kafkaTemplate.send("sse-events",
+                                        binaryContent.getId().toString(), message);
+                                    return null;
+                                })
+                            ;
+                        }
+                    });
+
                 return binaryContent;
             })
             .orElse(null);
@@ -151,12 +247,20 @@ public class BasicUserService implements UserService {
         user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
         log.info("사용자 수정 완료: id={}", userId);
+
+        NotificationMessage message = new NotificationMessage(
+            "users.refresh", UUID.randomUUID().toString(),
+            Map.of("userId",
+                userId));
+        kafkaTemplate.send("sse-events",
+            UUID.randomUUID().toString(), message);
+
         return userMapper.toDto(user);
     }
 
     @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
     @Transactional
-    @CacheEvict(cacheNames = "users", key = "'all'")
+    @CacheEvict(value = "users", key = "'all'")
     @Override
     public void delete(UUID userId) {
         log.debug("사용자 삭제 시작: id={}", userId);

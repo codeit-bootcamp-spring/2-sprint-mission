@@ -8,7 +8,6 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: validate
     open-in-view: false
@@ -17,30 +16,28 @@ spring:
       - dev
   config:
     import: optional:file:.env[.properties]
-
+  cache:
+    type: redis
+    cache-names:
+      - channelsByUser
+      - notificationsByUser
+      - users
+    redis:
+      enable-statistics: true
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   kafka:
-    bootstrap-servers: host.docker.internal:9092
-
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
       group-id: discodeit-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "*"
-    listener:
-      missing-topics-fatal: false
-  cache:
-    type: redis
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 
 
@@ -48,17 +45,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,loggers,prometheus
-
+        include: health,info,metrics,loggers,caches
   endpoint:
-    metrics:
-      enabled: true
     health:
       show-details: always
-
-  metrics:
-    enable:
-      all: true
+  observations:
+    annotations:
+      enabled: true
 
 info:
   name: Discodeit
