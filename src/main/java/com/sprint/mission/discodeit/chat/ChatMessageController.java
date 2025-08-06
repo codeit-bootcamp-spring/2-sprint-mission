@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.chat;
+package com.sprint.mission.discodeit.chat;
 
 import com.sprint.mission.discodeit.domain.message.dto.MessageResult;
 import com.sprint.mission.discodeit.domain.message.dto.request.MessageCreateRequest;

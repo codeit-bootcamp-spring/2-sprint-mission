@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.common.failure.event.AsyncJobType;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContent;
 import com.sprint.mission.discodeit.domain.binarycontent.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.domain.binarycontent.event.BinaryContentCreatedEvent;
+import com.sprint.mission.discodeit.domain.binarycontent.event.BinaryContentUploadStatusChangedEvent;
 import com.sprint.mission.discodeit.domain.binarycontent.exception.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.domain.binarycontent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
@@ -51,7 +52,13 @@ public class BinaryContentEventHandler {
 
     CompletableFuture
         .allOf(uploadResults.toArray(new CompletableFuture[0]))
-        .thenRun(() -> binaryContentRepository.saveAll(binaryContents.values()));
+        .thenRun(() -> {
+          List<BinaryContent> uploadedContents = binaryContentRepository.saveAll(
+              binaryContents.values());
+          for (BinaryContent binaryContent : uploadedContents) {
+            eventPublisher.publishEvent(BinaryContentUploadStatusChangedEvent.from(binaryContent));
+          }
+        });
   }
 
   @TransactionalEventListener
@@ -63,7 +70,10 @@ public class BinaryContentEventHandler {
     CompletableFuture<UUID> uploadResult = getBinaryStorageUploadResult(
         binaryContent.getId(), binaryContentCreatedEvent, binaryContent);
 
-    uploadResult.thenRun(() -> binaryContentRepository.save(binaryContent));
+    uploadResult.thenRun(() -> {
+      BinaryContent content = binaryContentRepository.save(binaryContent);
+      eventPublisher.publishEvent(BinaryContentUploadStatusChangedEvent.from(content));
+    });
   }
 
   private CompletableFuture<UUID> getBinaryStorageUploadResult(UUID binaryContentId,

@@ -14,7 +14,10 @@ public record BinaryContentCreatedEvent(
   public static BinaryContentCreatedEvent createBinaryContentCreatedEvent(
       BinaryContent binaryContent, BinaryContentRequest binaryContentRequest
   ) {
-    return new BinaryContentCreatedEvent(binaryContent.getId(), binaryContentRequest.bytes());
+    return new BinaryContentCreatedEvent(
+        binaryContent.getId(),
+        binaryContentRequest.bytes()
+    );
   }
 
   public static List<BinaryContentCreatedEvent> createBinaryContentsCreatedEvent(
@@ -22,9 +25,10 @@ public record BinaryContentCreatedEvent(
   ) {
     return binaryContents.entrySet()
         .stream()
-        .map(binaryContent -> new BinaryContentCreatedEvent(binaryContent.getKey().getId(),
-            binaryContent.getValue().bytes()))
-        .toList();
+        .map(binaryContent -> new BinaryContentCreatedEvent(
+            binaryContent.getKey().getId(),
+            binaryContent.getValue().bytes())
+        ).toList();
   }
 
 }

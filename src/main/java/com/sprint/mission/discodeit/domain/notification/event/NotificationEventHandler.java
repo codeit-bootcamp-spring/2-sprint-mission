@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.domain.notification.repository.NotificationR
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -30,6 +31,7 @@ public class NotificationEventHandler {
   private static final int NOTIFICATION_MAX_ATTEMPT = 2;
   private final NotificationRepository notificationRepository;
   private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   @TransactionalEventListener
   @Async("notificationExecutor")
@@ -46,7 +48,7 @@ public class NotificationEventHandler {
         NotificationType.ROLE_CHANGED,
         event.userId()
     );
-    notificationRepository.save(notification);
+    saveNotification(notification);
   }
 
   @Recover
@@ -75,7 +77,7 @@ public class NotificationEventHandler {
         NotificationType.ROLE_CHANGED,
         event.userId()
     );
-    notificationRepository.save(notification);
+    saveNotification(notification);
   }
 
   @Recover
@@ -120,7 +122,7 @@ public class NotificationEventHandler {
         NotificationType.ASYNC_FAILED,
         null
     );
-    notificationRepository.save(notification);
+    saveNotification(notification);
   }
 
   @Recover
@@ -137,6 +139,11 @@ public class NotificationEventHandler {
   private static String createNotificationContent(AsyncJobFailedEvent event) {
     return String.format("%s 업로드 작업이 %s 문제로 실패했습니다.", event.JobType(),
         event.throwable().getClass().getName());
+  }
+
+  private void saveNotification(Notification notification) {
+    Notification savedNotification = notificationRepository.save(notification);
+    applicationEventPublisher.publishEvent(NotificationCreatedEvent.from(savedNotification));
   }
 
 }
