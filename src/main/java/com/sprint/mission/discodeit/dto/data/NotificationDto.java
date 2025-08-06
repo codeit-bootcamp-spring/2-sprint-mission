@@ -8,10 +8,9 @@ public record NotificationDto(
     UUID id,
     Instant createdAt,
     UUID receiverId,
-    String Title,
+    String title,
     String content,
     NotificationType type,
-    UUID targetID
+    UUID targetId
 ) {
-
-}
+} 

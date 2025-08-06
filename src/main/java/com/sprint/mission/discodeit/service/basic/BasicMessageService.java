@@ -6,15 +6,15 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.NotificationType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.event.NotificationEvent;
-import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.event.NewMessageEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -23,9 +23,10 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import io.micrometer.core.annotation.Timed;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
@@ -52,8 +54,10 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
   private final PageResponseMapper pageResponseMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SimpMessagingTemplate messagingTemplate;
+  private final SseService sseService;
+  private final BinaryContentMapper binaryContentMapper;
 
-  @Timed(value = "message.create.time", description = "Message creation execution time")
   @Transactional
   @Override
   public MessageDto create(MessageCreateRequest messageCreateRequest,
@@ -67,6 +71,7 @@ public class BasicMessageService implements MessageService {
     User author = userRepository.findById(authorId)
         .orElseThrow(() -> UserNotFoundException.withId(authorId));
 
+    Map<UUID, byte[]> bytesMap = new HashMap<>();
     List<BinaryContent> attachments = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();
@@ -76,10 +81,46 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
-          updateUploadStatusAfterPut(binaryContent, bytes);
+          UUID binaryContentId = binaryContent.getId();
+          bytesMap.put(binaryContentId, bytes);
           return binaryContent;
         })
         .toList();
+
+    TransactionSynchronizationManager.registerSynchronization(
+        new TransactionSynchronization() {
+          @Override
+          public void afterCommit() {
+            attachments.forEach(binaryContent -> {
+              UUID binaryContentId = binaryContent.getId();
+              binaryContentStorage.putAsync(binaryContentId, bytesMap.get(binaryContentId))
+                  .thenAccept(result -> {
+                    log.debug("메시지에 포함된 첨부파일 업로드 성공: {}", binaryContentId);
+                    binaryContentRepository.updateUploadStatus(binaryContentId,
+                        BinaryContentUploadStatus.SUCCESS);
+
+                    // 업로드 성공 SSE 이벤트 전송
+                    binaryContentRepository.findById(binaryContentId).ifPresent(content ->
+                        sseService.sendEventToUser(authorId, "binaryContents.status",
+                            binaryContentMapper.toDto(content))
+                    );
+                  })
+                  .exceptionally(ex -> {
+                    log.error("메시지에 포함된 첨부파일 업로드 실패: {}", binaryContentId, ex);
+                    binaryContentRepository.updateUploadStatus(binaryContentId,
+                        BinaryContentUploadStatus.FAILED);
+
+                    // 업로드 실패 SSE 이벤트 전송
+                    binaryContentRepository.findById(binaryContentId).ifPresent(content ->
+                        sseService.sendEventToUser(authorId, "binaryContents.status",
+                            binaryContentMapper.toDto(content))
+                    );
+                    return null;
+                  })
+              ;
+            });
+          }
+        });
 
     String content = messageCreateRequest.content();
     Message message = new Message(
@@ -90,18 +131,11 @@ public class BasicMessageService implements MessageService {
     );
 
     messageRepository.save(message);
-
-    NotificationEvent event = new NotificationEvent(
-        author.getId(),
-        NotificationType.NEW_MESSAGE,
-        "새 메시지 도착",
-        "메시지가 채팅방에 등록되었습니다.",
-        channel.getId()
-    );
-    eventPublisher.publishEvent(event);
-
     log.info("메시지 생성 완료: id={}, channelId={}", message.getId(), channelId);
-    return messageMapper.toDto(message);
+
+    MessageDto messageDto = messageMapper.toDto(message);
+    eventPublisher.publishEvent(new NewMessageEvent(messageDto));
+    return messageDto;
   }
 
   @Transactional(readOnly = true)
@@ -155,34 +189,11 @@ public class BasicMessageService implements MessageService {
     log.info("메시지 삭제 완료: id={}", messageId);
   }
 
-  private void updateUploadStatusAfterPut(BinaryContent binaryContent, byte[] bytes) {
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          public void afterCommit() {
-            try {
-              // 비동기 put 호출
-              UUID uploadedId = binaryContentStorage.put(
-                  binaryContent.getId(), bytes);
-
-              // BinaryContent 조회 및 상태 업데이트
-              BinaryContent updatedContent = binaryContentRepository.findById(
-                      binaryContent.getId())
-                  .orElseThrow(
-                      () -> BinaryContentNotFoundException.withId(binaryContent.getId()));
-
-              if (uploadedId != null) {
-                updatedContent.markUploadSuccess();
-              } else {
-                updatedContent.markUploadFailed();
-              }
-              binaryContentRepository.save(updatedContent); // 상태 저장
-              log.info("업로드 상태 업데이트 완료: ID = {}, 상태 = {}",
-                  binaryContent.getId(), updatedContent.getUploadStatus());
-            } catch (Exception e) {
-              log.error("afterCommit 중 업로드 실패: ID = {}, 오류 = {}",
-                  binaryContent.getId(), e.getMessage());
-            }
-          }
-        });
+  @Transactional
+  @Override
+  public void broadcastMessage(MessageDto createdMessage, UUID channelId) {
+    String destination = "/sub/channels." + channelId + ".messages";
+    messagingTemplate.convertAndSend(destination, createdMessage);
+    log.info("메시지 브로드캐스트: destination={}, messageId={}", destination, createdMessage.id());
   }
 }

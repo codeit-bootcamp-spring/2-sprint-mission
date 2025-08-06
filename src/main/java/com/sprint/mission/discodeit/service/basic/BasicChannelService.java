@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.event.PrivateChannelCreatedEvent;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -16,9 +17,13 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +39,12 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
+  private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
+  @CacheEvict(value = "channelsByUser", allEntries = true)
   @Override
   public ChannelDto create(PublicChannelCreateRequest request) {
     log.debug("채널 생성 시작: {}", request);
@@ -46,6 +54,10 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.save(channel);
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+
+    // 모든 사용자에게 채널 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("channels.refresh", Map.of("channelId", channel.getId()));
+
     return channelMapper.toDto(channel);
   }
 
@@ -60,9 +72,17 @@ public class BasicChannelService implements ChannelService {
         .map(user -> new ReadStatus(user, channel, channel.getCreatedAt()))
         .toList();
     readStatusRepository.saveAll(readStatuses);
-
     log.info("채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
-    return channelMapper.toDto(channel);
+
+    request.participantIds().forEach(participantId ->
+        sseService.sendEventToUser(participantId, "channels.refresh",
+            Map.of("channelId", channel.getId()))
+    );
+
+    ChannelDto channelDto = channelMapper.toDto(channel);
+    eventPublisher.publishEvent(
+        new PrivateChannelCreatedEvent(channelDto, request.participantIds()));
+    return channelDto;
   }
 
   @Transactional(readOnly = true)
@@ -74,6 +94,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Transactional(readOnly = true)
+  @Cacheable(value = "channelsByUser", key = "#userId", unless = "#result.isEmpty()")
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
     List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
@@ -89,6 +110,7 @@ public class BasicChannelService implements ChannelService {
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
+  @CacheEvict(value = "channelsByUser", allEntries = true)
   @Override
   public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
     log.debug("채널 수정 시작: id={}, request={}", channelId, request);
@@ -101,11 +123,16 @@ public class BasicChannelService implements ChannelService {
     }
     channel.update(newName, newDescription);
     log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
+
+    // 모든 사용자에게 채널 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("channels.refresh", Map.of("channelId", channelId));
+
     return channelMapper.toDto(channel);
   }
 
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
   @Transactional
+  @CacheEvict(value = "channelsByUser", allEntries = true)
   @Override
   public void delete(UUID channelId) {
     log.debug("채널 삭제 시작: id={}", channelId);
@@ -118,5 +145,8 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.deleteById(channelId);
     log.info("채널 삭제 완료: id={}", channelId);
+
+    // 모든 사용자에게 채널 목록 갱신 입엔트 전송
+    sseService.broadcastEvent("channels.refresh", Map.of("channelId", channelId));
   }
 }

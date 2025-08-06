@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.storage.s3;
 
-import com.sprint.mission.discodeit.dto.data.AsyncTaskFailure;
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.CompletableFuture;
+
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +20,15 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import com.sprint.mission.discodeit.config.MDCLoggingInterceptor;
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.AsyncTaskFailure;
+import com.sprint.mission.discodeit.event.AsyncTaskFailedEvent;
+import com.sprint.mission.discodeit.repository.AsyncTaskFailureRepository;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -42,6 +50,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   private final String secretKey;
   private final String region;
   private final String bucket;
+  private final AsyncTaskFailureRepository asyncTaskFailureRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Value("${discodeit.storage.s3.presigned-url-expiration:600}") // 기본값 10분
   private long presignedUrlExpirationSeconds;
@@ -50,26 +60,22 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
       @Value("${discodeit.storage.s3.access-key}") String accessKey,
       @Value("${discodeit.storage.s3.secret-key}") String secretKey,
       @Value("${discodeit.storage.s3.region}") String region,
-      @Value("${discodeit.storage.s3.bucket}") String bucket
+      @Value("${discodeit.storage.s3.bucket}") String bucket,
+      AsyncTaskFailureRepository asyncTaskFailureRepository,
+      ApplicationEventPublisher eventPublisher
   ) {
     this.accessKey = accessKey;
     this.secretKey = secretKey;
     this.region = region;
     this.bucket = bucket;
+    this.asyncTaskFailureRepository = asyncTaskFailureRepository;
+    this.eventPublisher = eventPublisher;
   }
 
-  @Async
-  @Retryable(
-      retryFor = {RuntimeException.class},
-      maxAttempts = 3,
-      backoff = @Backoff(delay = 1000, maxDelay = 5000)
-  )
   @Override
   public UUID put(UUID binaryContentId, byte[] bytes) {
     String key = binaryContentId.toString();
     try {
-      Thread.sleep(2000);
-
       S3Client s3Client = getS3Client();
 
       PutObjectRequest request = PutObjectRequest.builder()
@@ -84,25 +90,38 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     } catch (S3Exception e) {
       log.error("S3에 파일 업로드 실패: {}", e.getMessage());
       throw new RuntimeException("S3에 파일 업로드 실패: " + key, e);
-    } catch (InterruptedException e) {
-      log.error("지연 중 인터럽트 발생: {}", e.getMessage());
-      Thread.currentThread().interrupt();
-
-      throw new RuntimeException("지연 처리 실패: " + key + e);
     }
   }
 
+  @Async("binaryContentTaskExecutor")
+  @Retryable(
+      value = {S3Exception.class, RuntimeException.class},
+      maxAttempts = 3,
+      backoff = @Backoff(delay = 1000, multiplier = 2)
+  )
+  public CompletableFuture<UUID> putAsync(UUID binaryContentId, byte[] bytes) {
+    log.info("파일 업로드 시도: {}", binaryContentId);
+
+    return CompletableFuture.completedFuture(put(binaryContentId, bytes));
+  }
+
   @Recover
-  public UUID recoverPut(RuntimeException e, UUID binaryContentId, byte[] bytes) {
-    Throwable cause = e.getCause();
-    String failureReason = (cause instanceof IOException) ? cause.getMessage() : e.getMessage();
-    String requestId = MDC.get("requestId");
+  public CompletableFuture<UUID> recoverPutAsync(Exception e, UUID binaryContentId, byte[] bytes) {
+    String taskName = getClass().getSimpleName() + "#" + "putAsync";
+    String failureReason = String.format("S3 파일 업로드 실패 (binaryContentId: %s): %s",
+        binaryContentId, e.getMessage());
 
-    AsyncTaskFailure failure = new AsyncTaskFailure("S3 putMethod", requestId, failureReason);
+    String requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID))
+        .map(Object::toString)
+        .orElse("unknown");
 
-    log.error("업로드 실패: {}, 컨텐츠 ID: {}", failure, binaryContentId);
+    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
+    asyncTaskFailureRepository.save(failure);
 
-    return null;
+    eventPublisher.publishEvent(new AsyncTaskFailedEvent(failure));
+
+    log.error("파일 업로드 최종 실패 (실패 정보 기록됨): {}", binaryContentId, e);
+    throw new RuntimeException("파일 업로드 최종 실패: " + binaryContentId, e);
   }
 
   @Override

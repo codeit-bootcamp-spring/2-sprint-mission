@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContentUploadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.binarycontent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -16,8 +16,8 @@ import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import io.micrometer.core.annotation.Timed;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -28,8 +28,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,9 +44,10 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final SseService sseService;
 
-  @Timed(value = "user.create.time", description = "User creation execution time", longTask = true)
   @Transactional
+  @CacheEvict(value = "users", key = "'all'")
   @Override
   public UserDto create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -60,33 +63,48 @@ public class BasicUserService implements UserService {
       throw UserAlreadyExistsException.withUsername(username);
     }
 
-    final byte[] profileBytes = optionalProfileCreateRequest
-        .map(BinaryContentCreateRequest::bytes)
-        .orElse(null);
-
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) profileBytes.length,
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                      .thenAccept(result -> {
+                        log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.SUCCESS);
+                      })
+                      .exceptionally(throwable -> {
+                        log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.FAILED);
+                        return null;
+                      })
+                  ;
+                }
+              });
 
           return binaryContent;
         })
         .orElse(null);
-
     String password = userCreateRequest.password();
+
     String hashedPassword = passwordEncoder.encode(password);
     User user = new User(username, email, hashedPassword, nullableProfile);
+
     userRepository.save(user);
-
-    // 트랜잭션 끝나고 비동기 업로드 작업
-    if (nullableProfile != null) {
-      updateUploadStatusAfterPut(nullableProfile, profileBytes);
-    }
-
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+
+    // 모든 사용자에게 사용자 목록 갱신 이벤트 전송
+    sseService.broadcastEvent("users.refresh", Map.of("userId", user.getId()));
+
     return userMapper.toDto(user);
   }
 
@@ -101,6 +119,7 @@ public class BasicUserService implements UserService {
     return userDto;
   }
 
+  @Cacheable(value = "users", key = "'all'", unless = "#result.isEmpty()")
   @Override
   public List<UserDto> findAll() {
     log.debug("모든 사용자 조회 시작");
@@ -116,9 +135,9 @@ public class BasicUserService implements UserService {
     return userDtos;
   }
 
-  @Timed(value = "user.create.time", description = "User creation execution time", longTask = true)
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
+  @CacheEvict(value = "users", key = "'all'")
   @Override
   public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -141,17 +160,34 @@ public class BasicUserService implements UserService {
       throw UserAlreadyExistsException.withUsername(newUsername);
     }
 
-    final byte[] profileBytes = optionalProfileCreateRequest
-        .map(BinaryContentCreateRequest::bytes)
-        .orElse(null);
-
     BinaryContent nullableProfile = optionalProfileCreateRequest
         .map(profileRequest -> {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) profileBytes.length,
+          byte[] bytes = profileRequest.bytes();
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType);
           binaryContentRepository.save(binaryContent);
+          TransactionSynchronizationManager.registerSynchronization(
+              new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                  binaryContentStorage.putAsync(binaryContent.getId(), bytes)
+                      .thenAccept(result -> {
+                        log.debug("프로필 이미지 업로드 성공: {}", binaryContent.getId());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.SUCCESS);
+                      })
+                      .exceptionally(throwable -> {
+                        log.error("프로필 이미지 업로드 실패: {}", throwable.getMessage());
+                        binaryContentRepository.updateUploadStatus(binaryContent.getId(),
+                            BinaryContentUploadStatus.FAILED);
+                        return null;
+                      })
+                  ;
+                }
+              });
+
           return binaryContent;
         })
         .orElse(null);
@@ -160,18 +196,16 @@ public class BasicUserService implements UserService {
     String hashedNewPassword = Optional.ofNullable(newPassword).map(passwordEncoder::encode)
         .orElse(null);
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
-
-    // 트랜잭션 끝나고 비동기 업로드 작업
-    if (nullableProfile != null) {
-      updateUploadStatusAfterPut(nullableProfile, profileBytes);
-    }
-
     log.info("사용자 수정 완료: id={}", userId);
+
+    sseService.broadcastEvent("users.refresh", Map.of("userId", userId));
+
     return userMapper.toDto(user);
   }
 
   @PreAuthorize("hasRole('ADMIN') or principal.userDto.id == #userId")
   @Transactional
+  @CacheEvict(value = "users", key = "'all'")
   @Override
   public void delete(UUID userId) {
     log.debug("사용자 삭제 시작: id={}", userId);
@@ -182,37 +216,7 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+
+    sseService.broadcastEvent("users.refresh", Map.of("usersId", userId));
   }
-
-  private void updateUploadStatusAfterPut(BinaryContent binaryContent, byte[] profileBytes) {
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronizationAdapter() {
-          public void afterCommit() {
-            try {
-              // 비동기 put 호출
-              UUID uploadedId = binaryContentStorage.put(
-                  binaryContent.getId(), profileBytes);
-
-              // BinaryContent 조회 및 상태 업데이트
-              BinaryContent updatedContent = binaryContentRepository.findById(
-                      binaryContent.getId())
-                  .orElseThrow(
-                      () -> BinaryContentNotFoundException.withId(binaryContent.getId()));
-
-              if (uploadedId != null) {
-                updatedContent.markUploadSuccess();
-              } else {
-                updatedContent.markUploadFailed();
-              }
-              binaryContentRepository.save(updatedContent); // 상태 저장
-              log.info("업로드 상태 업데이트 완료: ID = {}, 상태 = {}",
-                  binaryContent.getId(), updatedContent.getUploadStatus());
-            } catch (Exception e) {
-              log.error("afterCommit 중 업로드 실패: ID = {}, 오류 = {}",
-                  binaryContent.getId(), e.getMessage());
-            }
-          }
-        });
-  }
-
 }
