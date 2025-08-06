@@ -1,56 +1,73 @@
 package com.sprint.mission.discodeit.config;
 
-import java.util.Map;
-import java.util.concurrent.Executor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
+import java.util.List;
+import java.util.Optional;
+
+import org.jboss.logging.MDC;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.support.CompositeTaskDecorator;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-@Slf4j
+
 @Configuration
+@EnableAsync
 public class AsyncConfig {
-
-  public static class MdcTaskDecorator implements TaskDecorator {
-    @Override
-    public Runnable decorate(Runnable runnable) {
-      Map<String, String> mdcContext = MDC.getCopyOfContextMap();
-      SecurityContext securityContext = SecurityContextHolder.getContext();
-      return () -> {
-        try {
-          if (mdcContext != null) MDC.setContextMap(mdcContext);
-          SecurityContextHolder.setContext(securityContext);
-          runnable.run();
-        } finally {
-          MDC.clear();
-          SecurityContextHolder.clearContext();
-        }
-      };
-    }
-  }
-
-  private static ThreadPoolTaskExecutor createExecutor(String namePrefix, int corePoolSize, int maxPoolSize) {
+  
+  @Bean("binaryContentTaskExecutor")
+  public TaskExecutor binaryContentTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    executor.setCorePoolSize(corePoolSize);
-    executor.setMaxPoolSize(maxPoolSize);
-    executor.setQueueCapacity(50);
-    executor.setThreadNamePrefix(namePrefix);
-    executor.setTaskDecorator(new MdcTaskDecorator());
+    executor.setCorePoolSize(10);
+    executor.setMaxPoolSize(20);
+    executor.setQueueCapacity(100);
+    executor.setThreadNamePrefix("binary-content-");
+    executor.setTaskDecorator(new CompositeTaskDecorator(List.of(mdcTaskDecorator(), securityContextTaskDecorator())));
     executor.initialize();
     return executor;
   }
 
-  @Bean(name = "fileUploadTaskExecutor")
-  public Executor fileUploadTaskExecutor() {
-    return createExecutor("file-upload-", 5, 10);
+  @Bean(name = "eventTaskExecutor")
+    public TaskExecutor eventExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("event-task-");
+        executor.setTaskDecorator(new CompositeTaskDecorator(List.of(mdcTaskDecorator(), securityContextTaskDecorator())));
+        executor.initialize();
+        return executor;
+    }
+
+  public TaskDecorator mdcTaskDecorator() {
+    return runnable -> {
+      Optional<String> requestId = Optional.ofNullable(MDC.get(MDCLoggingInterceptor.REQUEST_ID)).map(String.class::cast);
+      return () -> {
+        requestId.ifPresent(id -> MDC.put(MDCLoggingInterceptor.REQUEST_ID, id));
+        try {
+          runnable.run();
+        } finally {
+          requestId.ifPresent(id -> MDC.remove(MDCLoggingInterceptor.REQUEST_ID));
+        }
+      };
+    };
   }
 
-  @Bean(name = "notificationTaskExecutor")
-  public Executor notificationTaskExecutor() {
-    return createExecutor("notification-", 2, 5);
+  public TaskDecorator securityContextTaskDecorator() {
+    return runnable -> {
+      SecurityContext securityContext = SecurityContextHolder.getContext();
+      return () -> {
+        SecurityContextHolder.setContext(securityContext);
+        try {
+          runnable.run();
+        } finally {
+          SecurityContextHolder.clearContext();
+        }
+      };
+    };
   }
 }

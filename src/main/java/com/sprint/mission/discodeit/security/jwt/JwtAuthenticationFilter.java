@@ -67,14 +67,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
   private Optional<String> resolveAccessToken(HttpServletRequest request) {
     String prefix = "Bearer ";
-    return Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
-        .map(value -> {
-          if (value.startsWith(prefix)) {
-            return value.substring(prefix.length());
-          } else {
-            return null;
-          }
-        });
+    Optional<String> tokenFromHeader = Optional.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+        .filter(value -> value.startsWith(prefix))
+        .map(value -> value.substring(prefix.length()));
+
+    // 2. 헤더에 토큰이 없으면, 'token'이라는 쿼리 파라미터에서 찾기
+    if (tokenFromHeader.isPresent()) {
+      return tokenFromHeader;
+    } else {
+      return Optional.ofNullable(request.getParameter("token"));
+    }
   }
 
   private boolean isPermitAll(HttpServletRequest request) {

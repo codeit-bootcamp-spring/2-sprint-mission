@@ -18,9 +18,9 @@ public class JwtSession extends BaseUpdatableEntity {
 
   @Column(columnDefinition = "uuid", updatable = false, nullable = false)
   private UUID userId;
-  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
+  @Column(columnDefinition = "text", nullable = false, unique = true)
   private String accessToken;
-  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
+  @Column(columnDefinition = "text", nullable = false, unique = true)
   private String refreshToken;
   @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant expirationTime;

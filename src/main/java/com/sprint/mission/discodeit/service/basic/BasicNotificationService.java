@@ -1,70 +1,110 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.NotificationDto;
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.mapper.NotificationMapper; // Mapper는 직접 만들어야 함
-import com.sprint.mission.discodeit.repository.NotificationRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.service.NotificationService;
-import com.sprint.mission.discodeit.service.event.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+import com.sprint.mission.discodeit.event.MultipleNotificationCreatedEvent;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
+
+import com.sprint.mission.discodeit.dto.data.NotificationDto;
+import com.sprint.mission.discodeit.entity.Notification;
+import com.sprint.mission.discodeit.entity.NotificationType;
+import com.sprint.mission.discodeit.exception.notification.NotificationNotFoundException;
+import com.sprint.mission.discodeit.mapper.NotificationMapper;
+import com.sprint.mission.discodeit.repository.NotificationRepository;
+import com.sprint.mission.discodeit.service.NotificationService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 public class BasicNotificationService implements NotificationService {
 
   private final NotificationRepository notificationRepository;
-  private final ReadStatusRepository readStatusRepository;
-  private final NotificationMapper notificationMapper; // MapStruct Mapper
+  private final NotificationMapper notificationMapper;
+  private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
 
-  @Async("notificationTaskExecutor")
-  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void handleNewMessage(NewMessageNotificationEvent event) {
-    Message message = event.message();
-    List<ReadStatus> subscribedUsers = readStatusRepository.findAllByChannelIdWithUser(message.getChannel().getId());
+  @PreAuthorize("principal.userDto.id == #receiverId")
+  @Cacheable(value = "notificationsByUser", key = "#receiverId", unless = "#result.isEmpty()")
+  @Override
+  public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
+    log.debug("알림 목록 조회 시작: receiverId={}", receiverId);
+    List<NotificationDto> notifications = notificationRepository.findAllByReceiverIdOrderByCreatedAtDesc(
+            receiverId)
+        .stream()
+        .map(notificationMapper::toDto)
+        .toList();
+    log.info("알림 목록 조회 완료: receiverId={}, 조회된 항목 수={}", receiverId, notifications.size());
+    return notifications;
+  }
 
-    for (ReadStatus status : subscribedUsers) {
-      if (status.isNotificationEnabled() && !status.getUser().getId().equals(message.getAuthor().getId())) {
-        String title = String.format("새 메시지: %s", message.getChannel().getName());
-        String content = String.format("%s: %s", message.getAuthor().getUsername(), message.getContent());
-        Notification notification = new Notification(status.getUser(), title, content, NotificationType.NEW_MESSAGE, message.getChannel().getId());
-        notificationRepository.save(notification);
-        log.info("{}님에게 새 메시지 알림 생성", status.getUser().getUsername());
-      }
+  @PreAuthorize("principal.userDto.id == #receiverId")
+  @Transactional
+  @CacheEvict(value = "notificationsByUser", key = "#receiverId")
+  @Override
+  public void delete(UUID notificationId, UUID receiverId) {
+    log.debug("알림 삭제 시작: id={}, receiverId={}", notificationId, receiverId);
+    try {
+      notificationRepository.deleteByIdAndReceiverId(notificationId, receiverId);
+      log.info("알림 삭제 완료: id={}, receiverId={}", notificationId, receiverId);
+    } catch (Exception e) {
+      log.error("알림 삭제 실패: id={}, receiverId={}", notificationId, receiverId, e);
+      throw NotificationNotFoundException.withId(notificationId);
     }
   }
 
+  @Transactional
+  @CacheEvict(value = "notificationsByUser", key = "#receiverId")
   @Override
-  @Cacheable(value = "userNotifications", key = "#receiverId")
-  public List<NotificationDto> findAllByReceiverId(UUID receiverId) {
-    return notificationRepository.findAllByReceiverId(receiverId).stream()
-        .map(notificationMapper::toDto)
-        .toList();
+  public void create(UUID receiverId, String title, String content,
+      NotificationType notificationType, UUID targetId) {
+    log.debug("새 알림 생성 시작: receiverId={}, channelId={}", receiverId);
+
+    Notification notification = new Notification(
+        receiverId,
+        title,
+        content,
+        notificationType,
+        targetId
+    );
+    notificationRepository.save(notification);
+
+    // "notifications" 라는 이름으로 Dto 데이터를 SSE로 전송
+    sseService.send(receiverId, "notifications", notificationMapper.toDto(notification));
+
+    log.info("새 알림 생성 완료: id={}, receiverId={}, targetId={}",
+        notification.getId(), receiverId, targetId);
   }
 
+  @Transactional
   @Override
-  @CacheEvict(value = "userNotifications", key = "#userId")
-  public void delete(UUID notificationId, UUID userId) {
-    notificationRepository.deleteById(notificationId);
-  }
+  public void createAll(Set<UUID> receiverIds, String title, String content,
+      NotificationType notificationType, UUID targetId) {
+    log.debug("새 알림 생성 시작: receiverIds={}, targetId={}", receiverIds, targetId);
+    List<Notification> notifications = receiverIds.stream()
+        .map(receiverId -> new Notification(
+            receiverId,
+            title,
+            content,
+            notificationType,
+            targetId
+        )).toList();
+    notificationRepository.saveAll(notifications);
 
-  @Override
-  public boolean isOwner(UUID notificationId, UUID userId) {
-    return notificationRepository.findById(notificationId)
-        .map(n -> n.getReceiver().getId().equals(userId))
-        .orElse(false);
+    // 이벤트 발행
+    eventPublisher.publishEvent(new MultipleNotificationCreatedEvent(receiverIds));
+
+    log.info("새 알림 생성 완료: receiverIds={}, targetId={}",
+        receiverIds, targetId);
   }
-}
+} 

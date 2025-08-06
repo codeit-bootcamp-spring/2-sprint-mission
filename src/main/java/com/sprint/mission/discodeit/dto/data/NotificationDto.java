@@ -13,4 +13,4 @@ public record NotificationDto(
     NotificationType type,
     UUID targetId
 ) {
-}
+} 
