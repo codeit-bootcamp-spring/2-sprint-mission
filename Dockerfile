@@ -1,31 +1,44 @@
-FROM amazoncorretto:17-alpine as build
-WORKDIR /workspace/app
+# 빌드 스테이지
+FROM amazoncorretto:17 AS builder
 
-COPY gradlew build.gradle settings.gradle ./
-COPY gradle  ./gradle
-
-RUN ./gradlew --no-daemon dependencies
-
-COPY src ./src
-RUN ./gradlew --no-daemon clean bootJar -x test
-
-FROM amazoncorretto:17-alpine as runtime
+# 작업 디렉토리 설정
 WORKDIR /app
 
-ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=2.0-M9 \
-    JVM_OPTS=""
+# Gradle Wrapper 파일 먼저 복사
+COPY gradle ./gradle
+COPY gradlew ./gradlew
 
+# Gradle 캐시를 위한 의존성 파일 복사
+COPY build.gradle settings.gradle ./
+
+# 의존성 다운로드
+RUN ./gradlew dependencies
+
+# 소스 코드 복사 및 빌드
+COPY src ./src
+RUN ./gradlew build -x test
+
+
+# 런타임 스테이지
+FROM amazoncorretto:17-alpine3.21
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 프로젝트 정보를 ENV로 설정
+#ENV PROJECT_NAME=discodeit \
+#    PROJECT_VERSION=3.0-M12 \
+#    JVM_OPTS=""
+
+ENV JVM_OPTS=""
+
+# 빌드 스테이지에서 jar 파일만 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
+#COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
+
+# 80 포트 노출
 EXPOSE 80
 
-COPY --from=build /workspace/app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
-
-# entrypoint 복사
-COPY entrypoint.sh /entrypoint.sh
-
-# **CR 제거 + 실행권한**
-RUN sed -i 's/\r$//' /entrypoint.sh
-
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]
+# jar 파일 실행
+#ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar ${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} -jar app.jar"]

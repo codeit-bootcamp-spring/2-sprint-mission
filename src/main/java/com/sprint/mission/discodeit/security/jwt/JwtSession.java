@@ -1,49 +1,44 @@
 package com.sprint.mission.discodeit.security.jwt;
 
+import com.sprint.mission.discodeit.domain.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class JwtSession {
+@Table(name = "jwt_sessions")
+@Entity
+public class JwtSession extends BaseUpdatableEntity {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  @Setter
-  private UUID id;
-
-  @Column(nullable = false, unique = true)
+  @Column(columnDefinition = "uuid", updatable = false, nullable = false)
   private UUID userId;
-
-  @Column(nullable = false)
-  private String username;
-
-  @Column(length = 512, nullable = false)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String accessToken;
-
-  @Column(length = 512, nullable = false)
+  @Column(columnDefinition = "varchar(512)", nullable = false, unique = true)
   private String refreshToken;
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
+  private Instant expirationTime;
 
-  @Builder
-  public JwtSession(UUID userId, String username, String accessToken, String refreshToken) {
+  public JwtSession(UUID userId, String accessToken, String refreshToken, Instant expirationTime) {
     this.userId = userId;
-    this.username = username;
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
   }
 
-  public void updateTokens(String newAccessToken, String newRefreshToken) {
-    this.accessToken = newAccessToken;
-    this.refreshToken = newRefreshToken;
+  public boolean isExpired() {
+    return this.expirationTime.isBefore(Instant.now());
+  }
+
+  public void update(String accessToken, String refreshToken, Instant expirationTime) {
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.expirationTime = expirationTime;
   }
 }

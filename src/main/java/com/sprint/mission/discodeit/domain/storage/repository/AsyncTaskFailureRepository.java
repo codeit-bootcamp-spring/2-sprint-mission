@@ -1,0 +1,9 @@
+package com.sprint.mission.discodeit.domain.storage.repository;
+
+import com.sprint.mission.discodeit.domain.storage.entity.AsyncTaskFailure;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface AsyncTaskFailureRepository extends JpaRepository<AsyncTaskFailure, UUID> {
+
+}

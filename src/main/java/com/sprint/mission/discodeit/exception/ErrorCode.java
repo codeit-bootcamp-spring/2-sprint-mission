@@ -1,38 +1,47 @@
 package com.sprint.mission.discodeit.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
 public enum ErrorCode {
-  INTERNAL_SERVER_ERROR(500, "S001", "Internal Server Error"),
-  METHOD_ARGUMENT_NOT_VALID(400, "V000", "error.Argument"),
+  // User 관련 에러 코드
+  USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
+  DUPLICATE_USER("이미 존재하는 사용자입니다."),
+  INVALID_USER_CREDENTIALS("잘못된 사용자 인증 정보입니다."),
 
-  USER_INVALID_REQUEST(400, "U000", "error.user.invalid-input"),
-  USER_NOT_FOUND(404, "U001", "error.user.not-found"),
-  LOGIN_FAILED(400, "U002", "error.user.login-failed"),
-  USER_NAME_ALREADY_EXISTS(400, "U003", "error.user.name-already-exists"),
-  USER_EMAIL_ALREADY_EXISTS(400, "U004", "error.user.email-already-exists"),
+  // Channel 관련 에러 코드
+  CHANNEL_NOT_FOUND("채널을 찾을 수 없습니다."),
+  PRIVATE_CHANNEL_UPDATE("비공개 채널은 수정할 수 없습니다."),
 
-  CHANNEL_INVALID_REQUEST(400, "C000", "error.channel.invalid-input"),
-  CHANNEL_NOT_FOUND(404, "C001", "error.channel.not-found"),
-  UNMODIFIABLE_ERROR(400, "C002", "error.channel.unmodifiable"),
+  // Message 관련 에러 코드
+  MESSAGE_NOT_FOUND("메시지를 찾을 수 없습니다."),
 
-  USER_STATUS_NOT_FOUND(404, "US001", "error.user-status.not-found"),
-  USER_STATUS_ALREADY_EXISTS(400, "US002", "error.user-status.already-exists"),
+  // BinaryContent 관련 에러 코드
+  BINARY_CONTENT_NOT_FOUND("바이너리 컨텐츠를 찾을 수 없습니다."),
 
-  READ_STATUS_NOT_FOUND(404, "RS001", "error.read-status.not-found"),
-  READ_STATUS_ALREADY_EXISTS(400, "RS002", "error.read-status.already-exists"),
+  // ReadStatus 관련 에러 코드
+  READ_STATUS_NOT_FOUND("읽음 상태를 찾을 수 없습니다."),
+  DUPLICATE_READ_STATUS("이미 존재하는 읽음 상태입니다."),
 
-  MESSAGE_INVALID_REQUEST(400, "M000", "error.message.invalid-input"),
-  MESSAGE_NOT_FOUND(404, "M001", "error.message.not-found"),
+  // UserStatus 관련 에러 코드
+  USER_STATUS_NOT_FOUND("사용자 상태를 찾을 수 없습니다."),
+  DUPLICATE_USER_STATUS("이미 존재하는 사용자 상태입니다."),
 
-  FILE_NOT_FOUND(404, "F001", "error.file.not-found");
+  // Notification 관련 에러 코드
+  NOTIFICATION_NOT_FOUND("알림을 찾을 수 없습니다."),
 
+  // Server 에러 코드
+  INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
+  INVALID_REQUEST("잘못된 요청입니다."),
 
-  private final int httpStatus;
-  private final String code;
+  // 인증/인가 에러 코드
+  INVALID_TOKEN_SECRET("유효하지 않은 시크릿입니다."),
+  INVALID_TOKEN("유효하지 않은 토큰입니다."),
+  TOKEN_NOT_FOUND("토큰을 찾을 수 없습니다.");
+
   private final String message;
 
-}
+  ErrorCode(String message) {
+    this.message = message;
+  }
+} 

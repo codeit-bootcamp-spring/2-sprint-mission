@@ -1,94 +1,155 @@
-create table if not exists binary_contents
+-- 테이블
+-- User
+CREATE TABLE users
 (
-    id           uuid primary key,
-    created_at   timestamp    not null,
-    file_name    varchar(255) not null,
-    size         bigint       not null,
-    extension    varchar(100) not null,
-    content_type varchar(100) not null
-);
-
-create table if not exists users
-(
-    id         uuid primary key,
-    created_at timestamp default current_timestamp NOT NULL,
-    updated_at timestamp,
-    username   varchar(50) unique                  not null,
-    email      varchar(100) unique                 not null,
-    password   varchar(60)                         not null,
-    role       varchar(10)                         not null,
+    id         uuid PRIMARY KEY,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
+    username   varchar(50) UNIQUE       NOT NULL,
+    email      varchar(100) UNIQUE      NOT NULL,
+    password   varchar(60)              NOT NULL,
     profile_id uuid,
-    constraint fk_binary_contents
-        foreign key (profile_id)
-            references binary_contents (id)
-            on delete set null
+    role       varchar(20)              NOT NULL
 );
 
-create table if not exists channels
+-- BinaryContent
+CREATE TABLE binary_contents
 (
-    id          uuid primary key,
-    created_at  timestamp default current_timestamp not null,
-    updated_at  timestamp,
+    id            uuid PRIMARY KEY,
+    created_at    timestamp with time zone NOT NULL,
+    file_name     varchar(255)             NOT NULL,
+    size          bigint                   NOT NULL,
+    content_type  varchar(100)             NOT NULL,
+    upload_status varchar(20)              NOT NULL
+);
+
+
+-- Channel
+CREATE TABLE channels
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    updated_at  timestamp with time zone,
     name        varchar(100),
     description varchar(500),
-    type        varchar(10)                         not null
+    type        varchar(10)              NOT NULL
 );
 
-create table if not exists messages
+-- Message
+CREATE TABLE messages
 (
-    id         uuid primary key,
-    created_at timestamp default current_timestamp not null,
-    updated_at timestamp,
+    id         uuid PRIMARY KEY,
+    created_at timestamp with time zone NOT NULL,
+    updated_at timestamp with time zone,
     content    text,
-    channel_id uuid                                not null,
-    author_id  uuid,
-    constraint fk_user
-        foreign key (author_id)
-            references users (id)
-            on delete set null,
-    constraint fk_channel
-        foreign key (channel_id)
-            references channels (id)
-            on delete cascade
+    channel_id uuid                     NOT NULL,
+    author_id  uuid
 );
 
-create table if not exists read_statuses
-(
-    id           uuid primary key,
-    created_at   timestamp default current_timestamp not null,
-    updated_at   timestamp,
-    last_read_at timestamp                           not null,
-    user_id      uuid,
-    channel_id   uuid,
-    constraint fk_user
-        foreign key (user_id)
-            references users (id)
-            on delete cascade,
-    constraint fk_channel
-        foreign key (channel_id)
-            references channels (id)
-            on delete cascade,
-    CONSTRAINT uq_read_status_user_channel UNIQUE (user_id, channel_id)
-);
-
-create table if not exists message_attachments
+-- Message.attachments
+CREATE TABLE message_attachments
 (
     message_id    uuid,
     attachment_id uuid,
-    constraint fk_message
-        foreign key (message_id)
-            references messages (id)
-            on delete cascade,
-    constraint fk_binary_content
-        foreign key (attachment_id)
-            references binary_contents (id)
-            on delete cascade
+    PRIMARY KEY (message_id, attachment_id)
 );
+
+-- ReadStatus
+CREATE TABLE read_statuses
+(
+    id                   uuid PRIMARY KEY,
+    created_at           timestamp with time zone NOT NULL,
+    updated_at           timestamp with time zone,
+    user_id              uuid                     NOT NULL,
+    channel_id           uuid                     NOT NULL,
+    last_read_at         timestamp with time zone NOT NULL,
+    notification_enabled boolean                  NOT NULL,
+    UNIQUE (user_id, channel_id)
+);
+
+
+-- 제약 조건
+-- User (1) -> BinaryContent (1)
+ALTER TABLE users
+    ADD CONSTRAINT fk_user_binary_content
+        FOREIGN KEY (profile_id)
+            REFERENCES binary_contents (id)
+            ON DELETE SET NULL;
+
+-- Message (N) -> Channel (1)
+ALTER TABLE messages
+    ADD CONSTRAINT fk_message_channel
+        FOREIGN KEY (channel_id)
+            REFERENCES channels (id)
+            ON DELETE CASCADE;
+
+-- Message (N) -> Author (1)
+ALTER TABLE messages
+    ADD CONSTRAINT fk_message_user
+        FOREIGN KEY (author_id)
+            REFERENCES users (id)
+            ON DELETE SET NULL;
+
+-- MessageAttachment (1) -> BinaryContent (1)
+ALTER TABLE message_attachments
+    ADD CONSTRAINT fk_message_attachment_binary_content
+        FOREIGN KEY (attachment_id)
+            REFERENCES binary_contents (id)
+            ON DELETE CASCADE;
+
+-- ReadStatus (N) -> User (1)
+ALTER TABLE read_statuses
+    ADD CONSTRAINT fk_read_status_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE;
+
+-- ReadStatus (N) -> User (1)
+ALTER TABLE read_statuses
+    ADD CONSTRAINT fk_read_status_channel
+        FOREIGN KEY (channel_id)
+            REFERENCES channels (id)
+            ON DELETE CASCADE;
 
 CREATE TABLE persistent_logins
 (
-    username  VARCHAR(64) NOT NULL,
-    series    VARCHAR(64) PRIMARY KEY,
-    token     VARCHAR(64) NOT NULL,
-    last_used TIMESTAMP   NOT NULL
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+);
+
+CREATE TABLE jwt_sessions
+(
+    id              uuid PRIMARY KEY,
+    created_at      timestamp with time zone NOT NULL,
+    updated_at      timestamp with time zone,
+
+    user_id         uuid                     NOT NULL,
+    access_token    TEXT UNIQUE              NOT NULL,
+    refresh_token   TEXT UNIQUE              NOT NULL,
+    expiration_time timestamp with time zone NOT NULL
+);
+
+CREATE TABLE async_task_failures
+(
+    id             uuid PRIMARY KEY,
+    created_at     timestamp with time zone NOT NULL,
+    updated_at     timestamp with time zone,
+
+    task_name      varchar(255)             NOT NULL,
+    request_id     varchar(255)             NOT NULL,
+    failure_reason text                     NOT NULL
+);
+
+CREATE TABLE notifications
+(
+    id          uuid PRIMARY KEY,
+    created_at  timestamp with time zone NOT NULL,
+    updated_at  timestamp with time zone,
+    receiver_id uuid                     NOT NULL,
+    title       varchar(255)             NOT NULL,
+    content     text                     NOT NULL,
+    type        varchar(20)              NOT NULL,
+    target_id   uuid
 );
