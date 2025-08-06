@@ -101,7 +101,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         "Failed to store binary content in local storage (key=%s) : %s",
         binaryContentId, ex.getMessage());
 
-    AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(taskName, failureReason, requestId);
+    AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(taskName, requestId, failureReason);
     asyncTaskFailureRepository.save(asyncTaskFailure);
 
     log.error("Failed to store binary content in local storage : {}",

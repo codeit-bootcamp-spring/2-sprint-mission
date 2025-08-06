@@ -14,7 +14,8 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.security.jwt.JwtService;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
-import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.SseService;
+import com.sprint.mission.discodeit.service.UploadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.List;
@@ -44,7 +45,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
-  private final BinaryContentService binaryContentService;
+  private final UploadStatusService uploadStatusService;
+  private final SseService sseService;
 
   @CacheEvict(value = "users", key = "'allUsers'")
   @Transactional
@@ -78,12 +80,14 @@ public class BasicUserService implements UserService {
                 public void afterCommit() {
                   binaryContentStorage.putAsync(binaryContentId, bytes)
                       .thenAccept(res -> {
-                        binaryContentService.updateUploadStatus(binaryContentId,
+                        uploadStatusService.updateUploadStatus(binaryContentId,
                             BinaryContentUploadStatus.SUCCESS);
+                        sseService.sendBinaryContent(binaryContent);
                       })
                       .exceptionally(throwable -> {
-                        binaryContentService.updateUploadStatus(binaryContentId,
+                        uploadStatusService.updateUploadStatus(binaryContentId,
                             BinaryContentUploadStatus.FAILED);
+                        sseService.sendBinaryContent(binaryContent);
                         return null;
                       });
                 }
@@ -98,6 +102,7 @@ public class BasicUserService implements UserService {
 
     userRepository.save(user);
     log.info("사용자 생성 완료: id={}, username={}", user.getId(), username);
+    sseService.sendAllUsersRefresh(user.getId());
     return userMapper.toDto(user);
   }
 
@@ -137,10 +142,7 @@ public class BasicUserService implements UserService {
     log.debug("사용자 수정 시작: id={}, request={}", userId, userUpdateRequest);
 
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          UserNotFoundException exception = UserNotFoundException.withId(userId);
-          return exception;
-        });
+        .orElseThrow(() -> UserNotFoundException.withId(userId));
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
@@ -170,12 +172,14 @@ public class BasicUserService implements UserService {
                 public void afterCommit() {
                   binaryContentStorage.putAsync(binaryContentId, bytes)
                       .thenAccept(res -> {
-                        binaryContentService.updateUploadStatus(binaryContentId,
+                        uploadStatusService.updateUploadStatus(binaryContentId,
                             BinaryContentUploadStatus.SUCCESS);
+                        sseService.sendBinaryContent(binaryContent);
                       })
                       .exceptionally(throwable -> {
-                        binaryContentService.updateUploadStatus(binaryContentId,
+                        uploadStatusService.updateUploadStatus(binaryContentId,
                             BinaryContentUploadStatus.FAILED);
+                        sseService.sendBinaryContent(binaryContent);
                         return null;
                       });
                 }
@@ -191,6 +195,7 @@ public class BasicUserService implements UserService {
     user.update(newUsername, newEmail, hashedNewPassword, nullableProfile);
 
     log.info("사용자 수정 완료: id={}", userId);
+    sseService.sendAllUsersRefresh(user.getId());
     return userMapper.toDto(user);
   }
 
@@ -207,5 +212,6 @@ public class BasicUserService implements UserService {
 
     userRepository.deleteById(userId);
     log.info("사용자 삭제 완료: id={}", userId);
+    sseService.sendAllUsersRefresh(userId);
   }
 }

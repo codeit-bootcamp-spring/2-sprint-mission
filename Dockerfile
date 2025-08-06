@@ -24,7 +24,7 @@ EXPOSE 80
 
 # 환경 변수 설정
 ENV PROJECT_NAME=discodeit \
-    PROJECT_VERSION=2.0-M9 \
+    PROJECT_VERSION=3.0-M12 \
     JVM_OPTS=""
 
 # 실행 이미지

@@ -14,8 +14,10 @@ import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.SseEmitterRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.SseService;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,6 +42,8 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
   private final ApplicationEventPublisher eventPublisher;
+  private final SseService sseService;
+  private final SseEmitterRepository sseEmitterRepository;
 
   @CacheEvict(value = "channels", allEntries = true)
   @PreAuthorize("hasRole('CHANNEL_MANAGER')")
@@ -53,6 +57,10 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.save(channel);
     log.info("공개 채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
+
+    sseEmitterRepository.findAllEmitters().keySet().forEach(userId ->
+        sseService.sendChannelRefresh(userId, channel.getId()));
+
     return channelMapper.toDto(channel);
   }
 
@@ -70,6 +78,8 @@ public class BasicChannelService implements ChannelService {
     log.info("비공개 채널 생성 완료: id={}, name={}", channel.getId(), channel.getName());
 
     eventPublisher.publishEvent(new NewPrivateChannelEvent(request.participantIds()));
+
+    sseService.sendPrivateChannelRefresh(request.participantIds(), channel.getId());
     return channelMapper.toDto(channel);
   }
 
@@ -111,6 +121,10 @@ public class BasicChannelService implements ChannelService {
     }
     channel.update(newName, newDescription);
     log.info("채널 수정 완료: id={}, name={}", channelId, channel.getName());
+
+    sseEmitterRepository.findAllEmitters().keySet().forEach(userId ->
+        sseService.sendChannelRefresh(userId, channel.getId()));
+
     return channelMapper.toDto(channel);
   }
 
@@ -129,5 +143,8 @@ public class BasicChannelService implements ChannelService {
 
     channelRepository.deleteById(channelId);
     log.info("채널 삭제 완료: id={}", channelId);
+
+    sseEmitterRepository.findAllEmitters().keySet().forEach(userId ->
+        sseService.sendChannelRefresh(userId, channelId));
   }
 }

@@ -44,7 +44,7 @@ public class BasicNotificationService implements NotificationService {
 
   @Override
   @Transactional
-  public void createAll(
+  public List<Notification> createAll(
       Set<UUID> receiverIds, String title, String content, NotificationType type, UUID targetId) {
     log.debug("단체 알림 생성 시작 - type : {}, targetId : {}", type, targetId);
     List<Notification> notificationList = receiverIds.stream()
@@ -55,6 +55,7 @@ public class BasicNotificationService implements NotificationService {
     eventPublisher.publishEvent(new GroupNotificationEvent(receiverIds));
 
     log.debug("단체 알림 생성 완료 - {}건", notificationList.size());
+    return notificationList;
   }
 
   @Cacheable(value = "notifications", key = "#receiverId")

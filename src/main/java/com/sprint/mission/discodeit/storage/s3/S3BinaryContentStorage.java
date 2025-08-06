@@ -107,7 +107,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         "Failed to store binary content in S3 storage (key=%s) : %s",
         binaryContentId, ex.getMessage());
 
-    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, failureReason, requestId);
+    AsyncTaskFailure failure = new AsyncTaskFailure(taskName, requestId, failureReason);
     asyncTaskFailureRepository.save(failure);
 
     log.error("Failed to store binary content in S3 storage : {}",
