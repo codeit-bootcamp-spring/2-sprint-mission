@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.event.sse.SseUserRefreshEvent;
 import com.sprint.mission.discodeit.security.DiscodeitUserDetails;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -17,11 +21,14 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
   private final ObjectMapper objectMapper;
   private final JwtService jwtService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
       Authentication authentication) throws IOException, ServletException {
     DiscodeitUserDetails principal = (DiscodeitUserDetails) authentication.getPrincipal();
+    UUID userId = principal.getUserDto().id();
+
     jwtService.invalidateJwtSession(principal.getUserDto().id());
     JwtSession jwtSession = jwtService.registerJwtSession(principal.getUserDto());
 
@@ -35,5 +42,11 @@ public class JwtLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     response.setCharacterEncoding("UTF-8");
     response.getWriter().write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
+
+    eventPublisher.publishEvent(new SseUserRefreshEvent(
+        null,
+        userId,
+        Instant.now()
+    ));
   }
 }

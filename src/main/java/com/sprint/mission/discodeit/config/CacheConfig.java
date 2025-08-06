@@ -1,60 +1,68 @@
 package com.sprint.mission.discodeit.config;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Slf4j
 @Configuration
 @EnableCaching
 public class CacheConfig {
 
   @Bean
-  public CacheManager cacheManager() {
-    CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+  public RedisCacheConfiguration redisCacheConfiguration(ObjectMapper objectMapper) {
+    ObjectMapper redisObjectMapper = objectMapper.copy();
+    redisObjectMapper.activateDefaultTyping(
+        LaissezFaireSubTypeValidator.instance,
+        DefaultTyping.EVERYTHING,
+        As.PROPERTY
+    );
 
-    cacheManager.setCaffeine(Caffeine.newBuilder()
-        .maximumSize(1000)
-        .expireAfterWrite(Duration.ofMinutes(15))
-        .recordStats()
-        .evictionListener((key, value, cause) ->
-            log.debug("캐시 제거: key={}, cause={}", key, cause)));
+    return RedisCacheConfiguration.defaultCacheConfig()
+        .serializeValuesWith(
+            RedisSerializationContext.SerializationPair.fromSerializer(
+                new GenericJackson2JsonRedisSerializer(redisObjectMapper)
+            )
+        )
+        .prefixCacheNameWith("discodeit:")
+        .entryTtl(Duration.ofSeconds(600))
+        .disableCachingNullValues();
+  }
 
-    cacheManager.registerCustomCache("channels",
-        Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(Duration.ofMinutes(10))
-            .recordStats()
-            .build());
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory,
+      ObjectMapper objectMapper) {
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(connectionFactory);
 
-    cacheManager.registerCustomCache("notifications",
-        Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(Duration.ofMinutes(5))
-            .recordStats()
-            .build());
+    ObjectMapper redisObjectMapper = objectMapper.copy();
+    redisObjectMapper.activateDefaultTyping(
+        LaissezFaireSubTypeValidator.instance,
+        DefaultTyping.EVERYTHING,
+        As.PROPERTY
+    );
+    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(
+        redisObjectMapper);
 
-    cacheManager.registerCustomCache("users",
-        Caffeine.newBuilder()
-            .maximumSize(500)
-            .expireAfterWrite(Duration.ofMinutes(30))
-            .recordStats()
-            .build());
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(serializer);
 
-    cacheManager.registerCustomCache("user",
-        Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(Duration.ofHours(1))
-            .recordStats()
-            .build());
+    template.setHashKeySerializer(new StringRedisSerializer());
+    template.setHashValueSerializer(serializer);
 
-    log.info("Caffeine 캐시 매니저가 설정되었습니다.");
-    return cacheManager;
+    template.afterPropertiesSet();
+    return template;
   }
 }
