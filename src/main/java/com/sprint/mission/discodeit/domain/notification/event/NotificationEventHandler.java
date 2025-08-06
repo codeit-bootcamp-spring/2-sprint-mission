@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -22,7 +23,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-// TODO: 7/26/25 로직, 전략패턴으로 리펙터링 필요, 카프카에선 어떻게 적용할지 생각해야함
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -107,8 +107,7 @@ public class NotificationEventHandler {
     return messageContent;
   }
 
-  @TransactionalEventListener
-  @Async("notificationExecutor")
+  @EventListener
   @Retryable(
       retryFor = Exception.class,
       maxAttempts = NOTIFICATION_MAX_ATTEMPT,

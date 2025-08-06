@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.sse.repository;
 
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,13 +33,11 @@ public class ConnectionManager {
     return emitters.get(userId);
   }
 
-  public Optional<Set<Emitter>> findAllEmitters() {
-    Set<Emitter> emitterSet = emitters.values()
+  public Set<Emitter> findAllEmitters() {
+    return emitters.values()
         .stream()
         .flatMap(ConcurrentSkipListSet::stream)
         .collect(Collectors.toSet());
-
-    return Optional.of(emitterSet);
   }
 
   public void delete(UUID userId, Emitter emitter) {

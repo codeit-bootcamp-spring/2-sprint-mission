@@ -34,4 +34,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
   void deleteAllByChannel_Id(UUID channelId);
 
+  @Query("""
+          SELECT m
+          FROM Message m
+          JOIN m.attachments a
+          WHERE a.id = :binaryContentId
+      """)
+  Optional<Message> findByAttachmentId(@Param("binaryContentId") UUID binaryContentId);
+
 }

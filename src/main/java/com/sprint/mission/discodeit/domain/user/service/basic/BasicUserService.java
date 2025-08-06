@@ -8,6 +8,9 @@ import com.sprint.mission.discodeit.domain.user.dto.UserResult;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.domain.user.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.domain.user.entity.User;
+import com.sprint.mission.discodeit.domain.user.event.UserCreatedEvent;
+import com.sprint.mission.discodeit.domain.user.event.UserDeletedEvent;
+import com.sprint.mission.discodeit.domain.user.event.UserUpdatedEvent;
 import com.sprint.mission.discodeit.domain.user.exception.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.mapper.UserResultMapper;
@@ -22,6 +25,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +39,7 @@ public class BasicUserService implements UserService {
   private final UserBinaryContentService userBinaryContentService;
   private final UserResultMapper userResultMapper;
   private final PasswordEncoder passwordEncoder;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Caching(
       put = @CachePut(value = USER_CACHE_NAME, key = "#result.id"),
@@ -49,11 +54,13 @@ public class BasicUserService implements UserService {
     validateDuplicateEmail(userRequest.email());
     validateDuplicateUserName(userRequest.username());
 
-    BinaryContent binaryContent = userBinaryContentService.createBinaryContent(binaryContentRequest);
+    BinaryContent binaryContent = userBinaryContentService.createBinaryContent(
+        binaryContentRequest);
 
     User user = new User(userRequest.username(), userRequest.email(),
         passwordEncoder.encode(userRequest.password()), binaryContent);
     User savedUser = userRepository.save(user);
+    eventPublisher.publishEvent(new UserCreatedEvent(savedUser.getId()));
 
     return userResultMapper.convertToUserResult(savedUser);
   }
@@ -113,10 +120,13 @@ public class BasicUserService implements UserService {
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
     userBinaryContentService.delete(user.getBinaryContent());
 
-    BinaryContent binaryContent = userBinaryContentService.createBinaryContent(binaryContentRequest);
+    BinaryContent binaryContent = userBinaryContentService.createBinaryContent(
+        binaryContentRequest);
     user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail(),
         passwordEncoder.encode(userUpdateRequest.newPassword()), binaryContent);
     User updatedUser = userRepository.save(user);
+
+    eventPublisher.publishEvent(new UserUpdatedEvent(updatedUser.getId()));
 
     return userResultMapper.convertToUserResult(updatedUser);
   }
@@ -131,6 +141,7 @@ public class BasicUserService implements UserService {
     validateUserExist(userId);
 
     userRepository.deleteById(userId);
+    eventPublisher.publishEvent(new UserDeletedEvent());
   }
 
   private void validateDuplicateUserName(String name) {

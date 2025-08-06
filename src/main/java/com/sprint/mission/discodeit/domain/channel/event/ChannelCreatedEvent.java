@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.domain.channel.event;
 
-public record ChannelCreatedEvent(
+import java.util.UUID;
 
+public record ChannelCreatedEvent(
+    UUID channelId
 ) {
 
 }

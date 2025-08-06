@@ -50,10 +50,16 @@ public class SseService {
     }
   }
 
+  public void broadcastALl(String name, Object data) {
+    Set<Emitter> allEmitters = connectionManager.findAllEmitters();
+    for (Emitter emitter : allEmitters) {
+      sendEvent(null, emitter, name, data);
+    }
+  }
+
   @Scheduled(fixedRate = 3_600_000L)
   private void sendPing() {
-    Set<Emitter> allEmitters = connectionManager.findAllEmitters()
-        .orElseThrow(() -> new IllegalArgumentException("sse emiter가 없습니다."));
+    Set<Emitter> allEmitters = connectionManager.findAllEmitters();
     for (Emitter sseEmitter : allEmitters) {
       sendEvent(null, sseEmitter, "ping", "Send ping");
     }

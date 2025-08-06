@@ -8,6 +8,9 @@ import com.sprint.mission.discodeit.domain.channel.dto.request.PublicChannelUpda
 import com.sprint.mission.discodeit.domain.channel.dto.service.ChannelResult;
 import com.sprint.mission.discodeit.domain.channel.entity.Channel;
 import com.sprint.mission.discodeit.domain.channel.entity.ChannelType;
+import com.sprint.mission.discodeit.domain.channel.event.ChannelCreatedEvent;
+import com.sprint.mission.discodeit.domain.channel.event.ChannelDeletedEvent;
+import com.sprint.mission.discodeit.domain.channel.event.ChannelUpdatedEvent;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.domain.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.domain.channel.repository.ChannelRepository;
@@ -20,6 +23,7 @@ import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +38,7 @@ public class BasicChannelService implements ChannelService {
   private final MessageRepository messageRepository;
   private final UserRepository userRepository;
   private final ChannelMapper channelMapper;
+  private final ApplicationEventPublisher eventPublisher;
 
   @CacheEvict(value = CHANNEL_CACHE_NAME, allEntries = true)
   @Transactional
@@ -44,6 +49,8 @@ public class BasicChannelService implements ChannelService {
         channelRegisterRequest.description()
     );
     Channel savedChannel = channelRepository.save(channel);
+
+    eventPublisher.publishEvent(new ChannelCreatedEvent(savedChannel.getId()));
 
     return channelMapper.convertToChannelResult(savedChannel);
   }
@@ -61,6 +68,7 @@ public class BasicChannelService implements ChannelService {
         .toList();
     readStatusRepository.saveAllAndFlush(readStatuses);
 
+    eventPublisher.publishEvent(new ChannelCreatedEvent(savedChannel.getId()));
     return channelMapper.convertToChannelResult(savedChannel);
   }
 
@@ -106,6 +114,8 @@ public class BasicChannelService implements ChannelService {
         publicChannelUpdateRequest.newDescription());
     Channel updatedChannel = channelRepository.save(channel);
 
+    eventPublisher.publishEvent(new ChannelUpdatedEvent(updatedChannel.getId()));
+
     return channelMapper.convertToChannelResult(updatedChannel);
   }
 
@@ -119,6 +129,7 @@ public class BasicChannelService implements ChannelService {
     messageRepository.deleteAllByChannel_Id(channelId);
 
     channelRepository.deleteById(channelId);
+    eventPublisher.publishEvent(new ChannelDeletedEvent(channelId));
   }
 
   private void validateChannelExist(UUID channelId) {
