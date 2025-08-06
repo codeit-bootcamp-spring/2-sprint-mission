@@ -7,9 +7,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+@Slf4j
 @Component
 public class ConnectionManager {
 
@@ -30,7 +32,12 @@ public class ConnectionManager {
   }
 
   public Set<Emitter> findUserEmitters(UUID userId) {
-    return emitters.get(userId);
+    ConcurrentSkipListSet<Emitter> emitters = this.emitters.get(userId);
+    if (emitters == null) {
+      throw new IllegalArgumentException("해당 user-id의 emiiter가 없습니다.");
+    }
+
+    return emitters;
   }
 
   public Set<Emitter> findAllEmitters() {

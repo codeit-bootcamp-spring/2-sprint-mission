@@ -10,9 +10,9 @@ public class MDCContextTaskDecorator implements TaskDecorator {
 
   @Override
   public Runnable decorate(Runnable runnable) {
-    Map<String, String> mdcContext = MDC.getCopyOfContextMap();
 
     return () -> {
+      Map<String, String> mdcContext = MDC.getCopyOfContextMap();
       try {
         if (mdcContext != null) {
           MDC.setContextMap(mdcContext);

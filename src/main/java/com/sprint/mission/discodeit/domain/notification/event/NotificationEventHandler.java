@@ -83,6 +83,7 @@ public class NotificationEventHandler {
   @Recover
   public void recover(Exception ex, MessageCreatedEvent event) {
     String requestId = MDC.get(REQUEST_ID);
+    log.debug("메세지 실패 확인필요 {}, mdc이름  {}", ex.getMessage(), requestId);
     String errorType = ex.getClass().getSimpleName();
 
     AsyncTaskFailure asyncTaskFailure = new AsyncTaskFailure(
