@@ -40,7 +40,6 @@ public class BinaryContent extends BaseEntity {
         this.binaryContentUploadStatus.equals(binaryContentUploadStatus)) {
       return;
     }
-
     this.binaryContentUploadStatus = binaryContentUploadStatus;
   }
 

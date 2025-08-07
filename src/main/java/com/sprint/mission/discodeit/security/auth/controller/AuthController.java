@@ -1,0 +1,84 @@
+package com.sprint.mission.discodeit.security.auth.controller;
+
+import static com.sprint.mission.discodeit.security.config.SecurityConstant.REFRESH_TOKEN;
+
+import com.sprint.mission.discodeit.security.auth.dto.RoleUpdateRequest;
+import com.sprint.mission.discodeit.security.auth.service.AuthService;
+import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.security.jwt.JwtSession;
+import com.sprint.mission.discodeit.security.JwtService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+  private final AuthService authService;
+  private final JwtService jwtService;
+
+  @GetMapping("/csrf-token")
+  public ResponseEntity<CsrfToken> getCsrfToken(CsrfToken csrfToken) {
+    return ResponseEntity.ok(csrfToken);
+  }
+
+  @GetMapping("/me")
+  public ResponseEntity<String> getCurrentUser(HttpServletRequest request) {
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    String accessToken = jwtService.getAccessTokenByRefreshToken(refreshToken);
+
+    return ResponseEntity.ok(accessToken);
+  }
+
+  @PutMapping("/role")
+  public ResponseEntity<UserResult> updateRole(
+      @RequestBody RoleUpdateRequest roleUpdateRequest,
+      HttpServletRequest request
+  ) {
+    UserResult userResult = authService.updateRole(roleUpdateRequest);
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    jwtService.invalidateSession(refreshToken);
+
+    return ResponseEntity.ok(userResult);
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<String> revokeAccessToken(
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    String refreshToken = extractRefreshTokenFromCookie(request);
+    JwtSession jwtSession = jwtService.refreshSession(refreshToken);
+
+    Cookie newRefreshCookie = new Cookie(REFRESH_TOKEN, jwtSession.getRefreshToken());
+    response.addCookie(newRefreshCookie);
+
+    return ResponseEntity.ok(jwtSession.getAccessToken());
+  }
+
+  private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+    if (request.getCookies() == null) {
+      throw new IllegalArgumentException("리프레시 토큰이 없습니다.");
+    }
+
+    for (Cookie cookie : request.getCookies()) {
+      if (REFRESH_TOKEN.equals(cookie.getName())) {
+        return cookie.getValue();
+      }
+    }
+
+    throw new IllegalArgumentException("리프레시 토큰이 없습니다.");
+  }
+
+}

@@ -112,7 +112,7 @@ class UserControllerTest extends ControllerTestSupport {
 
     // when & then
     Assertions.assertThat(mockMvc.get()
-            .uri("/api/users/{userId}", userId))
+            .uri("/api/users/{receiverId}", userId))
         .hasStatusOk()
         .bodyJson()
         .extractingPath("$.email")

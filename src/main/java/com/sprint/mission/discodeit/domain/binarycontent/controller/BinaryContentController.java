@@ -6,10 +6,8 @@ import com.sprint.mission.discodeit.domain.binarycontent.service.BinaryContentSe
 import com.sprint.mission.discodeit.domain.binarycontent.storage.BinaryContentStorage;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,10 +23,8 @@ public class BinaryContentController {
   private final BinaryContentStorage binaryContentStorage;
 
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<BinaryContentResult> create(@RequestPart MultipartFile multipartFile)
-      throws MethodArgumentNotValidException {
-    BinaryContentRequest binaryContentRequest = BinaryContentRequest.fromMultipartFile(
-        multipartFile);
+  public ResponseEntity<BinaryContentResult> create(@RequestPart MultipartFile multipartFile) {
+    BinaryContentRequest binaryContentRequest = BinaryContentRequest.from(multipartFile);
     BinaryContentResult binaryContentResult = binaryContentService.createBinaryContent(
         binaryContentRequest);
 
@@ -52,7 +48,7 @@ public class BinaryContentController {
     return ResponseEntity.ok().body(binaryContentResult);
   }
 
-  @GetMapping("{binaryContentId}/download")
+  @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable(value = "binaryContentId") UUID binaryContentId) {
     return binaryContentStorage.download(binaryContentId);
   }

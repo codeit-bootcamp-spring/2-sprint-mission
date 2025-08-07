@@ -24,7 +24,7 @@ public class UserSelfAuthorizationManager implements
 
     boolean isAdmin = auth.getAuthorities().stream()
         .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    String pathUserId = context.getVariables().get("userId");
+    String pathUserId = context.getVariables().get("receiverId");
 
     boolean isOwner = userId.equals(pathUserId);
     return new AuthorizationDecision(isOwner || isAdmin);

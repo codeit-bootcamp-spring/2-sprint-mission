@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.security.jwt.accessmanager;
 import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
 import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -28,9 +29,10 @@ public class ReadStatusSelfAuthorizationManager implements
       RequestAuthorizationContext context
   ) {
     String readStatusId = context.getVariables().get("readStatusId");
-    UUID currentUserId = ((UserResult) auth.get().getPrincipal()).id();
+    UUID currentUserId = ((CustomUserDetails) auth.get().getPrincipal()).getUserResult().id();
 
-    Optional<ReadStatus> readStatus = readStatusRepository.findFetchUserById(UUID.fromString(readStatusId));
+    Optional<ReadStatus> readStatus = readStatusRepository.findFetchUserById(
+        UUID.fromString(readStatusId));
     if (readStatus.isPresent() && currentUserId.equals(readStatus.get().getUser().getId())) {
       return new AuthorizationDecision(true);
     }

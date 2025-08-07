@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.common.config.async;
 
-import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -77,6 +77,7 @@ class BasicUserServiceTest extends IntegrationTestSupport {
     // given
     UserCreateRequest userRequest = new UserCreateRequest(USER_NAME, USER_EMAIL, USER_PASSWORD);
     String fileName = UUID.randomUUID().toString();
+
     BinaryContentRequest binaryContentRequest = new BinaryContentRequest(fileName, "", 0,
         "hello".getBytes());
 

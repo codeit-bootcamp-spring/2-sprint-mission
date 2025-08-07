@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.notification.service.impl;
 
-import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.cache.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
 
 import com.sprint.mission.discodeit.domain.notification.dto.NotificationResult;
 import com.sprint.mission.discodeit.domain.notification.entity.Notification;
@@ -26,12 +26,6 @@ public class NotificationServiceImpl implements NotificationService {
   @Transactional(readOnly = true)
   @Override
   public List<NotificationResult> getAllByUserId(UUID userId) {
-    try {
-      Thread.sleep(3000);
-    } catch (InterruptedException ex) {
-
-    }
-
     List<Notification> notifications = notificationRepository.findAllByReceiverId(userId);
     return NotificationResult.from(notifications);
   }

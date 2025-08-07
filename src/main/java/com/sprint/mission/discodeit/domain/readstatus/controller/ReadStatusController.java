@@ -21,7 +21,8 @@ public class ReadStatusController {
 
   @PostMapping
   public ResponseEntity<ReadStatusResult> create(
-      @Valid @RequestBody ReadStatusCreateRequest request) {
+      @Valid @RequestBody ReadStatusCreateRequest request
+  ) {
     ReadStatusResult readStatusResult = readStatusService.create(request);
 
     return ResponseEntity.ok(readStatusResult);

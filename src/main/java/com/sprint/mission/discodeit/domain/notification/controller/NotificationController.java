@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.domain.notification.controller;
 import com.sprint.mission.discodeit.domain.notification.dto.NotificationResult;
 import com.sprint.mission.discodeit.domain.notification.service.NotificationService;
 import com.sprint.mission.discodeit.domain.user.dto.UserResult;
+import com.sprint.mission.discodeit.security.userDetails.CustomUserDetails;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,10 @@ public class NotificationController {
 
   @GetMapping
   public ResponseEntity<List<NotificationResult>> getAllByUserId(
-      @AuthenticationPrincipal UserResult userResult
+      @AuthenticationPrincipal CustomUserDetails principal
   ) {
-    return ResponseEntity.ok(notificationService.getAllByUserId(userResult.id()));
+    UUID userId = principal.getUserResult().id();
+    return ResponseEntity.ok(notificationService.getAllByUserId(userId));
   }
 
   @DeleteMapping("/{notificationId}")

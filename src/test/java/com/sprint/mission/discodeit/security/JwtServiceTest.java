@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.testutil.IntegrationTestSupport;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-// 요구사항에 따른 보안 로직 테스트 작성
-// TODO: 7/23/25 보안 요구사항 재정리 필요
 class JwtServiceTest extends IntegrationTestSupport {
 
   @DisplayName("UserDTO 정보로, JWT 토큰을 생성합니다. ")

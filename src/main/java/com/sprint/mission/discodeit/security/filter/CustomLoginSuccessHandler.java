@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.security.filter;
 
+import static com.sprint.mission.discodeit.security.config.SecurityConstant.REFRESH_TOKEN;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.security.jwt.JwtSession;
 import com.sprint.mission.discodeit.security.JwtService;
@@ -31,10 +33,11 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
     JwtSession jwtSession = jwtService.generateSession(principal.getUserResult());
-    Cookie cookie = new Cookie("refresh_token", jwtSession.getRefreshToken());
+    Cookie cookie = new Cookie(REFRESH_TOKEN, jwtSession.getRefreshToken());
     response.addCookie(cookie);
 
-    response.getWriter().write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
+    response.getWriter()
+        .write(objectMapper.writeValueAsString(jwtSession.getAccessToken()));
   }
 
 }

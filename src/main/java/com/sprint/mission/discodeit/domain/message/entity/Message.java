@@ -29,7 +29,7 @@ public class Message extends BaseUpdatableEntity {
     @Column(name = "content", nullable = false)
     private String context;
 
-    @BatchSize(size = 100) //누락
+    @BatchSize(size = 100)
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinTable(
             name = "message_attachments",

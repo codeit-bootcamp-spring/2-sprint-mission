@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.domain.message.service.basic;
 
-import static com.sprint.mission.discodeit.common.config.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
+import static com.sprint.mission.discodeit.common.config.cache.CaffeineCacheConfig.NOTIFICATION_CACHE_NAME;
 
 import com.sprint.mission.discodeit.common.dto.response.PageResponse;
 import com.sprint.mission.discodeit.domain.binarycontent.dto.BinaryContentRequest;
@@ -16,9 +16,7 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.message.mapper.MessageResultMapper;
 import com.sprint.mission.discodeit.domain.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.domain.message.service.MessageService;
-import com.sprint.mission.discodeit.common.event.event.NewMessageNotificationEvent;
-import com.sprint.mission.discodeit.domain.readstatus.entity.ReadStatus;
-import com.sprint.mission.discodeit.domain.readstatus.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.domain.message.event.MessageCreatedEvent;
 import com.sprint.mission.discodeit.domain.user.entity.User;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.repository.UserRepository;
@@ -48,8 +46,6 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final MessageBinaryContentService messageBinaryContentService;
   private final MessageResultMapper messageResultMapper;
-  private final ReadStatusRepository readStatusRepository;
-
   private final ApplicationEventPublisher eventPublisher;
 
   @CacheEvict(value = NOTIFICATION_CACHE_NAME, key = "#messageCreateRequest.authorId")
@@ -68,11 +64,12 @@ public class BasicMessageService implements MessageService {
     User user = userRepository.findById(messageCreateRequest.authorId())
         .orElseThrow(() -> new UserNotFoundException(Map.of()));
 
-    List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(files);
+    List<BinaryContent> attachments = messageBinaryContentService.createBinaryContents(
+        files);
     Message savedMessage = messageRepository.save(
         new Message(channel, user, messageCreateRequest.content(), attachments));
 
-    publishMessageEvent(savedMessage);
+    eventPublisher.publishEvent(MessageCreatedEvent.from(savedMessage));
 
     return messageResultMapper.convertToMessageResult(savedMessage);
   }
@@ -98,8 +95,11 @@ public class BasicMessageService implements MessageService {
     Slice<Message> messages = messageRepository.findAllByChannelIdWithAuthorDesc(channelId,
         cursorCreatedAt, pageable);
 
-    return PageResponse.of(messages, messageResultMapper::convertToMessageResult,
-        getNextCursor(messages));
+    return PageResponse.of(
+        messages,
+        messageResultMapper::convertToMessageResult,
+        getNextCursor(messages)
+    );
   }
 
   @Transactional
@@ -122,27 +122,8 @@ public class BasicMessageService implements MessageService {
     messageRepository.deleteById(messageId);
   }
 
-  private void publishMessageEvent(Message message) { // 매개변수는 이벤트 대상을 추천, 내부에서 메세지 형태 만들기 좋게
-    if (isNotificationNotEnabled(message)) {
-      return;
-    }
-    NewMessageNotificationEvent newMessageNotificationEvent = new NewMessageNotificationEvent(
-        message);
-    eventPublisher.publishEvent(newMessageNotificationEvent);
-  }
-
-  private boolean isNotificationNotEnabled(Message message) {
-    return !readStatusRepository.findByChannelIdAndUserId(
-            message.getChannel().getId(),
-            message.getUser().getId()
-        )
-        .map(ReadStatus::getNotificationEnabled)
-        .orElse(false);
-  }
-
   private Pageable createPageable(ChannelMessagePageRequest request) {
     Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-
     return PageRequest.of(request.pageNumber(), request.pageSize(), sort);
   }
 
